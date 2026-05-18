@@ -6,90 +6,81 @@ body {
   margin: 0;
   background: #f3f5f9;
   font-family: "Pretendard", "Noto Sans KR", sans-serif;
-  color: #1e293b;
+  color: #0f172a;
 }
 
 .page {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 36px 20px 60px;
+  padding: 36px 18px 70px;
 }
 
 .header {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  margin-bottom: 28px;
-}
-
-.logo {
-  width: 64px;
-  height: 64px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #1f3d68, #0f172a);
-  color: #d6ad5b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30px;
-  font-weight: 900;
+  text-align: center;
+  margin-bottom: 30px;
 }
 
 .header h1 {
   margin: 0;
-  font-size: 38px;
+  font-size: 56px;
   font-weight: 900;
   color: #1f3d68;
+  letter-spacing: -2px;
 }
 
 .header p {
-  margin: 6px 0 0;
+  margin: 12px 0 0;
+  font-size: 22px;
   color: #64748b;
-  letter-spacing: 3px;
-  font-size: 14px;
 }
 
 .card {
   background: #fff;
   border-radius: 26px;
   padding: 34px;
-  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
 }
 
 .section {
-  margin-bottom: 38px;
+  margin-bottom: 34px;
 }
 
 .section h2 {
-  margin: 0 0 18px;
-  font-size: 26px;
+  margin: 0 0 22px;
+  font-size: 30px;
   color: #1f3d68;
-  border-left: 8px solid #d6ad5b;
+  font-weight: 900;
+  border-left: 8px solid #1f3d68;
   padding-left: 14px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px 22px;
 }
 
 label {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 9px;
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 900;
+}
+
+.full {
+  grid-column: 1 / -1;
 }
 
 input,
 select {
-  height: 58px;
+  height: 62px;
   border: 1px solid #cbd5e1;
   border-radius: 14px;
-  padding: 0 16px;
-  font-size: 18px;
+  padding: 0 17px;
+  font-size: 20px;
   background: #fff;
+  color: #111827;
 }
 
 input:focus,
@@ -98,13 +89,13 @@ select:focus {
   border-color: #1f3d68;
 }
 
-.full {
-  grid-column: 1 / -1;
+input[readonly] {
+  background: #f8fafc;
 }
 
 .info-box {
   margin-top: 18px;
-  padding: 18px;
+  padding: 18px 20px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 18px;
@@ -112,34 +103,73 @@ select:focus {
   line-height: 1.7;
 }
 
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 34px 0;
+}
+
+button {
+  height: 68px;
+  border: none;
+  border-radius: 16px;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button.blue {
+  background: #1f3d68;
+}
+
+button.green {
+  background: #079669;
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.preview-section {
+  margin-top: 30px;
+}
+
 .preview {
   border: 1px solid #cbd5e1;
-  border-radius: 18px;
-  padding: 26px;
-  min-height: 300px;
+  border-radius: 20px;
+  padding: 34px;
   background: #fff;
   line-height: 1.9;
   font-size: 18px;
+  overflow-x: auto;
 }
 
 .preview h1 {
   text-align: center;
-  font-size: 34px;
+  font-size: 36px;
   letter-spacing: 8px;
-  margin-bottom: 30px;
+  margin: 10px 0 34px;
 }
 
 .preview h3 {
-  margin-top: 28px;
+  margin-top: 30px;
   padding-bottom: 6px;
   border-bottom: 1px solid #334155;
   color: #1f3d68;
+  font-size: 22px;
 }
 
 .preview table {
   width: 100%;
   border-collapse: collapse;
-  margin: 14px 0;
+  margin: 14px 0 26px;
 }
 
 .preview th,
@@ -149,34 +179,9 @@ select:focus {
   text-align: center;
 }
 
-.buttons {
-  display: flex;
-  gap: 16px;
-}
-
-button {
-  flex: 1;
-  height: 66px;
-  border: none;
-  border-radius: 16px;
-  background: #1f3d68;
-  color: #fff;
-  font-size: 22px;
-  font-weight: 900;
-  cursor: pointer;
-}
-
-button.gray {
-  background: #64748b;
-}
-
-button:active {
-  transform: scale(0.98);
-}
-
 .result-box {
   margin-top: 24px;
-  padding: 22px;
+  padding: 24px;
   background: #ecfdf5;
   border: 1px solid #86efac;
   border-radius: 18px;
@@ -189,21 +194,29 @@ button:active {
   margin-top: 12px;
 }
 
-@media (max-width: 768px) {
-  .page {
-    padding: 20px 14px 40px;
+.result-box button {
+  margin-top: 12px;
+  width: 100%;
+  background: #1f3d68;
+}
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .header h1 {
-    font-size: 26px;
+    font-size: 42px;
   }
+}
 
-  .header p {
-    font-size: 11px;
+@media (max-width: 640px) {
+  .page {
+    padding: 20px 10px 50px;
   }
 
   .card {
-    padding: 22px;
+    padding: 20px;
     border-radius: 22px;
   }
 
@@ -211,18 +224,34 @@ button:active {
     grid-template-columns: 1fr;
   }
 
-  .buttons {
-    flex-direction: column;
+  .header h1 {
+    font-size: 32px;
+  }
+
+  .header p {
+    font-size: 16px;
+  }
+
+  .section h2 {
+    font-size: 25px;
+  }
+
+  input,
+  select {
+    font-size: 18px;
+  }
+
+  button {
+    font-size: 20px;
   }
 
   .preview {
+    padding: 20px;
     font-size: 16px;
-    padding: 18px;
-    overflow-x: auto;
   }
 
   .preview h1 {
-    font-size: 26px;
+    font-size: 28px;
     letter-spacing: 4px;
   }
 }

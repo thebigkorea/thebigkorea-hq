@@ -5,46 +5,88 @@ const WORKPLACES = {
   hq: {
     workplaceName: "더큰코리아 본사",
     companyName: "주식회사 더큰코리아",
-    representative: "박병호",
-    address: "서울특별시 송파구 올림픽로 300",
-    phone: "070-5015-7233",
+    companyRepresentative: "박병호",
+    companyAddress: "서울특별시 송파구 올림픽로 300",
+    companyPhone: "070-5015-7233",
     defaultWorkPlace: "더큰코리아 본사"
   },
+
   koreahouse_jamsil: {
     workplaceName: "한국의집 잠실롯데월드몰",
     companyName: "한국의집 롯데월드몰점",
-    representative: "박병호",
-    address: "서울특별시 송파구 올림픽로 300, 롯데월드몰 5층",
-    phone: "070-5015-7233",
+    companyRepresentative: "박병호",
+    companyAddress: "서울특별시 송파구 올림픽로 300, 롯데월드몰 5층",
+    companyPhone: "070-5015-7233",
     defaultWorkPlace: "한국의집 롯데월드몰점"
   },
+
   gilchaejeong_apgujeong: {
     workplaceName: "길채정 압구정",
     companyName: "길채정 압구정",
-    representative: "박병호",
-    address: "서울특별시 강남구 압구정로 343, 갤러리아백화점",
-    phone: "070-5015-7233",
+    companyRepresentative: "박병호",
+    companyAddress: "서울특별시 강남구 압구정로 343, 갤러리아백화점",
+    companyPhone: "070-5015-7233",
     defaultWorkPlace: "길채정 압구정"
   },
+
   sobagongbang_pyeongchon: {
     workplaceName: "평촌 소바공방",
     companyName: "소바공방 평촌점",
-    representative: "박병호",
-    address: "경기도 안양시 동안구 시민대로 180, 롯데백화점 평촌점",
-    phone: "070-5015-7233",
+    companyRepresentative: "박병호",
+    companyAddress: "경기도 안양시 동안구 시민대로 180, 롯데백화점 평촌점",
+    companyPhone: "070-5015-7233",
     defaultWorkPlace: "소바공방 평촌점"
   }
 };
 
 window.onload = function () {
-  document.getElementById("workplaceCode").addEventListener("change", applyWorkplace);
-  ["basePay", "overtimePay", "dutyPay", "positionPay", "mealPay"].forEach(id => {
-    document.getElementById(id).addEventListener("input", calcTotalPay);
-  });
-
+  setupTimeOptions();
+  setupEvents();
   applyWorkplace();
+  calcTotalPay();
   makePreview();
 };
+
+function setupEvents() {
+  document.getElementById("workplaceCode").addEventListener("change", function () {
+    applyWorkplace();
+    makePreview();
+  });
+
+  document.getElementById("residentNo").addEventListener("input", function () {
+    autoBirthFromResidentNo();
+  });
+
+  document.querySelectorAll(".money").forEach(input => {
+    input.addEventListener("input", function () {
+      formatMoneyInput(this);
+      calcTotalPay();
+    });
+  });
+
+  document.querySelectorAll("input, select").forEach(el => {
+    el.addEventListener("change", makePreview);
+    el.addEventListener("input", makePreview);
+  });
+}
+
+function setupTimeOptions() {
+  const start = document.getElementById("startTime");
+  const end = document.getElementById("endTime");
+
+  start.innerHTML = `<option value="">출근시간 선택</option>`;
+  end.innerHTML = `<option value="">퇴근시간 선택</option>`;
+
+  for (let h = 6; h <= 23; h++) {
+    ["00", "30"].forEach(m => {
+      const time = `${String(h).padStart(2, "0")}:${m}`;
+      start.innerHTML += `<option value="${time}">${time}</option>`;
+      end.innerHTML += `<option value="${time}">${time}</option>`;
+    });
+  }
+
+  end.innerHTML += `<option value="24:00">24:00</option>`;
+}
 
 function applyWorkplace() {
   const code = document.getElementById("workplaceCode").value;
@@ -55,21 +97,50 @@ function applyWorkplace() {
   document.getElementById("workplaceInfo").innerHTML = `
     <strong>${wp.workplaceName}</strong><br>
     상호 : ${wp.companyName}<br>
-    대표자 : ${wp.representative}<br>
-    주소 : ${wp.address}<br>
-    연락처 : ${wp.phone}
+    대표자 : ${wp.companyRepresentative}<br>
+    주소 : ${wp.companyAddress}<br>
+    연락처 : ${wp.companyPhone}
   `;
+}
 
-  makePreview();
+function autoBirthFromResidentNo() {
+  const rrn = document.getElementById("residentNo").value.replace(/[^0-9]/g, "");
+  if (rrn.length < 7) return;
+
+  const yy = rrn.substring(0, 2);
+  const mm = rrn.substring(2, 4);
+  const dd = rrn.substring(4, 6);
+  const genderCode = rrn.substring(6, 7);
+
+  let century = "19";
+
+  if (genderCode === "3" || genderCode === "4" || genderCode === "7" || genderCode === "8") {
+    century = "20";
+  }
+
+  document.getElementById("birth").value = `${century}${yy}-${mm}-${dd}`;
+}
+
+function formatMoneyInput(input) {
+  const raw = input.value.replace(/[^0-9]/g, "");
+  if (!raw) {
+    input.value = "";
+    return;
+  }
+
+  input.value = Number(raw).toLocaleString("ko-KR");
 }
 
 function calcTotalPay() {
   const ids = ["basePay", "overtimePay", "dutyPay", "positionPay", "mealPay"];
+
   const total = ids.reduce((sum, id) => {
-    return sum + Number(document.getElementById(id).value || 0);
+    return sum + toNumber(document.getElementById(id).value);
   }, 0);
 
-  document.getElementById("totalPay").value = total;
+  document.getElementById("totalPay").value =
+    total ? total.toLocaleString("ko-KR") : "";
+
   makePreview();
 }
 
@@ -83,39 +154,51 @@ function getData() {
     workplaceCode,
     workplaceName: wp.workplaceName,
     companyName: wp.companyName,
-    companyRepresentative: wp.representative,
-    companyAddress: wp.address,
-    companyPhone: wp.phone,
+    companyRepresentative: wp.companyRepresentative,
+    companyAddress: wp.companyAddress,
+    companyPhone: wp.companyPhone,
 
     empName: val("empName"),
-    phone: val("phone"),
-    birth: val("birth"),
     residentNo: val("residentNo"),
+    birth: val("birth"),
+    phone: val("phone"),
     address: val("address"),
-    joinDate: val("joinDate"),
-    jobDuty: val("jobDuty"),
 
-    workPlace: val("workPlace"),
+    joinDate: val("joinDate"),
     workDays: val("workDays"),
     monthHour: val("monthHour"),
-    workTime: val("workTime"),
+    startTime: val("startTime"),
+    endTime: val("endTime"),
     breakTime: val("breakTime"),
-    holiday: val("holiday"),
+    workPlace: val("workPlace"),
+    jobDuty: val("jobDuty"),
 
-    basePay: val("basePay"),
-    overtimePay: val("overtimePay"),
-    dutyPay: val("dutyPay"),
-    positionPay: val("positionPay"),
-    mealPay: val("mealPay"),
-    totalPay: val("totalPay")
+    workTime: makeWorkTime(),
+
+    basePay: moneyVal("basePay"),
+    overtimePay: moneyVal("overtimePay"),
+    dutyPay: moneyVal("dutyPay"),
+    positionPay: moneyVal("positionPay"),
+    mealPay: moneyVal("mealPay"),
+    totalPay: moneyVal("totalPay"),
+
+    bankName: val("bankName"),
+    bankAccount: val("bankAccount")
   };
+}
+
+function makeWorkTime() {
+  const start = val("startTime");
+  const end = val("endTime");
+
+  if (!start && !end) return "";
+  return `${start || ""} ~ ${end || ""}`;
 }
 
 function makePreview() {
   const c = getData();
-  const preview = document.getElementById("preview");
 
-  preview.innerHTML = `
+  document.getElementById("preview").innerHTML = `
     <h1>근 로 계 약 서</h1>
 
     <p>
@@ -135,7 +218,7 @@ function makePreview() {
     <h3>제3조 근로시간 및 휴게</h3>
     <table>
       <tr>
-        <th>근무일수</th>
+        <th>주 근무일수</th>
         <th>월 기준시간</th>
         <th>근무시간</th>
         <th>휴게시간</th>
@@ -172,8 +255,13 @@ function makePreview() {
       </tr>
     </table>
 
-    <h3>제6조 임금지급일</h3>
-    <p>회사는 매월 1일부터 말일까지의 기간 동안 산정한 급여를 익월 10일에 직원 명의의 은행계좌로 지급한다.</p>
+    <h3>제6조 임금지급방법</h3>
+    <p>
+      회사는 매월 1일부터 말일까지의 기간 동안 산정한 급여를 익월 10일에
+      직원 명의의 은행계좌로 지급한다.
+    </p>
+    <p>급여은행 : ${c.bankName || "________"}</p>
+    <p>계좌번호 : ${c.bankAccount || "________"}</p>
 
     <h3>제7조 제출서류</h3>
     <p>직원은 채용과 동시에 주민등록등본, 보건증, 통장사본, 신분증사본 등 회사가 요청하는 서류를 제출한다.</p>
@@ -207,14 +295,22 @@ function makePreview() {
 async function saveContract() {
   const c = getData();
 
-  if (!c.empName) return alert("직원명을 입력하세요.");
+  if (!c.empName) return alert("직원 성명을 입력하세요.");
+  if (!c.residentNo) return alert("주민등록번호를 입력하세요.");
   if (!c.phone) return alert("연락처를 입력하세요.");
   if (!c.joinDate) return alert("입사일을 입력하세요.");
-  if (!c.totalPay || Number(c.totalPay) <= 0) return alert("임금 항목을 입력하세요.");
+  if (!c.workDays) return alert("주 근무일수를 선택하세요.");
+  if (!c.startTime) return alert("출근시간을 선택하세요.");
+  if (!c.endTime) return alert("퇴근시간을 선택하세요.");
+  if (!c.breakTime) return alert("휴게시간을 선택하세요.");
+  if (!c.jobDuty) return alert("업무내용을 선택하세요.");
+  if (!c.totalPay || Number(c.totalPay) <= 0) return alert("임금 정보를 입력하세요.");
+  if (!c.bankName) return alert("급여은행을 입력하세요.");
+  if (!c.bankAccount) return alert("계좌번호를 입력하세요.");
 
   const btn = document.getElementById("saveBtn");
   btn.disabled = true;
-  btn.innerText = "저장 중...";
+  btn.innerText = "저장 중입니다...";
 
   try {
     const result = await postData({
@@ -223,24 +319,30 @@ async function saveContract() {
       employeeName: c.empName,
       phone: c.phone,
       joinDate: c.joinDate,
+      workplaceName: c.workplaceName,
+      companyName: c.companyName,
       contract: c
     });
 
     if (!result.success) {
-      alert(result.message || "저장 실패");
+      alert(result.message || "저장에 실패했습니다.");
       return;
     }
 
-    const link = result.workerLink || result.link || "";
+    const contractId = result.contractId || "";
+    const link =
+      result.workerLink ||
+      result.link ||
+      `https://thebigkorea.github.io/thebigkorea-hq/contract-view.html?id=${encodeURIComponent(contractId)}`;
 
     const box = document.getElementById("resultBox");
     box.style.display = "block";
     box.innerHTML = `
       <strong>계약서가 저장되었습니다.</strong><br>
-      계약번호 : ${result.contractId || ""}<br>
+      계약번호 : ${contractId}<br>
       직원에게 아래 링크를 보내 전자서명을 진행하세요.
       <input id="workerLink" value="${link}" readonly />
-      <button style="margin-top:12px;width:100%;" onclick="copyWorkerLink()">직원 링크 복사</button>
+      <button onclick="copyWorkerLink()">직원 링크 복사</button>
     `;
 
     alert("계약서 저장이 완료되었습니다.");
@@ -273,11 +375,16 @@ function val(id) {
   return document.getElementById(id).value.trim();
 }
 
+function moneyVal(id) {
+  return String(document.getElementById(id).value || "").replace(/[^0-9]/g, "");
+}
+
+function toNumber(v) {
+  return Number(String(v || "").replace(/[^0-9]/g, ""));
+}
+
 function won(v) {
-  if (!v || Number(v) === 0) return "0원";
-
-  const num = Number(String(v).replace(/[^0-9]/g, ""));
+  const num = Number(String(v || "").replace(/[^0-9]/g, ""));
   if (!num) return "0원";
-
   return num.toLocaleString("ko-KR") + "원";
 }
