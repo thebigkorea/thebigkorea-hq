@@ -181,9 +181,7 @@ function calcTotalPay() {
 
 function getJobDutyValue() {
   const job = val("jobDuty");
-  if (job === "기타") {
-    return val("jobDutyEtc");
-  }
+  if (job === "기타") return val("jobDutyEtc");
   return job;
 }
 
@@ -239,6 +237,7 @@ function makeWorkTime() {
 
 function makePreview() {
   const btn = document.querySelector("button.blue");
+
   if (btn) {
     btn.disabled = true;
     btn.innerText = "계약서 생성 중...";
@@ -251,13 +250,17 @@ function makePreview() {
       btn.disabled = false;
       btn.innerText = "정규직 근로계약서 생성";
     }
-  }, 500);
+  }, 400);
 }
 
 function renderPreview() {
   const c = getData();
 
-  document.getElementById("preview").innerHTML = `
+  document.getElementById("preview").innerHTML = renderContractHtml(c);
+}
+
+function renderContractHtml(c) {
+  return `
     <h1>근 로 계 약 서</h1>
 
     <p>
@@ -344,6 +347,7 @@ function renderPreview() {
     <p>본 계약서에 명시되지 않은 사항은 근로기준법, 관계 법령, 취업규칙 및 판례가 정하는 바에 따른다.</p>
 
     <h3>사용자 및 근로자 서명</h3>
+
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:20px;">
       <div style="border:1px solid #cbd5e1;border-radius:16px;padding:20px;min-height:220px;">
         <h3>[회사]</h3>
@@ -450,7 +454,8 @@ async function postData(data) {
 }
 
 function val(id) {
-  return document.getElementById(id).value.trim();
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : "";
 }
 
 function moneyVal(id) {
