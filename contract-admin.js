@@ -332,7 +332,7 @@ function signAdminBox(c, signature, result, company, companyLabel, workerLabel) 
         <p>대표 : ${company.companyRepresentative}</p>
         <p>주소 : ${company.companyAddress}</p>
         <p>연락처 : ${company.companyPhone}</p>
-        <img class="company-stamp" src="https://thebigkorea.github.io/hr-system/stamp.png">
+        <img class="company-stamp" src="stamp.png">
       </div>
 
       <div>

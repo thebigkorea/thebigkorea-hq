@@ -298,7 +298,7 @@ function makePreview() {
       <div style="border:1px solid #cbd5e1;border-radius:16px;padding:20px;min-height:220px;">
         <h3>[회사]</h3>
         <p>상호 : ${c.companyName}</p>
-        <p>대표자 : ${c.companyRepresentative} <span style="display:inline-block;border:2px solid #b91c1c;color:#b91c1c;border-radius:50%;width:52px;height:52px;text-align:center;line-height:48px;font-weight:900;margin-left:10px;">직인</span></p>
+        <p>대표자 : ${c.companyRepresentative} <img src="stamp.png" style="width:90px; vertical-align:middle; margin-left:10px;"></p>
         <p>주소 : ${c.companyAddress}</p>
         <p>연락처 : ${c.companyPhone}</p>
       </div>
