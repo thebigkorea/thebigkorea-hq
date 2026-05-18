@@ -59,7 +59,7 @@ function searchContracts() {
       workplace === "all" || workplaceName.includes(workplace);
 
     const matchStatus =
-      status === "all" || c.status === status;
+      status === "all" || String(c.status || "").includes(status);
 
     let matchType = false;
 
@@ -96,8 +96,8 @@ function resetSearch() {
 
 function renderStats(list) {
   const total = list.length;
-  const wait = list.filter(c => c.status === "서명대기").length;
-  const done = list.filter(c => c.status === "서명완료").length;
+  const wait = list.filter(c => String(c.status || "").includes("대기")).length;
+  const done = list.filter(c => String(c.status || "").includes("완료")).length;
 
   const now = new Date();
   const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -123,7 +123,7 @@ function renderContracts(list) {
   }
 
   list.forEach(c => {
-    const isDone = c.status === "서명완료";
+    const isDone = String(c.status || "").includes("완료");
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -143,7 +143,7 @@ function renderContracts(list) {
       <td>
         <div class="action-buttons">
           <button onclick="openContract('${c.contractId}')">원본보기</button>
-          <button class="green" onclick="copyViewLink('${c.contractId || ""}')">완료본</button>
+          <button class="green" onclick="openCompleteView('${c.contractId || ""}')">완료본</button>
         </div>
       </td>
     `;
@@ -216,15 +216,16 @@ function renderRegularAdmin(c, signature, result) {
     <p>
       <strong>${company.companyName}</strong>(이하 “회사”라 한다)과 근로자
       <strong>${c.empName || ""}</strong>
-      (이하 “직원”이라 한다)은 다음과 같이 근로계약을 체결한다.
+      (이하 “직원”이라 한다)은 다음과 같이 근로계약을 체결하고 이를 성실히 이행할 것을 약정한다.
     </p>
 
     <h3>제1조 계약기간</h3>
     <p>입사일 : ${c.joinDate || ""}</p>
+    <p>입사일로부터 기간의 정함이 없는 근로계약을 체결한다. 수습기간은 3개월로 한다.</p>
 
     <h3>제2조 근무장소 및 업무내용</h3>
-    <p>근무장소 : ${c.workPlace || ""}</p>
-    <p>업무내용 : ${c.jobDuty || ""}</p>
+    <p>① 근무장소 : ${c.workPlace || ""}</p>
+    <p>② 업무내용 : ${c.jobDuty || ""}</p>
 
     <h3>제3조 근로시간 및 휴게</h3>
     <table class="detail-table">
@@ -242,7 +243,11 @@ function renderRegularAdmin(c, signature, result) {
       </tr>
     </table>
 
-    <h3>제4조 임금</h3>
+    <h3>제4조 휴일 및 휴가</h3>
+    <p>① 법정유급휴일은 주휴일 및 근로자의 날로 한다.</p>
+    <p>② 회사는 근로기준법이 정하는 바에 따라 연차휴가를 부여한다.</p>
+
+    <h3>제5조 임금</h3>
     <table class="detail-table">
       <tr>
         <th>기본급</th>
@@ -258,9 +263,38 @@ function renderRegularAdmin(c, signature, result) {
         <td>${won(c.dutyPay)}</td>
         <td>${won(c.positionPay)}</td>
         <td>${won(c.mealPay)}</td>
-        <td>${won(c.totalPay)}</td>
+        <td><strong>${won(c.totalPay)}</strong></td>
       </tr>
     </table>
+
+    <h3>제6조 임금지급방법</h3>
+    <p>
+      회사는 매월 1일부터 말일까지의 기간 동안 산정한 급여를 익월 10일에
+      직원 명의의 은행계좌로 지급한다.
+    </p>
+    <p>급여은행 : ${c.bankName || ""}</p>
+    <p>계좌번호 : ${c.bankAccount || ""}</p>
+
+    <h3>제7조 제출서류</h3>
+    <p>직원은 채용과 동시에 주민등록등본, 보건증, 통장사본, 신분증사본 등 회사가 요청하는 서류를 제출한다.</p>
+
+    <h3>제8조 퇴직급여</h3>
+    <p>회사는 근로자퇴직급여보장법이 정한 바에 따라 퇴직급여를 지급한다.</p>
+
+    <h3>제9조 퇴직절차</h3>
+    <p>직원은 퇴직하고자 할 경우 사직원을 사전 제출하여야 한다.</p>
+
+    <h3>제10조 신의성실의무</h3>
+    <p>직원은 회사의 경영방침에 따라 신의와 성실로 근무하여야 하며, 회사의 영업기밀사항을 외부에 누설하여서는 아니 된다.</p>
+
+    <h3>제11조 CCTV 설치 동의</h3>
+    <p>직원은 방범, 화재예방, 시설안전관리 목적의 CCTV 설치 및 운영에 대해 충분히 설명을 듣고 이해 및 동의한다.</p>
+
+    <h3>제12조 전자계약 및 계약서 교부 확인</h3>
+    <p>회사와 직원은 본 계약이 전자문서 및 전자서명 방식으로 체결될 수 있음을 확인하며, 전자서명은 자필서명 또는 날인과 동일한 효력을 가진다.</p>
+
+    <h3>제13조 기타사항</h3>
+    <p>본 계약서에 명시되지 않은 사항은 근로기준법, 관계 법령, 취업규칙 및 판례가 정하는 바에 따른다.</p>
 
     ${signAdminBox(c, signature, result, company, "회사", "근로자")}
   `;
@@ -285,6 +319,20 @@ function renderPartAdmin(c, signature, result) {
 
     <h3>업무내용</h3>
     <p>${c.jobDuty || ""}</p>
+
+    <h3>근로시간</h3>
+    <table class="detail-table">
+      <tr>
+        <th>근무일수</th>
+        <th>근무시간</th>
+        <th>휴게시간</th>
+      </tr>
+      <tr>
+        <td>${c.workDays || ""}</td>
+        <td>${c.workTime || ""}</td>
+        <td>${c.breakTime || ""}</td>
+      </tr>
+    </table>
 
     <h3>임금</h3>
     <p>${won(c.hourPay || c.totalPay)}</p>
@@ -332,7 +380,7 @@ function signAdminBox(c, signature, result, company, companyLabel, workerLabel) 
         <p>대표 : ${company.companyRepresentative}</p>
         <p>주소 : ${company.companyAddress}</p>
         <p>연락처 : ${company.companyPhone}</p>
-        <img class="company-stamp" src="stamp.png">
+        <img class="company-stamp" src="stamp.png" alt="회사 직인">
       </div>
 
       <div>
@@ -354,10 +402,23 @@ function signAdminBox(c, signature, result, company, companyLabel, workerLabel) 
 
 function getCompanyInfo(c) {
   return {
-    companyName: c.companyName || c.workplaceName || "한국의집 롯데월드몰점",
-    companyRepresentative: c.companyRepresentative || "박병호",
-    companyAddress: c.companyAddress || "서울특별시 송파구 올림픽로 300, 롯데월드몰 5층",
-    companyPhone: c.companyPhone || "070-5015-7233"
+    companyName:
+      c.companyName ||
+      c.workplaceName ||
+      "한국의집 롯데월드몰점",
+
+    companyRepresentative:
+      c.companyRepresentative ||
+      c.representative ||
+      "박병호",
+
+    companyAddress:
+      c.companyAddress ||
+      "서울특별시 송파구 올림픽로 300, 롯데월드몰 5층",
+
+    companyPhone:
+      c.companyPhone ||
+      "070-5015-7233"
   };
 }
 
@@ -376,6 +437,18 @@ function copyWorkerLink() {
   }
 
   copyViewLink(selectedContract.contractId);
+}
+
+function openCompleteView(contractId) {
+  if (!contractId) {
+    alert("계약번호가 없습니다.");
+    return;
+  }
+
+  const link =
+    `https://thebigkorea.github.io/thebigkorea-hq/contract-view.html?id=${encodeURIComponent(contractId)}&v=${Date.now()}`;
+
+  window.open(link, "_blank");
 }
 
 function copyViewLink(contractId) {
@@ -410,8 +483,7 @@ async function postData(data) {
 }
 
 function won(v) {
-  if (!v || Number(v) === 0) return "0원";
-  const num = Number(String(v).replace(/[^0-9]/g, ""));
-  if (!num) return String(v);
+  const num = Number(String(v || "").replace(/[^0-9]/g, ""));
+  if (!num) return "0원";
   return num.toLocaleString("ko-KR") + "원";
 }
