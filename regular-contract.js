@@ -41,25 +41,34 @@ window.onload = function () {
   setupEvents();
   applyWorkplace();
   calcTotalPay();
-  makePreview();
+  renderPreview();
 };
 
 function setupEvents() {
   document.getElementById("workplaceCode").addEventListener("change", function () {
     applyWorkplace();
-    makePreview();
+    renderPreview();
   });
 
-  document.getElementById("residentNo").addEventListener("input", autoBirthFromResidentNo);
+  document.getElementById("residentNo").addEventListener("input", function () {
+    formatResidentNo();
+    autoBirthFromResidentNo();
+    renderPreview();
+  });
+
+  document.getElementById("phone").addEventListener("input", function () {
+    formatPhone();
+    renderPreview();
+  });
 
   document.getElementById("jobDuty").addEventListener("change", function () {
     const wrap = document.getElementById("jobDutyEtcWrap");
-    wrap.style.display = this.value === "기타" ? "flex" : "none";
-    makePreview();
+    if (wrap) wrap.style.display = this.value === "기타" ? "flex" : "none";
+    renderPreview();
   });
 
   const etc = document.getElementById("jobDutyEtc");
-  if (etc) etc.addEventListener("input", makePreview);
+  if (etc) etc.addEventListener("input", renderPreview);
 
   document.querySelectorAll(".money").forEach(input => {
     input.addEventListener("input", function () {
@@ -69,8 +78,14 @@ function setupEvents() {
   });
 
   document.querySelectorAll("input, select").forEach(el => {
-    el.addEventListener("change", makePreview);
-    el.addEventListener("input", makePreview);
+    if (
+      el.id === "residentNo" ||
+      el.id === "phone" ||
+      el.classList.contains("money")
+    ) return;
+
+    el.addEventListener("change", renderPreview);
+    el.addEventListener("input", renderPreview);
   });
 }
 
@@ -107,6 +122,17 @@ function applyWorkplace() {
   `;
 }
 
+function formatResidentNo() {
+  const input = document.getElementById("residentNo");
+  let v = input.value.replace(/[^0-9]/g, "").slice(0, 13);
+
+  if (v.length > 6) {
+    v = v.slice(0, 6) + "-" + v.slice(6);
+  }
+
+  input.value = v;
+}
+
 function autoBirthFromResidentNo() {
   const rrn = document.getElementById("residentNo").value.replace(/[^0-9]/g, "");
   if (rrn.length < 7) return;
@@ -120,6 +146,19 @@ function autoBirthFromResidentNo() {
   if (["3", "4", "7", "8"].includes(genderCode)) century = "20";
 
   document.getElementById("birth").value = `${century}${yy}-${mm}-${dd}`;
+}
+
+function formatPhone() {
+  const input = document.getElementById("phone");
+  let v = input.value.replace(/[^0-9]/g, "").slice(0, 11);
+
+  if (v.length <= 3) {
+    input.value = v;
+  } else if (v.length <= 7) {
+    input.value = v.slice(0, 3) + "-" + v.slice(3);
+  } else {
+    input.value = v.slice(0, 3) + "-" + v.slice(3, 7) + "-" + v.slice(7);
+  }
 }
 
 function formatMoneyInput(input) {
@@ -137,7 +176,7 @@ function calcTotalPay() {
   document.getElementById("totalPay").value =
     total ? total.toLocaleString("ko-KR") : "";
 
-  makePreview();
+  renderPreview();
 }
 
 function getJobDutyValue() {
@@ -201,10 +240,21 @@ function makeWorkTime() {
 function makePreview() {
   const btn = document.querySelector("button.blue");
   if (btn) {
-    btn.innerText = "계약서 생성 중...";
     btn.disabled = true;
+    btn.innerText = "계약서 생성 중...";
   }
 
+  renderPreview();
+
+  setTimeout(() => {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = "정규직 근로계약서 생성";
+    }
+  }, 500);
+}
+
+function renderPreview() {
   const c = getData();
 
   document.getElementById("preview").innerHTML = `
@@ -298,7 +348,10 @@ function makePreview() {
       <div style="border:1px solid #cbd5e1;border-radius:16px;padding:20px;min-height:220px;">
         <h3>[회사]</h3>
         <p>상호 : ${c.companyName}</p>
-        <p>대표자 : ${c.companyRepresentative} <img src="stamp.png" style="width:90px; vertical-align:middle; margin-left:10px;"></p>
+        <p>
+          대표자 : ${c.companyRepresentative}
+          <img src="stamp.png" style="width:90px;vertical-align:middle;margin-left:10px;">
+        </p>
         <p>주소 : ${c.companyAddress}</p>
         <p>연락처 : ${c.companyPhone}</p>
       </div>
@@ -313,13 +366,6 @@ function makePreview() {
       </div>
     </div>
   `;
-
-  setTimeout(() => {
-    if (btn) {
-      btn.innerText = "정규직 근로계약서 생성";
-      btn.disabled = false;
-    }
-  }, 300);
 }
 
 async function saveContract() {
@@ -377,7 +423,6 @@ async function saveContract() {
     `;
 
     btn.innerText = "계약 저장 완료";
-
     alert("계약서 저장 및 직원 링크 생성이 완료되었습니다.");
 
   } catch (err) {
