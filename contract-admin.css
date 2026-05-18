@@ -107,7 +107,7 @@ button:active {
   overflow: auto;
 }
 
-table {
+.table-wrap table {
   width: 100%;
   border-collapse: collapse;
   min-width: 1300px;
@@ -315,4 +315,35 @@ td {
   .modal-buttons {
     display: none !important;
   }
+}
+.contract-detail {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.contract-detail table {
+  width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
+}
+
+.contract-detail th,
+.contract-detail td {
+  word-break: keep-all;
+  white-space: normal;
+  font-size: 14px;
+}
+
+.modal-content {
+  max-width: 1100px;
+  overflow-x: hidden;
+}
+
+.sign-admin-box {
+  max-width: 100%;
+}
+.contract-detail table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
 }

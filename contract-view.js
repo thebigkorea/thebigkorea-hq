@@ -29,21 +29,25 @@ async function loadContractView() {
     const c = result.contract || {};
     const signature = result.signature || "";
     const status = result.status || "서명대기";
+    const isSigned =
+       String(status).includes("완료") ||
+       String(result.signedAt || "").length > 1 ||
+       String(signature || "").length > 20;
 
     document.getElementById("loading").style.display = "none";
     document.getElementById("contractWrap").style.display = "block";
 
     document.getElementById("pageTitle").innerText =
-      status === "서명완료"
-        ? "전자근로계약 완료본"
-        : "전자근로계약 서명요청서";
+      isSigned
+       ? "전자근로계약 완료본"
+       : "전자근로계약 서명요청서";
 
     document.getElementById("contractContent").innerHTML =
       renderContractHtml(c, result, signature);
 
-    if (status !== "서명완료") {
+    if (!isSigned) {
       setTimeout(setupSignatureCanvas, 100);
-    }
+     }
 
   } catch (err) {
     showError("오류가 발생했습니다: " + err.message);
