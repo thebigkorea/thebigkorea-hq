@@ -10,7 +10,6 @@ const WORKPLACES = {
     companyPhone: "070-5015-7233",
     defaultWorkPlace: "더큰코리아 본사"
   },
-
   koreahouse_jamsil: {
     workplaceName: "한국의집 잠실롯데월드몰",
     companyName: "한국의집 롯데월드몰점",
@@ -19,7 +18,6 @@ const WORKPLACES = {
     companyPhone: "070-5015-7233",
     defaultWorkPlace: "한국의집 롯데월드몰점"
   },
-
   gilchaejeong_apgujeong: {
     workplaceName: "길채정 압구정",
     companyName: "길채정 압구정",
@@ -28,7 +26,6 @@ const WORKPLACES = {
     companyPhone: "070-5015-7233",
     defaultWorkPlace: "길채정 압구정"
   },
-
   sobagongbang_pyeongchon: {
     workplaceName: "평촌 소바공방",
     companyName: "소바공방 평촌점",
@@ -53,9 +50,16 @@ function setupEvents() {
     makePreview();
   });
 
-  document.getElementById("residentNo").addEventListener("input", function () {
-    autoBirthFromResidentNo();
+  document.getElementById("residentNo").addEventListener("input", autoBirthFromResidentNo);
+
+  document.getElementById("jobDuty").addEventListener("change", function () {
+    const wrap = document.getElementById("jobDutyEtcWrap");
+    wrap.style.display = this.value === "기타" ? "flex" : "none";
+    makePreview();
   });
+
+  const etc = document.getElementById("jobDutyEtc");
+  if (etc) etc.addEventListener("input", makePreview);
 
   document.querySelectorAll(".money").forEach(input => {
     input.addEventListener("input", function () {
@@ -113,22 +117,14 @@ function autoBirthFromResidentNo() {
   const genderCode = rrn.substring(6, 7);
 
   let century = "19";
-
-  if (genderCode === "3" || genderCode === "4" || genderCode === "7" || genderCode === "8") {
-    century = "20";
-  }
+  if (["3", "4", "7", "8"].includes(genderCode)) century = "20";
 
   document.getElementById("birth").value = `${century}${yy}-${mm}-${dd}`;
 }
 
 function formatMoneyInput(input) {
   const raw = input.value.replace(/[^0-9]/g, "");
-  if (!raw) {
-    input.value = "";
-    return;
-  }
-
-  input.value = Number(raw).toLocaleString("ko-KR");
+  input.value = raw ? Number(raw).toLocaleString("ko-KR") : "";
 }
 
 function calcTotalPay() {
@@ -142,6 +138,14 @@ function calcTotalPay() {
     total ? total.toLocaleString("ko-KR") : "";
 
   makePreview();
+}
+
+function getJobDutyValue() {
+  const job = val("jobDuty");
+  if (job === "기타") {
+    return val("jobDutyEtc");
+  }
+  return job;
 }
 
 function getData() {
@@ -171,7 +175,7 @@ function getData() {
     endTime: val("endTime"),
     breakTime: val("breakTime"),
     workPlace: val("workPlace"),
-    jobDuty: val("jobDuty"),
+    jobDuty: getJobDutyValue(),
 
     workTime: makeWorkTime(),
 
@@ -190,12 +194,17 @@ function getData() {
 function makeWorkTime() {
   const start = val("startTime");
   const end = val("endTime");
-
   if (!start && !end) return "";
   return `${start || ""} ~ ${end || ""}`;
 }
 
 function makePreview() {
+  const btn = document.querySelector("button.blue");
+  if (btn) {
+    btn.innerText = "계약서 생성 중...";
+    btn.disabled = true;
+  }
+
   const c = getData();
 
   document.getElementById("preview").innerHTML = `
@@ -284,12 +293,33 @@ function makePreview() {
     <h3>제13조 기타사항</h3>
     <p>본 계약서에 명시되지 않은 사항은 근로기준법, 관계 법령, 취업규칙 및 판례가 정하는 바에 따른다.</p>
 
-    <h3>사용자 정보</h3>
-    <p>상호 : ${c.companyName}</p>
-    <p>대표자 : ${c.companyRepresentative}</p>
-    <p>주소 : ${c.companyAddress}</p>
-    <p>연락처 : ${c.companyPhone}</p>
+    <h3>사용자 및 근로자 서명</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:20px;">
+      <div style="border:1px solid #cbd5e1;border-radius:16px;padding:20px;min-height:220px;">
+        <h3>[회사]</h3>
+        <p>상호 : ${c.companyName}</p>
+        <p>대표자 : ${c.companyRepresentative} <span style="display:inline-block;border:2px solid #b91c1c;color:#b91c1c;border-radius:50%;width:52px;height:52px;text-align:center;line-height:48px;font-weight:900;margin-left:10px;">직인</span></p>
+        <p>주소 : ${c.companyAddress}</p>
+        <p>연락처 : ${c.companyPhone}</p>
+      </div>
+
+      <div style="border:1px solid #cbd5e1;border-radius:16px;padding:20px;min-height:220px;">
+        <h3>[근로자]</h3>
+        <p>성명 : ${c.empName || "________"}</p>
+        <p>주민등록번호 : ${c.residentNo || "________"}</p>
+        <p>주소 : ${c.address || "________"}</p>
+        <p>연락처 : ${c.phone || "________"}</p>
+        <p style="margin-top:30px;">근로자 서명 : ____________________</p>
+      </div>
+    </div>
   `;
+
+  setTimeout(() => {
+    if (btn) {
+      btn.innerText = "정규직 근로계약서 생성";
+      btn.disabled = false;
+    }
+  }, 300);
 }
 
 async function saveContract() {
@@ -310,7 +340,7 @@ async function saveContract() {
 
   const btn = document.getElementById("saveBtn");
   btn.disabled = true;
-  btn.innerText = "저장 중입니다...";
+  btn.innerText = "계약 저장 중입니다...";
 
   try {
     const result = await postData({
@@ -330,6 +360,7 @@ async function saveContract() {
     }
 
     const contractId = result.contractId || "";
+
     const link =
       result.workerLink ||
       result.link ||
@@ -345,13 +376,17 @@ async function saveContract() {
       <button onclick="copyWorkerLink()">직원 링크 복사</button>
     `;
 
-    alert("계약서 저장이 완료되었습니다.");
+    btn.innerText = "계약 저장 완료";
+
+    alert("계약서 저장 및 직원 링크 생성이 완료되었습니다.");
 
   } catch (err) {
     alert("오류 발생: " + err.message);
   } finally {
-    btn.disabled = false;
-    btn.innerText = "계약 저장 및 직원 링크 생성";
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerText = "계약 저장 및 직원 링크 생성";
+    }, 800);
   }
 }
 
