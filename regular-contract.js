@@ -1,5 +1,5 @@
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbzCO4TLMRGgt_OY-3T92mw58AAKcOwquq0ubepUEJgPO9YPeMV-hNeP7AHy7lvOPog7oQ/exec";
+  "https://script.google.com/macros/s/AKfycbzeA02m0ipkNRN93C0YENiFnxsDlK20V2G7sw8OfW9A6d7iqS-7J_Y8gayCItxNbJN4/exec";
 
 const WORKPLACES = {
   hq: {
@@ -408,9 +408,7 @@ async function saveContract() {
     const contractId = result.contractId || "";
 
     const link =
-      result.workerLink ||
-      result.link ||
-      `https://thebigkorea.github.io/thebigkorea-hq/contract-view.html?id=${encodeURIComponent(contractId)}`;
+      `https://thebigkorea.github.io/thebigkorea-hq/contract-view.html?id=${encodeURIComponent(contractId)}&v=${Date.now()}`;
 
     const box = document.getElementById("resultBox");
     box.style.display = "block";
