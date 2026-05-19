@@ -61,8 +61,20 @@
    .sub-go {
      background: #fff !important;
      color: var(--brown-dark) !important;
-    border: 1px solid var(--line);
+     border: 1px solid var(--line);
     }
+
+    .quick-two-buttons {
+     display: grid;
+     grid-template-columns: 1fr 1fr;
+     gap: 10px;
+    }
+
+  .quick-list .quick-small {
+    justify-content: center;
+    font-size: 15px;
+    padding: 14px 12px;
+   }
 
     .brand {
       display: flex;
@@ -595,6 +607,16 @@
           <a href="contract-admin.html" target="_blank">전자계약 관리 <span>›</span></a>
           <a href="regular-contract.html" target="_blank">정규직 계약 작성 <span>›</span></a>
           <a href="https://script.google.com/macros/s/AKfycbx-QNqhusp57z6cxhKLcTymf0z5gx7mHkt9kOrcLEGIfxN9b-kgNlk8qtZ_VLWv57dA/exec" target="_blank">영업실적 입력 <span>›</span></a>
+          <div class="quick-two-buttons">
+            <a class="quick-small badge-wrap" href="daily-worker.html" target="_blank">
+              일용직 근무내역 입력
+             <span id="dailyUnpaidBadgeTop" class="badge-new">0</span>
+            </a>
+
+            <a class="quick-small" href="일용직_구글시트_주소" target="_blank">
+              일용직 원장조회
+            </a>
+</div>
         </div>
       </aside>
     </section>
@@ -809,7 +831,19 @@ async function loadDailyUnpaidBadge() {
     const res = await fetch(API_URL + "?action=getDailyUnpaidCount");
     const data = await res.json();
 
-    const badge = document.getElementById("dailyUnpaidBadge");
+    const badges = [
+     document.getElementById("dailyUnpaidBadge"),
+     document.getElementById("dailyUnpaidBadgeTop")
+    ].filter(Boolean);
+
+     badges.forEach(function(badge) {
+       if (count > 0) {
+        badge.textContent = count > 99 ? "99+" : count;
+        badge.style.display = "flex";
+       } else {
+        badge.style.display = "none";
+       }
+      });
     const count = Number(data.count || 0);
 
     if (count > 0) {
