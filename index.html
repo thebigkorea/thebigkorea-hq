@@ -52,6 +52,18 @@
       gap: 24px;
     }
 
+    .card-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+   .sub-go {
+     background: #fff !important;
+     color: var(--brown-dark) !important;
+    border: 1px solid var(--line);
+    }
+
     .brand {
       display: flex;
       align-items: center;
@@ -251,6 +263,28 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+    }
+
+    .badge-wrap {
+  position: relative;
+}
+
+  .badge-new {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #e53935;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 900;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,.25);
     }
 
     .icon {
@@ -647,7 +681,16 @@
            </p>
         </div>
 
-        <a class="go" href="daily-worker.html" target="_blank">열기</a>
+        <div class="card-buttons">
+          <a class="go badge-wrap" href="daily-worker.html" target="_blank">
+           근무내역 입력
+          <span id="dailyUnpaidBadge" class="badge-new">0</span>
+        </a>
+
+        <a class="go sub-go" href="일용직_구글시트_주소" target="_blank">
+         원장조회
+        </a>
+</div>
     </div>
 
         <div class="card" id="sales">
@@ -755,8 +798,33 @@
   </main>
 
   <footer class="footer">
-    더큰코리아 본사 업무포털 · THE BIG KOREA HEAD OFFICE INTRANET
-  </footer>
+  더큰코리아 본사 업무포털 · THE BIG KOREA HEAD OFFICE INTRANET
+</footer>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbz_NFlMRhx_mP_0maccpd62iWNHGMVo-pAZCHg7s8-tM26QvKlIVrPL6TmElRgM6XIS/exec";
+
+async function loadDailyUnpaidBadge() {
+  try {
+    const res = await fetch(API_URL + "?action=getDailyUnpaidCount");
+    const data = await res.json();
+
+    const badge = document.getElementById("dailyUnpaidBadge");
+    const count = Number(data.count || 0);
+
+    if (count > 0) {
+      badge.textContent = count > 99 ? "99+" : count;
+      badge.style.display = "flex";
+    } else {
+      badge.style.display = "none";
+    }
+  } catch (e) {
+    console.log("미지급 배지 조회 실패", e);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadDailyUnpaidBadge);
+</script>
 
 </body>
 </html>
