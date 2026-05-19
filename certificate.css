@@ -1,0 +1,252 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #f3f5f9;
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  color: #111;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.result-wrap {
+  max-width: none;
+}
+
+.card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 50px;
+  margin-bottom: 36px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.top-logo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.top-logo img {
+  width: 90px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 54px;
+  color: #173b72;
+  margin-bottom: 10px;
+  font-weight: 900;
+}
+
+.sub-title {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 40px;
+  font-size: 20px;
+}
+
+.form-box {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+label {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+input,
+select {
+  width: 100%;
+  height: 78px;
+  border-radius: 18px;
+  border: 2px solid #d1d5db;
+  padding: 0 24px;
+  font-size: 26px;
+  background: #fff;
+}
+
+button {
+  width: 100%;
+  border: none;
+  border-radius: 20px;
+  background: #173b72;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 22px 20px;
+  margin-top: 10px;
+}
+
+button:active {
+  transform: scale(0.98);
+  opacity: 0.75;
+}
+
+.message {
+  text-align: center;
+  color: red;
+  margin-top: 10px;
+  font-size: 20px;
+}
+
+.certificate-paper {
+  width: 794px;
+  min-height: 1123px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 72px 70px 62px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+}
+
+.issue-no {
+  font-size: 13px;
+  margin-bottom: 42px;
+}
+
+.paper-title {
+  text-align: center;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 16px;
+  margin-bottom: 44px;
+}
+
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto 38px;
+}
+
+.info-table th,
+.info-table td {
+  border: 1px solid #222;
+  padding: 14px 18px;
+  height: 54px;
+  font-size: 18px;
+}
+
+.info-table th {
+  width: 28%;
+  background: #f3f4f6;
+  text-align: center;
+  font-weight: 800;
+}
+
+.confirm-text,
+.date-text,
+.company-info {
+  text-align: center;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.date-text {
+  margin-top: 24px;
+}
+
+.company-info {
+  margin-top: 48px;
+  font-size: 17px;
+}
+
+.representative-line {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+}
+
+.representative-line span {
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.small-stamp {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.print-btn-area {
+  width: 794px;
+  margin: 24px auto 0;
+}
+
+.print-btn {
+  width: 100%;
+  display: block;
+  padding: 22px 20px;
+  border: none;
+  border-radius: 16px;
+  background: #1f4678;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  html,
+  body {
+    width: 210mm;
+    height: 297mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    overflow: hidden !important;
+  }
+
+  .wrap {
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .card,
+  .form-box,
+  .top-logo,
+  h1,
+  .sub-title,
+  .message,
+  .print-btn-area,
+  .no-print {
+    display: none !important;
+  }
+
+  .certificate-paper {
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 18mm 20mm 12mm !important;
+    box-shadow: none !important;
+  }
+
+  .paper-title {
+    font-size: 30px !important;
+    margin-bottom: 28px !important;
+  }
+
+  .info-table th,
+  .info-table td {
+    font-size: 15px !important;
+    padding: 9px 13px !important;
+    height: 40px !important;
+  }
+}

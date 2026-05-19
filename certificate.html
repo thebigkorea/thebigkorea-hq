@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>재직증명서</title>
+  <link rel="stylesheet" href="certificate.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="top-logo">
+        <img src="logo.png" alt="logo">
+      </div>
+
+      <h1>재직증명서</h1>
+      <p class="sub-title">Certificate of Employment</p>
+
+      <div class="form-box">
+        <label>소속</label>
+        <select id="store"></select>
+
+        <label>이름</label>
+        <input type="text" id="name" placeholder="이름 입력">
+
+        <label>주민번호 뒤 7자리</label>
+        <input type="password" id="ssn" maxlength="7" placeholder="주민번호 뒤 7자리">
+
+        <label>제출 용도</label>
+        <input type="text" id="purpose" placeholder="예) 금융기관 제출용">
+
+        <button id="searchBtn">재직증명서 조회 및 생성</button>
+        <p id="message" class="message"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="certificate.js"></script>
+</body>
+</html>
