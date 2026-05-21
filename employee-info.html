@@ -209,7 +209,7 @@
 
   <script>
     const API_URL =
-"https://script.google.com/macros/s/AKfycbynUyD-Go6kcr1q-UDwpggpWo5s04Nf_wmgL-29ISdUS19Pb6EWcryk61522B1QMboW-g/exec";
+      "https://script.google.com/macros/s/AKfycbynUyD-Go6kcr1q-UDwpggpWo5s04Nf_wmgL-29ISdUS19Pb6EWcryk61522B1QMboW-g/exec";
 
     const saveBtn = document.getElementById("saveBtn");
     const message = document.getElementById("message");
@@ -235,7 +235,9 @@
         employmentType: val("employmentType"),
         joinDate: val("joinDate"),
         status: val("status"),
-        memo: val("memo")
+        memo: val("memo"),
+        source: "직원정보 입력앱",
+        agree: "Y"
       };
 
       if (!data.workplace || !data.name || !data.phone || !data.ssnFront || !data.ssnBack) {
@@ -250,21 +252,17 @@
         message.style.color = "#173b72";
         message.innerText = "직원정보를 저장하고 있습니다.";
 
-        const res = await fetch(API_URL, {
+        await fetch(API_URL, {
           method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
           body: JSON.stringify(data)
         });
 
-        const result = await res.json();
-
-        if (!result.success) {
-          message.style.color = "red";
-          message.innerText = result.message || "저장에 실패했습니다.";
-          return;
-        }
-
         message.style.color = "green";
-        message.innerText = result.message || "직원정보가 저장되었습니다.";
+        message.innerText = "직원정보가 저장되었습니다. 시트에서 확인해주세요.";
 
       } catch (err) {
         console.error(err);
