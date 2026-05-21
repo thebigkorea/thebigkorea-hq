@@ -269,7 +269,7 @@
       } catch (err) {
         console.error(err);
         message.style.color = "red";
-        message.innerText = "저장 중 오류가 발생했습니다.";
+        message.innerText = "저장 오류: " + err.message;
       } finally {
         saveBtn.disabled = false;
         saveBtn.innerText = "직원정보 저장";
