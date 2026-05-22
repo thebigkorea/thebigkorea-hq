@@ -1,5 +1,5 @@
 const API_URL =
-"https://script.google.com/macros/s/AKfycbynUyD-Go6kcr1q-UDwpggpWo5s04Nf_wmgL-29ISdUS19Pb6EWcryk61522B1QMboW-g/exec";
+"https://script.google.com/macros/s/AKfycbzCO4TLMRGgt_OY-3T92mw58AAKcOwquq0ubepUEJgPO9YPeMV-hNeP7AHy7lvOPog7oQ/exec";
 
 const WORKPLACES = {
   hq: {

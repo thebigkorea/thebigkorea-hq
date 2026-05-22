@@ -1,5 +1,5 @@
 const API_URL =
-"https://script.google.com/macros/s/AKfycbxrR-fYAVoZ6M1ntFaPqQiBUzRxlJ25EMSuKYtcdbhRZ9xY2QQHrojYwX_4evPGLcJ1JQ/exec";
+"https://script.google.com/macros/s/AKfycbzCO4TLMRGgt_OY-3T92mw58AAKcOwquq0ubepUEJgPO9YPeMV-hNeP7AHy7lvOPog7oQ/exec";
 
 const STORE_OPTIONS = [
   "주식회사 더큰코리아 본사",
