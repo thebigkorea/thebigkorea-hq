@@ -16,7 +16,7 @@
     }
 
     .wrap {
-      max-width: 720px;
+      max-width: 760px;
       margin: 0 auto;
       padding: 28px 18px 60px;
     }
@@ -49,9 +49,7 @@
       font-weight: 800;
     }
 
-    input,
-    select,
-    textarea {
+    input, select, textarea {
       width: 100%;
       height: 56px;
       border: 1px solid #cfd6df;
@@ -88,13 +86,15 @@
 
     button:disabled {
       opacity: .6;
+      cursor: not-allowed;
     }
 
     .msg {
       margin-top: 18px;
       text-align: center;
       font-size: 17px;
-      font-weight: 800;
+      font-weight: 900;
+      line-height: 1.5;
     }
 
     .notice {
@@ -138,7 +138,6 @@
           <label>이름</label>
           <input id="name" type="text" placeholder="홍길동" />
         </div>
-
         <div>
           <label>연락처</label>
           <input id="phone" type="tel" placeholder="01012345678" />
@@ -150,7 +149,6 @@
           <label>주민번호 앞자리</label>
           <input id="ssnFront" type="tel" maxlength="6" placeholder="예: 900101" />
         </div>
-
         <div>
           <label>주민번호 뒤 7자리</label>
           <input id="ssnBack" type="password" maxlength="7" placeholder="예: 1234567" />
@@ -163,9 +161,8 @@
       <div class="row">
         <div>
           <label>직위</label>
-          <input id="position" type="text" placeholder="예: 직원, 조리원, 매니저" />
+          <input id="position" type="text" placeholder="예: 직원, 주임, 매니저" />
         </div>
-
         <div>
           <label>고용형태</label>
           <select id="employmentType">
@@ -182,7 +179,6 @@
           <label>입사일</label>
           <input id="joinDate" type="date" />
         </div>
-
         <div>
           <label>재직상태</label>
           <select id="status">
@@ -207,6 +203,8 @@
     </div>
   </div>
 
+  <iframe id="saveFrame" name="saveFrame" style="display:none;"></iframe>
+
   <script>
     const API_URL =
       "https://script.google.com/macros/s/AKfycbynUyD-Go6kcr1q-UDwpggpWo5s04Nf_wmgL-29ISdUS19Pb6EWcryk61522B1QMboW-g/exec";
@@ -222,7 +220,7 @@
       return String(phone || "").replace(/[^0-9]/g, "");
     }
 
-    async function saveEmployeeInfo() {
+    function saveEmployeeInfo() {
       const data = {
         action: "saveEmployeeInfo",
         workplace: val("workplace"),
@@ -235,9 +233,7 @@
         employmentType: val("employmentType"),
         joinDate: val("joinDate"),
         status: val("status"),
-        memo: val("memo"),
-        source: "직원정보 입력앱",
-        agree: "Y"
+        memo: val("memo")
       };
 
       if (!data.workplace || !data.name || !data.phone || !data.ssnFront || !data.ssnBack) {
@@ -246,30 +242,23 @@
         return;
       }
 
-      try {
-        saveBtn.disabled = true;
-        saveBtn.innerText = "저장 중...";
-        message.style.color = "#173b72";
-        message.innerText = "직원정보를 저장하고 있습니다.";
+      saveBtn.disabled = true;
+      saveBtn.innerText = "저장 중...";
+      message.style.color = "#173b72";
+      message.innerText = "직원정보 저장 요청을 보내고 있습니다.";
 
-        const params = new URLSearchParams(data);
+      const params = new URLSearchParams(data);
+      const saveUrl = API_URL + "?" + params.toString() + "&t=" + Date.now();
 
-         await fetch(API_URL + "?" + params.toString(), {
-  method: "GET",
-  mode: "no-cors"
-});
+      const iframe = document.getElementById("saveFrame");
+      iframe.src = saveUrl;
 
-          message.style.color = "green";
-          message.innerText = "직원정보가 저장되었습니다. 시트에서 확인해주세요.";
-
-      } catch (err) {
-        console.error(err);
-        message.style.color = "red";
-        message.innerText = "저장 오류: " + err.message;
-      } finally {
+      setTimeout(function () {
+        message.style.color = "green";
+        message.innerText = "저장 요청 완료. HR_Master 시트를 새로고침해서 확인해주세요.";
         saveBtn.disabled = false;
         saveBtn.innerText = "직원정보 저장";
-      }
+      }, 2000);
     }
   </script>
 </body>
