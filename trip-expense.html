@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>이동비 현황</title>
+
+  <link rel="stylesheet" href="trip-expense.css"/>
+</head>
+
+<body>
+
+<header class="header">
+  <div>
+    <h1>이동비 현황</h1>
+    <p>THE BIG KOREA TRIP EXPENSE</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="summary">
+
+    <div class="summary-card">
+      <strong id="totalFuelCost">0</strong>
+      <span>총 주유비</span>
+    </div>
+
+    <div class="summary-card">
+      <strong id="totalTollCost">0</strong>
+      <span>총 톨비</span>
+    </div>
+
+    <div class="summary-card">
+      <strong id="totalParkingCost">0</strong>
+      <span>총 주차비</span>
+    </div>
+
+  </section>
+
+  <section class="panel">
+
+    <div class="panel-head">
+      <div>
+        <h2>출장 이동비 내역</h2>
+        <p>직원별 주유비, 톨비, 주차비 및 운행거리를 확인합니다.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>출장일자</th>
+            <th>출장자</th>
+            <th>부서</th>
+            <th>이동수단</th>
+            <th>차량번호</th>
+            <th>방문처</th>
+            <th>주유비</th>
+            <th>톨비</th>
+            <th>주차비</th>
+            <th>운행거리</th>
+            <th>상태</th>
+          </tr>
+        </thead>
+
+        <tbody id="expenseTable"></tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</main>
+
+<script src="trip-expense.js"></script>
+
+</body>
+</html>
