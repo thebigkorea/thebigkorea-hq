@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>출장 승인 관리</title>
+
+  <link rel="stylesheet" href="trip-admin.css"/>
+</head>
+
+<body>
+
+<header class="header">
+  <div>
+    <h1>출장 승인 관리</h1>
+    <p>THE BIG KOREA TRIP ADMIN</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="summary">
+
+    <div class="summary-card">
+      <strong id="totalTrips">0</strong>
+      <span>전체 출장</span>
+    </div>
+
+    <div class="summary-card">
+      <strong id="pendingTrips">0</strong>
+      <span>승인대기</span>
+    </div>
+
+    <div class="summary-card">
+      <strong id="approvedTrips">0</strong>
+      <span>승인완료</span>
+    </div>
+
+  </section>
+
+  <section class="panel">
+
+    <div class="panel-head">
+      <div>
+        <h2>출장 신청 목록</h2>
+        <p>출장 승인 및 차량예약 자동 생성</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>출장일자</th>
+            <th>출장자</th>
+            <th>부서</th>
+            <th>차량번호</th>
+            <th>방문처</th>
+            <th>출장목적</th>
+            <th>시간</th>
+            <th>상태</th>
+            <th>관리</th>
+          </tr>
+        </thead>
+
+        <tbody id="tripTable"></tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</main>
+
+<script src="trip-admin.js"></script>
+
+</body>
+</html>
