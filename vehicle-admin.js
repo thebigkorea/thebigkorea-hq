@@ -75,7 +75,7 @@ async function loadVehicles() {
         <td>${vehicle.carModel}</td>
         <td>${vehicle.manager}</td>
         <td>${vehicle.insuranceCompany}</td>
-        <td>${vehicle.insuranceEndDate}</td>
+        <td>${insuranceDday_(vehicle.insuranceEndDate)}</td>
         <td>${number_(vehicle.currentKm)} km</td>
         <td>
           <span class="status ${statusClass}">
@@ -229,4 +229,55 @@ function renderTodayReservations() {
 
     tbody.appendChild(tr);
   });
+}
+function insuranceDday_(dateText) {
+  if (!dateText) return "";
+
+  const today = new Date();
+  const target = new Date(dateText);
+
+  today.setHours(0, 0, 0, 0);
+  target.setHours(0, 0, 0, 0);
+
+  const diff =
+    Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+
+  if (diff < 0) {
+    return `만료 ${Math.abs(diff)}일 경과`;
+  }
+
+  if (diff === 0) {
+    return "오늘 만료";
+  }
+
+  if (diff <= 30) {
+    return `D-${diff}`;
+  }
+
+  return dateText;
+}function insuranceDday_(dateText) {
+  if (!dateText) return "";
+
+  const today = new Date();
+  const target = new Date(dateText);
+
+  today.setHours(0, 0, 0, 0);
+  target.setHours(0, 0, 0, 0);
+
+  const diff =
+    Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+
+  if (diff < 0) {
+    return `만료 ${Math.abs(diff)}일 경과`;
+  }
+
+  if (diff === 0) {
+    return "오늘 만료";
+  }
+
+  if (diff <= 30) {
+    return `D-${diff}`;
+  }
+
+  return dateText;
 }
