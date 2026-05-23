@@ -36,7 +36,7 @@
 
     <section class="panel">
 
-      <h2>출장 신청</h2>
+      <h2>출장 등록</h2>
 
       <div class="form-grid">
 
@@ -53,6 +53,16 @@
         <label>
           부서
           <input type="text" id="department" placeholder="예: 운영관리팀">
+        </label>
+
+        <label>
+          이동수단
+          <select id="transportType">
+            <option value="법인차량">법인차량</option>
+            <option value="개인차량">개인차량</option>
+            <option value="대중교통">대중교통</option>
+            <option value="기타">기타</option>
+          </select>
         </label>
 
         <label>
@@ -80,6 +90,26 @@
           <input type="time" id="endTime">
         </label>
 
+        <label>
+          주유금액
+          <input type="number" id="fuelCost" value="0">
+        </label>
+
+        <label>
+          톨비
+          <input type="number" id="tollCost" value="0">
+        </label>
+
+        <label>
+          주차비
+          <input type="number" id="parkingCost" value="0">
+        </label>
+
+        <label>
+          운행거리 km
+          <input type="number" id="distance" placeholder="예: 120">
+        </label>
+
       </div>
 
       <label class="full-label">
@@ -88,7 +118,7 @@
       </label>
 
       <button class="submit" onclick="saveTrip()">
-        출장 신청 저장
+        출장 등록 저장
       </button>
 
     </section>
