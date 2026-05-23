@@ -40,6 +40,7 @@
       <button class="tab" onclick="showTab('maintenance')">정비등록</button>
       <button class="tab" onclick="showTab('accident')">사고등록</button>
       <button class="tab" onclick="showTab('expense')">비용등록</button>
+      <button class="tab" onclick="showTab('reservation')">차량예약</button>
     </section>
 
     <section id="log" class="panel active">
@@ -158,6 +159,58 @@
 
       <button class="submit" onclick="saveExpense()">비용내역 저장</button>
     </section>
+
+    <section id="reservation" class="panel">
+     <h2>차량 예약</h2>
+
+      <div class="form-grid">
+
+      <label>
+        예약일자
+        <input type="date" id="reserveDate">
+      </label>
+
+      <label>
+        예약자
+        <input type="text" id="reserveUserName" placeholder="예: 홍길동">
+      </label>
+
+      <label>
+        차량번호
+        <select id="reserveCarNumber"></select>
+      </label>
+
+      <label>
+        사용목적
+        <input type="text" id="reservePurpose" placeholder="예: 점포 방문">
+      </label>
+
+      <label>
+        방문처
+        <input type="text" id="reserveDestination" placeholder="예: 잠실 롯데월드몰">
+      </label>
+
+      <label>
+        시작시간
+        <input type="time" id="reserveStartTime">
+      </label>
+
+      <label>
+        종료시간
+        <input type="time" id="reserveEndTime">
+      </label>
+
+    </div>
+
+    <label class="full-label">
+      비고
+      <textarea id="reserveMemo"></textarea>
+    </label>
+
+    <button class="submit" onclick="saveReservation()">
+      차량 예약 저장
+    </button>
+  </section>
 
     <section class="history">
       <h2>최근 운행내역</h2>

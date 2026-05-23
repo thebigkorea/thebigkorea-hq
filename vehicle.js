@@ -51,7 +51,8 @@ async function loadVehicles() {
       document.getElementById("carNumber"),
       document.getElementById("maintenanceCarNumber"),
       document.getElementById("accidentCarNumber"),
-      document.getElementById("expenseCarNumber")
+      document.getElementById("expenseCarNumber"),
+      document.getElementById("reserveCarNumber")
     ];
 
     selects.forEach(select => {
@@ -309,5 +310,36 @@ function clearLogForm() {
         el.value = "";
       }
     }
+  });
+}
+async function saveReservation() {
+
+  const body = {
+    action: "saveReservation",
+    reserveDate: value_("reserveDate"),
+    startTime: value_("reserveStartTime"),
+    endTime: value_("reserveEndTime"),
+    userName: value_("reserveUserName"),
+    carNumber: value_("reserveCarNumber"),
+    purpose: value_("reservePurpose"),
+    destination: value_("reserveDestination"),
+    memo: value_("reserveMemo"),
+    status: "예약"
+  };
+
+  await postData(body, "차량 예약이 저장되었습니다.");
+
+  [
+    "reserveUserName",
+    "reservePurpose",
+    "reserveDestination",
+    "reserveStartTime",
+    "reserveEndTime",
+    "reserveMemo"
+  ].forEach(id => {
+
+    const el = document.getElementById(id);
+
+    if (el) el.value = "";
   });
 }
