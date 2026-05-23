@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>법인차량 관리자 대시보드</title>
+
+  <link rel="stylesheet" href="vehicle-admin.css" />
+</head>
+
+<body>
+  <header class="header">
+    <div>
+      <h1>법인차량 관리자 대시보드</h1>
+      <p>THE BIG KOREA VEHICLE ADMIN</p>
+    </div>
+
+    <a href="vehicle.html" class="back-btn">차량 입력화면</a>
+  </header>
+
+  <main class="container">
+
+    <section class="summary">
+      <div class="summary-card">
+        <span>등록 차량</span>
+        <strong id="vehicleCount">0</strong>
+      </div>
+
+      <div class="summary-card">
+        <span>총 운행건수</span>
+        <strong id="totalLogs">0</strong>
+      </div>
+
+      <div class="summary-card">
+        <span>총 운행거리</span>
+        <strong id="totalDistance">0 km</strong>
+      </div>
+
+      <div class="summary-card">
+        <span>총 비용</span>
+        <strong id="totalCost">0 원</strong>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>차량별 현황</h2>
+          <p>차량번호, 차종, 담당자, 보험만기일을 확인합니다.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>차량번호</th>
+              <th>차종</th>
+              <th>담당자</th>
+              <th>보험사</th>
+              <th>보험만기일</th>
+              <th>현재km</th>
+              <th>사용여부</th>
+            </tr>
+          </thead>
+          <tbody id="vehicleTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>최근 운행내역</h2>
+          <p>최근 입력된 법인차량 운행 기록입니다.</p>
+        </div>
+
+        <input id="searchInput" type="text" placeholder="차량번호 / 운전자 / 방문처 검색" />
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>사용일자</th>
+              <th>차량번호</th>
+              <th>운전자</th>
+              <th>목적</th>
+              <th>방문처</th>
+              <th>운행거리</th>
+              <th>주유비</th>
+              <th>주차비</th>
+              <th>톨비</th>
+            </tr>
+          </thead>
+          <tbody id="logTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="vehicle-admin.js"></script>
+</body>
+</html>
