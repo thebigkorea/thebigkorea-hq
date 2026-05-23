@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>더큰코리아 본사 업무포털</title>
 
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#3a2517">
+
   <style>
     :root {
       --bg: #f5efe6;
@@ -979,6 +982,12 @@ async function loadDailyUnpaidBadge() {
 }
 
 document.addEventListener("DOMContentLoaded", loadDailyUnpaidBadge);
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js");
+}
 </script>
 
 </body>
