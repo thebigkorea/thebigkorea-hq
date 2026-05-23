@@ -60,18 +60,23 @@ async function loadVehicles() {
 async function saveTrip() {
 
   const body = {
-    action: "saveTrip",
-    tripDate: value_("tripDate"),
-    userName: value_("userName"),
-    department: value_("department"),
-    carNumber: value_("carNumber"),
-    destination: value_("destination"),
-    purpose: value_("purpose"),
-    startTime: value_("startTime"),
-    endTime: value_("endTime"),
-    memo: value_("memo"),
-    status: "신청"
-  };
+  action: "saveTrip",
+  tripDate: value_("tripDate"),
+  userName: value_("userName"),
+  department: value_("department"),
+  transportType: value_("transportType"),
+  carNumber: value_("carNumber"),
+  destination: value_("destination"),
+  purpose: value_("purpose"),
+  startTime: value_("startTime"),
+  endTime: value_("endTime"),
+  fuelCost: value_("fuelCost"),
+  tollCost: value_("tollCost"),
+  parkingCost: value_("parkingCost"),
+  distance: value_("distance"),
+  memo: value_("memo"),
+  status: "출장중"
+};
 
   try {
 
