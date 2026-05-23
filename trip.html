@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>출장관리</title>
+
+  <link rel="stylesheet" href="trip.css" />
+</head>
+
+<body>
+
+  <header class="header">
+    <div>
+      <h1>더큰코리아 출장관리</h1>
+      <p>BUSINESS TRIP MANAGEMENT</p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="summary">
+
+      <div class="summary-card">
+        <strong id="tripCount">0</strong>
+        <span>출장 신청건수</span>
+      </div>
+
+      <div class="summary-card">
+        <strong id="todayTripCount">0</strong>
+        <span>오늘 출장</span>
+      </div>
+
+    </section>
+
+    <section class="panel">
+
+      <h2>출장 신청</h2>
+
+      <div class="form-grid">
+
+        <label>
+          출장일자
+          <input type="date" id="tripDate">
+        </label>
+
+        <label>
+          출장자
+          <input type="text" id="userName" placeholder="예: 홍길동">
+        </label>
+
+        <label>
+          부서
+          <input type="text" id="department" placeholder="예: 운영관리팀">
+        </label>
+
+        <label>
+          차량번호
+          <select id="carNumber"></select>
+        </label>
+
+        <label>
+          방문처
+          <input type="text" id="destination" placeholder="예: 잠실 롯데월드몰">
+        </label>
+
+        <label>
+          출장목적
+          <input type="text" id="purpose" placeholder="예: 매장 점검">
+        </label>
+
+        <label>
+          시작시간
+          <input type="time" id="startTime">
+        </label>
+
+        <label>
+          종료시간
+          <input type="time" id="endTime">
+        </label>
+
+      </div>
+
+      <label class="full-label">
+        비고
+        <textarea id="memo"></textarea>
+      </label>
+
+      <button class="submit" onclick="saveTrip()">
+        출장 신청 저장
+      </button>
+
+    </section>
+
+    <section class="history">
+
+      <h2>최근 출장 신청내역</h2>
+
+      <div id="tripList" class="trip-list"></div>
+
+    </section>
+
+  </main>
+
+  <script src="trip.js"></script>
+
+</body>
+</html>
