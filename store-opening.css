@@ -1,0 +1,195 @@
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#f4f6f9;
+  font-family:'Malgun Gothic', Arial, sans-serif;
+  color:#222;
+}
+
+.header{
+  background:linear-gradient(135deg,#2b1d12,#7c2d12);
+  color:#fff;
+  padding:28px 18px;
+  border-bottom-left-radius:28px;
+  border-bottom-right-radius:28px;
+}
+
+.header h1{
+  margin:0;
+  font-size:26px;
+}
+
+.header p{
+  margin:7px 0 0;
+  opacity:.85;
+}
+
+.wrap{
+  max-width:1080px;
+  margin:0 auto;
+  padding:18px;
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-bottom:16px;
+}
+
+.summary-card{
+  background:#fff;
+  border-radius:20px;
+  padding:18px;
+  text-align:center;
+}
+
+.summary-card strong{
+  display:block;
+  font-size:28px;
+  color:#7c2d12;
+}
+
+.tabs{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-bottom:16px;
+}
+
+.tab{
+  border:none;
+  border-radius:15px;
+  padding:13px;
+  background:#e7ebf2;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.tab.active{
+  background:#7c2d12;
+  color:#fff;
+}
+
+.panel{
+  display:none;
+  background:#fff;
+  border-radius:22px;
+  padding:20px;
+  margin-bottom:18px;
+}
+
+.panel.active{
+  display:block;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+label{
+  display:block;
+  font-weight:bold;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  margin-top:6px;
+  border:1px solid #d7dce5;
+  border-radius:13px;
+  padding:13px;
+}
+
+textarea{
+  min-height:90px;
+}
+
+.full-label{
+  margin-top:12px;
+}
+
+.primary{
+  width:100%;
+  border:none;
+  border-radius:15px;
+  padding:15px;
+  margin-top:16px;
+  background:#7c2d12;
+  color:#fff;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.project-list{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.project-card{
+  border:1px solid #e5e7eb;
+  background:#fafafa;
+  border-radius:18px;
+  padding:16px;
+}
+
+.project-title{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:6px;
+}
+
+.project-meta{
+  font-size:14px;
+  color:#555;
+  line-height:1.7;
+}
+
+.progress-wrap{
+  margin-top:10px;
+  height:10px;
+  background:#e5e7eb;
+  border-radius:999px;
+}
+
+.progress-bar{
+  height:100%;
+  background:#7c2d12;
+  border-radius:999px;
+}
+
+.schedule-item{
+  border-left:5px solid #7c2d12;
+  background:#fff7ed;
+  border-radius:14px;
+  padding:13px;
+  margin-bottom:9px;
+}
+
+@media(max-width:760px){
+
+  .summary{
+    grid-template-columns:1fr;
+  }
+
+  .tabs{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .project-list{
+    grid-template-columns:1fr;
+  }
+
+}
