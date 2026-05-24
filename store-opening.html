@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>신규점포 개설관리</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f6f9;font-family:'Malgun Gothic',Arial,sans-serif;color:#222}
+.header{background:linear-gradient(135deg,#2b1d12,#7c2d12);color:#fff;padding:28px 18px;border-bottom-left-radius:28px;border-bottom-right-radius:28px;box-shadow:0 5px 22px rgba(0,0,0,.18)}
+.header h1{margin:0;font-size:26px;letter-spacing:-1px}
+.header p{margin:7px 0 0;font-size:13px;opacity:.85}
+.wrap{width:100%;max-width:1080px;margin:0 auto;padding:18px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.summary-card{background:#fff;border-radius:20px;padding:18px 12px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.summary-card strong{display:block;font-size:26px;color:#7c2d12;margin-bottom:6px}
+.summary-card span{color:#666;font-size:13px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.tab{border:none;border-radius:15px;padding:13px 6px;background:#e7ebf2;color:#333;font-weight:bold;font-size:14px;cursor:pointer}
+.tab.active{background:#7c2d12;color:#fff}
+.panel{display:none;background:#fff;border-radius:22px;padding:20px;margin-bottom:18px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.panel.active{display:block}
+h2{margin:0 0 16px;font-size:22px;letter-spacing:-1px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+label{display:block;font-size:14px;font-weight:bold}
+input,select,textarea{width:100%;margin-top:6px;border:1px solid #d7dce5;border-radius:13px;padding:13px;font-size:15px;background:#fff}
+textarea{min-height:90px;resize:vertical}
+.full-label{margin-top:12px}
+.primary{width:100%;border:none;border-radius:15px;padding:15px;margin-top:16px;background:#7c2d12;color:#fff;font-size:16px;font-weight:bold;cursor:pointer}
+.project-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.project-card{border:1px solid #e5e7eb;background:#fafafa;border-radius:18px;padding:16px}
+.project-title{font-size:18px;font-weight:bold;margin-bottom:6px}
+.project-meta{color:#555;font-size:14px;line-height:1.7}
+.badge{display:inline-block;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:bold;margin-top:7px}
+.badge.status{background:#fff7ed;color:#c2410c}
+.badge.soon{background:#fee2e2;color:#b91c1c}
+.progress-wrap{margin-top:10px;background:#e5e7eb;height:10px;border-radius:999px;overflow:hidden}
+.progress-bar{height:100%;background:#7c2d12;border-radius:999px}
+.schedule-item{border-left:5px solid #7c2d12;background:#fff7ed;border-radius:14px;padding:13px;margin-bottom:9px;line-height:1.6}
+.schedule-date{font-weight:bold;color:#7c2d12}
+.empty{color:#666;padding:12px}
+@media(max-width:760px){.wrap{padding:14px}.summary{grid-template-columns:1fr}.tabs{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.project-list{grid-template-columns:1fr}.header h1{font-size:23px}}
+</style>
+</head>
+<body>
+<header class="header">
+  <h1>신규점포 개설관리</h1>
+  <p>STORE OPENING PROJECT MANAGEMENT</p>
+</header>
+
+<main class="wrap">
+  <section class="summary">
+    <div class="summary-card"><strong id="totalProjects">0</strong><span>전체 프로젝트</span></div>
+    <div class="summary-card"><strong id="openSoon">0</strong><span>30일 이내 오픈</span></div>
+    <div class="summary-card"><strong id="avgProgress">0%</strong><span>평균 진행률</span></div>
+  </section>
+
+  <section class="tabs">
+    <button class="tab active" onclick="showTab('list', this)">현황</button>
+    <button class="tab" onclick="showTab('project', this)">점포등록</button>
+    <button class="tab" onclick="showTab('task', this)">업무등록</button>
+    <button class="tab" onclick="showTab('schedule', this)">일정표</button>
+  </section>
+
+  <section id="list" class="panel active">
+    <h2>점포 개설 현황</h2>
+    <div id="projectList" class="project-list">불러오는 중...</div>
+  </section>
+
+  <section id="project" class="panel">
+    <h2>신규점포 등록</h2>
+    <div class="form-grid">
+      <label>브랜드<select id="brand"><option>한국의집</option><option>고호재</option><option>효종갱</option><option>길채정</option><option>소바공방</option><option>기타</option></select></label>
+      <label>점포명<input type="text" id="storeName" placeholder="예: 롯데 평촌 소바공방"></label>
+      <label>유통사<input type="text" id="retailer" placeholder="예: 롯데백화점"></label>
+      <label>층/위치<input type="text" id="location" placeholder="예: B1 식품관"></label>
+      <label>MD 담당자<input type="text" id="mdName" placeholder="예: 홍길동 MD"></label>
+      <label>내부 담당자<input type="text" id="owner" placeholder="예: 박상신"></label>
+      <label>계약예정일<input type="date" id="contractDate"></label>
+      <label>공사시작일<input type="date" id="constructionStart"></label>
+      <label>가오픈일<input type="date" id="preOpenDate"></label>
+      <label>정식오픈일<input type="date" id="openDate"></label>
+      <label>현재상태<select id="status"><option>검토중</option><option>계약진행</option><option>도면확정</option><option>공사진행</option><option>채용중</option><option>오픈준비</option><option>가오픈</option><option>오픈완료</option><option>보류</option></select></label>
+      <label>진행률(%)<input type="number" id="progress" value="0" min="0" max="100"></label>
+    </div>
+    <label class="full-label">메모<textarea id="projectMemo"></textarea></label>
+    <button class="primary" onclick="saveProject()">점포 프로젝트 저장</button>
+  </section>
+
+  <section id="task" class="panel">
+    <h2>업무 등록</h2>
+    <div class="form-grid">
+      <label>점포 선택<select id="taskProjectId"></select></label>
+      <label>업무구분<select id="taskCategory"><option>계약</option><option>도면</option><option>공사</option><option>집기/장비</option><option>인허가</option><option>채용</option><option>교육</option><option>물류/발주</option><option>홍보/오픈행사</option><option>기타</option></select></label>
+      <label>업무명<input type="text" id="taskTitle" placeholder="예: 주방집기 발주"></label>
+      <label>담당자<input type="text" id="taskOwner"></label>
+      <label>시작일<input type="date" id="taskStartDate"></label>
+      <label>마감일<input type="date" id="taskDueDate"></label>
+      <label>상태<select id="taskStatus"><option>예정</option><option>진행중</option><option>완료</option><option>보류</option></select></label>
+      <label>중요도<select id="taskPriority"><option>보통</option><option>중요</option><option>긴급</option></select></label>
+    </div>
+    <label class="full-label">메모<textarea id="taskMemo"></textarea></label>
+    <button class="primary" onclick="saveTask()">업무 저장</button>
+  </section>
+
+  <section id="schedule" class="panel">
+    <h2>일정표</h2>
+    <div class="form-grid">
+      <label>조회월<input type="month" id="scheduleMonth" onchange="loadSchedule()"></label>
+      <label>점포 선택<select id="scheduleProjectId" onchange="loadSchedule()"></select></label>
+    </div>
+    <div id="scheduleList" class="schedule-list">일정을 불러오는 중...</div>
+  </section>
+</main>
+
+<script>
+const API_URL = "여기에_APPS_SCRIPT_웹앱_URL_입력";
+let projectsCache = [];
+
+document.addEventListener("DOMContentLoaded", function(){
+  setDefaultMonth();
+  loadProjects();
+});
+
+function showTab(id, btn){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  btn.classList.add("active");
+  if(id === "schedule") loadSchedule();
+}
+
+function checkApi(){
+  if(!API_URL || API_URL.includes("여기에_APPS_SCRIPT")){
+    document.getElementById("projectList").innerHTML = "<div class='empty'>API_URL 설정 전입니다. Apps Script 주소를 넣으면 사용 가능합니다.</div>";
+    return false;
+  }
+  return true;
+}
+
+async function api(params){
+  if(!checkApi()) return {projects:[], schedules:[]};
+  const query = new URLSearchParams(params);
+  const res = await fetch(API_URL + "?" + query.toString());
+  return await res.json();
+}
+
+function val(id){
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : "";
+}
+
+function setDefaultMonth(){
+  const el = document.getElementById("scheduleMonth");
+  if(!el) return;
+  const today = new Date();
+  el.value = today.getFullYear() + "-" + String(today.getMonth()+1).padStart(2,"0");
+}
+
+async function saveProject(){
+  if(!val("storeName")){ alert("점포명을 입력하세요."); return; }
+  const data = await api({
+    action:"saveStoreOpening",
+    brand:val("brand"), storeName:val("storeName"), retailer:val("retailer"), location:val("location"),
+    mdName:val("mdName"), owner:val("owner"), contractDate:val("contractDate"),
+    constructionStart:val("constructionStart"), preOpenDate:val("preOpenDate"), openDate:val("openDate"),
+    status:val("status"), progress:val("progress"), memo:val("projectMemo")
+  });
+  alert(data.message || "저장되었습니다.");
+  loadProjects();
+}
+
+async function saveTask(){
+  if(!val("taskProjectId")){ alert("점포를 선택하세요."); return; }
+  if(!val("taskTitle")){ alert("업무명을 입력하세요."); return; }
+  const data = await api({
+    action:"saveOpeningTask",
+    projectId:val("taskProjectId"), category:val("taskCategory"), title:val("taskTitle"),
+    owner:val("taskOwner"), startDate:val("taskStartDate"), dueDate:val("taskDueDate"),
+    status:val("taskStatus"), priority:val("taskPriority"), memo:val("taskMemo")
+  });
+  alert(data.message || "업무가 저장되었습니다.");
+  loadProjects();
+}
+
+async function loadProjects(){
+  const data = await api({action:"getStoreOpenings"});
+  projectsCache = data.projects || [];
+  renderDashboard(projectsCache);
+  renderProjects(projectsCache);
+  fillProjectSelects(projectsCache);
+  loadSchedule();
+}
+
+function renderDashboard(projects){
+  const total = projects.length;
+  let soon = 0, progressSum = 0;
+  const today = new Date(); today.setHours(0,0,0,0);
+  projects.forEach(p=>{
+    progressSum += Number(p.progress || 0);
+    if(p.openDate){
+      const d = new Date(p.openDate); d.setHours(0,0,0,0);
+      const diff = Math.floor((d - today) / 86400000);
+      if(diff >= 0 && diff <= 30) soon++;
+    }
+  });
+  document.getElementById("totalProjects").textContent = total;
+  document.getElementById("openSoon").textContent = soon;
+  document.getElementById("avgProgress").textContent = total ? Math.round(progressSum / total) + "%" : "0%";
+}
+
+function renderProjects(projects){
+  const box = document.getElementById("projectList");
+  if(projects.length === 0){
+    box.innerHTML = "<div class='empty'>등록된 신규점포 프로젝트가 없습니다.</div>";
+    return;
+  }
+  box.innerHTML = projects.map(p=>{
+    const dday = getDday(p.openDate);
+    const soonBadge = dday !== null && dday >= 0 && dday <= 30 ? `<span class="badge soon">D-${dday}</span>` : "";
+    return `
+      <div class="project-card">
+        <div class="project-title">${p.storeName || "-"}</div>
+        <div class="project-meta">
+          브랜드: ${p.brand || "-"}<br>
+          유통사: ${p.retailer || "-"} / 위치: ${p.location || "-"}<br>
+          담당: ${p.owner || "-"} / MD: ${p.mdName || "-"}<br>
+          오픈예정: ${p.openDate || "-"}
+        </div>
+        <span class="badge status">${p.status || "검토중"}</span>
+        ${soonBadge}
+        <div class="progress-wrap"><div class="progress-bar" style="width:${Number(p.progress || 0)}%"></div></div>
+        <div class="project-meta">진행률 ${p.progress || 0}%</div>
+      </div>`;
+  }).join("");
+}
+
+function fillProjectSelects(projects){
+  ["taskProjectId","scheduleProjectId"].forEach(id=>{
+    const select = document.getElementById(id);
+    if(!select) return;
+    select.innerHTML = "";
+    if(id === "scheduleProjectId"){
+      const all = document.createElement("option");
+      all.value = ""; all.textContent = "전체 점포";
+      select.appendChild(all);
+    }
+    projects.forEach(p=>{
+      const opt = document.createElement("option");
+      opt.value = p.projectId;
+      opt.textContent = p.storeName;
+      select.appendChild(opt);
+    });
+  });
+}
+
+async function loadSchedule(){
+  const data = await api({action:"getOpeningSchedule", month:val("scheduleMonth"), projectId:val("scheduleProjectId")});
+  const list = data.schedules || [];
+  const box = document.getElementById("scheduleList");
+  if(list.length === 0){
+    box.innerHTML = "<div class='empty'>해당 월의 일정이 없습니다.</div>";
+    return;
+  }
+  box.innerHTML = list.map(s=>`
+    <div class="schedule-item">
+      <div class="schedule-date">${s.date || "-"}</div>
+      <div><b>${s.storeName || "-"}</b> / ${s.title || "-"}</div>
+      <div>${s.category || "-"} · 담당: ${s.owner || "-"} · 상태: ${s.status || "-"}</div>
+    </div>`).join("");
+}
+
+function getDday(dateText){
+  if(!dateText) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(dateText); d.setHours(0,0,0,0);
+  return Math.floor((d - today) / 86400000);
+}
+</script>
+</body>
+</html>
