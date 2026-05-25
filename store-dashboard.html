@@ -34,7 +34,7 @@ body{
 }
 
 .container{
-  max-width:1200px;
+  max-width:1300px;
   margin:0 auto;
   padding:20px;
 }
@@ -69,21 +69,17 @@ body{
   font-size:14px;
 }
 
-h2{
-  margin:0 0 18px;
-  font-size:24px;
-}
-
 table{
   width:100%;
   border-collapse:collapse;
 }
 
 th,td{
-  padding:14px 10px;
+  padding:12px 10px;
   border-bottom:1px solid #eee;
   text-align:left;
   font-size:14px;
+  vertical-align:top;
 }
 
 th{
@@ -111,6 +107,28 @@ th{
 .urgent{
   background:#fee2e2;
   color:#b91c1c;
+}
+
+textarea,select{
+  width:100%;
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:8px;
+  font-size:13px;
+}
+
+textarea{
+  min-height:70px;
+}
+
+.save-btn{
+  border:none;
+  background:#7c2d12;
+  color:#fff;
+  border-radius:10px;
+  padding:10px 14px;
+  cursor:pointer;
+  font-weight:bold;
 }
 
 @media(max-width:900px){
@@ -166,8 +184,6 @@ th{
 
   <div class="card">
 
-    <h2>최근 등록 내역</h2>
-
     <table>
       <thead>
         <tr>
@@ -175,15 +191,15 @@ th{
           <th>점포명</th>
           <th>구분</th>
           <th>긴급도</th>
+          <th>내용</th>
+          <th>본사피드백</th>
           <th>조치상태</th>
+          <th>저장</th>
         </tr>
       </thead>
 
-      <tbody id="tbody">
-        <tr>
-          <td colspan="5">불러오는 중...</td>
-        </tr>
-      </tbody>
+      <tbody id="tbody"></tbody>
+
     </table>
 
   </div>
@@ -196,63 +212,124 @@ const API_URL =
 
 async function loadDashboard(){
 
-  try{
+  const res = await fetch(API_URL + "?action=getDashboard");
+  const data = await res.json();
 
-    const res = await fetch(API_URL + "?action=getDashboard");
-    const data = await res.json();
+  document.getElementById("todayCount").textContent =
+    data.todayCount || 0;
 
-    document.getElementById("todayCount").textContent =
-      data.todayCount || 0;
+  document.getElementById("pendingCount").textContent =
+    data.pendingCount || 0;
 
-    document.getElementById("pendingCount").textContent =
-      data.pendingCount || 0;
+  document.getElementById("urgentCount").textContent =
+    data.urgentCount || 0;
 
-    document.getElementById("urgentCount").textContent =
-      data.urgentCount || 0;
+  document.getElementById("totalCount").textContent =
+    data.totalCount || 0;
 
-    document.getElementById("totalCount").textContent =
-      data.totalCount || 0;
+  const logs = data.logs || [];
 
-    const logs = data.logs || [];
+  const tbody = document.getElementById("tbody");
 
-    const tbody = document.getElementById("tbody");
+  tbody.innerHTML = logs.map(log=>{
 
-    if(!logs.length){
-      tbody.innerHTML =
-        "<tr><td colspan='5'>등록된 내역이 없습니다.</td></tr>";
-      return;
+    let badgeClass = "normal";
+
+    if(log.priority === "중요"){
+      badgeClass = "important";
     }
 
-    tbody.innerHTML = logs.map(log=>{
+    if(log.priority === "긴급"){
+      badgeClass = "urgent";
+    }
 
-      let badgeClass = "normal";
+    return `
+      <tr>
 
-      if(log.priority === "중요"){
-        badgeClass = "important";
-      }
+        <td>${log.date}</td>
 
-      if(log.priority === "긴급"){
-        badgeClass = "urgent";
-      }
+        <td>
+          ${log.store}<br>
+          <small>${log.brand}</small>
+        </td>
 
-      return `
-        <tr>
-          <td>${log.date || ""}</td>
-          <td>${log.store || ""}</td>
-          <td>${log.category || ""}</td>
-          <td>
-            <span class="badge ${badgeClass}">
-              ${log.priority || "일반"}
-            </span>
-          </td>
-          <td>${log.status || ""}</td>
-        </tr>
-      `;
-    }).join("");
+        <td>${log.category}</td>
 
-  }catch(e){
-    console.log(e);
-  }
+        <td>
+          <span class="badge ${badgeClass}">
+            ${log.priority}
+          </span>
+        </td>
+
+        <td style="white-space:pre-line;">
+          ${log.content}
+        </td>
+
+        <td>
+          <textarea id="feedback_${log.row}">
+${log.feedback || ""}
+          </textarea>
+        </td>
+
+        <td>
+          <select id="status_${log.row}">
+            <option value="미확인"
+              ${log.status==="미확인"?"selected":""}>
+              미확인
+            </option>
+
+            <option value="확인완료"
+              ${log.status==="확인완료"?"selected":""}>
+              확인완료
+            </option>
+
+            <option value="보완요청"
+              ${log.status==="보완요청"?"selected":""}>
+              보완요청
+            </option>
+
+            <option value="조치완료"
+              ${log.status==="조치완료"?"selected":""}>
+              조치완료
+            </option>
+          </select>
+        </td>
+
+        <td>
+          <button class="save-btn"
+            onclick="saveFeedback(${log.row})">
+            저장
+          </button>
+        </td>
+
+      </tr>
+    `;
+  }).join("");
+}
+
+async function saveFeedback(row){
+
+  const feedback =
+    document.getElementById("feedback_" + row).value;
+
+  const status =
+    document.getElementById("status_" + row).value;
+
+  const res = await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"updateFeedback",
+      row:row,
+      feedback:feedback,
+      status:status
+    })
+  });
+
+  const data = await res.json();
+
+  alert(data.message || "저장완료");
+
+  loadDashboard();
 }
 
 loadDashboard();
