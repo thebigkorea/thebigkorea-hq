@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>매장점검 대시보드</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#f4f6f9;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;
+  color:#222;
+}
+
+.header{
+  background:linear-gradient(135deg,#2b1d12,#7c2d12);
+  color:#fff;
+  padding:30px 20px;
+  border-bottom-left-radius:28px;
+  border-bottom-right-radius:28px;
+}
+
+.header h1{
+  margin:0;
+  font-size:28px;
+}
+
+.header p{
+  margin:8px 0 0;
+  opacity:.8;
+}
+
+.container{
+  max-width:1200px;
+  margin:0 auto;
+  padding:20px;
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.card{
+  background:#fff;
+  border-radius:22px;
+  padding:24px;
+  box-shadow:0 4px 16px rgba(0,0,0,.08);
+}
+
+.summary .card{
+  text-align:center;
+}
+
+.summary strong{
+  display:block;
+  font-size:34px;
+  color:#7c2d12;
+  margin-bottom:6px;
+}
+
+.summary span{
+  color:#666;
+  font-size:14px;
+}
+
+h2{
+  margin:0 0 18px;
+  font-size:24px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  padding:14px 10px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+  font-size:14px;
+}
+
+th{
+  background:#fafafa;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.normal{
+  background:#f1f5f9;
+  color:#475569;
+}
+
+.important{
+  background:#fff7ed;
+  color:#c2410c;
+}
+
+.urgent{
+  background:#fee2e2;
+  color:#b91c1c;
+}
+
+@media(max-width:900px){
+  .summary{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:700px){
+  .summary{
+    grid-template-columns:1fr;
+  }
+
+  table{
+    font-size:12px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>매장점검 대시보드</h1>
+  <p>더큰코리아 본사 통합 모니터링</p>
+</div>
+
+<div class="container">
+
+  <div class="summary">
+
+    <div class="card">
+      <strong id="todayCount">0</strong>
+      <span>오늘 등록</span>
+    </div>
+
+    <div class="card">
+      <strong id="pendingCount">0</strong>
+      <span>미확인</span>
+    </div>
+
+    <div class="card">
+      <strong id="urgentCount">0</strong>
+      <span>긴급</span>
+    </div>
+
+    <div class="card">
+      <strong id="totalCount">0</strong>
+      <span>전체 건수</span>
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <h2>최근 등록 내역</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>등록일</th>
+          <th>점포명</th>
+          <th>구분</th>
+          <th>긴급도</th>
+          <th>조치상태</th>
+        </tr>
+      </thead>
+
+      <tbody id="tbody">
+        <tr>
+          <td colspan="5">불러오는 중...</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+</div>
+
+<script>
+const API_URL =
+"https://script.google.com/macros/s/AKfycby1RoQvXt51KjoasIG-_MmD7SiMau10eRWAYiq4Vk1k2s9yRVsuEBrBVEFvmW7aX765/exec";
+
+async function loadDashboard(){
+
+  try{
+
+    const res = await fetch(API_URL + "?action=getDashboard");
+    const data = await res.json();
+
+    document.getElementById("todayCount").textContent =
+      data.todayCount || 0;
+
+    document.getElementById("pendingCount").textContent =
+      data.pendingCount || 0;
+
+    document.getElementById("urgentCount").textContent =
+      data.urgentCount || 0;
+
+    document.getElementById("totalCount").textContent =
+      data.totalCount || 0;
+
+    const logs = data.logs || [];
+
+    const tbody = document.getElementById("tbody");
+
+    if(!logs.length){
+      tbody.innerHTML =
+        "<tr><td colspan='5'>등록된 내역이 없습니다.</td></tr>";
+      return;
+    }
+
+    tbody.innerHTML = logs.map(log=>{
+
+      let badgeClass = "normal";
+
+      if(log.priority === "중요"){
+        badgeClass = "important";
+      }
+
+      if(log.priority === "긴급"){
+        badgeClass = "urgent";
+      }
+
+      return `
+        <tr>
+          <td>${log.date || ""}</td>
+          <td>${log.store || ""}</td>
+          <td>${log.category || ""}</td>
+          <td>
+            <span class="badge ${badgeClass}">
+              ${log.priority || "일반"}
+            </span>
+          </td>
+          <td>${log.status || ""}</td>
+        </tr>
+      `;
+    }).join("");
+
+  }catch(e){
+    console.log(e);
+  }
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>
