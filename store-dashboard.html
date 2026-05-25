@@ -23,15 +23,8 @@ body{
   border-bottom-right-radius:28px;
 }
 
-.header h1{
-  margin:0;
-  font-size:28px;
-}
-
-.header p{
-  margin:8px 0 0;
-  opacity:.8;
-}
+.header h1{margin:0;font-size:28px}
+.header p{margin:8px 0 0;opacity:.8}
 
 .container{
   max-width:1300px;
@@ -53,9 +46,7 @@ body{
   box-shadow:0 4px 16px rgba(0,0,0,.08);
 }
 
-.summary .card{
-  text-align:center;
-}
+.summary .card{text-align:center}
 
 .summary strong{
   display:block;
@@ -67,6 +58,24 @@ body{
 .summary span{
   color:#666;
   font-size:14px;
+}
+
+.filter-box{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+
+select, textarea{
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:9px;
+  font-size:13px;
+}
+
+.filter-box select{
+  min-width:150px;
 }
 
 table{
@@ -82,9 +91,7 @@ th,td{
   vertical-align:top;
 }
 
-th{
-  background:#fafafa;
-}
+th{background:#fafafa}
 
 .badge{
   display:inline-block;
@@ -94,30 +101,12 @@ th{
   font-weight:bold;
 }
 
-.normal{
-  background:#f1f5f9;
-  color:#475569;
-}
-
-.important{
-  background:#fff7ed;
-  color:#c2410c;
-}
-
-.urgent{
-  background:#fee2e2;
-  color:#b91c1c;
-}
-
-textarea,select{
-  width:100%;
-  border:1px solid #ddd;
-  border-radius:10px;
-  padding:8px;
-  font-size:13px;
-}
+.normal{background:#f1f5f9;color:#475569}
+.important{background:#fff7ed;color:#c2410c}
+.urgent{background:#fee2e2;color:#b91c1c}
 
 textarea{
+  width:100%;
   min-height:70px;
 }
 
@@ -132,19 +121,12 @@ textarea{
 }
 
 @media(max-width:900px){
-  .summary{
-    grid-template-columns:repeat(2,1fr);
-  }
+  .summary{grid-template-columns:repeat(2,1fr)}
 }
 
 @media(max-width:700px){
-  .summary{
-    grid-template-columns:1fr;
-  }
-
-  table{
-    font-size:12px;
-  }
+  .summary{grid-template-columns:1fr}
+  table{font-size:12px}
 }
 </style>
 </head>
@@ -159,7 +141,6 @@ textarea{
 <div class="container">
 
   <div class="summary">
-
     <div class="card">
       <strong id="todayCount">0</strong>
       <span>오늘 등록</span>
@@ -179,10 +160,26 @@ textarea{
       <strong id="totalCount">0</strong>
       <span>전체 건수</span>
     </div>
-
   </div>
 
   <div class="card">
+
+    <div class="filter-box">
+      <select id="brandFilter" onchange="loadDashboard()">
+        <option value="">전체 브랜드</option>
+        <option value="한국의집">한국의집</option>
+        <option value="길채정">길채정</option>
+        <option value="소바공방">소바공방</option>
+      </select>
+
+      <select id="statusFilter" onchange="loadDashboard()">
+        <option value="">전체 상태</option>
+        <option value="미확인">미확인</option>
+        <option value="확인완료">확인완료</option>
+        <option value="보완요청">보완요청</option>
+        <option value="조치완료">조치완료</option>
+      </select>
+    </div>
 
     <table>
       <thead>
@@ -198,8 +195,11 @@ textarea{
         </tr>
       </thead>
 
-      <tbody id="tbody"></tbody>
-
+      <tbody id="tbody">
+        <tr>
+          <td colspan="8">불러오는 중...</td>
+        </tr>
+      </tbody>
     </table>
 
   </div>
@@ -212,110 +212,98 @@ const API_URL =
 
 async function loadDashboard(){
 
-  const res = await fetch(API_URL + "?action=getDashboard");
-  const data = await res.json();
+  try{
+    const res = await fetch(API_URL + "?action=getDashboard&t=" + Date.now());
+    const data = await res.json();
 
-  document.getElementById("todayCount").textContent =
-    data.todayCount || 0;
+    document.getElementById("todayCount").textContent = data.todayCount || 0;
+    document.getElementById("pendingCount").textContent = data.pendingCount || 0;
+    document.getElementById("urgentCount").textContent = data.urgentCount || 0;
+    document.getElementById("totalCount").textContent = data.totalCount || 0;
 
-  document.getElementById("pendingCount").textContent =
-    data.pendingCount || 0;
+    const logs = data.logs || [];
 
-  document.getElementById("urgentCount").textContent =
-    data.urgentCount || 0;
+    const brandFilter = document.getElementById("brandFilter").value;
+    const statusFilter = document.getElementById("statusFilter").value;
 
-  document.getElementById("totalCount").textContent =
-    data.totalCount || 0;
+    const filteredLogs = logs.filter(log => {
+      if(brandFilter && log.brand !== brandFilter) return false;
+      if(statusFilter && log.status !== statusFilter) return false;
+      return true;
+    });
 
-  const logs = data.logs || [];
+    const tbody = document.getElementById("tbody");
 
-  const tbody = document.getElementById("tbody");
-
-  tbody.innerHTML = logs.map(log=>{
-
-    let badgeClass = "normal";
-
-    if(log.priority === "중요"){
-      badgeClass = "important";
+    if(filteredLogs.length === 0){
+      tbody.innerHTML = "<tr><td colspan='8'>조회된 내역이 없습니다.</td></tr>";
+      return;
     }
 
-    if(log.priority === "긴급"){
-      badgeClass = "urgent";
-    }
+    tbody.innerHTML = filteredLogs.map(log => {
 
-    return `
-      <tr>
+      let badgeClass = "normal";
 
-        <td>${log.date}</td>
+      if(log.priority === "중요") badgeClass = "important";
+      if(log.priority === "긴급") badgeClass = "urgent";
 
-        <td>
-          ${log.store}<br>
-          <small>${log.brand}</small>
-        </td>
+      return `
+        <tr style="background:${log.priority === "긴급" ? "#fff5f5" : "#fff"};">
 
-        <td>${log.category}</td>
+          <td>${log.date || ""}</td>
 
-        <td>
-          <span class="badge ${badgeClass}">
-            ${log.priority}
-          </span>
-        </td>
+          <td>
+            ${log.store || ""}<br>
+            <small>${log.brand || ""}</small>
+          </td>
 
-        <td style="white-space:pre-line;">
-          ${log.content}
-        </td>
+          <td>${log.category || ""}</td>
 
-        <td>
-          <textarea id="feedback_${log.row}">
-${log.feedback || ""}
-          </textarea>
-        </td>
+          <td>
+            <span class="badge ${badgeClass}">
+              ${log.priority || "일반"}
+            </span>
+          </td>
 
-        <td>
-          <select id="status_${log.row}">
-            <option value="미확인"
-              ${log.status==="미확인"?"selected":""}>
-              미확인
-            </option>
+          <td style="white-space:pre-line;">
+            ${log.content || ""}
+          </td>
 
-            <option value="확인완료"
-              ${log.status==="확인완료"?"selected":""}>
-              확인완료
-            </option>
+          <td>
+            <textarea id="feedback_${log.row}">${log.feedback || ""}</textarea>
+          </td>
 
-            <option value="보완요청"
-              ${log.status==="보완요청"?"selected":""}>
-              보완요청
-            </option>
+          <td>
+            <select id="status_${log.row}">
+              <option value="미확인" ${log.status==="미확인"?"selected":""}>미확인</option>
+              <option value="확인완료" ${log.status==="확인완료"?"selected":""}>확인완료</option>
+              <option value="보완요청" ${log.status==="보완요청"?"selected":""}>보완요청</option>
+              <option value="조치완료" ${log.status==="조치완료"?"selected":""}>조치완료</option>
+            </select>
+          </td>
 
-            <option value="조치완료"
-              ${log.status==="조치완료"?"selected":""}>
-              조치완료
-            </option>
-          </select>
-        </td>
+          <td>
+            <button class="save-btn" onclick="saveFeedback(${log.row})">
+              저장
+            </button>
+          </td>
 
-        <td>
-          <button class="save-btn"
-            onclick="saveFeedback(${log.row})">
-            저장
-          </button>
-        </td>
+        </tr>
+      `;
+    }).join("");
 
-      </tr>
-    `;
-  }).join("");
+  }catch(e){
+    console.log(e);
+    document.getElementById("tbody").innerHTML =
+      "<tr><td colspan='8'>대시보드를 불러오지 못했습니다.</td></tr>";
+  }
 }
 
 async function saveFeedback(row){
 
-  const feedback =
-    document.getElementById("feedback_" + row).value;
+  const feedback = document.getElementById("feedback_" + row).value;
+  const status = document.getElementById("status_" + row).value;
 
-  const status =
-    document.getElementById("status_" + row).value;
-
-  const res = await fetch(API_URL,{
+  const res = await fetch(API_URL, {
     method:"POST",
     body:JSON.stringify({
       action:"updateFeedback",
