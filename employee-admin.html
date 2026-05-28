@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>직원정보 관리자 조회</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;
+  background:#f4f6f9;
+  color:#111;
+}
+.header{
+  background:linear-gradient(135deg,#173b72,#0f2344);
+  color:#fff;
+  padding:30px 20px;
+  border-bottom-left-radius:28px;
+  border-bottom-right-radius:28px;
+}
+.header h1{margin:0;font-size:28px}
+.header p{margin:8px 0 0;color:rgba(255,255,255,.85)}
+
+.wrap{
+  max-width:1100px;
+  margin:0 auto;
+  padding:22px;
+}
+
+.card{
+  background:#fff;
+  border-radius:22px;
+  padding:24px;
+  margin-bottom:18px;
+  box-shadow:0 6px 22px rgba(0,0,0,.08);
+}
+
+.search-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr auto;
+  gap:12px;
+}
+
+label{
+  font-weight:900;
+  font-size:14px;
+}
+
+input,select{
+  width:100%;
+  margin-top:7px;
+  height:52px;
+  border:1px solid #d7dce5;
+  border-radius:13px;
+  padding:0 14px;
+  font-size:15px;
+}
+
+button{
+  height:52px;
+  border:0;
+  border-radius:13px;
+  padding:0 22px;
+  background:#173b72;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+  margin-top:24px;
+}
+
+button.gray{background:#64748b}
+button.green{background:#197857}
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:950px;
+}
+
+th,td{
+  border-bottom:1px solid #e5e7eb;
+  padding:12px 10px;
+  text-align:left;
+  font-size:14px;
+}
+
+th{
+  background:#eef3f8;
+  font-weight:900;
+}
+
+tr:hover{background:#fafafa}
+
+.status{
+  margin-top:14px;
+  padding:13px;
+  border-radius:12px;
+  background:#f1f5f9;
+  color:#334155;
+  font-size:14px;
+}
+
+.empty{
+  text-align:center;
+  color:#777;
+  padding:30px;
+}
+
+.detail-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.full{grid-column:1/-1}
+
+textarea{
+  width:100%;
+  min-height:90px;
+  border:1px solid #d7dce5;
+  border-radius:13px;
+  padding:13px;
+  font-size:15px;
+  resize:vertical;
+}
+
+.hidden{display:none}
+
+@media(max-width:760px){
+  .search-grid,.detail-grid{
+    grid-template-columns:1fr;
+  }
+  button{width:100%}
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <h1>직원정보 관리자 조회</h1>
+  <p>본사 전용 직원정보 조회 및 관리 화면입니다.</p>
+</header>
+
+<main class="wrap">
+
+  <section class="card">
+    <h2>직원 검색</h2>
+
+    <div class="search-grid">
+      <label>
+        직원명 / 연락처
+        <input id="keyword" type="text" placeholder="예: 홍길동 또는 01012345678">
+      </label>
+
+      <label>
+        소속
+        <select id="workplace">
+          <option value="">전체</option>
+          <option>주식회사 더큰코리아 본사</option>
+          <option>한국의집 롯데월드몰점</option>
+          <option>소바공방 평촌점</option>
+          <option>길채정 압구정점</option>
+          <option>고궁 롯데부여아울렛점</option>
+        </select>
+      </label>
+
+      <button onclick="searchEmployees()">조회</button>
+    </div>
+
+    <div id="status" class="status">검색 조건을 입력하고 조회하세요.</div>
+  </section>
+
+  <section class="card">
+    <h2>검색 결과</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>소속</th>
+            <th>이름</th>
+            <th>연락처</th>
+            <th>주민번호</th>
+            <th>직위</th>
+            <th>고용형태</th>
+            <th>입사일</th>
+            <th>퇴사일</th>
+            <th>보기</th>
+          </tr>
+        </thead>
+        <tbody id="resultBody">
+          <tr>
+            <td colspan="9" class="empty">조회 결과가 없습니다.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="detailCard" class="card hidden">
+    <h2>직원 상세정보</h2>
+
+    <div class="detail-grid">
+      <label>
+        소속
+        <input id="d_workplace" type="text">
+      </label>
+
+      <label>
+        이름
+        <input id="d_name" type="text">
+      </label>
+
+      <label>
+        연락처
+        <input id="d_phone" type="text">
+      </label>
+
+      <label>
+        주민번호
+        <input id="d_residentNo" type="text">
+      </label>
+
+      <label>
+        직위
+        <input id="d_position" type="text">
+      </label>
+
+      <label>
+        고용형태
+        <input id="d_contractType" type="text">
+      </label>
+
+      <label>
+        입사일
+        <input id="d_joinDate" type="date">
+      </label>
+
+      <label>
+        퇴사일
+        <input id="d_leaveDate" type="date">
+      </label>
+
+      <label class="full">
+        주소
+        <input id="d_address" type="text">
+      </label>
+
+      <label class="full">
+        비고
+        <textarea id="d_memo"></textarea>
+      </label>
+    </div>
+
+    <button class="green" onclick="updateEmployee()">수정 저장</button>
+    <button class="gray" onclick="closeDetail()">닫기</button>
+
+    <div id="detailStatus" class="status"></div>
+  </section>
+
+</main>
+
+<script>
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbzCO4TLMRGgt_OY-3T92mw58AAKcOwquq0ubepUEJgPO9YPeMV-hNeP7AHy7lvOPog7oQ/exec";
+
+let selectedRowId = "";
+
+function val(id){
+  return document.getElementById(id).value.trim();
+}
+
+function setStatus(msg){
+  document.getElementById("status").innerText = msg;
+}
+
+async function searchEmployees(){
+  const keyword = val("keyword");
+  const workplace = val("workplace");
+
+  setStatus("조회 중입니다...");
+
+  try{
+    const res = await fetch(API_URL,{
+      method:"POST",
+      body:JSON.stringify({
+        action:"searchEmployeeAdmin",
+        keyword,
+        workplace
+      })
+    });
+
+    const result = await res.json();
+    const list = result.data || [];
+
+    renderResults(list);
+    setStatus(list.length + "건 조회되었습니다.");
+
+  }catch(e){
+    console.error(e);
+    setStatus("조회 중 오류가 발생했습니다.");
+  }
+}
+
+function renderResults(list){
+  const body = document.getElementById("resultBody");
+
+  if(!list.length){
+    body.innerHTML = `<tr><td colspan="9" class="empty">조회 결과가 없습니다.</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = list.map((item, idx) => `
+    <tr>
+      <td>${item.workplace || item.workPlace || ""}</td>
+      <td>${item.name || item.empName || ""}</td>
+      <td>${item.phone || ""}</td>
+      <td>${item.residentNo || ""}</td>
+      <td>${item.position || ""}</td>
+      <td>${item.contractType || ""}</td>
+      <td>${item.joinDate || item.startDate || ""}</td>
+      <td>${item.leaveDate || item.endDate || ""}</td>
+      <td><button onclick='openDetail(${JSON.stringify(item)})'>보기</button></td>
+    </tr>
+  `).join("");
+}
+
+function openDetail(item){
+  selectedRowId = item.rowId || item.row || "";
+
+  document.getElementById("d_workplace").value = item.workplace || item.workPlace || "";
+  document.getElementById("d_name").value = item.name || item.empName || "";
+  document.getElementById("d_phone").value = item.phone || "";
+  document.getElementById("d_residentNo").value = item.residentNo || "";
+  document.getElementById("d_position").value = item.position || "";
+  document.getElementById("d_contractType").value = item.contractType || "";
+  document.getElementById("d_joinDate").value = item.joinDate || item.startDate || "";
+  document.getElementById("d_leaveDate").value = item.leaveDate || item.endDate || "";
+  document.getElementById("d_address").value = item.address || "";
+  document.getElementById("d_memo").value = item.memo || item.jobDuty || "";
+
+  document.getElementById("detailCard").classList.remove("hidden");
+  document.getElementById("detailStatus").innerText = "";
+}
+
+function closeDetail(){
+  document.getElementById("detailCard").classList.add("hidden");
+}
+
+async function updateEmployee(){
+  const data = {
+    action:"updateEmployeeAdmin",
+    rowId:selectedRowId,
+    workplace:val("d_workplace"),
+    workPlace:val("d_workplace"),
+    name:val("d_name"),
+    empName:val("d_name"),
+    phone:val("d_phone"),
+    residentNo:val("d_residentNo"),
+    position:val("d_position"),
+    contractType:val("d_contractType"),
+    joinDate:val("d_joinDate"),
+    startDate:val("d_joinDate"),
+    leaveDate:val("d_leaveDate"),
+    endDate:val("d_leaveDate"),
+    address:val("d_address"),
+    memo:val("d_memo"),
+    jobDuty:val("d_memo")
+  };
+
+  document.getElementById("detailStatus").innerText = "저장 중입니다...";
+
+  try{
+    const res = await fetch(API_URL,{
+      method:"POST",
+      body:JSON.stringify(data)
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      document.getElementById("detailStatus").innerText = "수정 저장되었습니다.";
+      searchEmployees();
+    }else{
+      document.getElementById("detailStatus").innerText = result.message || "저장 실패";
+    }
+
+  }catch(e){
+    console.error(e);
+    document.getElementById("detailStatus").innerText = "저장 중 오류가 발생했습니다.";
+  }
+}
+</script>
+
+</body>
+</html>
