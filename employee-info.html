@@ -16,7 +16,7 @@
     }
 
     .wrap {
-      max-width: 720px;
+      max-width: 760px;
       margin: 0 auto;
       padding: 28px 18px 60px;
     }
@@ -157,6 +157,22 @@
         </div>
       </div>
 
+      <div class="row">
+        <div>
+          <label>생년월일</label>
+          <input id="birth" type="date" />
+        </div>
+
+        <div>
+          <label>상태</label>
+          <select id="status">
+            <option value="재직">재직</option>
+            <option value="퇴사">퇴사</option>
+            <option value="휴직">휴직</option>
+          </select>
+        </div>
+      </div>
+
       <label>주소</label>
       <input id="address" type="text" placeholder="주소 입력" />
 
@@ -173,9 +189,33 @@
             <option value="정규직 근로계약서">정규직 근로계약서</option>
             <option value="계약직(아르바이트)">계약직(아르바이트)</option>
             <option value="사업소득자 용역계약서">사업소득자 용역계약서</option>
+            <option value="일용직">일용직</option>
           </select>
         </div>
       </div>
+
+      <div class="row">
+        <div>
+          <label>부서</label>
+          <select id="department">
+            <option value="">선택</option>
+            <option>본사</option>
+            <option>홀</option>
+            <option>주방</option>
+            <option>설거지</option>
+            <option>전처리</option>
+            <option>관리</option>
+          </select>
+        </div>
+
+        <div>
+          <label>은행명</label>
+          <input id="bank" type="text" placeholder="예: 국민은행" />
+        </div>
+      </div>
+
+      <label>계좌번호</label>
+      <input id="account" type="text" placeholder="계좌번호" />
 
       <div class="row">
         <div>
@@ -238,15 +278,29 @@
         empName: name,
         name: name,
         phone: phone,
+
         residentNo: ssnFront + "-" + ssnBack,
-        birth: ssnFront,
+        rrn: ssnFront + "-" + ssnBack,
+        birth: val("birth") || ssnFront,
+
         address: val("address"),
 
         workPlace: workplace,
+        workplace: workplace,
+
         position: val("position"),
         contractType: val("employmentType"),
+        employmentType: val("employmentType"),
+
+        department: val("department"),
+        status: val("status"),
+
+        bank: val("bank"),
+        account: val("account"),
+
         joinDate: val("joinDate"),
         startDate: val("joinDate"),
+        leaveDate: val("leaveDate"),
         endDate: val("leaveDate"),
 
         jobDuty: val("memo"),
