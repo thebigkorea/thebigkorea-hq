@@ -82,6 +82,17 @@ body{
   color:#fff;
 }
 
+.tab-btn span{
+  display:inline-block;
+  min-width:22px;
+  margin-left:6px;
+  padding:2px 7px;
+  border-radius:999px;
+  background:#fff;
+  color:#7c2d12;
+  font-size:12px;
+}
+
 .filter-box{
   display:grid;
   grid-template-columns:160px 180px 150px 1fr;
@@ -156,7 +167,7 @@ th{background:#fafafa}
 .small-text{
   color:#777;
   font-size:12px;
-  margin-top:8px;
+  margin:8px 0 12px;
 }
 
 @media(max-width:1000px){
@@ -202,13 +213,13 @@ th{background:#fafafa}
   <div class="card">
 
     <div class="tab-row">
-      <button class="tab-btn active" onclick="setViewMode('active', this)">진행중</button>
-      <button class="tab-btn" onclick="setViewMode('미확인', this)">미확인</button>
-      <button class="tab-btn" onclick="setViewMode('확인사항', this)">확인사항</button>
-      <button class="tab-btn" onclick="setViewMode('보완요청', this)">보완사항</button>
-      <button class="tab-btn" onclick="setViewMode('조치필요', this)">조치사항</button>
-      <button class="tab-btn" onclick="setViewMode('done', this)">완료내역</button>
-      <button class="tab-btn" onclick="setViewMode('all', this)">전체</button>
+      <button class="tab-btn active" onclick="setViewMode('active', this)">진행중 <span id="badgeActive">0</span></button>
+      <button class="tab-btn" onclick="setViewMode('미확인', this)">미확인 <span id="badgePending">0</span></button>
+      <button class="tab-btn" onclick="setViewMode('확인사항', this)">확인사항 <span id="badgeCheck">0</span></button>
+      <button class="tab-btn" onclick="setViewMode('보완요청', this)">보완사항 <span id="badgeSupplement">0</span></button>
+      <button class="tab-btn" onclick="setViewMode('조치필요', this)">조치사항 <span id="badgeAction">0</span></button>
+      <button class="tab-btn" onclick="setViewMode('done', this)">완료내역 <span id="badgeDone">0</span></button>
+      <button class="tab-btn" onclick="setViewMode('all', this)">전체 <span id="badgeAll">0</span></button>
     </div>
 
     <div class="filter-box">
@@ -287,6 +298,7 @@ async function loadDashboard(){
     document.getElementById("totalCount").textContent = data.totalCount || 0;
 
     makeStoreFilter();
+    updateTabBadges();
     applyFilters();
 
   }catch(e){
@@ -296,14 +308,48 @@ async function loadDashboard(){
   }
 }
 
+function updateTabBadges(){
+  const counts = {
+    active: 0,
+    pending: 0,
+    check: 0,
+    supplement: 0,
+    action: 0,
+    done: 0,
+    all: allLogs.length
+  };
+
+  allLogs.forEach(log => {
+    const status = log.status || "미확인";
+
+    if(status !== "확인완료" && status !== "조치완료") counts.active++;
+    if(status === "미확인") counts.pending++;
+    if(status === "확인사항") counts.check++;
+    if(status === "보완요청") counts.supplement++;
+    if(status === "조치필요") counts.action++;
+    if(status === "확인완료" || status === "조치완료") counts.done++;
+  });
+
+  setBadgeText("badgeActive", counts.active);
+  setBadgeText("badgePending", counts.pending);
+  setBadgeText("badgeCheck", counts.check);
+  setBadgeText("badgeSupplement", counts.supplement);
+  setBadgeText("badgeAction", counts.action);
+  setBadgeText("badgeDone", counts.done);
+  setBadgeText("badgeAll", counts.all);
+}
+
+function setBadgeText(id, count){
+  const el = document.getElementById(id);
+  if(el) el.textContent = count;
+}
+
 function makeStoreFilter(){
   const storeFilter = document.getElementById("storeFilter");
   const currentValue = storeFilter.value;
 
   const stores = [...new Set(
-    allLogs
-      .map(log => log.store)
-      .filter(Boolean)
+    allLogs.map(log => log.store).filter(Boolean)
   )].sort();
 
   storeFilter.innerHTML = `<option value="">전체 점포</option>` +
@@ -318,8 +364,7 @@ function applyFilters(){
   const monthFilter = document.getElementById("monthFilter").value;
   const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
 
-  let filteredLogs = allLogs.filter(log => {
-
+  const filteredLogs = allLogs.filter(log => {
     const status = log.status || "미확인";
 
     if(currentViewMode === "active"){
@@ -375,10 +420,12 @@ function renderTable(logs){
   }
 
   tbody.innerHTML = logs.map(log => {
-
     let badgeClass = "normal";
     if(log.priority === "중요") badgeClass = "important";
     if(log.priority === "긴급") badgeClass = "urgent";
+
+    const status = log.status || "미확인";
+    const isDoneView = currentViewMode === "done";
 
     return `
       <tr style="background:${log.priority === "긴급" ? "#fff5f5" : "#fff"};">
@@ -403,24 +450,36 @@ function renderTable(logs){
         </td>
 
         <td>
-          <textarea id="feedback_${log.row}">${escapeHtml(log.feedback || "")}</textarea>
+          ${
+            isDoneView
+            ? `<div style="white-space:pre-line;">${escapeHtml(log.feedback || "-")}</div>`
+            : `<textarea id="feedback_${log.row}">${escapeHtml(log.feedback || "")}</textarea>`
+          }
         </td>
 
         <td>
-          <select id="status_${log.row}">
-            <option value="미확인" ${log.status==="미확인"?"selected":""}>미확인</option>
-            <option value="확인사항" ${log.status==="확인사항"?"selected":""}>확인사항</option>
-            <option value="보완요청" ${log.status==="보완요청"?"selected":""}>보완요청</option>
-            <option value="조치필요" ${log.status==="조치필요"?"selected":""}>조치필요</option>
-            <option value="확인완료" ${log.status==="확인완료"?"selected":""}>확인완료</option>
-            <option value="조치완료" ${log.status==="조치완료"?"selected":""}>조치완료</option>
-          </select>
+          ${
+            isDoneView
+            ? `<span class="status-badge">${escapeHtml(status)}</span>`
+            : `
+              <select id="status_${log.row}">
+                <option value="미확인" ${status==="미확인"?"selected":""}>미확인</option>
+                <option value="확인사항" ${status==="확인사항"?"selected":""}>확인사항</option>
+                <option value="보완요청" ${status==="보완요청"?"selected":""}>보완요청</option>
+                <option value="조치필요" ${status==="조치필요"?"selected":""}>조치필요</option>
+                <option value="확인완료" ${status==="확인완료"?"selected":""}>확인완료</option>
+                <option value="조치완료" ${status==="조치완료"?"selected":""}>조치완료</option>
+              </select>
+            `
+          }
         </td>
 
         <td>
-          <button class="save-btn" onclick="saveFeedback(${log.row})">
-            저장
-          </button>
+          ${
+            isDoneView
+            ? "-"
+            : `<button class="save-btn" onclick="saveFeedback(${log.row})">저장</button>`
+          }
         </td>
 
       </tr>
