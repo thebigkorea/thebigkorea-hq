@@ -27,7 +27,7 @@ body{
 .header p{margin:8px 0 0;opacity:.8}
 
 .container{
-  max-width:1300px;
+  max-width:1400px;
   margin:0 auto;
   padding:20px;
 }
@@ -60,27 +60,55 @@ body{
   font-size:14px;
 }
 
-.filter-box{
+.tab-row{
   display:flex;
-  gap:10px;
+  gap:8px;
   flex-wrap:wrap;
   margin-bottom:16px;
 }
 
-select, textarea{
-  border:1px solid #ddd;
-  border-radius:10px;
-  padding:9px;
-  font-size:13px;
+.tab-btn{
+  border:none;
+  background:#eee;
+  color:#333;
+  border-radius:999px;
+  padding:10px 16px;
+  font-weight:800;
+  cursor:pointer;
 }
 
-.filter-box select{
-  min-width:150px;
+.tab-btn.active{
+  background:#7c2d12;
+  color:#fff;
+}
+
+.filter-box{
+  display:grid;
+  grid-template-columns:160px 180px 150px 1fr;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+select,input,textarea{
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:10px;
+  font-size:14px;
+}
+
+textarea{
+  width:100%;
+  min-height:70px;
+}
+
+.table-wrap{
+  overflow-x:auto;
 }
 
 table{
   width:100%;
   border-collapse:collapse;
+  min-width:1150px;
 }
 
 th,td{
@@ -105,9 +133,14 @@ th{background:#fafafa}
 .important{background:#fff7ed;color:#c2410c}
 .urgent{background:#fee2e2;color:#b91c1c}
 
-textarea{
-  width:100%;
-  min-height:70px;
+.status-badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  background:#eef2ff;
+  color:#3730a3;
 }
 
 .save-btn{
@@ -120,13 +153,20 @@ textarea{
   font-weight:bold;
 }
 
-@media(max-width:900px){
+.small-text{
+  color:#777;
+  font-size:12px;
+  margin-top:8px;
+}
+
+@media(max-width:1000px){
   .summary{grid-template-columns:repeat(2,1fr)}
+  .filter-box{grid-template-columns:1fr 1fr}
 }
 
 @media(max-width:700px){
   .summary{grid-template-columns:1fr}
-  table{font-size:12px}
+  .filter-box{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -145,17 +185,14 @@ textarea{
       <strong id="todayCount">0</strong>
       <span>오늘 등록</span>
     </div>
-
     <div class="card">
       <strong id="pendingCount">0</strong>
       <span>미확인</span>
     </div>
-
     <div class="card">
       <strong id="urgentCount">0</strong>
       <span>긴급</span>
     </div>
-
     <div class="card">
       <strong id="totalCount">0</strong>
       <span>전체 건수</span>
@@ -164,43 +201,56 @@ textarea{
 
   <div class="card">
 
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="setViewMode('active', this)">진행중</button>
+      <button class="tab-btn" onclick="setViewMode('미확인', this)">미확인</button>
+      <button class="tab-btn" onclick="setViewMode('확인사항', this)">확인사항</button>
+      <button class="tab-btn" onclick="setViewMode('보완요청', this)">보완사항</button>
+      <button class="tab-btn" onclick="setViewMode('조치필요', this)">조치사항</button>
+      <button class="tab-btn" onclick="setViewMode('done', this)">완료내역</button>
+      <button class="tab-btn" onclick="setViewMode('all', this)">전체</button>
+    </div>
+
     <div class="filter-box">
-      <select id="brandFilter" onchange="loadDashboard()">
+      <select id="brandFilter" onchange="applyFilters()">
         <option value="">전체 브랜드</option>
         <option value="한국의집">한국의집</option>
         <option value="길채정">길채정</option>
         <option value="소바공방">소바공방</option>
       </select>
 
-      <select id="statusFilter" onchange="loadDashboard()">
-        <option value="">전체 상태</option>
-        <option value="미확인">미확인</option>
-        <option value="확인완료">확인완료</option>
-        <option value="보완요청">보완요청</option>
-        <option value="조치완료">조치완료</option>
+      <select id="storeFilter" onchange="applyFilters()">
+        <option value="">전체 점포</option>
       </select>
+
+      <input type="month" id="monthFilter" onchange="applyFilters()">
+
+      <input type="text" id="searchInput" placeholder="점포명, 내용, 본사피드백 검색" oninput="applyFilters()">
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>등록일</th>
-          <th>점포명</th>
-          <th>구분</th>
-          <th>긴급도</th>
-          <th>내용</th>
-          <th>본사피드백</th>
-          <th>조치상태</th>
-          <th>저장</th>
-        </tr>
-      </thead>
+    <div class="small-text">
+      기본 화면은 확인완료·조치완료 건을 제외한 진행중 내역만 표시됩니다.
+    </div>
 
-      <tbody id="tbody">
-        <tr>
-          <td colspan="8">불러오는 중...</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>등록일</th>
+            <th>점포명</th>
+            <th>구분</th>
+            <th>긴급도</th>
+            <th>내용</th>
+            <th>본사피드백</th>
+            <th>조치상태</th>
+            <th>저장</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="8">불러오는 중...</td></tr>
+        </tbody>
+      </table>
+    </div>
 
   </div>
 
@@ -210,86 +260,34 @@ textarea{
 const API_URL =
 "https://script.google.com/macros/s/AKfycby1RoQvXt51KjoasIG-_MmD7SiMau10eRWAYiq4Vk1k2s9yRVsuEBrBVEFvmW7aX765/exec";
 
-async function loadDashboard(){
+let allLogs = [];
+let currentViewMode = "active";
 
+function setViewMode(mode, btn){
+  currentViewMode = mode;
+
+  document.querySelectorAll(".tab-btn").forEach(b => {
+    b.classList.remove("active");
+  });
+
+  btn.classList.add("active");
+  applyFilters();
+}
+
+async function loadDashboard(){
   try{
     const res = await fetch(API_URL + "?action=getDashboard&t=" + Date.now());
     const data = await res.json();
+
+    allLogs = data.logs || [];
 
     document.getElementById("todayCount").textContent = data.todayCount || 0;
     document.getElementById("pendingCount").textContent = data.pendingCount || 0;
     document.getElementById("urgentCount").textContent = data.urgentCount || 0;
     document.getElementById("totalCount").textContent = data.totalCount || 0;
 
-    const logs = data.logs || [];
-
-    const brandFilter = document.getElementById("brandFilter").value;
-    const statusFilter = document.getElementById("statusFilter").value;
-
-    const filteredLogs = logs.filter(log => {
-      if(brandFilter && log.brand !== brandFilter) return false;
-      if(statusFilter && log.status !== statusFilter) return false;
-      return true;
-    });
-
-    const tbody = document.getElementById("tbody");
-
-    if(filteredLogs.length === 0){
-      tbody.innerHTML = "<tr><td colspan='8'>조회된 내역이 없습니다.</td></tr>";
-      return;
-    }
-
-    tbody.innerHTML = filteredLogs.map(log => {
-
-      let badgeClass = "normal";
-
-      if(log.priority === "중요") badgeClass = "important";
-      if(log.priority === "긴급") badgeClass = "urgent";
-
-      return `
-        <tr style="background:${log.priority === "긴급" ? "#fff5f5" : "#fff"};">
-
-          <td>${log.date || ""}</td>
-
-          <td>
-            ${log.store || ""}<br>
-            <small>${log.brand || ""}</small>
-          </td>
-
-          <td>${log.category || ""}</td>
-
-          <td>
-            <span class="badge ${badgeClass}">
-              ${log.priority || "일반"}
-            </span>
-          </td>
-
-          <td style="white-space:pre-line;">
-            ${log.content || ""}
-          </td>
-
-          <td>
-            <textarea id="feedback_${log.row}">${log.feedback || ""}</textarea>
-          </td>
-
-          <td>
-            <select id="status_${log.row}">
-              <option value="미확인" ${log.status==="미확인"?"selected":""}>미확인</option>
-              <option value="확인완료" ${log.status==="확인완료"?"selected":""}>확인완료</option>
-              <option value="보완요청" ${log.status==="보완요청"?"selected":""}>보완요청</option>
-              <option value="조치완료" ${log.status==="조치완료"?"selected":""}>조치완료</option>
-            </select>
-          </td>
-
-          <td>
-            <button class="save-btn" onclick="saveFeedback(${log.row})">
-              저장
-            </button>
-          </td>
-
-        </tr>
-      `;
-    }).join("");
+    makeStoreFilter();
+    applyFilters();
 
   }catch(e){
     console.log(e);
@@ -298,26 +296,171 @@ async function loadDashboard(){
   }
 }
 
-async function saveFeedback(row){
+function makeStoreFilter(){
+  const storeFilter = document.getElementById("storeFilter");
+  const currentValue = storeFilter.value;
 
+  const stores = [...new Set(
+    allLogs
+      .map(log => log.store)
+      .filter(Boolean)
+  )].sort();
+
+  storeFilter.innerHTML = `<option value="">전체 점포</option>` +
+    stores.map(store => `<option value="${escapeHtml(store)}">${escapeHtml(store)}</option>`).join("");
+
+  storeFilter.value = currentValue;
+}
+
+function applyFilters(){
+  const brandFilter = document.getElementById("brandFilter").value;
+  const storeFilter = document.getElementById("storeFilter").value;
+  const monthFilter = document.getElementById("monthFilter").value;
+  const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+
+  let filteredLogs = allLogs.filter(log => {
+
+    const status = log.status || "미확인";
+
+    if(currentViewMode === "active"){
+      if(status === "확인완료" || status === "조치완료") return false;
+    }
+
+    if(currentViewMode === "done"){
+      if(status !== "확인완료" && status !== "조치완료") return false;
+    }
+
+    if(
+      currentViewMode !== "active" &&
+      currentViewMode !== "done" &&
+      currentViewMode !== "all"
+    ){
+      if(status !== currentViewMode) return false;
+    }
+
+    if(brandFilter && log.brand !== brandFilter) return false;
+    if(storeFilter && log.store !== storeFilter) return false;
+
+    if(monthFilter){
+      const logDate = String(log.date || "");
+      if(!logDate.startsWith(monthFilter)) return false;
+    }
+
+    if(keyword){
+      const searchTarget = [
+        log.store,
+        log.brand,
+        log.category,
+        log.priority,
+        log.content,
+        log.feedback,
+        log.status
+      ].join(" ").toLowerCase();
+
+      if(!searchTarget.includes(keyword)) return false;
+    }
+
+    return true;
+  });
+
+  renderTable(filteredLogs);
+}
+
+function renderTable(logs){
+  const tbody = document.getElementById("tbody");
+
+  if(logs.length === 0){
+    tbody.innerHTML = "<tr><td colspan='8'>조회된 내역이 없습니다.</td></tr>";
+    return;
+  }
+
+  tbody.innerHTML = logs.map(log => {
+
+    let badgeClass = "normal";
+    if(log.priority === "중요") badgeClass = "important";
+    if(log.priority === "긴급") badgeClass = "urgent";
+
+    return `
+      <tr style="background:${log.priority === "긴급" ? "#fff5f5" : "#fff"};">
+
+        <td>${escapeHtml(log.date || "")}</td>
+
+        <td>
+          ${escapeHtml(log.store || "")}<br>
+          <small>${escapeHtml(log.brand || "")}</small>
+        </td>
+
+        <td>${escapeHtml(log.category || "")}</td>
+
+        <td>
+          <span class="badge ${badgeClass}">
+            ${escapeHtml(log.priority || "일반")}
+          </span>
+        </td>
+
+        <td style="white-space:pre-line;">
+          ${escapeHtml(log.content || "")}
+        </td>
+
+        <td>
+          <textarea id="feedback_${log.row}">${escapeHtml(log.feedback || "")}</textarea>
+        </td>
+
+        <td>
+          <select id="status_${log.row}">
+            <option value="미확인" ${log.status==="미확인"?"selected":""}>미확인</option>
+            <option value="확인사항" ${log.status==="확인사항"?"selected":""}>확인사항</option>
+            <option value="보완요청" ${log.status==="보완요청"?"selected":""}>보완요청</option>
+            <option value="조치필요" ${log.status==="조치필요"?"selected":""}>조치필요</option>
+            <option value="확인완료" ${log.status==="확인완료"?"selected":""}>확인완료</option>
+            <option value="조치완료" ${log.status==="조치완료"?"selected":""}>조치완료</option>
+          </select>
+        </td>
+
+        <td>
+          <button class="save-btn" onclick="saveFeedback(${log.row})">
+            저장
+          </button>
+        </td>
+
+      </tr>
+    `;
+  }).join("");
+}
+
+async function saveFeedback(row){
   const feedback = document.getElementById("feedback_" + row).value;
   const status = document.getElementById("status_" + row).value;
 
-  const res = await fetch(API_URL, {
-    method:"POST",
-    body:JSON.stringify({
-      action:"updateFeedback",
-      row:row,
-      feedback:feedback,
-      status:status
-    })
-  });
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body:JSON.stringify({
+        action:"updateFeedback",
+        row:row,
+        feedback:feedback,
+        status:status
+      })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
+    alert(data.message || "저장완료");
 
-  alert(data.message || "저장완료");
+    loadDashboard();
 
-  loadDashboard();
+  }catch(e){
+    console.log(e);
+    alert("저장 중 오류가 발생했습니다.");
+  }
+}
+
+function escapeHtml(text){
+  return String(text)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
 loadDashboard();
