@@ -25,16 +25,8 @@ body{
   box-shadow:0 5px 22px rgba(0,0,0,.18);
 }
 
-.header h1{
-  margin:0;
-  font-size:26px;
-}
-
-.header p{
-  margin:8px 0 0;
-  font-size:13px;
-  opacity:.85;
-}
+.header h1{margin:0;font-size:26px}
+.header p{margin:8px 0 0;font-size:13px;opacity:.85}
 
 .container{
   width:100%;
@@ -51,10 +43,7 @@ body{
   box-shadow:0 4px 16px rgba(0,0,0,.08);
 }
 
-h2{
-  margin:0 0 16px;
-  font-size:22px;
-}
+h2{margin:0 0 16px;font-size:22px}
 
 .form-grid{
   display:grid;
@@ -83,9 +72,7 @@ textarea{
   resize:vertical;
 }
 
-.full{
-  grid-column:1/-1;
-}
+.full{grid-column:1/-1}
 
 button{
   width:100%;
@@ -126,13 +113,8 @@ button:disabled{
 }
 
 @media(max-width:760px){
-  .form-grid{
-    grid-template-columns:1fr;
-  }
-
-  .header h1{
-    font-size:23px;
-  }
+  .form-grid{grid-template-columns:1fr}
+  .header h1{font-size:23px}
 }
 </style>
 </head>
@@ -154,26 +136,26 @@ button:disabled{
       <label>
         소속
         <select id="workplace">
-         <option value="주식회사 더큰코리아 본사">주식회사 더큰코리아 본사</option>
-         <option value="한국의집 롯데월드몰점">한국의집 롯데월드몰점</option>
-         <option value="소바공방 평촌점">소바공방 평촌점</option>
-         <option value="길채정 압구정점">길채정 압구정점</option>  
-       </select>
+          <option value="주식회사 더큰코리아 본사">주식회사 더큰코리아 본사</option>
+          <option value="한국의집 롯데월드몰점">한국의집 롯데월드몰점</option>
+          <option value="소바공방 평촌점">소바공방 평촌점</option>
+          <option value="길채정 압구정점">길채정 압구정점</option>
+        </select>
       </label>
 
       <label>
         직원명
-        <input id="name" type="text" placeholder="직원명">
+        <input id="name" type="text" placeholder="직원명" autocomplete="name">
       </label>
 
       <label>
         휴대폰
-        <input id="phone" type="tel" inputmode="numeric" maxlength="13" placeholder="010-0000-0000">
+        <input id="phone" type="tel" inputmode="numeric" pattern="[0-9\-]*" maxlength="13" placeholder="010-0000-0000" autocomplete="tel">
       </label>
 
       <label>
         주민번호
-        <input id="rrn" type="text" inputmode="numeric" maxlength="14" placeholder="000000-0000000">
+        <input id="rrn" type="tel" inputmode="numeric" pattern="[0-9\-]*" maxlength="14" placeholder="000000-0000000" autocomplete="off">
       </label>
 
       <label>
@@ -217,6 +199,10 @@ button:disabled{
           <option>인사</option>
           <option>영업관리</option>
           <option>운영관리</option>
+          <option>홀</option>
+          <option>주방</option>
+          <option>설거지</option>
+          <option>전처리</option>
         </select>
       </label>
 
@@ -236,7 +222,7 @@ button:disabled{
 
       <label>
         계좌번호
-        <input id="account" type="text" placeholder="계좌번호">
+        <input id="account" type="tel" inputmode="numeric" pattern="[0-9\-]*" placeholder="계좌번호">
       </label>
 
       <label class="full">
