@@ -8,7 +8,7 @@ const WORKPLACES = {
     companyRepresentative: "박병호",
     companyAddress: "서울특별시 송파구 올림픽로 300",
     companyPhone: "070-5015-7233",
-    defaultWorkPlace: "더큰코리아 본사"
+    defaultWorkPlace: "주식회사 더큰코리아 본사"
   },
   koreahouse_jamsil: {
     workplaceName: "한국의집 잠실롯데월드몰",
@@ -65,6 +65,9 @@ function setupEvents() {
     if (wrap) wrap.style.display = this.value === "기타" ? "flex" : "none";
     renderPreview();
   });
+
+  const etc = document.getElementById("jobDutyEtc");
+  if (etc) etc.addEventListener("input", renderPreview);
 
   document.querySelectorAll(".money").forEach(input => {
     input.addEventListener("input", function () {
@@ -123,17 +126,22 @@ function getData() {
   const wp = WORKPLACES[workplaceCode];
 
   return {
-    contractType: val("contractType"),
+    contractType: val("contractType") || "계약직·아르바이트 근로계약서",
 
-    workplaceCode,
+    workplaceCode: workplaceCode,
     workplaceName: wp.workplaceName,
+
     companyName: wp.companyName,
     companyRepresentative: wp.companyRepresentative,
     companyAddress: wp.companyAddress,
     companyPhone: wp.companyPhone,
 
     empName: val("empName"),
+    name: val("empName"),
+    employeeName: val("empName"),
+
     residentNo: val("residentNo"),
+    rrn: val("residentNo"),
     birth: val("birth"),
     phone: val("phone"),
     address: val("address"),
@@ -143,20 +151,36 @@ function getData() {
     joinDate: val("startDate"),
 
     workDays: val("workDays"),
+    weeklyDays: val("workDays"),
+
     startTime: val("startTime"),
     endTime: val("endTime"),
+
     breakTime: val("breakTime"),
+    restTime: val("breakTime"),
+
     workPlace: val("workPlace"),
+    workplace: val("workPlace"),
+    store: val("workPlace"),
+
     jobDuty: getJobDutyValue(),
+    workDetail: getJobDutyValue(),
+
     workTime: makeWorkTime(),
 
     hourPay: moneyVal("hourPay"),
     totalPay: moneyVal("totalPay"),
+    salary: moneyVal("totalPay"),
+    monthlySalary: moneyVal("totalPay"),
+
     weeklyHolidayPay: val("weeklyHolidayPay"),
     insurance: val("insurance"),
 
     bankName: val("bankName"),
-    bankAccount: val("bankAccount")
+    bank: val("bankName"),
+
+    bankAccount: val("bankAccount"),
+    account: val("bankAccount")
   };
 }
 
@@ -273,12 +297,8 @@ async function saveContract() {
   try {
     const result = await postData({
       action: "saveContractDraft",
-      contractType: c.contractType,
-      employeeName: c.empName,
-      phone: c.phone,
-      joinDate: c.startDate,
-      workplaceName: c.workplaceName,
-      companyName: c.companyName,
+      ...c,
+      data: c,
       contract: c
     });
 
@@ -287,7 +307,7 @@ async function saveContract() {
       return;
     }
 
-    const contractId = result.contractId || "";
+    const contractId = result.contractId || result.id || "";
     const link =
       `https://thebigkorea.github.io/thebigkorea-hq/contract-view.html?id=${encodeURIComponent(contractId)}&v=${Date.now()}`;
 

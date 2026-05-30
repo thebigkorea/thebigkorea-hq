@@ -8,7 +8,7 @@ const WORKPLACES = {
     companyRepresentative: "박병호",
     companyAddress: "서울특별시 송파구 올림픽로 300",
     companyPhone: "070-5015-7233",
-    defaultWorkPlace: "더큰코리아 본사"
+    defaultWorkPlace: "주식회사 더큰코리아 본사"
   },
   koreahouse_jamsil: {
     workplaceName: "한국의집 잠실롯데월드몰",
@@ -192,39 +192,72 @@ function getData() {
   return {
     contractType: "정규직 근로계약서",
 
-    workplaceCode,
+    workplaceCode: workplaceCode,
     workplaceName: wp.workplaceName,
+
     companyName: wp.companyName,
     companyRepresentative: wp.companyRepresentative,
     companyAddress: wp.companyAddress,
     companyPhone: wp.companyPhone,
 
     empName: val("empName"),
+    name: val("empName"),
+    employeeName: val("empName"),
+
     residentNo: val("residentNo"),
+    rrn: val("residentNo"),
     birth: val("birth"),
     phone: val("phone"),
     address: val("address"),
 
     joinDate: val("joinDate"),
+    startDate: val("joinDate"),
+
     workDays: val("workDays"),
+    weeklyDays: val("workDays"),
+
     monthHour: val("monthHour"),
+    monthlyHours: val("monthHour"),
+
     startTime: val("startTime"),
     endTime: val("endTime"),
+
     breakTime: val("breakTime"),
+    restTime: val("breakTime"),
+
     workPlace: val("workPlace"),
+    workplace: val("workPlace"),
+    store: val("workPlace"),
+
     jobDuty: getJobDutyValue(),
+    workDetail: getJobDutyValue(),
 
     workTime: makeWorkTime(),
 
     basePay: moneyVal("basePay"),
+    baseSalary: moneyVal("basePay"),
+
     overtimePay: moneyVal("overtimePay"),
+    overPay: moneyVal("overtimePay"),
+
     dutyPay: moneyVal("dutyPay"),
+    jobPay: moneyVal("dutyPay"),
+
     positionPay: moneyVal("positionPay"),
+    rankPay: moneyVal("positionPay"),
+
     mealPay: moneyVal("mealPay"),
+    foodPay: moneyVal("mealPay"),
+
     totalPay: moneyVal("totalPay"),
+    salary: moneyVal("totalPay"),
+    monthlySalary: moneyVal("totalPay"),
 
     bankName: val("bankName"),
-    bankAccount: val("bankAccount")
+    bank: val("bankName"),
+
+    bankAccount: val("bankAccount"),
+    account: val("bankAccount")
   };
 }
 
@@ -255,7 +288,6 @@ function makePreview() {
 
 function renderPreview() {
   const c = getData();
-
   document.getElementById("preview").innerHTML = renderContractHtml(c);
 }
 
@@ -395,12 +427,8 @@ async function saveContract() {
   try {
     const result = await postData({
       action: "saveContractDraft",
-      contractType: "정규직 근로계약서",
-      employeeName: c.empName,
-      phone: c.phone,
-      joinDate: c.joinDate,
-      workplaceName: c.workplaceName,
-      companyName: c.companyName,
+      ...c,
+      data: c,
       contract: c
     });
 
@@ -409,7 +437,7 @@ async function saveContract() {
       return;
     }
 
-    const contractId = result.contractId || "";
+    const contractId = result.contractId || result.id || "";
 
     const link =
       `https://thebigkorea.github.io/thebigkorea-hq/contract-view.html?id=${encodeURIComponent(contractId)}&v=${Date.now()}`;
