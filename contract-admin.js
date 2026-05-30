@@ -29,7 +29,13 @@ async function loadContracts() {
       return;
     }
 
-    allContracts = result.contracts || [];
+    allContracts =
+      result.contracts ||
+      result.rows ||
+      result.list ||
+      result.data ||
+      [];
+
     renderStats(allContracts);
     renderContracts(allContracts);
 
@@ -49,11 +55,24 @@ function searchContracts() {
   const type = document.getElementById("typeFilter").value;
 
   const filtered = allContracts.filter(c => {
-    const contractType = String(c.contractType || "");
-    const workplaceName = String(c.workplaceName || c.companyName || "");
+    const contractType = String(c.contractType || c.type || "");
+    const workplaceName = String(
+      c.workplaceName ||
+      c.workplace ||
+      c.store ||
+      c.companyName ||
+      ""
+    );
+
+    const employeeName = String(
+      c.employeeName ||
+      c.empName ||
+      c.name ||
+      ""
+    );
 
     const matchName =
-      !name || String(c.employeeName || "").includes(name);
+      !name || employeeName.includes(name);
 
     const matchWorkplace =
       workplace === "all" || workplaceName.includes(workplace);
@@ -125,25 +144,44 @@ function renderContracts(list) {
   list.forEach(c => {
     const isDone = String(c.status || "").includes("완료");
 
+    const contractId = c.contractId || c.id || "";
+    const workplaceName =
+      c.workplaceName ||
+      c.workplace ||
+      c.store ||
+      c.companyName ||
+      "-";
+
+    const employeeName =
+      c.employeeName ||
+      c.empName ||
+      c.name ||
+      "";
+
+    const contractType =
+      c.contractType ||
+      c.type ||
+      "";
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${c.contractId || ""}</td>
-      <td>${c.workplaceName || c.companyName || "-"}</td>
-      <td>${displayContractType(c.contractType)}</td>
+      <td>${contractId}</td>
+      <td>${workplaceName}</td>
+      <td>${displayContractType(contractType)}</td>
       <td>
         <span class="badge ${isDone ? "done" : "wait"}">
           ${c.status || ""}
         </span>
       </td>
-      <td>${c.employeeName || ""}</td>
+      <td>${employeeName}</td>
       <td>${c.phone || ""}</td>
-      <td>${c.joinDate || ""}</td>
+      <td>${c.joinDate || c.startDate || ""}</td>
       <td>${c.createdAt || ""}</td>
       <td>${c.signedAt || "-"}</td>
       <td>
         <div class="action-buttons">
-          <button onclick="openContract('${c.contractId}')">원본보기</button>
-          <button class="green" onclick="openCompleteView('${c.contractId || ""}')">완료본</button>
+          <button onclick="openContract('${contractId}')">원본보기</button>
+          <button class="green" onclick="openCompleteView('${contractId}')">완료본</button>
         </div>
       </td>
     `;
@@ -183,9 +221,23 @@ async function openContract(contractId) {
 
   selectedContract = result;
 
-  const c = result.contract || {};
-  const signature = result.signature || "";
-  const contractType = result.contractType || c.contractType || "";
+  const c =
+    result.contract ||
+    result.data ||
+    result.draft ||
+    {};
+
+  const signature =
+    result.signature ||
+    c.signature ||
+    c.signImage ||
+    "";
+
+  const contractType =
+    result.contractType ||
+    c.contractType ||
+    c.type ||
+    "";
 
   document.getElementById("contractDetail").innerHTML =
     renderAdminContract(c, signature, result, contractType);
@@ -207,25 +259,58 @@ function renderAdminContract(c, signature, result, contractType) {
   return renderRegularAdmin(c, signature, result);
 }
 
+function getVal(c, keys, fallback = "") {
+  for (const key of keys) {
+    if (
+      c &&
+      c[key] !== undefined &&
+      c[key] !== null &&
+      String(c[key]).trim() !== ""
+    ) {
+      return c[key];
+    }
+  }
+  return fallback;
+}
+
 function renderRegularAdmin(c, signature, result) {
   const company = getCompanyInfo(c);
+
+  const empName = getVal(c, ["empName", "name", "employeeName"]);
+  const joinDate = getVal(c, ["joinDate", "startDate"]);
+  const workPlace = getVal(c, ["workPlace", "workplace", "store"]);
+  const jobDuty = getVal(c, ["jobDuty", "workDetail"]);
+  const workDays = getVal(c, ["workDays", "weeklyDays"]);
+  const monthHour = getVal(c, ["monthHour", "monthlyHours"]);
+  const workTime = getVal(c, ["workTime"]);
+  const breakTime = getVal(c, ["breakTime", "restTime"]);
+
+  const basePay = getVal(c, ["basePay", "baseSalary"]);
+  const overtimePay = getVal(c, ["overtimePay", "overPay"]);
+  const dutyPay = getVal(c, ["dutyPay", "jobPay"]);
+  const positionPay = getVal(c, ["positionPay", "rankPay"]);
+  const mealPay = getVal(c, ["mealPay", "foodPay"]);
+  const totalPay = getVal(c, ["totalPay", "salary", "monthlySalary"]);
+
+  const bankName = getVal(c, ["bankName", "bank"]);
+  const bankAccount = getVal(c, ["bankAccount", "account"]);
 
   return `
     <h1>근 로 계 약 서</h1>
 
     <p>
       <strong>${company.companyName}</strong>(이하 “회사”라 한다)과 근로자
-      <strong>${c.empName || ""}</strong>
+      <strong>${empName}</strong>
       (이하 “직원”이라 한다)은 다음과 같이 근로계약을 체결하고 이를 성실히 이행할 것을 약정한다.
     </p>
 
     <h3>제1조 계약기간</h3>
-    <p>입사일 : ${c.joinDate || ""}</p>
+    <p>입사일 : ${joinDate}</p>
     <p>입사일로부터 기간의 정함이 없는 근로계약을 체결한다. 수습기간은 3개월로 한다.</p>
 
     <h3>제2조 근무장소 및 업무내용</h3>
-    <p>① 근무장소 : ${c.workPlace || ""}</p>
-    <p>② 업무내용 : ${c.jobDuty || ""}</p>
+    <p>① 근무장소 : ${workPlace}</p>
+    <p>② 업무내용 : ${jobDuty}</p>
 
     <h3>제3조 근로시간 및 휴게</h3>
     <table class="detail-table">
@@ -236,10 +321,10 @@ function renderRegularAdmin(c, signature, result) {
         <th>휴게시간</th>
       </tr>
       <tr>
-        <td>${c.workDays || ""}</td>
-        <td>${c.monthHour || ""}</td>
-        <td>${c.workTime || ""}</td>
-        <td>${c.breakTime || ""}</td>
+        <td>${workDays}</td>
+        <td>${monthHour}</td>
+        <td>${workTime}</td>
+        <td>${breakTime}</td>
       </tr>
     </table>
 
@@ -258,12 +343,12 @@ function renderRegularAdmin(c, signature, result) {
         <th>월급총액</th>
       </tr>
       <tr>
-        <td>${won(c.basePay)}</td>
-        <td>${won(c.overtimePay)}</td>
-        <td>${won(c.dutyPay)}</td>
-        <td>${won(c.positionPay)}</td>
-        <td>${won(c.mealPay)}</td>
-        <td><strong>${won(c.totalPay)}</strong></td>
+        <td>${won(basePay)}</td>
+        <td>${won(overtimePay)}</td>
+        <td>${won(dutyPay)}</td>
+        <td>${won(positionPay)}</td>
+        <td>${won(mealPay)}</td>
+        <td><strong>${won(totalPay)}</strong></td>
       </tr>
     </table>
 
@@ -272,8 +357,8 @@ function renderRegularAdmin(c, signature, result) {
       회사는 매월 1일부터 말일까지의 기간 동안 산정한 급여를 익월 10일에
       직원 명의의 은행계좌로 지급한다.
     </p>
-    <p>급여은행 : ${c.bankName || ""}</p>
-    <p>계좌번호 : ${c.bankAccount || ""}</p>
+    <p>급여은행 : ${bankName}</p>
+    <p>계좌번호 : ${bankAccount}</p>
 
     <h3>제7조 제출서류</h3>
     <p>직원은 채용과 동시에 주민등록등본, 보건증, 통장사본, 신분증사본 등 회사가 요청하는 서류를 제출한다.</p>
@@ -303,22 +388,33 @@ function renderRegularAdmin(c, signature, result) {
 function renderPartAdmin(c, signature, result) {
   const company = getCompanyInfo(c);
 
+  const empName = getVal(c, ["empName", "name", "employeeName"]);
+  const startDate = getVal(c, ["startDate", "joinDate"]);
+  const endDate = getVal(c, ["endDate"]);
+  const workPlace = getVal(c, ["workPlace", "workplace", "store"], company.companyName);
+  const jobDuty = getVal(c, ["jobDuty", "workDetail"]);
+  const workDays = getVal(c, ["workDays", "weeklyDays"]);
+  const workTime = getVal(c, ["workTime"]);
+  const breakTime = getVal(c, ["breakTime", "restTime"]);
+  const hourPay = getVal(c, ["hourPay"]);
+  const totalPay = getVal(c, ["totalPay", "salary", "monthlySalary"]);
+
   return `
     <h1>계약직 근로계약서</h1>
 
     <p>
       <strong>${company.companyName}</strong>과 근로자
-      <strong>${c.empName || ""}</strong>은 다음과 같이 근로계약을 체결한다.
+      <strong>${empName}</strong>은 다음과 같이 근로계약을 체결한다.
     </p>
 
     <h3>근로계약기간</h3>
-    <p>${c.startDate || c.joinDate || ""}부터 ${c.endDate || ""}까지</p>
+    <p>${startDate}부터 ${endDate}까지</p>
 
     <h3>근무장소</h3>
-    <p>${c.workPlace || company.companyName}</p>
+    <p>${workPlace}</p>
 
     <h3>업무내용</h3>
-    <p>${c.jobDuty || ""}</p>
+    <p>${jobDuty}</p>
 
     <h3>근로시간</h3>
     <table class="detail-table">
@@ -328,14 +424,15 @@ function renderPartAdmin(c, signature, result) {
         <th>휴게시간</th>
       </tr>
       <tr>
-        <td>${c.workDays || ""}</td>
-        <td>${c.workTime || ""}</td>
-        <td>${c.breakTime || ""}</td>
+        <td>${workDays}</td>
+        <td>${workTime}</td>
+        <td>${breakTime}</td>
       </tr>
     </table>
 
     <h3>임금</h3>
-    <p>${won(c.hourPay || c.totalPay)}</p>
+    <p>시급 : ${won(hourPay)}</p>
+    <p>환산액 : ${won(totalPay)}</p>
 
     ${signAdminBox(c, signature, result, company, "사업주", "근로자")}
   `;
@@ -344,34 +441,53 @@ function renderPartAdmin(c, signature, result) {
 function renderServiceAdmin(c, signature, result) {
   const company = getCompanyInfo(c);
 
+  const empName = getVal(c, ["empName", "name", "employeeName"]);
+  const startDate = getVal(c, ["startDate", "joinDate"]);
+  const endDate = getVal(c, ["endDate"]);
+  const workPlace = getVal(c, ["workPlace", "workplace", "store"], company.companyName);
+  const jobDuty = getVal(c, ["jobDuty", "workDetail"]);
+  const totalPay = getVal(c, ["totalPay", "salary", "monthlySalary"]);
+  const payType = getVal(c, ["payType"]);
+  const withholding = getVal(c, ["withholding"]);
+  const payDate = getVal(c, ["payDate"]);
+
   return `
     <h1>사업소득자 용역계약서</h1>
 
     <p>
       <strong>${company.companyName}</strong>과 용역제공자
-      <strong>${c.empName || ""}</strong>은 다음과 같이 용역계약을 체결한다.
+      <strong>${empName}</strong>은 다음과 같이 용역계약을 체결한다.
     </p>
 
     <h3>계약기간</h3>
-    <p>${c.startDate || c.joinDate || ""}부터 ${c.endDate || ""}까지</p>
+    <p>${startDate}부터 ${endDate}까지</p>
 
     <h3>용역장소 및 업무내용</h3>
-    <p>용역장소 : ${c.workPlace || company.companyName}</p>
-    <p>업무내용 : ${c.jobDuty || ""}</p>
+    <p>용역장소 : ${workPlace}</p>
+    <p>업무내용 : ${jobDuty}</p>
 
     <h3>용역비</h3>
-    <p>${won(c.totalPay || c.hourPay)}</p>
+    <p>지급기준 : ${payType}</p>
+    <p>용역비 : ${won(totalPay)}</p>
+    <p>원천징수 : ${withholding}</p>
+    <p>지급일 : ${payDate}</p>
 
     ${signAdminBox(c, signature, result, company, "사업자", "제공자")}
   `;
 }
 
 function signAdminBox(c, signature, result, company, companyLabel, workerLabel) {
+  const empName = getVal(c, ["empName", "name", "employeeName"]);
+  const residentNo = getVal(c, ["residentNo", "rrn"]);
+  const birth = getVal(c, ["birth"]);
+  const address = getVal(c, ["address"]);
+  const phone = getVal(c, ["phone"]);
+
   return `
     <h3>전자서명 정보</h3>
-    <p>계약번호 : ${result.contractId || ""}</p>
-    <p>계약상태 : ${result.status || ""}</p>
-    <p>서명일시 : ${result.signedAt || "-"}</p>
+    <p>계약번호 : ${result.contractId || result.id || ""}</p>
+    <p>계약상태 : ${result.status || c.status || ""}</p>
+    <p>서명일시 : ${result.signedAt || c.signedAt || "-"}</p>
 
     <div class="sign-admin-box">
       <div>
@@ -385,11 +501,11 @@ function signAdminBox(c, signature, result, company, companyLabel, workerLabel) 
 
       <div>
         <h3>[${workerLabel}]</h3>
-        <p>성명 : ${c.empName || ""}</p>
-        <p>주민등록번호 : ${c.residentNo || ""}</p>
-        <p>생년월일 : ${c.birth || ""}</p>
-        <p>주소 : ${c.address || ""}</p>
-        <p>연락처 : ${c.phone || ""}</p>
+        <p>성명 : ${empName}</p>
+        <p>주민등록번호 : ${residentNo}</p>
+        <p>생년월일 : ${birth}</p>
+        <p>주소 : ${address}</p>
+        <p>연락처 : ${phone}</p>
         ${
           signature
             ? `<img class="signature-img" src="${signature}" alt="근로자 전자서명">`
@@ -405,7 +521,9 @@ function getCompanyInfo(c) {
     companyName:
       c.companyName ||
       c.workplaceName ||
-      "한국의집 롯데월드몰점",
+      c.workplace ||
+      c.store ||
+      "주식회사 더큰코리아",
 
     companyRepresentative:
       c.companyRepresentative ||
@@ -414,7 +532,7 @@ function getCompanyInfo(c) {
 
     companyAddress:
       c.companyAddress ||
-      "서울특별시 송파구 올림픽로 300, 롯데월드몰 5층",
+      "서울특별시 송파구 올림픽로 300",
 
     companyPhone:
       c.companyPhone ||
@@ -431,12 +549,12 @@ function printContract() {
 }
 
 function copyWorkerLink() {
-  if (!selectedContract || !selectedContract.contractId) {
+  if (!selectedContract || !(selectedContract.contractId || selectedContract.id)) {
     alert("복사할 계약번호가 없습니다.");
     return;
   }
 
-  copyViewLink(selectedContract.contractId);
+  copyViewLink(selectedContract.contractId || selectedContract.id);
 }
 
 function openCompleteView(contractId) {
