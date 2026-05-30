@@ -48,7 +48,9 @@ async function createCareerCertificate() {
         action: "getCareerCertificate",
         name,
         ssn: ssnBack,
-        store
+        store,
+        purpose,
+        work
       })
     });
 
@@ -60,7 +62,7 @@ async function createCareerCertificate() {
       return;
     }
 
-    renderCareer(result.data, work, purpose, store);
+    renderCareer(result.employee, work, purpose, store);
     message.innerText = "경력증명서가 생성되었습니다.";
 
   } catch (err) {
