@@ -6,6 +6,15 @@ let HAS_DRAWN = false;
 
 window.onload = loadContractView;
 
+function getVal(c, keys, fallback = "") {
+  for (const key of keys) {
+    if (c && c[key] !== undefined && c[key] !== null && String(c[key]).trim() !== "") {
+      return c[key];
+    }
+  }
+  return fallback;
+}
+
 async function loadContractView() {
   const contractId = getParam("id");
   CURRENT_CONTRACT_ID = contractId;
@@ -18,8 +27,7 @@ async function loadContractView() {
   try {
     const result = await postData({
       action: "getContractById",
-      contractId: contractId,
-      id: contractId
+      contractId
     });
 
     if (!result.success) {
@@ -27,27 +35,22 @@ async function loadContractView() {
       return;
     }
 
-    const c = normalizeContract(result);
-
+    const c = result.contract || result.data || result.draft || {};
     const signature =
-      c.signature ||
       result.signature ||
+      c.signature ||
+      c.signImage ||
       "";
 
     const status =
-      c.status ||
       result.status ||
+      c.status ||
       "서명대기";
-
-    const signedAt =
-      c.signedAt ||
-      result.signedAt ||
-      "";
 
     const isSigned =
       String(status).includes("완료") ||
-      String(signedAt).length > 1 ||
-      String(signature).length > 20;
+      String(result.signedAt || c.signedAt || "").length > 1 ||
+      String(signature || "").length > 20;
 
     document.getElementById("loading").style.display = "none";
     document.getElementById("contractWrap").style.display = "block";
@@ -56,7 +59,7 @@ async function loadContractView() {
       isSigned ? "전자근로계약 완료본" : "전자근로계약 서명요청서";
 
     document.getElementById("contractContent").innerHTML =
-      renderContractHtml(c, signature, status, signedAt);
+      renderContractHtml(c, result, signature, isSigned);
 
     if (!isSigned) {
       setTimeout(setupSignatureCanvas, 100);
@@ -67,188 +70,51 @@ async function loadContractView() {
   }
 }
 
-function normalizeContract(result) {
-  const base =
-    result.contract ||
-    result.data ||
-    result.draft ||
-    {};
+function renderContractHtml(c, result, signature, isSigned) {
+  const companyName = getVal(c, ["companyName"], "주식회사 더큰코리아");
+  const empName = getVal(c, ["empName", "name", "employeeName"]);
+  const workPlace = getVal(c, ["workPlace", "workplace", "store", "workLocation"]);
+  const jobDuty = getVal(c, ["jobDuty", "workDetail", "job", "duty", "memo"]);
+  const workDays = getVal(c, ["workDays", "weeklyDays"]);
+  const monthHour = getVal(c, ["monthHour", "monthlyHours", "standardHours"]);
+  const workTime = getVal(c, ["workTime", "workingHours"]);
+  const breakTime = getVal(c, ["breakTime", "restTime"]);
 
-  return {
-    ...base,
+  const basePay = getVal(c, ["basePay", "baseSalary", "basicSalary"]);
+  const overtimePay = getVal(c, ["overtimePay", "overPay", "extensionPay"]);
+  const dutyPay = getVal(c, ["dutyPay", "jobPay"]);
+  const positionPay = getVal(c, ["positionPay", "rankPay"]);
+  const mealPay = getVal(c, ["mealPay", "foodPay"]);
+  const totalPay = getVal(c, ["totalPay", "salary", "monthlySalary", "totalSalary"]);
 
-    contractId:
-      base.contractId ||
-      result.contractId ||
-      result.id ||
-      "",
+  const bankName = getVal(c, ["bankName", "bank", "salaryBank"]);
+  const bankAccount = getVal(c, ["bankAccount", "account", "salaryAccount"]);
 
-    companyName:
-      base.companyName ||
-      "주식회사 더큰코리아",
+  const joinDate = getVal(c, ["joinDate", "startDate"]);
+  const residentNo = getVal(c, ["residentNo", "rrn", "ssn"]);
+  const address = getVal(c, ["address"]);
+  const phone = getVal(c, ["phone"]);
 
-    companyRepresentative:
-      base.companyRepresentative ||
-      base.representative ||
-      "박병호",
+  const companyRepresentative = getVal(c, ["companyRepresentative"], "박병호");
+  const companyAddress = getVal(c, ["companyAddress"], "");
+  const companyPhone = getVal(c, ["companyPhone"], "");
 
-    companyAddress:
-      base.companyAddress ||
-      "서울 송파구 오금로 87",
-
-    companyPhone:
-      base.companyPhone ||
-      "",
-
-    empName:
-      base.empName ||
-      base.name ||
-      result.empName ||
-      result.name ||
-      "",
-
-    name:
-      base.name ||
-      base.empName ||
-      result.name ||
-      "",
-
-    residentNo:
-      base.residentNo ||
-      base.rrn ||
-      base.ssn ||
-      "",
-
-    phone:
-      base.phone ||
-      result.phone ||
-      "",
-
-    address:
-      base.address ||
-      "",
-
-    joinDate:
-      base.joinDate ||
-      base.startDate ||
-      "",
-
-    workPlace:
-      base.workPlace ||
-      base.workplace ||
-      base.store ||
-      result.workplace ||
-      result.store ||
-      "",
-
-    jobDuty:
-      base.jobDuty ||
-      base.workDetail ||
-      base.duty ||
-      base.memo ||
-      "",
-
-    workDays:
-      base.workDays ||
-      base.weeklyDays ||
-      base.weekDays ||
-      "",
-
-    monthHour:
-      base.monthHour ||
-      base.monthlyHours ||
-      base.standardHours ||
-      "",
-
-    workTime:
-      base.workTime ||
-      base.workingHours ||
-      "",
-
-    breakTime:
-      base.breakTime ||
-      base.restTime ||
-      "",
-
-    basePay:
-      base.basePay ||
-      base.baseSalary ||
-      base.basicSalary ||
-      "",
-
-    overtimePay:
-      base.overtimePay ||
-      base.extensionPay ||
-      "",
-
-    dutyPay:
-      base.dutyPay ||
-      base.jobPay ||
-      "",
-
-    positionPay:
-      base.positionPay ||
-      base.titlePay ||
-      "",
-
-    mealPay:
-      base.mealPay ||
-      base.foodPay ||
-      "",
-
-    totalPay:
-      base.totalPay ||
-      base.totalSalary ||
-      base.monthlySalary ||
-      base.salary ||
-      "",
-
-    bankName:
-      base.bankName ||
-      base.bank ||
-      base.salaryBank ||
-      "",
-
-    bankAccount:
-      base.bankAccount ||
-      base.account ||
-      base.salaryAccount ||
-      "",
-
-    status:
-      base.status ||
-      result.status ||
-      "서명대기",
-
-    signedAt:
-      base.signedAt ||
-      result.signedAt ||
-      "",
-
-    signature:
-      base.signature ||
-      result.signature ||
-      ""
-  };
-}
-
-function renderContractHtml(c, signature, status, signedAt) {
   return `
     <h1>근 로 계 약 서</h1>
 
     <p>
-      <strong>${c.companyName}</strong>(이하 “회사”라 한다)과 근로자
-      <strong>${c.empName}</strong>
+      <strong>${companyName}</strong>(이하 “회사”라 한다)과 근로자
+      <strong>${empName}</strong>
       (이하 “직원”이라 한다)은 다음과 같이 근로계약을 체결하고 이를 성실히 이행할 것을 약정한다.
     </p>
 
     <h3>제1조 계약기간</h3>
-    <p>입사일 : ${c.joinDate}</p>
+    <p>입사일 : ${joinDate}</p>
     <p>입사일로부터 기간의 정함이 없는 근로계약을 체결한다. 수습기간은 3개월로 한다.</p>
 
     <h3>제2조 근무장소 및 업무내용</h3>
-    <p>① 근무장소 : ${c.workPlace}</p>
-    <p>② 업무내용 : ${c.jobDuty}</p>
+    <p>① 근무장소 : ${workPlace}</p>
+    <p>② 업무내용 : ${jobDuty}</p>
 
     <h3>제3조 근로시간 및 휴게</h3>
     <table>
@@ -259,10 +125,10 @@ function renderContractHtml(c, signature, status, signedAt) {
         <th>휴게시간</th>
       </tr>
       <tr>
-        <td>${c.workDays}</td>
-        <td>${c.monthHour}</td>
-        <td>${c.workTime}</td>
-        <td>${c.breakTime}</td>
+        <td>${workDays}</td>
+        <td>${monthHour}</td>
+        <td>${workTime}</td>
+        <td>${breakTime}</td>
       </tr>
     </table>
 
@@ -281,12 +147,12 @@ function renderContractHtml(c, signature, status, signedAt) {
         <th>월급총액</th>
       </tr>
       <tr>
-        <td>${won(c.basePay)}</td>
-        <td>${won(c.overtimePay)}</td>
-        <td>${won(c.dutyPay)}</td>
-        <td>${won(c.positionPay)}</td>
-        <td>${won(c.mealPay)}</td>
-        <td><strong>${won(c.totalPay)}</strong></td>
+        <td>${won(basePay)}</td>
+        <td>${won(overtimePay)}</td>
+        <td>${won(dutyPay)}</td>
+        <td>${won(positionPay)}</td>
+        <td>${won(mealPay)}</td>
+        <td><strong>${won(totalPay)}</strong></td>
       </tr>
     </table>
 
@@ -295,8 +161,8 @@ function renderContractHtml(c, signature, status, signedAt) {
       회사는 매월 1일부터 말일까지의 기간 동안 산정한 급여를 익월 10일에
       직원 명의의 은행계좌로 지급한다.
     </p>
-    <p>급여은행 : ${c.bankName}</p>
-    <p>계좌번호 : ${c.bankAccount}</p>
+    <p>급여은행 : ${bankName}</p>
+    <p>계좌번호 : ${bankAccount}</p>
 
     <h3>제7조 제출서류</h3>
     <p>직원은 채용과 동시에 주민등록등본, 보건증, 통장사본, 신분증사본 등 회사가 요청하는 서류를 제출한다.</p>
@@ -324,25 +190,25 @@ function renderContractHtml(c, signature, status, signedAt) {
     <div class="sign-area">
       <div class="sign-box">
         <h3>[회사]</h3>
-        <p>상호 : ${c.companyName}</p>
+        <p>상호 : ${companyName}</p>
         <p>
-          대표자 : ${c.companyRepresentative}
+          대표자 : ${companyRepresentative}
           <img class="stamp" src="stamp.png" alt="회사 직인">
         </p>
-        <p>주소 : ${c.companyAddress}</p>
-        <p>연락처 : ${c.companyPhone}</p>
+        <p>주소 : ${companyAddress}</p>
+        <p>연락처 : ${companyPhone}</p>
       </div>
 
       <div class="sign-box">
         <h3>[근로자]</h3>
-        <p>성명 : ${c.empName}</p>
-        <p>주민등록번호 : ${c.residentNo}</p>
-        <p>주소 : ${c.address}</p>
-        <p>연락처 : ${c.phone}</p>
+        <p>성명 : ${empName}</p>
+        <p>주민등록번호 : ${residentNo}</p>
+        <p>주소 : ${address}</p>
+        <p>연락처 : ${phone}</p>
         ${
-          status === "서명완료"
+          isSigned
             ? `
-              <p>서명일시 : ${signedAt}</p>
+              <p>서명일시 : ${result.signedAt || c.signedAt || ""}</p>
               ${signature ? `<img class="signature-img" src="${signature}" alt="근로자 전자서명">` : ""}
             `
             : `
@@ -353,7 +219,7 @@ function renderContractHtml(c, signature, status, signedAt) {
     </div>
 
     ${
-      status === "서명완료"
+      isSigned
         ? `
           <div class="bottom-buttons">
             <button class="blue" onclick="window.print()">인쇄 / PDF 저장</button>
@@ -466,8 +332,7 @@ async function submitSignature() {
     const result = await postData({
       action: "signContract",
       contractId: CURRENT_CONTRACT_ID,
-      id: CURRENT_CONTRACT_ID,
-      signature: signature
+      signature
     });
 
     if (!result.success) {
@@ -478,7 +343,6 @@ async function submitSignature() {
     }
 
     alert("전자서명이 완료되었습니다.");
-
     location.href =
       `contract-view.html?id=${encodeURIComponent(CURRENT_CONTRACT_ID)}&v=${Date.now()}`;
 
@@ -504,7 +368,7 @@ function getParam(name) {
 
 function won(v) {
   const num = Number(String(v || "").replace(/[^0-9]/g, ""));
-  if (!num) return "";
+  if (!num) return "0원";
   return num.toLocaleString("ko-KR") + "원";
 }
 
