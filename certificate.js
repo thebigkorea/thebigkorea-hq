@@ -43,11 +43,12 @@ async function searchCertificate() {
     const response = await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({
-        action: "getCertificate",
-        name,
-        ssn,
-        store
-      })
+       action: "getCertificate",
+       name,
+       ssn,
+       store,
+       purpose
+     })
     });
 
     const result = await response.json();
@@ -58,7 +59,7 @@ async function searchCertificate() {
       return;
     }
 
-    renderCertificate(result.data, purpose, store);
+    renderCertificate(result.employee, purpose, store);
 
   } catch (err) {
     console.error(err);
