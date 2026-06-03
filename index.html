@@ -795,6 +795,25 @@
         <a class="go sub-go" href="https://docs.google.com/spreadsheets/d/1CTvrc6NFomOp4bL0rY464MtEICczLXZ6rAbdTpfgMRg/edit?gid=1301705060#gid=1301705060" target="_blank">
          평촌 소바공방 원장조회
         </a>
+
+        <a class="go badge-wrap"
+          href="https://thebigkorea.github.io/gilchaejeong-apgujeong-intranet/daily-worker.html"
+          target="_blank">
+
+        압구정 길채정 근무내역 입력
+
+        <span id="gilchaejeongDailyUnpaidBadge"
+             class="badge-new">0</span>
+
+       </a>
+
+       <a class="go sub-go"
+          href="https://docs.google.com/spreadsheets/d/1UQ-ZTX7m5vncD3vAes77sLsB8kFPOnH759jt5EcZZuY/edit?gid=2024602370#gid=2024602370"
+          target="_blank">
+
+        압구정 길채정 원장조회
+
+       </a>
 </div>
     </div>
 
@@ -1047,6 +1066,9 @@ const KOREA_API_URL =
 const SOBA_API_URL =
 "https://script.google.com/macros/s/AKfycbwYnfRshHZs5kFl_3gvyYRlOgkfIPKx997vIjNg1hecxreYcetFFK_uS_ael9tuefP4/exec";
 
+const GILCHAEJEONG_API_URL =
+"https://script.google.com/macros/s/AKfycbzjJ4xzZl96Wi4AcYrfKrEzIl-gY5iEZCUEiZ_th51mD2Kq97G13z883QIMjFf99sQE3w/exec";
+
 function setUnpaidBadges(ids, count) {
   ids
     .map(function(id) { return document.getElementById(id); })
@@ -1076,6 +1098,7 @@ async function loadUnpaidBadge(apiUrl, badgeIds, label) {
 }
 
 function loadDailyUnpaidBadges() {
+
   loadUnpaidBadge(KOREA_API_URL, [
     "koreaDailyUnpaidBadge",
     "koreaDailyUnpaidBadgeTop"
@@ -1085,6 +1108,12 @@ function loadDailyUnpaidBadges() {
     "sobaDailyUnpaidBadge",
     "sobaDailyUnpaidBadgeTop"
   ], "평촌 소바공방");
+
+  loadUnpaidBadge(GILCHAEJEONG_API_URL, [
+    "gilchaejeongDailyUnpaidBadge",
+    "gilchaejeongDailyUnpaidBadgeTop"
+  ], "압구정 길채정");
+
 }
 
 document.addEventListener("DOMContentLoaded", loadDailyUnpaidBadges);
