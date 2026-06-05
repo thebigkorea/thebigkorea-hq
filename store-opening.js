@@ -160,6 +160,7 @@ function fillProjectSelects(projects){
   const selects = [
     "taskProjectId",
     "scheduleProjectId"
+     "expenseProjectId"
   ];
 
   selects.forEach(id=>{
