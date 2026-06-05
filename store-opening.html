@@ -205,6 +205,110 @@
 
   </section>
 
+  <section id="expense" class="panel">
+
+  <h2>점포 개설 출납대장</h2>
+
+  <div class="form-grid">
+
+    <label>점포 선택
+      <select id="expenseProjectId"></select>
+    </label>
+
+    <label>지출일자
+      <input type="date" id="expenseDate">
+    </label>
+
+    <label>비용구분
+      <select id="expenseCategory">
+        <option>계약금</option>
+        <option>보증금</option>
+        <option>권리금</option>
+        <option>설계비</option>
+        <option>공사비</option>
+        <option>전기/가스/수도</option>
+        <option>집기/장비</option>
+        <option>POS/전산</option>
+        <option>초도물품</option>
+        <option>인허가/수수료</option>
+        <option>교육비</option>
+        <option>인건비</option>
+        <option>교통/출장비</option>
+        <option>기타</option>
+      </select>
+    </label>
+
+    <label>거래처
+      <input type="text" id="expenseVendor" placeholder="예: 인테리어 업체, 장비업체">
+    </label>
+
+    <label>지출금액
+      <input type="text" id="expenseAmount" placeholder="예: 1,000,000">
+    </label>
+
+    <label>결제수단
+      <select id="expensePayMethod">
+        <option>계좌이체</option>
+        <option>법인카드</option>
+        <option>현금</option>
+        <option>개인카드</option>
+        <option>기타</option>
+      </select>
+    </label>
+
+    <label>비용부담
+      <select id="expenseShareType">
+        <option>본사부담</option>
+        <option>점포부담</option>
+        <option>공동부담</option>
+        <option>추후정산</option>
+      </select>
+    </label>
+
+    <label>증빙여부
+      <select id="expenseProof">
+        <option>세금계산서</option>
+        <option>카드영수증</option>
+        <option>현금영수증</option>
+        <option>간이영수증</option>
+        <option>증빙없음</option>
+      </select>
+    </label>
+
+  </div>
+
+  <label class="full-label">
+    메모
+    <textarea id="expenseMemo" placeholder="비용 배분 기준, 정산 예정일, 특이사항"></textarea>
+  </label>
+
+  <button class="primary" onclick="saveExpense()">
+    출납 내역 저장
+  </button>
+
+  <h2 style="margin-top:30px;">출납 내역</h2>
+
+  <div id="expenseSummary" class="summary" style="margin-bottom:16px;">
+    <div class="summary-card">
+      <strong id="expenseTotal">0원</strong>
+      <span>총 지출액</span>
+    </div>
+
+    <div class="summary-card">
+      <strong id="expenseHeadOffice">0원</strong>
+      <span>본사부담</span>
+    </div>
+
+    <div class="summary-card">
+      <strong id="expenseStore">0원</strong>
+      <span>점포부담</span>
+    </div>
+  </div>
+
+  <div id="expenseList" class="project-list"></div>
+
+</section>
+
 </main>
 
 <script src="store-opening.js"></script>
