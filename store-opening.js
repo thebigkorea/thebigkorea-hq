@@ -184,3 +184,114 @@ function fillProjectSelects(projects){
   });
 
 }
+
+async function saveExpense() {
+
+  const projectId =
+    document.getElementById("expenseProjectId").value;
+
+  const expenseDate =
+    document.getElementById("expenseDate").value;
+
+  const category =
+    document.getElementById("expenseCategory").value;
+
+  const vendor =
+    document.getElementById("expenseVendor").value;
+
+  const amount =
+    document.getElementById("expenseAmount").value
+      .replace(/,/g,"");
+
+  const payMethod =
+    document.getElementById("expensePayMethod").value;
+
+  const shareType =
+    document.getElementById("expenseShareType").value;
+
+  const proof =
+    document.getElementById("expenseProof").value;
+
+  const memo =
+    document.getElementById("expenseMemo").value;
+
+  if(!projectId){
+    alert("점포를 선택하세요.");
+    return;
+  }
+
+  if(!expenseDate){
+    alert("지출일자를 입력하세요.");
+    return;
+  }
+
+  if(!amount){
+    alert("지출금액을 입력하세요.");
+    return;
+  }
+
+  const project =
+    projects.find(p => p.id === projectId);
+
+  const payload = {
+
+    action:"saveExpense",
+
+    projectId,
+
+    brand:project?.brand || "",
+
+    storeName:project?.storeName || "",
+
+    expenseDate,
+
+    category,
+
+    vendor,
+
+    amount,
+
+    payMethod,
+
+    shareType,
+
+    proof,
+
+    memo
+
+  };
+
+  try{
+
+    const res =
+      await fetch(API_URL,{
+        method:"POST",
+        body:JSON.stringify(payload)
+      });
+
+    const data = await res.json();
+
+    if(data.success){
+
+      alert("출납내역 저장 완료");
+
+      document.getElementById("expenseDate").value = "";
+      document.getElementById("expenseVendor").value = "";
+      document.getElementById("expenseAmount").value = "";
+      document.getElementById("expenseMemo").value = "";
+
+    }else{
+
+      alert(data.message || "저장 실패");
+
+    }
+
+  }catch(err){
+
+    console.error(err);
+
+    alert("서버 오류");
+
+  }
+
+}
