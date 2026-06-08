@@ -587,6 +587,18 @@
       .admin-links {
         grid-template-columns: 1fr;
       }      
+
+      .buttons{
+         display:flex;
+         flex-direction:column;
+         gap:14px;
+         margin-top:24px;
+       }
+
+      .go.sub{
+        background:#8b5a2b;
+        font-size:15px;
+       }
     }
   </style>
 </head>
@@ -955,25 +967,34 @@
 </div>
 
  <div class="card">
-       <div>
-         <div class="icon">開</div>
 
-         <h3>신규점포 개설관리</h3>
-         <p> 신규 점포 오픈 일정과 진행현황을 관리합니다. </p>
-       </div>
+  <div>
+    <div class="icon">開</div>
 
-       <a class="go"
-          href="store-opening.html" target="_blank">
-          신규점포 관리 열기
-       </a>
+    <h3>신규점포 개설관리</h3>
 
-       <a class="go"
-          href="https://docs.google.com/spreadsheets/d/1sEdpKlRjjPesAvdyG-q55Gw3pJAPZC4WyE4EsAuCaCQ/edit#gid=0"
-          target="_blank">
-         원장조회
-       </a>
-       
-     </div>
+    <p>
+      신규 점포 오픈 일정과 진행현황을 관리합니다.
+    </p>
+  </div>
+
+  <div class="buttons">
+
+    <a class="go"
+       href="store-opening.html"
+       target="_blank">
+      신규점포 관리 열기
+    </a>
+
+    <a class="go sub"
+       href="https://docs.google.com/spreadsheets/d/1sEdpKlRjjPesAvdyG-q55Gw3pJAPZC4WyE4EsAuCaCQ/edit#gid=0"
+       target="_blank">
+      원장조회
+    </a>
+
+  </div>
+
+</div>
 
 <div class="card">
          <div>
