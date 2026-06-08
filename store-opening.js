@@ -42,8 +42,20 @@ function val(id) {
 
 async function api(params) {
   const query = new URLSearchParams(params);
-  const res = await fetch(API_URL + "?" + query.toString());
-  return await res.json();
+
+  const res = await fetch(API_URL + "?" + query.toString(), {
+    method: "GET",
+    redirect: "follow"
+  });
+
+  const text = await res.text();
+
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.log("서버 응답 원문:", text);
+    return {};
+  }
 }
 
 function setDefaultMonth() {
