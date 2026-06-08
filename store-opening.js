@@ -253,79 +253,266 @@ function renderSchedule(list) {
   const box = document.getElementById("scheduleList");
   if (!box) return;
 
+  const projectId = val("scheduleProjectId");
+
+  if (!projectId) {
+    box.innerHTML = `
+      <div style="
+        background:#eef5ff;
+        color:#1d4ed8;
+        padding:14px 18px;
+        border-radius:10px;
+        margin-bottom:16px;
+        font-weight:700;
+      ">
+        ⓘ 점포를 선택하면 해당 점포의 업무를 진행중 / 완료로 구분하여 보여줍니다.
+      </div>
+    `;
+    return;
+  }
+
   if (!list || list.length === 0) {
     box.innerHTML = `<div class="project-card">등록된 업무 일정이 없습니다.</div>`;
     return;
   }
 
+  const ingList = list.filter(t => t.status !== "완료");
+  const doneList = list.filter(t => t.status === "완료");
+
+  box.innerHTML = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+
+      <div>
+        <h3 style="color:#2563eb; margin-bottom:12px;">
+          진행중 업무 
+          <span style="background:#3b82f6;color:white;padding:4px 10px;border-radius:12px;font-size:13px;">
+            ${ingList.length}건
+          </span>
+        </h3>
+        ${renderTaskColumn(ingList, false)}
+      </div>
+
+      <div>
+        <h3 style="color:#16a34a; margin-bottom:12px;">
+          완료 업무 
+          <span style="background:#bbf7d0;color:#166534;padding:4px 10px;border-radius:12px;font-size:13px;">
+            ${doneList.length}건
+          </span>
+        </h3>
+        ${renderTaskColumn(doneList, true)}
+      </div>
+
+    </div>
+  `;
+}
+
+function renderTaskColumn(list, isDone) {
+
+  if (!list || list.length === 0) {
+    return `
+      <div class="project-card">
+        해당 업무가 없습니다.
+      </div>
+    `;
+  }
+
   let html = "";
 
   list.forEach(t => {
-    const progress = Number(t.progress || 0);
+
+    const progress =
+      Number(t.progress || 0);
+
+    const barColor =
+      isDone
+        ? "#22c55e"
+        : (t.status === "지연"
+            ? "#ef4444"
+            : "#2563eb");
 
     html += `
-      <div class="project-card" style="
-        display:grid;
-        grid-template-columns:120px 1.3fr 1fr 1.2fr 260px;
-        gap:18px;
-        align-items:center;
-      ">
 
-        <div style="font-weight:800;font-size:18px;">
-          ${t.date || ""}
-        </div>
-
-        <div>
-          <div class="project-title">${t.title || ""}</div>
-          <div class="project-meta">
-            점포 : ${t.storeName || ""}<br>
-            업무구분 : ${t.category || ""} ｜ 담당자 : ${t.owner || ""}
-          </div>
-        </div>
-
-        <div class="project-meta">
-          상태 : ${statusBadge(t.status)}<br>
-          진행률 : ${progress}%<br>
-          중요도 : ${t.priority || ""}
-          <div class="progress-wrap" style="margin-top:8px;">
-            <div class="progress-bar" style="width:${progress}%"></div>
-          </div>
-        </div>
-
-        <div class="project-meta">
-          지연사유 : ${t.delayReason || "-"}<br>
-          관리자메모 : ${t.adminMemo || "-"}<br>
-          최종수정 : ${t.updatedAt || "-"}
-        </div>
+      <div class="project-card" style="margin-bottom:14px;">
 
         <div style="
-          display:flex;
-          gap:8px;
-          justify-content:flex-end;
-          flex-wrap:wrap;
+          display:grid;
+          grid-template-columns:100px 1fr 220px;
+          gap:16px;
+          align-items:start;
         ">
-          <button class="primary" style="padding:8px 12px;font-size:13px;"
-            onclick="updateTaskProgress('${safeText(t.taskId)}')">
-            진행수정
-          </button>
 
-          <button class="primary" style="padding:8px 12px;font-size:13px;background:#b45309;"
-            onclick="delayTask('${safeText(t.taskId)}')">
-            지연등록
-          </button>
+          <div style="
+            font-size:24px;
+            font-weight:800;
+            color:#111827;
+          ">
+            ${t.date || ""}
+          </div>
 
-          <button class="primary" style="padding:8px 12px;font-size:13px;"
-            onclick="completeTask('${safeText(t.taskId)}')">
-            완료처리
-          </button>
+          <div>
+
+            <div class="project-title">
+              ${t.title || ""}
+            </div>
+
+            <div class="project-meta">
+              점포 : ${t.storeName || ""}<br>
+              업무구분 : ${t.category || ""}<br>
+              담당자 : ${t.owner || ""}<br>
+
+              상태 :
+              ${statusBadge(t.status)}<br>
+
+              진행률 :
+              ${progress}%<br>
+
+              중요도 :
+              ${t.priority || "보통"}<br>
+
+              지연사유 :
+              ${t.delayReason || "-"}<br>
+
+              관리자메모 :
+              ${t.adminMemo || "-"}<br>
+
+              최종수정 :
+              ${t.updatedAt || "-"}
+            </div>
+
+            <div class="progress-wrap" style="margin-top:10px;">
+              <div class="progress-bar"
+                   style="
+                     width:${progress}%;
+                     background:${barColor};
+                   ">
+              </div>
+            </div>
+
+          </div>
+
+          <div style="
+            display:flex;
+            flex-direction:column;
+            gap:10px;
+          ">
+
+            <button class="primary"
+              onclick="updateTaskProgress('${safeText(t.taskId)}')">
+
+              진행수정
+
+            </button>
+
+            <button class="primary"
+              style="background:#b45309;"
+              onclick="delayTask('${safeText(t.taskId)}')">
+
+              지연등록
+
+            </button>
+
+            <button class="primary"
+              ${isDone ? "disabled" : ""}
+              style="
+                ${isDone ? "opacity:.45;" : ""}
+              "
+              onclick="completeTask('${safeText(t.taskId)}')">
+
+              완료처리
+
+            </button>
+
+          </div>
+
         </div>
 
       </div>
+
     `;
   });
 
-  box.innerHTML = html;
+  return html;
 }
+
+
+function renderSchedule(list) {
+
+  const box =
+    document.getElementById("scheduleList");
+
+  if (!box) return;
+
+  const projectId =
+    val("scheduleProjectId");
+
+  if (!projectId) {
+
+    box.innerHTML = `
+      <div class="project-card">
+        점포를 선택하면 업무 일정이 표시됩니다.
+      </div>
+    `;
+
+    return;
+  }
+
+  if (!list || list.length === 0) {
+
+    box.innerHTML = `
+      <div class="project-card">
+        등록된 업무 일정이 없습니다.
+      </div>
+    `;
+
+    return;
+  }
+
+  const ingList =
+    list.filter(t => t.status !== "완료");
+
+  const doneList =
+    list.filter(t => t.status === "완료");
+
+  box.innerHTML = `
+
+    <div style="
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+      align-items:start;
+    ">
+
+      <div>
+
+        <h3 style="
+          margin-bottom:14px;
+          color:#2563eb;
+        ">
+          진행중 업무
+        </h3>
+
+        ${renderTaskColumn(ingList, false)}
+
+      </div>
+
+      <div>
+
+        <h3 style="
+          margin-bottom:14px;
+          color:#16a34a;
+        ">
+          완료 업무
+        </h3>
+
+        ${renderTaskColumn(doneList, true)}
+
+      </div>
+
+    </div>
+
+  `;
+}
+
 
 async function updateTaskProgress(taskId) {
   if (!taskId) {
