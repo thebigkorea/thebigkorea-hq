@@ -310,7 +310,10 @@ function renderResults(list){
       <td>${item.workplace || ""}</td>
       <td>${item.name || ""}</td>
       <td>${item.phone || ""}</td>
-      <td>${item.rrn || item.residentNo || ""}</td>
+      <td>${
+  (item.rrn || item.residentNo || "")
+    .replace(/^(\d{6})-(\d).*/, "$1-$2******")
+}</td>
       <td>${item.position || ""}</td>
       <td>${item.employmentType || item.contractType || ""}</td>
       <td>${item.joinDate || ""}</td>
