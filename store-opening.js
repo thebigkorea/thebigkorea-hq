@@ -254,11 +254,7 @@ function renderSchedule(list) {
   if (!box) return;
 
   if (!list || list.length === 0) {
-    box.innerHTML = `
-      <div class="project-card">
-        등록된 업무 일정이 없습니다.
-      </div>
-    `;
+    box.innerHTML = `<div class="project-card">등록된 업무 일정이 없습니다.</div>`;
     return;
   }
 
@@ -268,40 +264,62 @@ function renderSchedule(list) {
     const progress = Number(t.progress || 0);
 
     html += `
-      <div class="project-card">
-        <div class="project-title">
-          ${t.date || ""} · ${t.title || ""}
+      <div class="project-card" style="
+        display:grid;
+        grid-template-columns:120px 1.3fr 1fr 1.2fr 260px;
+        gap:18px;
+        align-items:center;
+      ">
+
+        <div style="font-weight:800;font-size:18px;">
+          ${t.date || ""}
+        </div>
+
+        <div>
+          <div class="project-title">${t.title || ""}</div>
+          <div class="project-meta">
+            점포 : ${t.storeName || ""}<br>
+            업무구분 : ${t.category || ""} ｜ 담당자 : ${t.owner || ""}
+          </div>
         </div>
 
         <div class="project-meta">
-          점포 : ${t.storeName || ""}<br>
-          업무구분 : ${t.category || ""}<br>
-          담당자 : ${t.owner || ""}<br>
           상태 : ${statusBadge(t.status)}<br>
           진행률 : ${progress}%<br>
-          중요도 : ${t.priority || ""}<br>
+          중요도 : ${t.priority || ""}
+          <div class="progress-wrap" style="margin-top:8px;">
+            <div class="progress-bar" style="width:${progress}%"></div>
+          </div>
+        </div>
+
+        <div class="project-meta">
           지연사유 : ${t.delayReason || "-"}<br>
           관리자메모 : ${t.adminMemo || "-"}<br>
           최종수정 : ${t.updatedAt || "-"}
         </div>
 
-        <div class="progress-wrap" style="margin-top:12px;">
-          <div class="progress-bar" style="width:${progress}%"></div>
-        </div>
-
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;">
-          <button class="primary" style="padding:9px 12px;" onclick="updateTaskProgress('${safeText(t.taskId)}')">
+        <div style="
+          display:flex;
+          gap:8px;
+          justify-content:flex-end;
+          flex-wrap:wrap;
+        ">
+          <button class="primary" style="padding:8px 12px;font-size:13px;"
+            onclick="updateTaskProgress('${safeText(t.taskId)}')">
             진행수정
           </button>
 
-          <button class="primary" style="padding:9px 12px;" onclick="delayTask('${safeText(t.taskId)}')">
+          <button class="primary" style="padding:8px 12px;font-size:13px;background:#b45309;"
+            onclick="delayTask('${safeText(t.taskId)}')">
             지연등록
           </button>
 
-          <button class="primary" style="padding:9px 12px;" onclick="completeTask('${safeText(t.taskId)}')">
+          <button class="primary" style="padding:8px 12px;font-size:13px;"
+            onclick="completeTask('${safeText(t.taskId)}')">
             완료처리
           </button>
         </div>
+
       </div>
     `;
   });
