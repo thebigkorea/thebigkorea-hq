@@ -116,22 +116,21 @@ textarea{
   button{width:100%}
 }
 </style>
-</head>
-
-<body>
 
 <script>
 const ADMIN_PASSWORD = "1234";
 
 const pw = prompt("관리자 비밀번호를 입력하세요.");
 
-if(pw !== ADMIN_PASSWORD){
+if (pw !== ADMIN_PASSWORD) {
   alert("비밀번호가 올바르지 않습니다.");
-  location.href = "index.html";
+  location.replace("index.html");
 }
 </script>
 
-<header class="header">
+</head>
+
+<body>
 
 <header class="header">
   <h1>직원정보 관리자 조회</h1>
