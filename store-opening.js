@@ -201,23 +201,23 @@ async function loadSchedule() {
   const box = document.getElementById("scheduleList");
   if (!box) return;
 
+  const month = val("scheduleMonth");
+  const projectId = val("scheduleProjectId");
+
   box.innerHTML = "일정을 불러오는 중입니다...";
 
   try {
     const data = await api({
-      action: "getOpeningTasks"
+      action: "getOpeningSchedule",
+      month: month,
+      projectId: projectId
     });
 
-    console.log("업무 데이터 확인:", data);
+    console.log("일정 데이터 확인:", data);
 
-    tasks =
-      data.tasks ||
-      data.items ||
-      data.data ||
-      data.rows ||
-      [];
+    const schedules = data.schedules || [];
 
-    renderSchedule(tasks);
+    renderSchedule(schedules);
 
   } catch (err) {
     console.error(err);
@@ -242,35 +242,21 @@ function renderSchedule(list) {
     return;
   }
 
-  list.sort((a, b) => {
-    const da = a.dueDate || a["마감일"] || a.startDate || a["시작일"] || "";
-    const db = b.dueDate || b["마감일"] || b.startDate || b["시작일"] || "";
-    return String(da).localeCompare(String(db));
-  });
-
   let html = "";
 
   list.forEach(t => {
-    const pid = t.projectId || t["projectId"];
-
-    const project = projects.find(p =>
-      String(p.projectId) === String(pid)
-    );
-
     html += `
       <div class="project-card">
         <div class="project-title">
-          ${t.title || t["업무명"] || ""}
+          ${t.date || ""} · ${t.title || ""}
         </div>
 
         <div class="project-meta">
-          점포 : ${project ? project.storeName : ""}<br>
-          업무구분 : ${t.category || t["업무구분"] || ""}<br>
-          담당자 : ${t.owner || t["담당자"] || ""}<br>
-          시작일 : ${t.startDate || t["시작일"] || ""}<br>
-          마감일 : ${t.dueDate || t["마감일"] || ""}<br>
-          상태 : ${t.status || t["상태"] || ""}<br>
-          메모 : ${t.memo || t["메모"] || ""}
+          점포 : ${t.storeName || ""}<br>
+          업무구분 : ${t.category || ""}<br>
+          담당자 : ${t.owner || ""}<br>
+          상태 : ${t.status || ""}<br>
+          중요도 : ${t.priority || ""}
         </div>
       </div>
     `;
