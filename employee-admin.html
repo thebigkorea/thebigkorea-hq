@@ -309,6 +309,11 @@ async function searchEmployees(){
   }
 }
 
+function maskRrn(v){
+  const s = String(v || "");
+  return s.replace(/^(\d{6})-(\d).*/, "$1-$2******");
+}
+
 function renderResults(list){
   const body = document.getElementById("resultBody");
 
@@ -322,10 +327,7 @@ function renderResults(list){
       <td>${item.workplace || ""}</td>
       <td>${item.name || ""}</td>
       <td>${item.phone || ""}</td>
-      <td>${
-  (item.rrn || item.residentNo || "")
-    .replace(/^(\d{6})-(\d).*/, "$1-$2******")
-}</td>
+      <td>${maskRrn(item.rrn || item.residentNo || "")}</td>
       <td>${item.position || ""}</td>
       <td>${item.employmentType || item.contractType || ""}</td>
       <td>${item.joinDate || ""}</td>
@@ -349,8 +351,15 @@ function openDetail(item){
   document.getElementById("d_address").value = item.address || "";
   document.getElementById("d_memo").value = item.memo || "";
 
-  document.getElementById("detailCard").classList.remove("hidden");
-  document.getElementById("detailStatus").innerText = "";
+  const detail = document.getElementById("detailCard");
+
+detail.classList.remove("hidden");
+document.getElementById("detailStatus").innerText = "";
+
+detail.scrollIntoView({
+  behavior: "smooth",
+  block: "start"
+});
 }
 
 function closeDetail(){
