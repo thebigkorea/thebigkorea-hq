@@ -2,10 +2,22 @@ const API_URL =
   "https://script.google.com/macros/s/AKfycbx1Yc28RHFH_rsl11OnZCyVPH7QvzjEI36lzjqhXZZUQSQMEo-n4fs--bEjPxI5Zbd4/exec";
 
 let projects = [];
+let tasks = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   setDefaultMonth();
   loadProjects();
+
+  const scheduleMonth = document.getElementById("scheduleMonth");
+  const scheduleProjectId = document.getElementById("scheduleProjectId");
+
+  if (scheduleMonth) {
+    scheduleMonth.addEventListener("change", loadSchedule);
+  }
+
+  if (scheduleProjectId) {
+    scheduleProjectId.addEventListener("change", loadSchedule);
+  }
 });
 
 function showTab(id, btn) {
@@ -17,6 +29,10 @@ function showTab(id, btn) {
 
   document.getElementById(id).classList.add("active");
   btn.classList.add("active");
+
+  if (id === "schedule") {
+    loadSchedule();
+  }
 }
 
 function val(id) {
@@ -87,6 +103,14 @@ async function saveTask() {
   });
 
   alert(data.message || "업무 저장 완료");
+
+  document.getElementById("taskTitle").value = "";
+  document.getElementById("taskOwner").value = "";
+  document.getElementById("taskStartDate").value = "";
+  document.getElementById("taskDueDate").value = "";
+  document.getElementById("taskMemo").value = "";
+
+  loadSchedule();
 }
 
 async function loadProjects() {
@@ -130,6 +154,7 @@ async function loadProjects() {
       : "0%";
 
   fillProjectSelects();
+  loadSchedule();
 }
 
 function fillProjectSelects() {
@@ -143,6 +168,8 @@ function fillProjectSelects() {
     const select = document.getElementById(id);
     if (!select) return;
 
+    const currentValue = select.value;
+
     select.innerHTML = `<option value="">점포 선택</option>`;
 
     projects.forEach(p => {
@@ -151,7 +178,105 @@ function fillProjectSelects() {
       opt.textContent = p.storeName;
       select.appendChild(opt);
     });
+
+    if (currentValue) {
+      select.value = currentValue;
+    }
   });
+}
+
+async function loadSchedule() {
+  const box = document.getElementById("scheduleList");
+  if (!box) return;
+
+  const month = val("scheduleMonth");
+  const projectId = val("scheduleProjectId");
+
+  box.innerHTML = "일정을 불러오는 중입니다...";
+
+  try {
+    const data = await api({
+      action: "getOpeningTasks",
+      projectId: projectId
+    });
+
+    tasks = data.tasks || data.items || [];
+
+    let filtered = tasks;
+
+    if (month) {
+      filtered = filtered.filter(t => {
+        const start = String(t.startDate || "");
+        const due = String(t.dueDate || "");
+
+        return start.startsWith(month) || due.startsWith(month);
+      });
+    }
+
+    if (projectId) {
+      filtered = filtered.filter(t =>
+        String(t.projectId) === String(projectId)
+      );
+    }
+
+    renderSchedule(filtered);
+
+  } catch (err) {
+    console.error(err);
+    box.innerHTML = `
+      <div class="project-card">
+        일정표를 불러오지 못했습니다.
+      </div>
+    `;
+  }
+}
+
+function renderSchedule(list) {
+  const box = document.getElementById("scheduleList");
+  if (!box) return;
+
+  if (!list || list.length === 0) {
+    box.innerHTML = `
+      <div class="project-card">
+        등록된 업무 일정이 없습니다.
+      </div>
+    `;
+    return;
+  }
+
+  list.sort((a, b) => {
+    const da = a.dueDate || a.startDate || "";
+    const db = b.dueDate || b.startDate || "";
+    return da.localeCompare(db);
+  });
+
+  let html = "";
+
+  list.forEach(t => {
+    const project = projects.find(p =>
+      String(p.projectId) === String(t.projectId)
+    );
+
+    html += `
+      <div class="project-card">
+        <div class="project-title">
+          ${t.title || ""}
+        </div>
+
+        <div class="project-meta">
+          점포 : ${project ? project.storeName : (t.storeName || "")}<br>
+          업무구분 : ${t.category || ""}<br>
+          담당자 : ${t.owner || ""}<br>
+          시작일 : ${t.startDate || ""}<br>
+          마감일 : ${t.dueDate || ""}<br>
+          상태 : ${t.status || ""}<br>
+          메모 : ${t.memo || ""}
+        </div>
+      </div>
+    `;
+  });
+
+  box.innerHTML = html;
 }
 
 async function saveExpense() {
