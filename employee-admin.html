@@ -22,13 +22,11 @@ body{
 }
 .header h1{margin:0;font-size:28px}
 .header p{margin:8px 0 0;color:rgba(255,255,255,.85)}
-
 .wrap{
   max-width:1100px;
   margin:0 auto;
   padding:22px;
 }
-
 .card{
   background:#fff;
   border-radius:22px;
@@ -36,18 +34,15 @@ body{
   margin-bottom:18px;
   box-shadow:0 6px 22px rgba(0,0,0,.08);
 }
-
 .search-grid{
   display:grid;
   grid-template-columns:1fr 1fr auto;
   gap:12px;
 }
-
 label{
   font-weight:900;
   font-size:14px;
 }
-
 input,select{
   width:100%;
   margin-top:7px;
@@ -57,7 +52,6 @@ input,select{
   padding:0 14px;
   font-size:15px;
 }
-
 button{
   height:52px;
   border:0;
@@ -69,34 +63,25 @@ button{
   cursor:pointer;
   margin-top:24px;
 }
-
 button.gray{background:#64748b}
 button.green{background:#197857}
-
-.table-wrap{
-  overflow-x:auto;
-}
-
+.table-wrap{overflow-x:auto}
 table{
   width:100%;
   border-collapse:collapse;
   min-width:950px;
 }
-
 th,td{
   border-bottom:1px solid #e5e7eb;
   padding:12px 10px;
   text-align:left;
   font-size:14px;
 }
-
 th{
   background:#eef3f8;
   font-weight:900;
 }
-
 tr:hover{background:#fafafa}
-
 .status{
   margin-top:14px;
   padding:13px;
@@ -105,21 +90,17 @@ tr:hover{background:#fafafa}
   color:#334155;
   font-size:14px;
 }
-
 .empty{
   text-align:center;
   color:#777;
   padding:30px;
 }
-
 .detail-grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:12px;
 }
-
 .full{grid-column:1/-1}
-
 textarea{
   width:100%;
   min-height:90px;
@@ -129,13 +110,9 @@ textarea{
   font-size:15px;
   resize:vertical;
 }
-
 .hidden{display:none}
-
 @media(max-width:760px){
-  .search-grid,.detail-grid{
-    grid-template-columns:1fr;
-  }
+  .search-grid,.detail-grid{grid-template-columns:1fr}
   button{width:100%}
 }
 </style>
@@ -281,6 +258,15 @@ function setStatus(msg){
   document.getElementById("status").innerText = msg;
 }
 
+async function postApi(data){
+  const res = await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify(data)
+  });
+
+  return await res.json();
+}
+
 async function searchEmployees(){
   const keyword = val("keyword");
   const workplace = val("workplace");
@@ -288,17 +274,19 @@ async function searchEmployees(){
   setStatus("조회 중입니다...");
 
   try{
-    const res = await fetch(API_URL,{
-      method:"POST",
-      body:JSON.stringify({
-        action:"searchEmployeeAdmin",
-        keyword,
-        workplace
-      })
+    const result = await postApi({
+      action:"searchEmployees",
+      keyword,
+      workplace
     });
 
-    const result = await res.json();
-    const list = result.data || [];
+    if(!result.success){
+      setStatus(result.message || "조회 실패");
+      renderResults([]);
+      return;
+    }
+
+    const list = result.rows || [];
 
     renderResults(list);
     setStatus(list.length + "건 조회되었습니다.");
@@ -317,34 +305,34 @@ function renderResults(list){
     return;
   }
 
-  body.innerHTML = list.map((item, idx) => `
+  body.innerHTML = list.map(item => `
     <tr>
-      <td>${item.workplace || item.workPlace || ""}</td>
-      <td>${item.name || item.empName || ""}</td>
+      <td>${item.workplace || ""}</td>
+      <td>${item.name || ""}</td>
       <td>${item.phone || ""}</td>
-      <td>${item.residentNo || ""}</td>
+      <td>${item.rrn || item.residentNo || ""}</td>
       <td>${item.position || ""}</td>
-      <td>${item.contractType || ""}</td>
-      <td>${item.joinDate || item.startDate || ""}</td>
-      <td>${item.leaveDate || item.endDate || ""}</td>
+      <td>${item.employmentType || item.contractType || ""}</td>
+      <td>${item.joinDate || ""}</td>
+      <td>${item.leaveDate || ""}</td>
       <td><button onclick='openDetail(${JSON.stringify(item)})'>보기</button></td>
     </tr>
   `).join("");
 }
 
 function openDetail(item){
-  selectedRowId = item.rowId || item.row || "";
+  selectedRowId = item.rowId || "";
 
-  document.getElementById("d_workplace").value = item.workplace || item.workPlace || "";
-  document.getElementById("d_name").value = item.name || item.empName || "";
+  document.getElementById("d_workplace").value = item.workplace || "";
+  document.getElementById("d_name").value = item.name || "";
   document.getElementById("d_phone").value = item.phone || "";
-  document.getElementById("d_residentNo").value = item.residentNo || "";
+  document.getElementById("d_residentNo").value = item.rrn || item.residentNo || "";
   document.getElementById("d_position").value = item.position || "";
-  document.getElementById("d_contractType").value = item.contractType || "";
-  document.getElementById("d_joinDate").value = item.joinDate || item.startDate || "";
-  document.getElementById("d_leaveDate").value = item.leaveDate || item.endDate || "";
+  document.getElementById("d_contractType").value = item.employmentType || item.contractType || "";
+  document.getElementById("d_joinDate").value = item.joinDate || "";
+  document.getElementById("d_leaveDate").value = item.leaveDate || "";
   document.getElementById("d_address").value = item.address || "";
-  document.getElementById("d_memo").value = item.memo || item.jobDuty || "";
+  document.getElementById("d_memo").value = item.memo || "";
 
   document.getElementById("detailCard").classList.remove("hidden");
   document.getElementById("detailStatus").innerText = "";
@@ -356,7 +344,7 @@ function closeDetail(){
 
 async function updateEmployee(){
   const data = {
-    action:"updateEmployeeAdmin",
+    action:"updateEmployee",
     rowId:selectedRowId,
     workplace:val("d_workplace"),
     workPlace:val("d_workplace"),
@@ -364,26 +352,22 @@ async function updateEmployee(){
     empName:val("d_name"),
     phone:val("d_phone"),
     residentNo:val("d_residentNo"),
+    rrn:val("d_residentNo"),
     position:val("d_position"),
+    employmentType:val("d_contractType"),
     contractType:val("d_contractType"),
     joinDate:val("d_joinDate"),
     startDate:val("d_joinDate"),
     leaveDate:val("d_leaveDate"),
     endDate:val("d_leaveDate"),
     address:val("d_address"),
-    memo:val("d_memo"),
-    jobDuty:val("d_memo")
+    memo:val("d_memo")
   };
 
   document.getElementById("detailStatus").innerText = "저장 중입니다...";
 
   try{
-    const res = await fetch(API_URL,{
-      method:"POST",
-      body:JSON.stringify(data)
-    });
-
-    const result = await res.json();
+    const result = await postApi(data);
 
     if(result.success){
       document.getElementById("detailStatus").innerText = "수정 저장되었습니다.";
@@ -397,6 +381,8 @@ async function updateEmployee(){
     document.getElementById("detailStatus").innerText = "저장 중 오류가 발생했습니다.";
   }
 }
+
+window.addEventListener("DOMContentLoaded", searchEmployees);
 </script>
 
 </body>
