@@ -196,27 +196,26 @@ async function loadSchedule() {
 
   try {
     const data = await api({
-      action: "getOpeningTasks",
-      projectId: projectId
+      action: "getOpeningTasks"
     });
 
-    tasks = data.tasks || data.items || [];
+    tasks = data.tasks || data.items || data.data || [];
 
     let filtered = tasks;
 
+    if (projectId) {
+      filtered = filtered.filter(t =>
+        String(t.projectId || t["projectId"]) === String(projectId)
+      );
+    }
+
     if (month) {
       filtered = filtered.filter(t => {
-        const start = String(t.startDate || "");
-        const due = String(t.dueDate || "");
+        const start = String(t.startDate || t["시작일"] || "");
+        const due = String(t.dueDate || t["마감일"] || "");
 
         return start.startsWith(month) || due.startsWith(month);
       });
-    }
-
-    if (projectId) {
-      filtered = filtered.filter(t =>
-        String(t.projectId) === String(projectId)
-      );
     }
 
     renderSchedule(filtered);
@@ -245,32 +244,34 @@ function renderSchedule(list) {
   }
 
   list.sort((a, b) => {
-    const da = a.dueDate || a.startDate || "";
-    const db = b.dueDate || b.startDate || "";
-    return da.localeCompare(db);
+    const da = a.dueDate || a["마감일"] || a.startDate || a["시작일"] || "";
+    const db = b.dueDate || b["마감일"] || b.startDate || b["시작일"] || "";
+    return String(da).localeCompare(String(db));
   });
 
   let html = "";
 
   list.forEach(t => {
+    const pid = t.projectId || t["projectId"];
+
     const project = projects.find(p =>
-      String(p.projectId) === String(t.projectId)
+      String(p.projectId) === String(pid)
     );
 
     html += `
       <div class="project-card">
         <div class="project-title">
-          ${t.title || ""}
+          ${t.title || t["업무명"] || ""}
         </div>
 
         <div class="project-meta">
-          점포 : ${project ? project.storeName : (t.storeName || "")}<br>
-          업무구분 : ${t.category || ""}<br>
-          담당자 : ${t.owner || ""}<br>
-          시작일 : ${t.startDate || ""}<br>
-          마감일 : ${t.dueDate || ""}<br>
-          상태 : ${t.status || ""}<br>
-          메모 : ${t.memo || ""}
+          점포 : ${project ? project.storeName : ""}<br>
+          업무구분 : ${t.category || t["업무구분"] || ""}<br>
+          담당자 : ${t.owner || t["담당자"] || ""}<br>
+          시작일 : ${t.startDate || t["시작일"] || ""}<br>
+          마감일 : ${t.dueDate || t["마감일"] || ""}<br>
+          상태 : ${t.status || t["상태"] || ""}<br>
+          메모 : ${t.memo || t["메모"] || ""}
         </div>
       </div>
     `;
