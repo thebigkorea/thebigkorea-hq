@@ -33,6 +33,10 @@ function showTab(id, btn) {
   if (id === "schedule") {
     loadSchedule();
   }
+
+  if (id === "list") {
+    loadProjects();
+  }
 }
 
 function val(id) {
@@ -111,6 +115,7 @@ async function saveTask() {
     startDate: val("taskStartDate"),
     dueDate: val("taskDueDate"),
     status: val("taskStatus"),
+    progress: val("taskStatus") === "완료" ? "100" : "0",
     memo: val("taskMemo")
   });
 
@@ -122,6 +127,7 @@ async function saveTask() {
   document.getElementById("taskDueDate").value = "";
   document.getElementById("taskMemo").value = "";
 
+  loadProjects();
   loadSchedule();
 }
 
@@ -139,7 +145,8 @@ async function loadProjects() {
   list.innerHTML = "";
 
   projects.forEach(p => {
-    progressSum += Number(p.progress || 0);
+    const progress = Number(p.progress || 0);
+    progressSum += progress;
 
     list.innerHTML += `
       <div class="project-card">
@@ -150,11 +157,12 @@ async function loadProjects() {
           유통사 : ${p.retailer || ""}<br>
           담당 : ${p.owner || ""}<br>
           오픈예정 : ${p.openDate || ""}<br>
-          상태 : ${p.status || ""}
+          상태 : ${p.status || ""}<br>
+          진행률 : ${progress}%
         </div>
 
         <div class="progress-wrap">
-          <div class="progress-bar" style="width:${p.progress || 0}%"></div>
+          <div class="progress-bar" style="width:${progress}%"></div>
         </div>
       </div>
     `;
@@ -166,7 +174,6 @@ async function loadProjects() {
       : "0%";
 
   fillProjectSelects();
-  loadSchedule();
 }
 
 function fillProjectSelects() {
@@ -213,10 +220,7 @@ async function loadSchedule() {
       projectId: projectId
     });
 
-    console.log("일정 데이터 확인:", data);
-
     const schedules = data.schedules || [];
-
     renderSchedule(schedules);
 
   } catch (err) {
@@ -227,6 +231,22 @@ async function loadSchedule() {
       </div>
     `;
   }
+}
+
+function statusBadge(status) {
+  if (status === "완료") return "✅ 완료";
+  if (status === "지연") return "⚠️ 지연";
+  if (status === "진행중") return "🔵 진행중";
+  if (status === "예정") return "🟡 예정";
+  return status || "";
+}
+
+function safeText(v) {
+  return String(v || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function renderSchedule(list) {
@@ -245,6 +265,8 @@ function renderSchedule(list) {
   let html = "";
 
   list.forEach(t => {
+    const progress = Number(t.progress || 0);
+
     html += `
       <div class="project-card">
         <div class="project-title">
@@ -255,14 +277,122 @@ function renderSchedule(list) {
           점포 : ${t.storeName || ""}<br>
           업무구분 : ${t.category || ""}<br>
           담당자 : ${t.owner || ""}<br>
-          상태 : ${t.status || ""}<br>
-          중요도 : ${t.priority || ""}
+          상태 : ${statusBadge(t.status)}<br>
+          진행률 : ${progress}%<br>
+          중요도 : ${t.priority || ""}<br>
+          지연사유 : ${t.delayReason || "-"}<br>
+          관리자메모 : ${t.adminMemo || "-"}<br>
+          최종수정 : ${t.updatedAt || "-"}
+        </div>
+
+        <div class="progress-wrap" style="margin-top:12px;">
+          <div class="progress-bar" style="width:${progress}%"></div>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;">
+          <button class="primary" style="padding:9px 12px;" onclick="updateTaskProgress('${safeText(t.taskId)}')">
+            진행수정
+          </button>
+
+          <button class="primary" style="padding:9px 12px;" onclick="delayTask('${safeText(t.taskId)}')">
+            지연등록
+          </button>
+
+          <button class="primary" style="padding:9px 12px;" onclick="completeTask('${safeText(t.taskId)}')">
+            완료처리
+          </button>
         </div>
       </div>
     `;
   });
 
   box.innerHTML = html;
+}
+
+async function updateTaskProgress(taskId) {
+  if (!taskId) {
+    alert("업무 ID가 없습니다.");
+    return;
+  }
+
+  let progress = prompt("현재 진행률을 숫자로 입력하세요. 예: 30, 50, 80");
+  if (progress === null) return;
+
+  progress = progress.replace(/[^0-9]/g, "");
+  progress = Math.max(0, Math.min(100, Number(progress || 0)));
+
+  const adminMemo = prompt("관리자 메모를 입력하세요.", "") || "";
+
+  const status = progress >= 100 ? "완료" : "진행중";
+
+  const data = await api({
+    action: "updateOpeningTask",
+    taskId: taskId,
+    status: status,
+    progress: progress,
+    delayReason: "",
+    adminMemo: adminMemo
+  });
+
+  alert(data.message || "진행상태가 수정되었습니다.");
+  loadProjects();
+  loadSchedule();
+}
+
+async function delayTask(taskId) {
+  if (!taskId) {
+    alert("업무 ID가 없습니다.");
+    return;
+  }
+
+  const delayReason = prompt("지연 사유를 입력하세요.", "");
+  if (delayReason === null) return;
+
+  let progress = prompt("현재 진행률을 입력하세요. 예: 20, 40, 60", "0");
+  if (progress === null) return;
+
+  progress = progress.replace(/[^0-9]/g, "");
+  progress = Math.max(0, Math.min(100, Number(progress || 0)));
+
+  const adminMemo = prompt("관리자 메모를 입력하세요.", "") || "";
+
+  const data = await api({
+    action: "updateOpeningTask",
+    taskId: taskId,
+    status: "지연",
+    progress: progress,
+    delayReason: delayReason,
+    adminMemo: adminMemo
+  });
+
+  alert(data.message || "지연상태가 등록되었습니다.");
+  loadProjects();
+  loadSchedule();
+}
+
+async function completeTask(taskId) {
+  if (!taskId) {
+    alert("업무 ID가 없습니다.");
+    return;
+  }
+
+  const ok = confirm("이 업무를 완료 처리하시겠습니까?");
+  if (!ok) return;
+
+  const adminMemo = prompt("완료 메모를 입력하세요.", "완료 처리") || "";
+
+  const data = await api({
+    action: "updateOpeningTask",
+    taskId: taskId,
+    status: "완료",
+    progress: "100",
+    delayReason: "",
+    adminMemo: adminMemo
+  });
+
+  alert(data.message || "완료 처리되었습니다.");
+  loadProjects();
+  loadSchedule();
 }
 
 async function saveExpense() {
