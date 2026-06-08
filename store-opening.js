@@ -189,9 +189,6 @@ async function loadSchedule() {
   const box = document.getElementById("scheduleList");
   if (!box) return;
 
-  const month = val("scheduleMonth");
-  const projectId = val("scheduleProjectId");
-
   box.innerHTML = "일정을 불러오는 중입니다...";
 
   try {
@@ -199,26 +196,16 @@ async function loadSchedule() {
       action: "getOpeningTasks"
     });
 
-    tasks = data.tasks || data.items || data.data || [];
+    console.log("업무 데이터 확인:", data);
 
-    let filtered = tasks;
+    tasks =
+      data.tasks ||
+      data.items ||
+      data.data ||
+      data.rows ||
+      [];
 
-    if (projectId) {
-      filtered = filtered.filter(t =>
-        String(t.projectId || t["projectId"]) === String(projectId)
-      );
-    }
-
-    if (month) {
-      filtered = filtered.filter(t => {
-        const start = String(t.startDate || t["시작일"] || "");
-        const due = String(t.dueDate || t["마감일"] || "");
-
-        return start.startsWith(month) || due.startsWith(month);
-      });
-    }
-
-    renderSchedule(filtered);
+    renderSchedule(tasks);
 
   } catch (err) {
     console.error(err);
