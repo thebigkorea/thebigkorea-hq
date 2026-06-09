@@ -22,6 +22,10 @@ function showTab(id, btn){
   if(id === "list"){
     loadTasks();
   }
+
+  if(id === "done"){
+    renderDoneTasks();
+  }
 }
 
 function setToday(){
@@ -46,9 +50,16 @@ async function saveTask(){
     dueDate: getValue("dueDate"),
     priority: getValue("priority"),
     status: getValue("status"),
+    progress: getValue("progress") || "0",
     detail: getValue("detail"),
+    delayReason: getValue("delayReason"),
     feedback: getValue("feedback")
   };
+
+  if(!data.storeName){
+    alert("관련 점포를 선택하세요.");
+    return;
+  }
 
   if(!data.title){
     alert("업무명을 입력하세요.");
@@ -71,7 +82,7 @@ async function saveTask(){
     if(result.success){
       alert("디자인 업무가 저장되었습니다.");
       clearForm();
-      loadTasks();
+      await loadTasks();
       showTab("list", document.querySelectorAll(".tab")[1]);
     }else{
       alert(result.message || "저장에 실패했습니다.");
@@ -86,7 +97,7 @@ async function saveTask(){
 async function loadTasks(){
 
   try{
-    const res = await fetch(API_URL + "?action=list");
+    const res = await fetch(API_URL + "?action=list&t=" + Date.now());
     tasks = await res.json();
 
     if(!Array.isArray(tasks)){
@@ -106,7 +117,9 @@ function renderSummary(){
 
   const today = getTodayDate();
 
-  const total = tasks.length;
+  const active = tasks.filter(t =>
+    t.status !== "완료"
+  ).length;
 
   const urgent = tasks.filter(t =>
     t.priority === "긴급" && t.status !== "완료"
@@ -117,9 +130,14 @@ function renderSummary(){
     return new Date(t.dueDate) < today;
   }).length;
 
-  document.getElementById("totalCount").innerText = total;
-  document.getElementById("urgentCount").innerText = urgent;
-  document.getElementById("overdueCount").innerText = overdue;
+  const done = tasks.filter(t =>
+    t.status === "완료"
+  ).length;
+
+  setText("activeCount", active);
+  setText("urgentCount", urgent);
+  setText("overdueCount", overdue);
+  setText("doneCount", done);
 }
 
 function renderTasks(){
@@ -127,10 +145,11 @@ function renderTasks(){
   const box = document.getElementById("taskList");
   if(!box) return;
 
-  const statusFilter = document.getElementById("filterStatus").value;
-  const priorityFilter = document.getElementById("filterPriority").value;
+  const statusFilter = getValue("filterStatus");
+  const priorityFilter = getValue("filterPriority");
+  const storeFilter = getValue("filterStore");
 
-  let list = tasks.slice();
+  let list = tasks.filter(t => t.status !== "완료");
 
   if(statusFilter){
     list = list.filter(t => t.status === statusFilter);
@@ -140,6 +159,10 @@ function renderTasks(){
     list = list.filter(t => t.priority === priorityFilter);
   }
 
+  if(storeFilter){
+    list = list.filter(t => t.storeName === storeFilter);
+  }
+
   list.sort((a,b) => {
     const da = a.dueDate || "9999-12-31";
     const db = b.dueDate || "9999-12-31";
@@ -147,65 +170,209 @@ function renderTasks(){
   });
 
   if(list.length === 0){
-    box.innerHTML = "<p>등록된 디자인 업무가 없습니다.</p>";
+    box.innerHTML = "<p>진행중인 디자인 업무가 없습니다.</p>";
     return;
   }
 
   const today = getTodayDate();
 
-  box.innerHTML = list.map(t => {
+  box.innerHTML = list.map(t => taskCardHtml(t, today)).join("");
+}
 
-    const overdue =
-      t.dueDate &&
-      t.status !== "완료" &&
-      new Date(t.dueDate) < today;
+function taskCardHtml(t, today){
 
-    let badge = "";
+  const overdue =
+    t.dueDate &&
+    t.status !== "완료" &&
+    new Date(t.dueDate) < today;
 
-    if(t.status === "완료"){
-      badge = `<span class="badge done">완료</span>`;
-    }else if(overdue){
-      badge = `<span class="badge danger">기한초과</span>`;
-    }else if(t.priority === "긴급"){
-      badge = `<span class="badge danger">긴급</span>`;
-    }else if(t.priority === "중요"){
-      badge = `<span class="badge warning">중요</span>`;
-    }else{
-      badge = `<span class="badge">진행</span>`;
-    }
+  const progress =
+    Number(t.progress || 0);
 
-    return `
-      <div class="task-card">
+  let badge = "";
 
-        <h3>${badge}${escapeHtml(t.title || "")}</h3>
+  if(t.status === "지연" || overdue){
+    badge = `<span class="badge danger">지연</span>`;
+  }else if(t.priority === "긴급"){
+    badge = `<span class="badge danger">긴급</span>`;
+  }else if(t.priority === "중요"){
+    badge = `<span class="badge warning">중요</span>`;
+  }else{
+    badge = `<span class="badge">진행</span>`;
+  }
 
-        <p><b>관련 점포:</b> ${escapeHtml(t.storeName || "-")}</p>
-        <p><b>업무유형:</b> ${escapeHtml(t.category || "-")}</p>
-        <p><b>요청자:</b> ${escapeHtml(t.requester || "-")}</p>
-        <p><b>디자인 담당자:</b> ${escapeHtml(t.owner || "-")}</p>
-        <p><b>요청일:</b> ${escapeHtml(t.requestDate || "-")}</p>
-        <p><b>목표일:</b> ${escapeHtml(t.dueDate || "-")}</p>
-        <p><b>중요도:</b> ${escapeHtml(t.priority || "-")}</p>
+  return `
+    <div class="task-card">
 
-        <label>상태 변경
-          <select onchange="updateStatus('${t.id}', this.value)">
-            ${statusOptions(t.status)}
-          </select>
-        </label>
+      <h3>${badge}${escapeHtml(t.title || "")}</h3>
 
-        <p><b>관리자 상세 요청사항</b></p>
-        <div class="memo-box">${escapeHtml(t.detail || "-")}</div>
+      <p><b>관련 점포:</b> ${escapeHtml(t.storeName || "-")}</p>
+      <p><b>업무유형:</b> ${escapeHtml(t.category || "-")}</p>
+      <p><b>요청자:</b> ${escapeHtml(t.requester || "-")}</p>
+      <p><b>디자인 담당자:</b> ${escapeHtml(t.owner || "-")}</p>
+      <p><b>요청일:</b> ${escapeHtml(t.requestDate || "-")}</p>
+      <p><b>목표일:</b> ${escapeHtml(t.dueDate || "-")}</p>
+      <p><b>중요도:</b> ${escapeHtml(t.priority || "-")}</p>
+      <p><b>현재 상태:</b> ${escapeHtml(t.status || "-")}</p>
 
-        <p><b>디자인팀 피드백</b></p>
-        <textarea id="feedback_${t.id}">${escapeHtml(t.feedback || "")}</textarea>
+      <label>진행률(%)
+        <input type="number"
+               id="progress_${t.id}"
+               value="${progress}"
+               min="0"
+               max="100">
+      </label>
+
+      <div class="progress-wrap">
+        <div class="progress-bar" style="width:${progress}%"></div>
+      </div>
+
+      <p><b>관리자 상세 요청사항</b></p>
+      <div class="memo-box">${escapeHtml(t.detail || "-")}</div>
+
+      <p><b>지연사유</b></p>
+      <textarea id="delay_${t.id}">${escapeHtml(t.delayReason || "")}</textarea>
+
+      <p><b>디자인팀 피드백</b></p>
+      <textarea id="feedback_${t.id}">${escapeHtml(t.feedback || "")}</textarea>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+
+        <button class="small-btn" onclick="updateProgress('${t.id}')">
+          진행수정
+        </button>
+
+        <button class="small-btn warning-btn" onclick="delayTask('${t.id}')">
+          지연등록
+        </button>
 
         <button class="small-btn" onclick="updateFeedback('${t.id}')">
           피드백 저장
         </button>
 
+        <button class="small-btn done-btn" onclick="completeTask('${t.id}')">
+          완료처리
+        </button>
+
       </div>
-    `;
-  }).join("");
+
+    </div>
+  `;
+}
+
+async function updateProgress(id){
+
+  const progress =
+    document.getElementById("progress_" + id)?.value || "0";
+
+  const feedback =
+    document.getElementById("feedback_" + id)?.value || "";
+
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body:JSON.stringify({
+        action:"updateProgress",
+        id,
+        progress,
+        feedback,
+        status: Number(progress) >= 100 ? "완료" : "진행중"
+      })
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      alert("진행률이 수정되었습니다.");
+      await loadTasks();
+    }else{
+      alert(result.message || "진행률 수정 실패");
+    }
+
+  }catch(err){
+    console.error(err);
+    alert("진행률 수정 중 오류가 발생했습니다.");
+  }
+}
+
+async function delayTask(id){
+
+  const progress =
+    document.getElementById("progress_" + id)?.value || "0";
+
+  const delayReason =
+    document.getElementById("delay_" + id)?.value ||
+    prompt("지연사유를 입력하세요.", "") ||
+    "";
+
+  if(!delayReason){
+    alert("지연사유를 입력하세요.");
+    return;
+  }
+
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body:JSON.stringify({
+        action:"delayTask",
+        id,
+        status:"지연",
+        progress,
+        delayReason
+      })
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      alert("지연으로 등록되었습니다.");
+      await loadTasks();
+    }else{
+      alert(result.message || "지연 등록 실패");
+    }
+
+  }catch(err){
+    console.error(err);
+    alert("지연 등록 중 오류가 발생했습니다.");
+  }
+}
+
+async function completeTask(id){
+
+  const ok =
+    confirm("이 디자인 업무를 완료 처리하시겠습니까?");
+
+  if(!ok) return;
+
+  const feedback =
+    document.getElementById("feedback_" + id)?.value || "";
+
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body:JSON.stringify({
+        action:"completeTask",
+        id,
+        status:"완료",
+        progress:"100",
+        feedback,
+        completedAt:getTodayString()
+      })
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      alert("업무가 완료 처리되었습니다.");
+      await loadTasks();
+    }else{
+      alert(result.message || "완료 처리 실패");
+    }
+
+  }catch(err){
+    console.error(err);
+    alert("완료 처리 중 오류가 발생했습니다.");
+  }
 }
 
 async function updateStatus(id, status){
@@ -264,6 +431,71 @@ async function updateFeedback(id){
   }
 }
 
+function renderDoneTasks(){
+
+  const box =
+    document.getElementById("doneTaskList");
+
+  if(!box) return;
+
+  const store =
+    getValue("doneStore");
+
+  const start =
+    getValue("doneStartDate");
+
+  const end =
+    getValue("doneEndDate");
+
+  let list =
+    tasks.filter(t => t.status === "완료");
+
+  if(store){
+    list = list.filter(t => t.storeName === store);
+  }
+
+  if(start){
+    list = list.filter(t =>
+      (t.completedAt || t.dueDate || "") >= start
+    );
+  }
+
+  if(end){
+    list = list.filter(t =>
+      (t.completedAt || t.dueDate || "") <= end
+    );
+  }
+
+  list.sort((a,b) => {
+    const da = a.completedAt || a.dueDate || "1900-01-01";
+    const db = b.completedAt || b.dueDate || "1900-01-01";
+    return db.localeCompare(da);
+  });
+
+  if(list.length === 0){
+    box.innerHTML = "<p>조회된 완료 업무가 없습니다.</p>";
+    return;
+  }
+
+  box.innerHTML = list.map(t => `
+    <div class="task-card">
+      <h3><span class="badge done">완료</span>${escapeHtml(t.title || "")}</h3>
+      <p><b>관련 점포:</b> ${escapeHtml(t.storeName || "-")}</p>
+      <p><b>업무유형:</b> ${escapeHtml(t.category || "-")}</p>
+      <p><b>요청자:</b> ${escapeHtml(t.requester || "-")}</p>
+      <p><b>디자인 담당자:</b> ${escapeHtml(t.owner || "-")}</p>
+      <p><b>요청일:</b> ${escapeHtml(t.requestDate || "-")}</p>
+      <p><b>목표일:</b> ${escapeHtml(t.dueDate || "-")}</p>
+      <p><b>완료일:</b> ${escapeHtml(t.completedAt || "-")}</p>
+      <p><b>진행률:</b> ${escapeHtml(t.progress || "100")}%</p>
+      <p><b>요청사항:</b></p>
+      <div class="memo-box">${escapeHtml(t.detail || "-")}</div>
+      <p><b>피드백:</b></p>
+      <div class="memo-box">${escapeHtml(t.feedback || "-")}</div>
+    </div>
+  `).join("");
+}
+
 function statusOptions(current){
   const list = [
     "요청",
@@ -271,6 +503,7 @@ function statusOptions(current){
     "진행중",
     "피드백대기",
     "수정중",
+    "지연",
     "완료",
     "보류"
   ];
@@ -282,20 +515,22 @@ function statusOptions(current){
 
 function clearForm(){
   [
-    "storeName",
     "title",
-    "requester",    
+    "requester",
     "dueDate",
     "detail",
+    "delayReason",
     "feedback"
   ].forEach(id => {
-    document.getElementById(id).value = "";
+    const el = document.getElementById(id);
+    if(el) el.value = "";
   });
 
+  document.getElementById("storeName").value = "";
   document.getElementById("category").value = "간판";
   document.getElementById("priority").value = "보통";
   document.getElementById("status").value = "요청";
-
+  document.getElementById("progress").value = "0";
   document.getElementById("owner").value = "김병식";
 
   setToday();
@@ -306,10 +541,19 @@ function getValue(id){
   return el ? el.value.trim() : "";
 }
 
+function setText(id, value){
+  const el = document.getElementById(id);
+  if(el) el.innerText = value;
+}
+
 function getTodayDate(){
   const today = new Date();
   today.setHours(0,0,0,0);
   return today;
+}
+
+function getTodayString(){
+  return new Date().toISOString().slice(0,10);
 }
 
 function escapeHtml(value){

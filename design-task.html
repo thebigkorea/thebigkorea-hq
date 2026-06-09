@@ -20,8 +20,8 @@
 
   <section class="summary">
     <div class="summary-card">
-      <strong id="totalCount">0</strong>
-      <span>전체 업무</span>
+      <strong id="activeCount">0</strong>
+      <span>진행중 업무</span>
     </div>
 
     <div class="summary-card">
@@ -33,11 +33,17 @@
       <strong id="overdueCount">0</strong>
       <span>기한초과</span>
     </div>
+
+    <div class="summary-card">
+      <strong id="doneCount">0</strong>
+      <span>완료 업무</span>
+    </div>
   </section>
 
   <section class="tabs">
     <button class="tab active" onclick="showTab('register', this)">업무등록</button>
-    <button class="tab" onclick="showTab('list', this)">업무현황</button>
+    <button class="tab" onclick="showTab('list', this)">진행업무</button>
+    <button class="tab" onclick="showTab('done', this)">완료업무조회</button>
   </section>
 
   <section id="register" class="panel active">
@@ -47,7 +53,17 @@
     <div class="form-grid">
 
       <label>관련 점포
-        <input type="text" id="storeName" placeholder="예: 파주 효종갱, 한국의집 롯데월드몰">
+        <select id="storeName">
+          <option value="">점포를 선택하세요</option>
+          <option>한국의집 롯데월드몰점</option>
+          <option>고호재 롯데월드몰점</option>
+          <option>효종갱 파주프리미엄아울렛점</option>
+          <option>압구정 길채정</option>
+          <option>평촌 소바공방</option>
+          <option>고궁 롯데부여아울렛점</option>
+          <option>카페그랑떼</option>
+          <option>기타</option>
+        </select>
       </label>
 
       <label>업무유형
@@ -93,6 +109,10 @@
         </select>
       </label>
 
+      <label>진행률(%)
+        <input type="number" id="progress" value="0" min="0" max="100">
+      </label>
+
       <label>상태
         <select id="status">
           <option>요청</option>
@@ -100,6 +120,7 @@
           <option>진행중</option>
           <option>피드백대기</option>
           <option>수정중</option>
+          <option>지연</option>
           <option>완료</option>
           <option>보류</option>
         </select>
@@ -113,6 +134,11 @@
     </label>
 
     <label class="full-label">
+      지연사유
+      <textarea id="delayReason" placeholder="기한 내 처리하지 못할 경우 지연사유를 입력하세요."></textarea>
+    </label>
+
+    <label class="full-label">
       디자인팀 피드백
       <textarea id="feedback" placeholder="디자인팀 의견, 진행상황, 문의사항 등을 입력하세요."></textarea>
     </label>
@@ -123,7 +149,7 @@
 
   <section id="list" class="panel">
 
-    <h2>디자인 업무 현황</h2>
+    <h2>진행중 디자인 업무</h2>
 
     <div class="filter-box">
       <select id="filterStatus" onchange="renderTasks()">
@@ -133,7 +159,7 @@
         <option>진행중</option>
         <option>피드백대기</option>
         <option>수정중</option>
-        <option>완료</option>
+        <option>지연</option>
         <option>보류</option>
       </select>
 
@@ -144,10 +170,60 @@
         <option>보통</option>
       </select>
 
+      <select id="filterStore" onchange="renderTasks()">
+        <option value="">전체점포</option>
+        <option>한국의집 롯데월드몰점</option>
+        <option>고호재 롯데월드몰점</option>
+        <option>효종갱 파주프리미엄아울렛점</option>
+        <option>압구정 길채정</option>
+        <option>평촌 소바공방</option>
+        <option>고궁 롯데부여아울렛점</option>
+        <option>카페그랑떼</option>
+        <option>기타</option>
+      </select>
+
       <button onclick="loadTasks()">새로고침</button>
     </div>
 
     <div id="taskList" class="task-list"></div>
+
+  </section>
+
+  <section id="done" class="panel">
+
+    <h2>완료된 디자인 업무 조회</h2>
+
+    <div class="form-grid">
+
+      <label>관련 점포
+        <select id="doneStore">
+          <option value="">전체점포</option>
+          <option>한국의집 롯데월드몰점</option>
+          <option>고호재 롯데월드몰점</option>
+          <option>효종갱 파주프리미엄아울렛점</option>
+          <option>압구정 길채정</option>
+          <option>평촌 소바공방</option>
+          <option>고궁 롯데부여아울렛점</option>
+          <option>카페그랑떼</option>
+          <option>기타</option>
+        </select>
+      </label>
+
+      <label>시작일
+        <input type="date" id="doneStartDate">
+      </label>
+
+      <label>종료일
+        <input type="date" id="doneEndDate">
+      </label>
+
+    </div>
+
+    <button class="primary" onclick="renderDoneTasks()">
+      완료 업무 조회
+    </button>
+
+    <div id="doneTaskList" class="task-list" style="margin-top:20px;"></div>
 
   </section>
 
