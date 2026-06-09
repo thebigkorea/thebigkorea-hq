@@ -284,8 +284,7 @@ function clearForm(){
   [
     "storeName",
     "title",
-    "requester",
-    "owner",
+    "requester",    
     "dueDate",
     "detail",
     "feedback"
@@ -296,6 +295,8 @@ function clearForm(){
   document.getElementById("category").value = "간판";
   document.getElementById("priority").value = "보통";
   document.getElementById("status").value = "요청";
+
+  document.getElementById("owner").value = "김병식";
 
   setToday();
 }
