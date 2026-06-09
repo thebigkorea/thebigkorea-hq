@@ -2,6 +2,7 @@ const API_URL =
   "https://script.google.com/macros/s/AKfycbwBT9t47oyGSXCahuJAfqx0LV08wmOQuACFyL_yHcJWCuXSTua2quhgDHPjqFdNV8JQ/exec";
 
 let tasks = [];
+let selectedTaskId = null;
 
 const STORE_OPTIONS = [
   "한국의집 롯데백화점 동탄점",
@@ -47,8 +48,11 @@ function showTab(id, btn){
   document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
 
-  document.getElementById(id).classList.add("active");
-  btn.classList.add("active");
+  const panel = document.getElementById(id);
+  if(panel) panel.classList.add("active");
+  if(btn) btn.classList.add("active");
+
+  selectedTaskId = null;
 
   if(id === "list") loadTasks();
   if(id === "done") renderDoneTasks();
@@ -114,6 +118,7 @@ async function loadTasks(){
 
     renderSummary();
     renderTasks();
+    renderDoneTasks();
   }catch(err){
     console.error(err);
     alert("업무 목록을 불러오지 못했습니다.");
@@ -127,7 +132,7 @@ function renderSummary(){
   const urgent = tasks.filter(t => t.priority === "긴급" && t.status !== "완료").length;
   const overdue = tasks.filter(t => {
     if(!t.dueDate || t.status === "완료") return false;
-    return new Date(t.dueDate) < today;
+    return parseDate(t.dueDate) < today;
   }).length;
   const done = tasks.filter(t => t.status === "완료").length;
 
@@ -147,6 +152,10 @@ function renderTasks(){
 
   let list = tasks.filter(t => t.status !== "완료");
 
+  if(selectedTaskId){
+    list = list.filter(t => String(t.id) === String(selectedTaskId));
+  }
+
   if(statusFilter) list = list.filter(t => t.status === statusFilter);
   if(priorityFilter) list = list.filter(t => t.priority === priorityFilter);
   if(storeFilter) list = list.filter(t => t.storeName === storeFilter);
@@ -163,18 +172,29 @@ function renderTasks(){
   }
 
   const today = getTodayDate();
-  box.innerHTML = list.map(t => taskCardHtml(t, today)).join("");
+
+  let html = "";
+
+  if(selectedTaskId){
+    html += `
+      <button class="small-btn" onclick="backToTaskList()" style="margin-bottom:12px;">
+        전체 목록으로
+      </button>
+    `;
+  }
+
+  html += list.map(t => taskCardHtml(t, today)).join("");
+
+  box.innerHTML = html;
 }
 
 function taskCardHtml(t, today){
-
   const overdue =
     t.dueDate &&
     t.status !== "완료" &&
-    new Date(t.dueDate) < today;
+    parseDate(t.dueDate) < today;
 
-  const progress =
-    Number(t.progress || 0);
+  const progress = Number(t.progress || 0);
 
   let badge = "";
 
@@ -188,12 +208,12 @@ function taskCardHtml(t, today){
     badge = `<span class="badge">진행</span>`;
   }
 
+  const isOpen = String(selectedTaskId) === String(t.id);
+
   return `
     <div class="task-card compact-card">
 
-      <div class="task-summary-line"
-           onclick="toggleTaskDetail('${t.id}')">
-
+      <div class="task-summary-line" onclick="toggleTaskDetail('${escapeAttr(t.id)}')">
         <div>
           <h3>${badge}${escapeHtml(t.title || "")}</h3>
           <p>
@@ -202,12 +222,10 @@ function taskCardHtml(t, today){
             · 진행률 ${progress}%
           </p>
         </div>
-
         <strong class="open-label">상세보기</strong>
-
       </div>
 
-      <div id="detail_${t.id}" class="task-detail" style="display:none;">
+      <div id="detail_${escapeAttr(t.id)}" class="task-detail" style="display:${isOpen ? "block" : "none"};">
 
         <p><b>관련 점포:</b> ${escapeHtml(t.storeName || "-")}</p>
         <p><b>업무유형:</b> ${escapeHtml(t.category || "-")}</p>
@@ -220,10 +238,14 @@ function taskCardHtml(t, today){
         <p><b>현재 상태:</b> ${escapeHtml(t.status || "-")}</p>
 
         <label>진행률(%)
-          <select id="progress_${t.id}">
+          <select id="progress_${escapeAttr(t.id)}">
             ${progressOptions(progress)}
           </select>
         </label>
+
+        <button class="small-btn" style="margin-top:8px;" onclick="updateProgress('${escapeAttr(t.id)}')">
+          진행률 등록
+        </button>
 
         <div class="progress-wrap">
           <div class="progress-bar" style="width:${progress}%"></div>
@@ -233,24 +255,23 @@ function taskCardHtml(t, today){
         <div class="memo-box">${escapeHtml(t.detail || "-")}</div>
 
         <p><b>지연사유</b></p>
-        <textarea id="delay_${t.id}">${escapeHtml(t.delayReason || "")}</textarea>
+        <textarea id="delay_${escapeAttr(t.id)}">${escapeHtml(t.delayReason || "")}</textarea>
 
         <p><b>수정 목표일</b></p>
-        <input type="date" id="revised_${t.id}" value="${escapeHtml(t.revisedDueDate || "")}">
+        <input type="date" id="revised_${escapeAttr(t.id)}" value="${escapeHtml(t.revisedDueDate || "")}">
 
         <p><b>작업요청자 피드백</b></p>
-        <textarea id="feedback_${t.id}">${escapeHtml(t.feedback || "")}</textarea>
+        <textarea id="feedback_${escapeAttr(t.id)}">${escapeHtml(t.feedback || "")}</textarea>
 
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
-          <button class="small-btn" onclick="updateProgress('${t.id}')">진행수정</button>
-          <button class="small-btn" onclick="editTask('${t.id}')">내용수정</button>
-          <button class="small-btn warning-btn" onclick="delayTask('${t.id}')">지연등록</button>
-          <button class="small-btn" onclick="updateFeedback('${t.id}')">피드백 저장</button>
-          <button class="small-btn done-btn" onclick="completeTask('${t.id}')">완료처리</button>
+          <button class="small-btn" onclick="updateProgress('${escapeAttr(t.id)}')">진행수정</button>
+          <button class="small-btn" onclick="editTask('${escapeAttr(t.id)}')">내용수정</button>
+          <button class="small-btn warning-btn" onclick="delayTask('${escapeAttr(t.id)}')">지연등록</button>
+          <button class="small-btn" onclick="updateFeedback('${escapeAttr(t.id)}')">피드백 저장</button>
+          <button class="small-btn done-btn" onclick="completeTask('${escapeAttr(t.id)}')">완료처리</button>
         </div>
 
       </div>
-
     </div>
   `;
 }
@@ -275,7 +296,17 @@ async function updateProgress(id){
 
     if(result.success){
       alert("진행률이 수정되었습니다.");
+
+      selectedTaskId = Number(progress) >= 100 ? null : id;
+
       await loadTasks();
+
+      if(Number(progress) >= 100){
+        showTab("done", document.querySelectorAll(".tab")[2]);
+      }else{
+        openTaskOnly(id);
+      }
+
     }else{
       alert(result.message || "진행률 수정 실패");
     }
@@ -317,7 +348,9 @@ async function delayTask(id){
 
     if(result.success){
       alert("지연으로 등록되었습니다.");
+      selectedTaskId = id;
       await loadTasks();
+      openTaskOnly(id);
     }else{
       alert(result.message || "지연 등록 실패");
     }
@@ -350,7 +383,9 @@ async function completeTask(id){
 
     if(result.success){
       alert("업무가 완료 처리되었습니다.");
+      selectedTaskId = null;
       await loadTasks();
+      showTab("done", document.querySelectorAll(".tab")[2]);
     }else{
       alert(result.message || "완료 처리 실패");
     }
@@ -377,13 +412,77 @@ async function updateFeedback(id){
 
     if(result.success){
       alert("피드백이 저장되었습니다.");
+      selectedTaskId = id;
       await loadTasks();
+      openTaskOnly(id);
     }else{
       alert(result.message || "피드백 저장 실패");
     }
   }catch(err){
     console.error(err);
     alert("피드백 저장 중 오류가 발생했습니다.");
+  }
+}
+
+function editTask(id){
+  const t = tasks.find(x => String(x.id) === String(id));
+
+  if(!t){
+    alert("수정할 업무를 찾을 수 없습니다.");
+    return;
+  }
+
+  const title = prompt("업무명", t.title || "");
+  if(!title){
+    alert("업무명을 입력하세요.");
+    return;
+  }
+
+  const storeName = prompt("관련 점포", t.storeName || "") || t.storeName || "";
+  const category = prompt("업무유형", t.category || "") || t.category || "";
+  const requester = prompt("요청자", t.requester || "") || t.requester || "";
+  const owner = prompt("디자인 담당자", t.owner || "") || t.owner || "";
+  const dueDate = prompt("목표일 예: 2026-06-10", t.dueDate || "") || t.dueDate || "";
+  const priority = prompt("중요도: 보통 / 중요 / 긴급", t.priority || "보통") || t.priority || "보통";
+  const detail = prompt("관리자 상세 요청사항", t.detail || "") || t.detail || "";
+
+  updateTask({
+    id,
+    storeName,
+    category,
+    title,
+    requester,
+    owner,
+    requestDate:t.requestDate || "",
+    dueDate,
+    priority,
+    detail
+  });
+}
+
+async function updateTask(data){
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body:JSON.stringify({
+        action:"updateTask",
+        ...data
+      })
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      alert("업무 내용이 수정되었습니다.");
+      selectedTaskId = data.id;
+      await loadTasks();
+      openTaskOnly(data.id);
+    }else{
+      alert(result.message || "수정 실패");
+    }
+  }catch(err){
+    console.error(err);
+    alert("내용 수정 중 오류가 발생했습니다.");
   }
 }
 
@@ -413,56 +512,43 @@ function renderDoneTasks(){
   }
 
   box.innerHTML = list.map(t => `
-  <div class="task-card compact-card">
+    <div class="task-card compact-card">
 
-    <div class="task-summary-line"
-         onclick="toggleTaskDetail('done_${t.id}')">
-
-      <div>
-        <h3>
-          <span class="badge done">완료</span>
-          ${escapeHtml(t.title || "")}
-        </h3>
-
-        <p>
-          ${escapeHtml(t.storeName || "-")}
-          · 완료일 ${escapeHtml(t.completedAt || "-")}
-          · 진행률 ${escapeHtml(t.progress || "100")}%
-        </p>
+      <div class="task-summary-line" onclick="toggleTaskDetail('done_${escapeAttr(t.id)}')">
+        <div>
+          <h3>
+            <span class="badge done">완료</span>
+            ${escapeHtml(t.title || "")}
+          </h3>
+          <p>
+            ${escapeHtml(t.storeName || "-")}
+            · 완료일 ${escapeHtml(t.completedAt || "-")}
+            · 진행률 ${escapeHtml(t.progress || "100")}%
+          </p>
+        </div>
+        <strong class="open-label">상세보기</strong>
       </div>
 
-      <strong class="open-label">상세보기</strong>
+      <div id="detail_done_${escapeAttr(t.id)}" class="task-detail" style="display:none;">
+        <p><b>관련 점포:</b> ${escapeHtml(t.storeName || "-")}</p>
+        <p><b>업무유형:</b> ${escapeHtml(t.category || "-")}</p>
+        <p><b>요청자:</b> ${escapeHtml(t.requester || "-")}</p>
+        <p><b>디자인 담당자:</b> ${escapeHtml(t.owner || "-")}</p>
+        <p><b>요청일:</b> ${escapeHtml(t.requestDate || "-")}</p>
+        <p><b>목표일:</b> ${escapeHtml(t.dueDate || "-")}</p>
+        <p><b>수정 목표일:</b> ${escapeHtml(t.revisedDueDate || "-")}</p>
+        <p><b>완료일:</b> ${escapeHtml(t.completedAt || "-")}</p>
+        <p><b>진행률:</b> ${escapeHtml(t.progress || "100")}%</p>
 
-    </div>
+        <p><b>요청사항:</b></p>
+        <div class="memo-box">${escapeHtml(t.detail || "-")}</div>
 
-    <div id="detail_done_${t.id}"
-         class="task-detail"
-         style="display:none;">
-
-      <p><b>관련 점포:</b> ${escapeHtml(t.storeName || "-")}</p>
-      <p><b>업무유형:</b> ${escapeHtml(t.category || "-")}</p>
-      <p><b>요청자:</b> ${escapeHtml(t.requester || "-")}</p>
-      <p><b>디자인 담당자:</b> ${escapeHtml(t.owner || "-")}</p>
-      <p><b>요청일:</b> ${escapeHtml(t.requestDate || "-")}</p>
-      <p><b>목표일:</b> ${escapeHtml(t.dueDate || "-")}</p>
-      <p><b>수정 목표일:</b> ${escapeHtml(t.revisedDueDate || "-")}</p>
-      <p><b>완료일:</b> ${escapeHtml(t.completedAt || "-")}</p>
-      <p><b>진행률:</b> ${escapeHtml(t.progress || "100")}%</p>
-
-      <p><b>요청사항:</b></p>
-      <div class="memo-box">
-        ${escapeHtml(t.detail || "-")}
-      </div>
-
-      <p><b>피드백:</b></p>
-      <div class="memo-box">
-        ${escapeHtml(t.feedback || "-")}
+        <p><b>피드백:</b></p>
+        <div class="memo-box">${escapeHtml(t.feedback || "-")}</div>
       </div>
 
     </div>
-
-  </div>
-`).join("");
+  `).join("");
 }
 
 function progressOptions(current){
@@ -480,6 +566,29 @@ function progressOptions(current){
   return html;
 }
 
+function toggleTaskDetail(id){
+  const detail = document.getElementById("detail_" + id);
+  if(!detail) return;
+
+  detail.style.display =
+    detail.style.display === "none" ? "block" : "none";
+}
+
+function openTaskOnly(id){
+  selectedTaskId = id;
+  renderTasks();
+
+  setTimeout(() => {
+    const detail = document.getElementById("detail_" + id);
+    if(detail) detail.style.display = "block";
+  }, 50);
+}
+
+function backToTaskList(){
+  selectedTaskId = null;
+  renderTasks();
+}
+
 function clearForm(){
   [
     "title",
@@ -494,19 +603,24 @@ function clearForm(){
     if(el) el.value = "";
   });
 
-  document.getElementById("storeName").value = "";
-  document.getElementById("category").value = "간판";
-  document.getElementById("priority").value = "보통";
-  document.getElementById("status").value = "진행중";
-  document.getElementById("progress").value = "0";
-  document.getElementById("owner").value = "김병식";
+  setValue("storeName", "");
+  setValue("category", "간판");
+  setValue("priority", "보통");
+  setValue("status", "진행중");
+  setValue("progress", "0");
+  setValue("owner", "김병식");
 
   setToday();
 }
 
 function getValue(id){
   const el = document.getElementById(id);
-  return el ? el.value.trim() : "";
+  return el ? String(el.value || "").trim() : "";
+}
+
+function setValue(id, value){
+  const el = document.getElementById(id);
+  if(el) el.value = value;
 }
 
 function setText(id, value){
@@ -524,6 +638,12 @@ function getTodayString(){
   return new Date().toISOString().slice(0,10);
 }
 
+function parseDate(value){
+  const d = new Date(value);
+  d.setHours(0,0,0,0);
+  return d;
+}
+
 function escapeHtml(value){
   return String(value || "")
     .replaceAll("&", "&amp;")
@@ -532,157 +652,10 @@ function escapeHtml(value){
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
-function editTask(id){
-  const task =
-    tasks.find(t => String(t.id) === String(id));
 
-  if(!task){
-    alert("수정할 업무를 찾을 수 없습니다.");
-    return;
-  }
-
-  const title =
-    prompt("업무명을 수정하세요.", task.title || "");
-
-  if(!title){
-    alert("업무명을 입력하세요.");
-    return;
-  }
-
-  const storeName =
-    prompt("관련 점포를 수정하세요.", task.storeName || "") || task.storeName || "";
-
-  const category =
-    prompt("업무유형을 수정하세요.", task.category || "") || task.category || "";
-지연등록
-  const requester =
-    prompt("요청자를 수정하세요.", task.requester || "") || task.requester || "";
-
-  const dueDate =
-    prompt("목표일을 수정하세요. 예: 2026-06-12", task.dueDate || "") || task.dueDate || "";
-
-  const priority =
-    prompt("중요도를 수정하세요. 보통 / 중요 / 긴급", task.priority || "보통") || task.priority || "보통";
-
-  const detail =
-    prompt("관리자 상세 요청사항을 수정하세요.", task.detail || "") || task.detail || "";
-
-  updateTask({
-    id,
-    storeName,
-    category,
-    title,
-    requester,
-    dueDate,
-    priority,
-    detail
-  });
-}
-
-async function updateTask(data){
-  try{
-    const res = await fetch(API_URL, {
-      method:"POST",
-      body:JSON.stringify({
-        action:"updateTask",
-        ...data
-      })
-    });
-
-    const result = await res.json();
-
-    if(result.success){
-      alert("업무 내용이 수정되었습니다.");
-      await loadTasks();
-    }else{
-      alert(result.message || "업무 내용 수정 실패");
-    }
-
-  }catch(err){
-    console.error(err);
-    alert("업무 내용 수정 중 오류가 발생했습니다.");
-  }
-}
-
-function toggleTaskDetail(id){
-  const detail =
-    document.getElementById("detail_" + id);
-
-  if(!detail) return;
-
-  detail.style.display =
-    detail.style.display === "none" ? "block" : "none";
-}
-
-let selectedTaskId = null;
-
-function openTaskOnly(id){
-  selectedTaskId = id;
-  renderTasks();
-
-  setTimeout(function(){
-    const detail = document.getElementById("detail_" + id);
-    if(detail) detail.style.display = "block";
-  }, 50);
-}
-
-function backToTaskList(){
-  selectedTaskId = null;
-  renderTasks();
-}
-
-function editTask(id){
-  const t = tasks.find(x => String(x.id) === String(id));
-  if(!t){
-    alert("수정할 업무를 찾을 수 없습니다.");
-    return;
-  }
-
-  const title = prompt("업무명", t.title || "");
-  if(!title) return;
-
-  const detail = prompt("관리자 상세 요청사항", t.detail || "") || "";
-  const dueDate = prompt("목표일 예: 2026-06-10", t.dueDate || "") || "";
-  const requester = prompt("요청자", t.requester || "") || "";
-  const priority = prompt("중요도: 보통 / 중요 / 긴급", t.priority || "보통") || "보통";
-
-  updateTask({
-    id:id,
-    storeName:t.storeName || "",
-    category:t.category || "",
-    title:title,
-    requester:requester,
-    requestDate:t.requestDate || "",
-    dueDate:dueDate,
-    priority:priority,
-    detail:detail
-  });
-}
-
-async function updateTask(data){
-  try{
-    const res = await fetch(API_URL, {
-      method:"POST",
-      body:JSON.stringify({
-        action:"updateTask",
-        ...data
-      })
-    });
-
-    const result = await res.json();
-
-    if(result.success){
-      alert("업무 내용이 수정되었습니다.");
-      await loadTasks();
-      selectedTaskId = data.id;
-      renderTasks();
-      openTaskOnly(data.id);
-    }else{
-      alert(result.message || "수정 실패");
-    }
-
-  }catch(err){
-    console.error(err);
-    alert("내용 수정 중 오류가 발생했습니다.");
-  }
+function escapeAttr(value){
+  return String(value || "")
+    .replaceAll("\\", "\\\\")
+    .replaceAll("'", "\\'")
+    .replaceAll('"', "&quot;");
 }
