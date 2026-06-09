@@ -3,10 +3,53 @@ const API_URL =
 
 let tasks = [];
 
+const STORE_OPTIONS = [
+  "한국의집 롯데백화점 동탄점",
+  "카페그랑떼 롯데아울렛 부여점",
+  "더큰식탁과 소바공방",
+  "한국의집효종갱 롯데의왕타임빌라스점",
+  "한국의집 롯데월드몰점",
+  "고호재 롯데월드몰점",
+  "소바공방롯데백화점평촌점",
+  "더큰코리아 본사",
+  "상궁전 롯데백화점 센텀시티점",
+  "고궁 롯데 아울렛 부여점",
+  "소바공방 시흥신세계프리미엄아울렛점",
+  "길채정",
+  "길채정 갤러리아타임월드점",
+  "한국의집 효종갱 신세계프리미엄아울렛 파주점"
+];
+
 document.addEventListener("DOMContentLoaded", () => {
+  fillStoreSelects();
   setToday();
   loadTasks();
 });
+
+function fillStoreSelects(){
+  [
+    "storeName",
+    "filterStore",
+    "doneStore"
+  ].forEach(id => {
+    const select = document.getElementById(id);
+    if(!select) return;
+
+    const firstText =
+      id === "storeName" ? "점포를 선택하세요" :
+      id === "filterStore" ? "전체점포" :
+      "전체점포";
+
+    select.innerHTML = `<option value="">${firstText}</option>`;
+
+    STORE_OPTIONS.forEach(name => {
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      select.appendChild(opt);
+    });
+  });
+}
 
 function showTab(id, btn){
 
@@ -216,11 +259,9 @@ function taskCardHtml(t, today){
       <p><b>현재 상태:</b> ${escapeHtml(t.status || "-")}</p>
 
       <label>진행률(%)
-        <input type="number"
-               id="progress_${t.id}"
-               value="${progress}"
-               min="0"
-               max="100">
+        <select id="progress_${t.id}">
+          ${progressOptions(progress)}
+        </select>
       </label>
 
       <div class="progress-wrap">
@@ -259,6 +300,7 @@ function taskCardHtml(t, today){
     </div>
   `;
 }
+
 
 async function updateProgress(id){
 
@@ -511,6 +553,27 @@ function statusOptions(current){
   return list.map(s =>
     `<option ${s === current ? "selected" : ""}>${s}</option>`
   ).join("");
+}
+
+
+function progressOptions(current){
+  const now = Number(current || 0);
+
+  let html = "";
+
+  for(let i = 0; i <= 100; i += 10){
+    html += `
+      <option value="${i}" ${now === i ? "selected" : ""}>
+        ${i}${i === 100 ? "% 완료" : "%"}
+      </option>
+    `;
+  }
+
+  return html;
+}
+
+function applyStatusFilter(){
+  renderTasks();
 }
 
 function clearForm(){
