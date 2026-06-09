@@ -91,6 +91,7 @@ async function saveTask(){
     owner: getValue("owner"),
     requestDate: getValue("requestDate"),
     dueDate: getValue("dueDate"),
+    revisedDueDate: getValue("revisedDueDate"),
     priority: getValue("priority"),
     status: getValue("status") || "진행중",
     progress: getValue("progress") || "0",
@@ -255,6 +256,7 @@ function taskCardHtml(t, today){
       <p><b>디자인 담당자:</b> ${escapeHtml(t.owner || "-")}</p>
       <p><b>요청일:</b> ${escapeHtml(t.requestDate || "-")}</p>
       <p><b>목표일:</b> ${escapeHtml(t.dueDate || "-")}</p>
+      <p><b>수정 목표일:</b> ${escapeHtml(t.revisedDueDate || "-")}</p>
       <p><b>중요도:</b> ${escapeHtml(t.priority || "-")}</p>
       <p><b>현재 상태:</b> ${escapeHtml(t.status || "-")}</p>
 
@@ -347,6 +349,9 @@ async function delayTask(id){
     prompt("지연사유를 입력하세요.", "") ||
     "";
 
+  const revisedDueDate =
+   prompt("수정 목표일을 입력하세요. 예: 2026-06-18", "") || "";  
+
   if(!delayReason){
     alert("지연사유를 입력하세요.");
     return;
@@ -360,7 +365,8 @@ async function delayTask(id){
         id,
         status:"지연",
         progress,
-        delayReason
+        delayReason,
+        revisedDueDate
       })
     });
 
@@ -576,6 +582,7 @@ function clearForm(){
     "title",
     "requester",
     "dueDate",
+    "revisedDueDate",
     "detail",
     "delayReason",
     "feedback"
