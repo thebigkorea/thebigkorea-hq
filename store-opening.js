@@ -638,6 +638,8 @@ async function saveExpense() {
     memo: val("expenseMemo")
   };
 
+  setButtonLoading("saveExpenseBtn", true, "출납 내역 저장", "저장 중...");
+
   try {
     const res = await fetch(API_URL, {
       method: "POST",
@@ -655,7 +657,7 @@ async function saveExpense() {
       document.getElementById("expenseMemo").value = "";
 
        await loadExpenses();
-       
+
     } else {
       alert(data.message || "저장 실패");
     }
@@ -663,7 +665,9 @@ async function saveExpense() {
   } catch (err) {
     console.error(err);
     alert("서버 오류");
-  }
+  } finally {
+  setButtonLoading("saveExpenseBtn", false, "출납 내역 저장", "저장 중...");
+}
 }
 
 document.addEventListener("input", function(e) {
@@ -677,10 +681,25 @@ let expenses = [];
 
 async function loadExpenses(){
 
+  setButtonLoading(
+    "loadExpenseBtn",
+    true,
+    "출납 내역 조회",
+    "조회 중..."
+  );
+
   const projectId =
     val("expenseProjectId");
 
   if(!projectId){
+
+    setButtonLoading(
+      "loadExpenseBtn",
+      false,
+      "출납 내역 조회",
+      "조회 중..."
+    );
+
     alert("점포를 선택하세요.");
     return;
   }
@@ -700,6 +719,16 @@ async function loadExpenses(){
 
     console.error(err);
     alert("출납 내역을 불러오지 못했습니다.");
+
+  } finally {
+
+    setButtonLoading(
+      "loadExpenseBtn",
+      false,
+      "출납 내역 조회",
+      "조회 중..."
+    );
+
   }
 }
 
@@ -781,4 +810,13 @@ function renderExpenses(){
 
     `;
   }).join("");
+}
+
+function setButtonLoading(btnId, isLoading, text, loadingText) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+
+  btn.disabled = isLoading;
+  btn.textContent = isLoading ? loadingText : text;
+  btn.style.opacity = isLoading ? "0.65" : "1";
 }
