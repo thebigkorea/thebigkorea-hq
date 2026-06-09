@@ -653,6 +653,9 @@ async function saveExpense() {
       document.getElementById("expenseVendor").value = "";
       document.getElementById("expenseAmount").value = "";
       document.getElementById("expenseMemo").value = "";
+
+       await loadExpenses();
+       
     } else {
       alert(data.message || "저장 실패");
     }
@@ -669,3 +672,113 @@ document.addEventListener("input", function(e) {
   const n = e.target.value.replace(/[^0-9]/g, "");
   e.target.value = n ? Number(n).toLocaleString() : "";
 });
+
+let expenses = [];
+
+async function loadExpenses(){
+
+  const projectId =
+    val("expenseProjectId");
+
+  if(!projectId){
+    alert("점포를 선택하세요.");
+    return;
+  }
+
+  try{
+
+    const data = await api({
+      action:"getExpenses",
+      projectId:projectId
+    });
+
+    expenses = data.expenses || [];
+
+    renderExpenses();
+
+  }catch(err){
+
+    console.error(err);
+    alert("출납 내역을 불러오지 못했습니다.");
+  }
+}
+
+function renderExpenses(){
+
+  const box =
+    document.getElementById("expenseList");
+
+  let total = 0;
+  let headOffice = 0;
+  let store = 0;
+
+  expenses.forEach(item => {
+
+    const amount =
+      Number(String(item.amount || "0")
+      .replace(/,/g,""));
+
+    total += amount;
+
+    if(item.shareType === "본사부담"){
+      headOffice += amount;
+    }
+
+    if(item.shareType === "점포부담"){
+      store += amount;
+    }
+  });
+
+  document.getElementById("expenseTotal").innerText =
+    total.toLocaleString() + "원";
+
+  document.getElementById("expenseHeadOffice").innerText =
+    headOffice.toLocaleString() + "원";
+
+  document.getElementById("expenseStore").innerText =
+    store.toLocaleString() + "원";
+
+  if(!box) return;
+
+  if(expenses.length === 0){
+
+    box.innerHTML = `
+      <div class="project-card">
+        등록된 출납내역이 없습니다.
+      </div>
+    `;
+
+    return;
+  }
+
+  box.innerHTML = expenses.map(item => {
+
+    const amount =
+      Number(String(item.amount || "0")
+      .replace(/,/g,""));
+
+    return `
+
+      <div class="project-card">
+
+        <div class="project-title">
+          ${item.category || "-"}
+        </div>
+
+        <div class="project-meta">
+
+          지출일자 : ${item.expenseDate || "-"}<br>
+          거래처 : ${item.vendor || "-"}<br>
+          금액 : ${amount.toLocaleString()}원<br>
+          결제수단 : ${item.payMethod || "-"}<br>
+          비용부담 : ${item.shareType || "-"}<br>
+          증빙 : ${item.proof || "-"}<br>
+          메모 : ${item.memo || "-"}
+
+        </div>
+
+      </div>
+
+    `;
+  }).join("");
+}
