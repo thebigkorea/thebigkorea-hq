@@ -780,6 +780,13 @@ function renderExpenses(){
     return;
   }
 
+  expenses.sort((a, b) => {
+    const da = a.expenseDate || "1900-01-01";
+    const db = b.expenseDate || "1900-01-01";
+
+    return db.localeCompare(da);
+  });
+
   box.innerHTML = expenses.map(item => {
 
     const amount =
