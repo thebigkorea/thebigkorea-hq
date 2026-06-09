@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>디자인팀 업무관리</title>
+
+  <link rel="stylesheet" href="design-task.css">
+</head>
+
+<body>
+
+<header class="header">
+  <h1>디자인팀 업무관리</h1>
+  <p>THEBIGKOREA DESIGN TASK MANAGEMENT</p>
+</header>
+
+<main class="wrap">
+
+  <section class="summary">
+    <div class="summary-card">
+      <strong id="totalCount">0</strong>
+      <span>전체 업무</span>
+    </div>
+
+    <div class="summary-card">
+      <strong id="urgentCount">0</strong>
+      <span>긴급 업무</span>
+    </div>
+
+    <div class="summary-card">
+      <strong id="overdueCount">0</strong>
+      <span>기한초과</span>
+    </div>
+  </section>
+
+  <section class="tabs">
+    <button class="tab active" onclick="showTab('register', this)">업무등록</button>
+    <button class="tab" onclick="showTab('list', this)">업무현황</button>
+  </section>
+
+  <section id="register" class="panel active">
+
+    <h2>디자인 업무 등록</h2>
+
+    <div class="form-grid">
+
+      <label>관련 점포
+        <input type="text" id="storeName" placeholder="예: 파주 효종갱, 한국의집 롯데월드몰">
+      </label>
+
+      <label>업무유형
+        <select id="category">
+          <option>간판</option>
+          <option>메뉴판</option>
+          <option>POP</option>
+          <option>배너</option>
+          <option>포스터</option>
+          <option>SNS 이미지</option>
+          <option>패키지</option>
+          <option>로고/상표</option>
+          <option>인쇄물</option>
+          <option>기타</option>
+        </select>
+      </label>
+
+      <label>업무명
+        <input type="text" id="title" placeholder="예: 파주 효종갱 오픈 메뉴판 제작">
+      </label>
+
+      <label>요청자
+        <input type="text" id="requester" placeholder="예: 박성신">
+      </label>
+
+      <label>디자인 담당자
+        <input type="text" id="owner" placeholder="예: 디자인팀 김OO">
+      </label>
+
+      <label>요청일
+        <input type="date" id="requestDate">
+      </label>
+
+      <label>목표일
+        <input type="date" id="dueDate">
+      </label>
+
+      <label>중요도
+        <select id="priority">
+          <option>보통</option>
+          <option>중요</option>
+          <option>긴급</option>
+        </select>
+      </label>
+
+      <label>상태
+        <select id="status">
+          <option>요청</option>
+          <option>확인중</option>
+          <option>진행중</option>
+          <option>피드백대기</option>
+          <option>수정중</option>
+          <option>완료</option>
+          <option>보류</option>
+        </select>
+      </label>
+
+    </div>
+
+    <label class="full-label">
+      관리자 상세 요청사항
+      <textarea id="detail" placeholder="사이즈, 용도, 문구, 참고자료, 납품형태, 마감시간 등을 상세히 입력하세요."></textarea>
+    </label>
+
+    <label class="full-label">
+      디자인팀 피드백
+      <textarea id="feedback" placeholder="디자인팀 의견, 진행상황, 문의사항 등을 입력하세요."></textarea>
+    </label>
+
+    <button class="primary" onclick="saveTask()">디자인 업무 저장</button>
+
+  </section>
+
+  <section id="list" class="panel">
+
+    <h2>디자인 업무 현황</h2>
+
+    <div class="filter-box">
+      <select id="filterStatus" onchange="renderTasks()">
+        <option value="">전체상태</option>
+        <option>요청</option>
+        <option>확인중</option>
+        <option>진행중</option>
+        <option>피드백대기</option>
+        <option>수정중</option>
+        <option>완료</option>
+        <option>보류</option>
+      </select>
+
+      <select id="filterPriority" onchange="renderTasks()">
+        <option value="">전체중요도</option>
+        <option>긴급</option>
+        <option>중요</option>
+        <option>보통</option>
+      </select>
+
+      <button onclick="loadTasks()">새로고침</button>
+    </div>
+
+    <div id="taskList" class="task-list"></div>
+
+  </section>
+
+</main>
+
+<script src="design-task.js"></script>
+
+</body>
+</html>
