@@ -72,7 +72,7 @@ async function saveTask(){
     dueDate:getValue("dueDate"),
     revisedDueDate:getValue("revisedDueDate"),
     priority:getValue("priority"),
-    status:getValue("status") || "진행중",
+    status:"진행중",
     progress:getValue("progress") || "0",
     detail:getValue("detail"),
     delayReason:getValue("delayReason"),
