@@ -232,3 +232,29 @@ textarea{
     flex-direction:column;
   }
 }
+.filter-box{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr auto auto;
+  gap:10px;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.filter-box select{
+  height:52px;
+}
+
+.filter-box button{
+  height:52px;
+  min-width:90px;
+}
+
+@media(max-width:800px){
+  .filter-box{
+    grid-template-columns:1fr;
+  }
+
+  .filter-box button{
+    width:100%;
+  }
+}
