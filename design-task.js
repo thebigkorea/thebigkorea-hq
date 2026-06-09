@@ -349,9 +349,7 @@ async function delayTask(id){
     prompt("지연사유를 입력하세요.", "") ||
     "";
 
-  const revisedDueDate =
-   prompt("수정 목표일을 입력하세요. 예: 2026-06-18", "") || "";  
-
+  
   if(!delayReason){
     alert("지연사유를 입력하세요.");
     return;
@@ -629,3 +627,27 @@ function escapeHtml(value){
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const statusEl =
+    document.getElementById("status");
+
+  const revisedWrap =
+    document.getElementById("revisedDueWrap");
+
+  if(statusEl){
+
+    statusEl.addEventListener("change", function(){
+
+      if(this.value === "지연"){
+        revisedWrap.style.display = "block";
+      }else{
+        revisedWrap.style.display = "none";
+      }
+
+    });
+
+  }
+
+});
