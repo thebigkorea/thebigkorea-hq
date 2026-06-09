@@ -219,7 +219,7 @@ function taskCardHtml(t, today){
       <p><b>수정 목표일</b></p>
       <input type="date" id="revised_${t.id}" value="${escapeHtml(t.revisedDueDate || "")}">
 
-      <p><b>디자인팀 피드백</b></p>
+      <p><b>작업요청자 피드백</b></p>
       <textarea id="feedback_${t.id}">${escapeHtml(t.feedback || "")}</textarea>
 
       <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
