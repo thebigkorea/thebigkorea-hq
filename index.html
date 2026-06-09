@@ -780,23 +780,20 @@
           </div>
           <div class="buttons">
 
-         <a class="btn primary"
-            href="certificate.html"
-            target="_blank">
-            재직증명서
-         </a>
+         <button class="btn primary"
+        onclick="openProtectedPage('certificate.html')">
+  재직증명서
+</button>
 
-         <a class="btn"
-           href="career.html"
-           target="_blank">
-           경력증명서
-         </a>
+<button class="btn"
+        onclick="openProtectedPage('career.html')">
+  경력증명서
+</button>
 
-        <a class="btn full"
-           href="hr-ledger.html"
-           target="_blank">
-          인사관리대장
-        </a>
+<button class="btn"
+        onclick="openProtectedPage('hr-list.html')">
+  인사관리대장
+</button>
 
          </div>
         </div>
@@ -1241,6 +1238,25 @@ function openHrSheet(){
     alert("비밀번호가 올바르지 않습니다.");
   }
 }
+</script>
+
+<script>
+
+function openProtectedPage(url){
+
+  const pw = prompt("비밀번호를 입력하세요.");
+
+  if(pw === "1234"){
+
+    window.open(url, "_blank");
+
+  }else{
+
+    alert("비밀번호가 올바르지 않습니다.");
+
+  }
+}
+
 </script>
 
 </body>
