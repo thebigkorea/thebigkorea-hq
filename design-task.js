@@ -27,19 +27,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function fillStoreSelects(){
-  [
-    "storeName",
-    "filterStore",
-    "doneStore"
-  ].forEach(id => {
+  ["storeName","filterStore","doneStore"].forEach(id => {
     const select = document.getElementById(id);
     if(!select) return;
 
-    const firstText =
-      id === "storeName" ? "점포를 선택하세요" :
-      id === "filterStore" ? "전체점포" :
-      "전체점포";
-
+    const firstText = id === "storeName" ? "점포를 선택하세요" : "전체점포";
     select.innerHTML = `<option value="">${firstText}</option>`;
 
     STORE_OPTIONS.forEach(name => {
@@ -52,68 +44,44 @@ function fillStoreSelects(){
 }
 
 function showTab(id, btn){
-
-  document.querySelectorAll(".panel")
-    .forEach(p => p.classList.remove("active"));
-
-  document.querySelectorAll(".tab")
-    .forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
 
   document.getElementById(id).classList.add("active");
   btn.classList.add("active");
 
-  if(id === "list"){
-    loadTasks();
-  }
-
-  if(id === "done"){
-    renderDoneTasks();
-  }
+  if(id === "list") loadTasks();
+  if(id === "done") renderDoneTasks();
 }
 
 function setToday(){
   const today = new Date().toISOString().slice(0,10);
-
   const requestDate = document.getElementById("requestDate");
-  if(requestDate && !requestDate.value){
-    requestDate.value = today;
-  }
+  if(requestDate && !requestDate.value) requestDate.value = today;
 }
 
 async function saveTask(){
-
   const data = {
     action:"save",
-    storeName: getValue("storeName"),
-    category: getValue("category"),
-    title: getValue("title"),
-    requester: getValue("requester"),
-    owner: getValue("owner"),
-    requestDate: getValue("requestDate"),
-    dueDate: getValue("dueDate"),
-    revisedDueDate: getValue("revisedDueDate"),
-    priority: getValue("priority"),
-    status: getValue("status") || "진행중",
-    progress: getValue("progress") || "0",
-    detail: getValue("detail"),
-    delayReason: getValue("delayReason"),
-    feedback: getValue("feedback")
+    storeName:getValue("storeName"),
+    category:getValue("category"),
+    title:getValue("title"),
+    requester:getValue("requester"),
+    owner:getValue("owner"),
+    requestDate:getValue("requestDate"),
+    dueDate:getValue("dueDate"),
+    revisedDueDate:getValue("revisedDueDate"),
+    priority:getValue("priority"),
+    status:getValue("status") || "진행중",
+    progress:getValue("progress") || "0",
+    detail:getValue("detail"),
+    delayReason:getValue("delayReason"),
+    feedback:getValue("feedback")
   };
 
-  if(!data.storeName){
-    alert("관련 점포를 선택하세요.");
-    return;
-  }
-
-  if(!data.title){
-    alert("업무명을 입력하세요.");
-    return;
-  }
-
-  if(!data.dueDate){
-    alert("목표일을 입력하세요.");
-    return;
-  }
+  if(!data.storeName){ alert("관련 점포를 선택하세요."); return; }
+  if(!data.title){ alert("업무명을 입력하세요."); return; }
+  if(!data.dueDate){ alert("목표일을 입력하세요."); return; }
 
   try{
     const res = await fetch(API_URL, {
@@ -131,26 +99,21 @@ async function saveTask(){
     }else{
       alert(result.message || "저장에 실패했습니다.");
     }
-
   }catch(err){
-    alert("저장 중 오류가 발생했습니다.");
     console.error(err);
+    alert("저장 중 오류가 발생했습니다.");
   }
 }
 
 async function loadTasks(){
-
   try{
     const res = await fetch(API_URL + "?action=list&t=" + Date.now());
     tasks = await res.json();
 
-    if(!Array.isArray(tasks)){
-      tasks = [];
-    }
+    if(!Array.isArray(tasks)) tasks = [];
 
     renderSummary();
     renderTasks();
-
   }catch(err){
     console.error(err);
     alert("업무 목록을 불러오지 못했습니다.");
@@ -158,25 +121,15 @@ async function loadTasks(){
 }
 
 function renderSummary(){
-
   const today = getTodayDate();
 
-  const active = tasks.filter(t =>
-    t.status !== "완료"
-  ).length;
-
-  const urgent = tasks.filter(t =>
-    t.priority === "긴급" && t.status !== "완료"
-  ).length;
-
+  const active = tasks.filter(t => t.status !== "완료").length;
+  const urgent = tasks.filter(t => t.priority === "긴급" && t.status !== "완료").length;
   const overdue = tasks.filter(t => {
     if(!t.dueDate || t.status === "완료") return false;
     return new Date(t.dueDate) < today;
   }).length;
-
-  const done = tasks.filter(t =>
-    t.status === "완료"
-  ).length;
+  const done = tasks.filter(t => t.status === "완료").length;
 
   setText("activeCount", active);
   setText("urgentCount", urgent);
@@ -185,7 +138,6 @@ function renderSummary(){
 }
 
 function renderTasks(){
-
   const box = document.getElementById("taskList");
   if(!box) return;
 
@@ -195,17 +147,9 @@ function renderTasks(){
 
   let list = tasks.filter(t => t.status !== "완료");
 
-  if(statusFilter){
-    list = list.filter(t => t.status === statusFilter);
-  }
-
-  if(priorityFilter){
-    list = list.filter(t => t.priority === priorityFilter);
-  }
-
-  if(storeFilter){
-    list = list.filter(t => t.storeName === storeFilter);
-  }
+  if(statusFilter) list = list.filter(t => t.status === statusFilter);
+  if(priorityFilter) list = list.filter(t => t.priority === priorityFilter);
+  if(storeFilter) list = list.filter(t => t.storeName === storeFilter);
 
   list.sort((a,b) => {
     const da = a.dueDate || "9999-12-31";
@@ -219,22 +163,18 @@ function renderTasks(){
   }
 
   const today = getTodayDate();
-
   box.innerHTML = list.map(t => taskCardHtml(t, today)).join("");
 }
 
 function taskCardHtml(t, today){
-
   const overdue =
     t.dueDate &&
     t.status !== "완료" &&
     new Date(t.dueDate) < today;
 
-  const progress =
-    Number(t.progress || 0);
+  const progress = Number(t.progress || 0);
 
   let badge = "";
-
   if(t.status === "지연" || overdue){
     badge = `<span class="badge danger">지연</span>`;
   }else if(t.priority === "긴급"){
@@ -276,41 +216,26 @@ function taskCardHtml(t, today){
       <p><b>지연사유</b></p>
       <textarea id="delay_${t.id}">${escapeHtml(t.delayReason || "")}</textarea>
 
+      <p><b>수정 목표일</b></p>
+      <input type="date" id="revised_${t.id}" value="${escapeHtml(t.revisedDueDate || "")}">
+
       <p><b>디자인팀 피드백</b></p>
       <textarea id="feedback_${t.id}">${escapeHtml(t.feedback || "")}</textarea>
 
       <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
-
-        <button class="small-btn" onclick="updateProgress('${t.id}')">
-          진행수정
-        </button>
-
-        <button class="small-btn warning-btn" onclick="delayTask('${t.id}')">
-          지연등록
-        </button>
-
-        <button class="small-btn" onclick="updateFeedback('${t.id}')">
-          피드백 저장
-        </button>
-
-        <button class="small-btn done-btn" onclick="completeTask('${t.id}')">
-          완료처리
-        </button>
-
+        <button class="small-btn" onclick="updateProgress('${t.id}')">진행수정</button>
+        <button class="small-btn warning-btn" onclick="delayTask('${t.id}')">지연등록</button>
+        <button class="small-btn" onclick="updateFeedback('${t.id}')">피드백 저장</button>
+        <button class="small-btn done-btn" onclick="completeTask('${t.id}')">완료처리</button>
       </div>
 
     </div>
   `;
 }
 
-
 async function updateProgress(id){
-
-  const progress =
-    document.getElementById("progress_" + id)?.value || "0";
-
-  const feedback =
-    document.getElementById("feedback_" + id)?.value || "";
+  const progress = document.getElementById("progress_" + id)?.value || "0";
+  const feedback = document.getElementById("feedback_" + id)?.value || "";
 
   try{
     const res = await fetch(API_URL, {
@@ -320,7 +245,7 @@ async function updateProgress(id){
         id,
         progress,
         feedback,
-        status: Number(progress) >= 100 ? "완료" : "진행중"
+        status:Number(progress) >= 100 ? "완료" : "진행중"
       })
     });
 
@@ -332,7 +257,6 @@ async function updateProgress(id){
     }else{
       alert(result.message || "진행률 수정 실패");
     }
-
   }catch(err){
     console.error(err);
     alert("진행률 수정 중 오류가 발생했습니다.");
@@ -340,22 +264,14 @@ async function updateProgress(id){
 }
 
 async function delayTask(id){
-
-  const progress =
-    document.getElementById("progress_" + id)?.value || "0";
-
-  const delayReason =
-    document.getElementById("delay_" + id)?.value ||
-    prompt("지연사유를 입력하세요.", "") ||
-    "";
+  const progress = document.getElementById("progress_" + id)?.value || "0";
+  const delayReason = document.getElementById("delay_" + id)?.value || "";
+  const revisedDueDate = document.getElementById("revised_" + id)?.value || "";
 
   if(!delayReason){
     alert("지연사유를 입력하세요.");
     return;
   }
-
-  const revisedDueDate =
-    prompt("수정 목표일을 입력하세요. 예: 2026-06-18", "");
 
   if(!revisedDueDate){
     alert("수정 목표일을 입력하세요.");
@@ -383,7 +299,6 @@ async function delayTask(id){
     }else{
       alert(result.message || "지연 등록 실패");
     }
-
   }catch(err){
     console.error(err);
     alert("지연 등록 중 오류가 발생했습니다.");
@@ -391,14 +306,10 @@ async function delayTask(id){
 }
 
 async function completeTask(id){
-
-  const ok =
-    confirm("이 디자인 업무를 완료 처리하시겠습니까?");
-
+  const ok = confirm("이 디자인 업무를 완료 처리하시겠습니까?");
   if(!ok) return;
 
-  const feedback =
-    document.getElementById("feedback_" + id)?.value || "";
+  const feedback = document.getElementById("feedback_" + id)?.value || "";
 
   try{
     const res = await fetch(API_URL, {
@@ -421,43 +332,14 @@ async function completeTask(id){
     }else{
       alert(result.message || "완료 처리 실패");
     }
-
   }catch(err){
     console.error(err);
     alert("완료 처리 중 오류가 발생했습니다.");
   }
 }
 
-async function updateStatus(id, status){
-
-  try{
-    const res = await fetch(API_URL, {
-      method:"POST",
-      body:JSON.stringify({
-        action:"updateStatus",
-        id,
-        status
-      })
-    });
-
-    const result = await res.json();
-
-    if(result.success){
-      await loadTasks();
-    }else{
-      alert(result.message || "상태 변경 실패");
-    }
-
-  }catch(err){
-    console.error(err);
-    alert("상태 변경 중 오류가 발생했습니다.");
-  }
-}
-
 async function updateFeedback(id){
-
-  const el = document.getElementById("feedback_" + id);
-  const feedback = el ? el.value : "";
+  const feedback = document.getElementById("feedback_" + id)?.value || "";
 
   try{
     const res = await fetch(API_URL, {
@@ -477,7 +359,6 @@ async function updateFeedback(id){
     }else{
       alert(result.message || "피드백 저장 실패");
     }
-
   }catch(err){
     console.error(err);
     alert("피드백 저장 중 오류가 발생했습니다.");
@@ -485,39 +366,18 @@ async function updateFeedback(id){
 }
 
 function renderDoneTasks(){
-
-  const box =
-    document.getElementById("doneTaskList");
-
+  const box = document.getElementById("doneTaskList");
   if(!box) return;
 
-  const store =
-    getValue("doneStore");
+  const store = getValue("doneStore");
+  const start = getValue("doneStartDate");
+  const end = getValue("doneEndDate");
 
-  const start =
-    getValue("doneStartDate");
+  let list = tasks.filter(t => t.status === "완료");
 
-  const end =
-    getValue("doneEndDate");
-
-  let list =
-    tasks.filter(t => t.status === "완료");
-
-  if(store){
-    list = list.filter(t => t.storeName === store);
-  }
-
-  if(start){
-    list = list.filter(t =>
-      (t.completedAt || t.dueDate || "") >= start
-    );
-  }
-
-  if(end){
-    list = list.filter(t =>
-      (t.completedAt || t.dueDate || "") <= end
-    );
-  }
+  if(store) list = list.filter(t => t.storeName === store);
+  if(start) list = list.filter(t => (t.completedAt || t.dueDate || "") >= start);
+  if(end) list = list.filter(t => (t.completedAt || t.dueDate || "") <= end);
 
   list.sort((a,b) => {
     const da = a.completedAt || a.dueDate || "1900-01-01";
@@ -539,6 +399,7 @@ function renderDoneTasks(){
       <p><b>디자인 담당자:</b> ${escapeHtml(t.owner || "-")}</p>
       <p><b>요청일:</b> ${escapeHtml(t.requestDate || "-")}</p>
       <p><b>목표일:</b> ${escapeHtml(t.dueDate || "-")}</p>
+      <p><b>수정 목표일:</b> ${escapeHtml(t.revisedDueDate || "-")}</p>
       <p><b>완료일:</b> ${escapeHtml(t.completedAt || "-")}</p>
       <p><b>진행률:</b> ${escapeHtml(t.progress || "100")}%</p>
       <p><b>요청사항:</b></p>
@@ -549,22 +410,8 @@ function renderDoneTasks(){
   `).join("");
 }
 
-function statusOptions(current){
-  const list = [
-    "진행중",
-    "지연",
-    "보류"
-  ];
-
-  return list.map(s =>
-    `<option ${s === current ? "selected" : ""}>${s}</option>`
-  ).join("");
-}
-
-
 function progressOptions(current){
   const now = Number(current || 0);
-
   let html = "";
 
   for(let i = 0; i <= 100; i += 10){
@@ -576,10 +423,6 @@ function progressOptions(current){
   }
 
   return html;
-}
-
-function applyStatusFilter(){
-  renderTasks();
 }
 
 function clearForm(){
@@ -627,34 +470,10 @@ function getTodayString(){
 }
 
 function escapeHtml(value){
-  return String(value)
+  return String(value || "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-
-  const statusEl =
-    document.getElementById("status");
-
-  const revisedWrap =
-    document.getElementById("revisedDueWrap");
-
-  if(statusEl){
-
-    statusEl.addEventListener("change", function(){
-
-      if(this.value === "지연"){
-        revisedWrap.style.display = "block";
-      }else{
-        revisedWrap.style.display = "none";
-      }
-
-    });
-
-  }
-
-});
