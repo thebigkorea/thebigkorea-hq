@@ -499,3 +499,33 @@ function won(v) {
   if (!num) return "0원";
   return num.toLocaleString("ko-KR") + "원";
 }
+
+document.addEventListener("DOMContentLoaded", function(){
+
+  const fileInput = document.getElementById("idCardFile");
+
+  if(fileInput){
+    fileInput.addEventListener("change", function(){
+
+      const file = this.files[0];
+      const preview = document.getElementById("idCardPreview");
+
+      if(!file){
+        preview.innerHTML = "";
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = function(e){
+        preview.innerHTML = `
+          <img src="${e.target.result}"
+               style="max-width:100%; border-radius:12px; border:1px solid #ddd;">
+        `;
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+});
