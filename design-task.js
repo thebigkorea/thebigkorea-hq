@@ -349,9 +349,16 @@ async function delayTask(id){
     prompt("지연사유를 입력하세요.", "") ||
     "";
 
-  
   if(!delayReason){
     alert("지연사유를 입력하세요.");
+    return;
+  }
+
+  const revisedDueDate =
+    prompt("수정 목표일을 입력하세요. 예: 2026-06-18", "");
+
+  if(!revisedDueDate){
+    alert("수정 목표일을 입력하세요.");
     return;
   }
 
