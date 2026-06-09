@@ -167,14 +167,17 @@ function renderTasks(){
 }
 
 function taskCardHtml(t, today){
+
   const overdue =
     t.dueDate &&
     t.status !== "완료" &&
     new Date(t.dueDate) < today;
 
-  const progress = Number(t.progress || 0);
+  const progress =
+    Number(t.progress || 0);
 
   let badge = "";
+
   if(t.status === "지연" || overdue){
     badge = `<span class="badge danger">지연</span>`;
   }else if(t.priority === "긴급"){
@@ -186,48 +189,66 @@ function taskCardHtml(t, today){
   }
 
   return `
-    <div class="task-card">
+    <div class="task-card compact-card">
 
-      <h3>${badge}${escapeHtml(t.title || "")}</h3>
+      <div class="task-summary-line"
+           onclick="toggleTaskDetail('${t.id}')">
 
-      <p><b>관련 점포:</b> ${escapeHtml(t.storeName || "-")}</p>
-      <p><b>업무유형:</b> ${escapeHtml(t.category || "-")}</p>
-      <p><b>요청자:</b> ${escapeHtml(t.requester || "-")}</p>
-      <p><b>디자인 담당자:</b> ${escapeHtml(t.owner || "-")}</p>
-      <p><b>요청일:</b> ${escapeHtml(t.requestDate || "-")}</p>
-      <p><b>목표일:</b> ${escapeHtml(t.dueDate || "-")}</p>
-      <p><b>수정 목표일:</b> ${escapeHtml(t.revisedDueDate || "-")}</p>
-      <p><b>중요도:</b> ${escapeHtml(t.priority || "-")}</p>
-      <p><b>현재 상태:</b> ${escapeHtml(t.status || "-")}</p>
+        <div>
+          <h3>${badge}${escapeHtml(t.title || "")}</h3>
+          <p>
+            ${escapeHtml(t.storeName || "-")}
+            · 목표일 ${escapeHtml(t.dueDate || "-")}
+            · 진행률 ${progress}%
+          </p>
+        </div>
 
-      <label>진행률(%)
-        <select id="progress_${t.id}">
-          ${progressOptions(progress)}
-        </select>
-      </label>
+        <strong class="open-label">상세보기</strong>
 
-      <div class="progress-wrap">
-        <div class="progress-bar" style="width:${progress}%"></div>
       </div>
 
-      <p><b>관리자 상세 요청사항</b></p>
-      <div class="memo-box">${escapeHtml(t.detail || "-")}</div>
+      <div id="detail_${t.id}" class="task-detail" style="display:none;">
 
-      <p><b>지연사유</b></p>
-      <textarea id="delay_${t.id}">${escapeHtml(t.delayReason || "")}</textarea>
+        <p><b>관련 점포:</b> ${escapeHtml(t.storeName || "-")}</p>
+        <p><b>업무유형:</b> ${escapeHtml(t.category || "-")}</p>
+        <p><b>요청자:</b> ${escapeHtml(t.requester || "-")}</p>
+        <p><b>디자인 담당자:</b> ${escapeHtml(t.owner || "-")}</p>
+        <p><b>요청일:</b> ${escapeHtml(t.requestDate || "-")}</p>
+        <p><b>목표일:</b> ${escapeHtml(t.dueDate || "-")}</p>
+        <p><b>수정 목표일:</b> ${escapeHtml(t.revisedDueDate || "-")}</p>
+        <p><b>중요도:</b> ${escapeHtml(t.priority || "-")}</p>
+        <p><b>현재 상태:</b> ${escapeHtml(t.status || "-")}</p>
 
-      <p><b>수정 목표일</b></p>
-      <input type="date" id="revised_${t.id}" value="${escapeHtml(t.revisedDueDate || "")}">
+        <label>진행률(%)
+          <select id="progress_${t.id}">
+            ${progressOptions(progress)}
+          </select>
+        </label>
 
-      <p><b>작업요청자 피드백</b></p>
-      <textarea id="feedback_${t.id}">${escapeHtml(t.feedback || "")}</textarea>
+        <div class="progress-wrap">
+          <div class="progress-bar" style="width:${progress}%"></div>
+        </div>
 
-      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
-        <button class="small-btn" onclick="updateProgress('${t.id}')">진행수정</button>
-        <button class="small-btn" onclick="editTask('${t.id}')">내용수정</button>
-        <button class="small-btn warning-btn" onclick="delayTask('${t.id}')">지연등록</button>
-        <button class="small-btn" onclick="updateFeedback('${t.id}')">피드백 저장</button>
-        <button class="small-btn done-btn" onclick="completeTask('${t.id}')">완료처리</button>
+        <p><b>관리자 상세 요청사항</b></p>
+        <div class="memo-box">${escapeHtml(t.detail || "-")}</div>
+
+        <p><b>지연사유</b></p>
+        <textarea id="delay_${t.id}">${escapeHtml(t.delayReason || "")}</textarea>
+
+        <p><b>수정 목표일</b></p>
+        <input type="date" id="revised_${t.id}" value="${escapeHtml(t.revisedDueDate || "")}">
+
+        <p><b>작업요청자 피드백</b></p>
+        <textarea id="feedback_${t.id}">${escapeHtml(t.feedback || "")}</textarea>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+          <button class="small-btn" onclick="updateProgress('${t.id}')">진행수정</button>
+          <button class="small-btn" onclick="editTask('${t.id}')">내용수정</button>
+          <button class="small-btn warning-btn" onclick="delayTask('${t.id}')">지연등록</button>
+          <button class="small-btn" onclick="updateFeedback('${t.id}')">피드백 저장</button>
+          <button class="small-btn done-btn" onclick="completeTask('${t.id}')">완료처리</button>
+        </div>
+
       </div>
 
     </div>
@@ -392,8 +413,32 @@ function renderDoneTasks(){
   }
 
   box.innerHTML = list.map(t => `
-    <div class="task-card">
-      <h3><span class="badge done">완료</span>${escapeHtml(t.title || "")}</h3>
+  <div class="task-card compact-card">
+
+    <div class="task-summary-line"
+         onclick="toggleTaskDetail('done_${t.id}')">
+
+      <div>
+        <h3>
+          <span class="badge done">완료</span>
+          ${escapeHtml(t.title || "")}
+        </h3>
+
+        <p>
+          ${escapeHtml(t.storeName || "-")}
+          · 완료일 ${escapeHtml(t.completedAt || "-")}
+          · 진행률 ${escapeHtml(t.progress || "100")}%
+        </p>
+      </div>
+
+      <strong class="open-label">상세보기</strong>
+
+    </div>
+
+    <div id="detail_done_${t.id}"
+         class="task-detail"
+         style="display:none;">
+
       <p><b>관련 점포:</b> ${escapeHtml(t.storeName || "-")}</p>
       <p><b>업무유형:</b> ${escapeHtml(t.category || "-")}</p>
       <p><b>요청자:</b> ${escapeHtml(t.requester || "-")}</p>
@@ -403,12 +448,21 @@ function renderDoneTasks(){
       <p><b>수정 목표일:</b> ${escapeHtml(t.revisedDueDate || "-")}</p>
       <p><b>완료일:</b> ${escapeHtml(t.completedAt || "-")}</p>
       <p><b>진행률:</b> ${escapeHtml(t.progress || "100")}%</p>
+
       <p><b>요청사항:</b></p>
-      <div class="memo-box">${escapeHtml(t.detail || "-")}</div>
+      <div class="memo-box">
+        ${escapeHtml(t.detail || "-")}
+      </div>
+
       <p><b>피드백:</b></p>
-      <div class="memo-box">${escapeHtml(t.feedback || "-")}</div>
+      <div class="memo-box">
+        ${escapeHtml(t.feedback || "-")}
+      </div>
+
     </div>
-  `).join("");
+
+  </div>
+`).join("");
 }
 
 function progressOptions(current){
@@ -500,7 +554,7 @@ function editTask(id){
 
   const category =
     prompt("업무유형을 수정하세요.", task.category || "") || task.category || "";
-
+지연등록
   const requester =
     prompt("요청자를 수정하세요.", task.requester || "") || task.requester || "";
 
@@ -548,4 +602,14 @@ async function updateTask(data){
     console.error(err);
     alert("업무 내용 수정 중 오류가 발생했습니다.");
   }
+}
+
+function toggleTaskDetail(id){
+  const detail =
+    document.getElementById("detail_" + id);
+
+  if(!detail) return;
+
+  detail.style.display =
+    detail.style.display === "none" ? "block" : "none";
 }
