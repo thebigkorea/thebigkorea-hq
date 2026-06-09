@@ -224,6 +224,7 @@ function taskCardHtml(t, today){
 
       <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
         <button class="small-btn" onclick="updateProgress('${t.id}')">진행수정</button>
+        <button class="small-btn" onclick="editTask('${t.id}')">내용수정</button>
         <button class="small-btn warning-btn" onclick="delayTask('${t.id}')">지연등록</button>
         <button class="small-btn" onclick="updateFeedback('${t.id}')">피드백 저장</button>
         <button class="small-btn done-btn" onclick="completeTask('${t.id}')">완료처리</button>
@@ -476,4 +477,75 @@ function escapeHtml(value){
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+function editTask(id){
+  const task =
+    tasks.find(t => String(t.id) === String(id));
+
+  if(!task){
+    alert("수정할 업무를 찾을 수 없습니다.");
+    return;
+  }
+
+  const title =
+    prompt("업무명을 수정하세요.", task.title || "");
+
+  if(!title){
+    alert("업무명을 입력하세요.");
+    return;
+  }
+
+  const storeName =
+    prompt("관련 점포를 수정하세요.", task.storeName || "") || task.storeName || "";
+
+  const category =
+    prompt("업무유형을 수정하세요.", task.category || "") || task.category || "";
+
+  const requester =
+    prompt("요청자를 수정하세요.", task.requester || "") || task.requester || "";
+
+  const dueDate =
+    prompt("목표일을 수정하세요. 예: 2026-06-12", task.dueDate || "") || task.dueDate || "";
+
+  const priority =
+    prompt("중요도를 수정하세요. 보통 / 중요 / 긴급", task.priority || "보통") || task.priority || "보통";
+
+  const detail =
+    prompt("관리자 상세 요청사항을 수정하세요.", task.detail || "") || task.detail || "";
+
+  updateTask({
+    id,
+    storeName,
+    category,
+    title,
+    requester,
+    dueDate,
+    priority,
+    detail
+  });
+}
+
+async function updateTask(data){
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body:JSON.stringify({
+        action:"updateTask",
+        ...data
+      })
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      alert("업무 내용이 수정되었습니다.");
+      await loadTasks();
+    }else{
+      alert(result.message || "업무 내용 수정 실패");
+    }
+
+  }catch(err){
+    console.error(err);
+    alert("업무 내용 수정 중 오류가 발생했습니다.");
+  }
 }
