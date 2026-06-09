@@ -613,3 +613,76 @@ function toggleTaskDetail(id){
   detail.style.display =
     detail.style.display === "none" ? "block" : "none";
 }
+
+let selectedTaskId = null;
+
+function openTaskOnly(id){
+  selectedTaskId = id;
+  renderTasks();
+
+  setTimeout(function(){
+    const detail = document.getElementById("detail_" + id);
+    if(detail) detail.style.display = "block";
+  }, 50);
+}
+
+function backToTaskList(){
+  selectedTaskId = null;
+  renderTasks();
+}
+
+function editTask(id){
+  const t = tasks.find(x => String(x.id) === String(id));
+  if(!t){
+    alert("수정할 업무를 찾을 수 없습니다.");
+    return;
+  }
+
+  const title = prompt("업무명", t.title || "");
+  if(!title) return;
+
+  const detail = prompt("관리자 상세 요청사항", t.detail || "") || "";
+  const dueDate = prompt("목표일 예: 2026-06-10", t.dueDate || "") || "";
+  const requester = prompt("요청자", t.requester || "") || "";
+  const priority = prompt("중요도: 보통 / 중요 / 긴급", t.priority || "보통") || "보통";
+
+  updateTask({
+    id:id,
+    storeName:t.storeName || "",
+    category:t.category || "",
+    title:title,
+    requester:requester,
+    requestDate:t.requestDate || "",
+    dueDate:dueDate,
+    priority:priority,
+    detail:detail
+  });
+}
+
+async function updateTask(data){
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body:JSON.stringify({
+        action:"updateTask",
+        ...data
+      })
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      alert("업무 내용이 수정되었습니다.");
+      await loadTasks();
+      selectedTaskId = data.id;
+      renderTasks();
+      openTaskOnly(data.id);
+    }else{
+      alert(result.message || "수정 실패");
+    }
+
+  }catch(err){
+    console.error(err);
+    alert("내용 수정 중 오류가 발생했습니다.");
+  }
+}

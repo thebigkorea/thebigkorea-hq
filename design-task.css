@@ -296,3 +296,32 @@ textarea{
   border-top:1px solid #eee;
   padding:18px;
 }
+
+.task-list{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.task-card{
+  margin:0;
+}
+
+.task-summary-line{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  cursor:pointer;
+}
+
+.task-detail{
+  grid-column:1 / -1;
+  margin-top:14px;
+}
+
+@media(max-width:800px){
+  .task-list{
+    grid-template-columns:1fr;
+  }
+}
