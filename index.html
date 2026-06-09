@@ -966,11 +966,9 @@
      관리자 조회
   </a>
   
-  <a class="btn" 
-   href="https://docs.google.com/spreadsheets/d/1EsG6vbfILRYIEZUdiy1TZ_3ppx1nPRZDmmaOWFGS09g/edit?gid=1047975074#gid=1047975074"
-   target="_blank">
+  <button class="btn" onclick="openHrSheet()">
   본사 인사관리대장
-</a>
+</button>
 
 </div>
 </div>
@@ -1226,6 +1224,22 @@ document.addEventListener("DOMContentLoaded", loadDailyUnpaidBadges);
 <script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js");
+}
+</script>
+
+<script>
+function openHrSheet(){
+
+  const pw = prompt("비밀번호를 입력하세요.");
+
+  if(pw === "1234"){
+    window.open(
+      "https://docs.google.com/spreadsheets/d/1EsG6vbfILRYIEZUdiy1TZ_3ppx1nPRZDmmaOWFGS09g/edit?gid=1047975074#gid=1047975074",
+      "_blank"
+    );
+  }else{
+    alert("비밀번호가 올바르지 않습니다.");
+  }
 }
 </script>
 
