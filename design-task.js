@@ -92,7 +92,7 @@ async function saveTask(){
     requestDate: getValue("requestDate"),
     dueDate: getValue("dueDate"),
     priority: getValue("priority"),
-    status: getValue("status"),
+    status: getValue("status") || "진행중",
     progress: getValue("progress") || "0",
     detail: getValue("detail"),
     delayReason: getValue("delayReason"),
@@ -540,13 +540,8 @@ function renderDoneTasks(){
 
 function statusOptions(current){
   const list = [
-    "요청",
-    "확인중",
     "진행중",
-    "피드백대기",
-    "수정중",
     "지연",
-    "완료",
     "보류"
   ];
 
@@ -592,7 +587,7 @@ function clearForm(){
   document.getElementById("storeName").value = "";
   document.getElementById("category").value = "간판";
   document.getElementById("priority").value = "보통";
-  document.getElementById("status").value = "요청";
+  document.getElementById("status").value = "진행중";
   document.getElementById("progress").value = "0";
   document.getElementById("owner").value = "김병식";
 

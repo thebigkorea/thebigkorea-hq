@@ -127,13 +127,8 @@
 
       <label>상태
         <select id="status">
-          <option>요청</option>
-          <option>확인중</option>
           <option>진행중</option>
-          <option>피드백대기</option>
-          <option>수정중</option>
           <option>지연</option>
-          <option>완료</option>
           <option>보류</option>
         </select>
       </label>
@@ -163,17 +158,14 @@
 
     <h2>진행중 디자인 업무</h2>
 
-    <div class="filter-box">
-      <select id="filterStatus" onchange="renderTasks()">
-        <option value="">전체상태</option>
-        <option>요청</option>
-        <option>확인중</option>
-        <option>진행중</option>
-        <option>피드백대기</option>
-        <option>수정중</option>
-        <option>지연</option>
-        <option>보류</option>
-      </select>
+    <select id="filterStatus">
+      <option value="">전체상태</option>
+      <option>진행중</option>
+      <option>지연</option>
+      <option>보류</option>
+    </select>
+
+<button onclick="renderTasks()">상태 조회</button>
 
       <select id="filterPriority" onchange="renderTasks()">
         <option value="">전체중요도</option>
