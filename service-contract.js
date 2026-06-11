@@ -33,7 +33,15 @@ const WORKPLACES = {
     companyAddress: "경기도 안양시 동안구 시민대로 180, 롯데백화점 평촌점",
     companyPhone: "070-5015-7233",
     defaultWorkPlace: "소바공방 평촌점"
-  }
+  },
+  koreahouse_hyojonggang_paju: {
+  workplaceName: "한국의집 효종갱 파주",
+  companyName: "한국의집 효종갱 파주",
+  companyRepresentative: "박병호",
+  companyAddress: "경기도 파주시 필승로 200, 파주프리미엄아울렛",
+  companyPhone: "070-5015-7233",
+  defaultWorkPlace: "한국의집 효종갱 파주"
+}
 };
 
 window.onload = function () {
