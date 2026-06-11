@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>전자근로계약 완료서</title>
+
+  <!-- 카카오톡 / 문자 미리보기 -->
+
+  <meta property="og:title" content="전자근로계약 완료서">
+  <meta property="og:description" content="전자근로계약이 정상 완료되었습니다.">
+  <meta property="og:image" content="https://thebigkorea.github.io/thebigkorea-hq/contract-complete-thumb.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://thebigkorea.github.io/thebigkorea-hq/contract-complete.html">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="전자근로계약 완료서">
+  <meta name="twitter:description" content="전자근로계약이 정상 완료되었습니다.">
+  <meta name="twitter:image" content="https://thebigkorea.github.io/thebigkorea-hq/contract-complete-thumb.jpg">
+
+  <style>
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      background:#f3f5f9;
+      font-family:
+        "Pretendard",
+        "Noto Sans KR",
+        sans-serif;
+      color:#0f172a;
+    }
+
+    .wrap{
+      max-width:960px;
+      margin:40px auto;
+      padding:20px;
+    }
+
+    .card{
+      background:#fff;
+      border-radius:24px;
+      overflow:hidden;
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
+    }
+
+    .hero img{
+      width:100%;
+      display:block;
+    }
+
+    .content{
+      padding:50px;
+    }
+
+    h1{
+      margin:0 0 20px;
+      font-size:42px;
+      color:#0f2f63;
+      font-weight:800;
+    }
+
+    .desc{
+      font-size:18px;
+      line-height:1.9;
+      color:#334155;
+    }
+
+    .info-box{
+      margin-top:30px;
+      background:#f8fafc;
+      border:1px solid #e2e8f0;
+      border-radius:18px;
+      padding:24px;
+      line-height:1.9;
+      font-size:16px;
+    }
+
+    .success{
+      display:inline-block;
+      margin-top:14px;
+      background:#dcfce7;
+      color:#166534;
+      padding:10px 18px;
+      border-radius:999px;
+      font-size:15px;
+      font-weight:700;
+    }
+
+    .btn-wrap{
+      margin-top:40px;
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:220px;
+      height:58px;
+      border-radius:14px;
+      text-decoration:none;
+      font-size:18px;
+      font-weight:700;
+      transition:.2s;
+    }
+
+    .btn.primary{
+      background:#0f2f63;
+      color:#fff;
+    }
+
+    .btn.sub{
+      background:#e2e8f0;
+      color:#0f172a;
+    }
+
+    .footer{
+      margin-top:50px;
+      padding-top:24px;
+      border-top:1px solid #e5e7eb;
+      color:#64748b;
+      font-size:14px;
+      line-height:1.8;
+    }
+
+    @media(max-width:768px){
+
+      .content{
+        padding:32px 24px;
+      }
+
+      h1{
+        font-size:32px;
+      }
+
+      .desc{
+        font-size:16px;
+      }
+
+      .btn{
+        width:100%;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="wrap">
+
+```
+<div class="card">
+
+  <div class="hero">
+    <img
+      src="contract-complete-thumb.jpg"
+      alt="전자근로계약 완료"
+    >
+  </div>
+
+  <div class="content">
+
+    <div class="success">
+      ✔ 전자계약 완료
+    </div>
+
+    <h1>
+      전자근로계약이 완료되었습니다
+    </h1>
+
+    <div class="desc">
+      더큰코리아 전자근로계약 시스템을 이용해 주셔서 감사합니다.<br>
+      계약서 작성 및 전자서명이 정상적으로 완료되었습니다.
+    </div>
+
+    <div class="info-box">
+
+      <strong>안내사항</strong><br>
+
+      • 완료된 계약서는 본사 전자계약 시스템에 안전하게 보관됩니다.<br>
+      • 필요 시 언제든지 계약서를 다시 열람할 수 있습니다.<br>
+      • 문의사항은 각 사업장 관리자 또는 본사로 문의해 주세요.
+
+    </div>
+
+    <div class="btn-wrap">
+
+      <a
+        id="viewContractBtn"
+        class="btn primary"
+        href="#"
+      >
+        완료 계약서 확인
+      </a>
+
+      <a
+        class="btn sub"
+        href="https://thebigkorea.github.io/thebigkorea-hq/"
+      >
+        더큰코리아 본사
+      </a>
+
+    </div>
+
+    <div class="footer">
+
+      주식회사 더큰코리아<br>
+      전자근로계약 시스템
+
+    </div>
+
+  </div>
+
+</div>
+```
+
+  </div>
+
+  <script>
+
+    const params =
+      new URLSearchParams(location.search);
+
+    const id =
+      params.get("id");
+
+    document
+      .getElementById("viewContractBtn")
+      .href =
+      `contract-result.html?id=${id}&v=${Date.now()}`;
+
+  </script>
+
+</body>
+</html>
