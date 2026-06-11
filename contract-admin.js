@@ -181,7 +181,9 @@ function renderContracts(list) {
       <td>
         <div class="action-buttons">
           <button onclick="openContract('${contractId}')">원본보기</button>
-          <button class="green" onclick="openCompleteView('${contractId}')">완료본</button>
+          <button class="green" onclick="copyCompleteLink('${contractId}')">
+           완료본 링크복사
+          </button>
         </div>
       </td>
     `;
@@ -577,6 +579,19 @@ function copyViewLink(contractId) {
 
   const link =
     `https://thebigkorea.github.io/thebigkorea-hq/contract-view.html?id=${encodeURIComponent(contractId)}&v=${Date.now()}`;
+
+  copyText(link);
+  alert("완료본 링크가 복사되었습니다.");
+}
+
+function copyCompleteLink(contractId) {
+  if (!contractId) {
+    alert("계약번호가 없습니다.");
+    return;
+  }
+
+  const link =
+    `https://thebigkorea.github.io/thebigkorea-hq/contract-complete.html?id=${encodeURIComponent(contractId)}&v=${Date.now()}`;
 
   copyText(link);
   alert("완료본 링크가 복사되었습니다.");
