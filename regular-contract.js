@@ -6,8 +6,8 @@ const WORKPLACES = {
     workplaceName: "더큰코리아 본사",
     companyName: "주식회사 더큰코리아",
     companyRepresentative: "박병호",
-    companyAddress: "서울특별시 송파구 올림픽로 300",
-    companyPhone: "070-5015-7233",
+    companyAddress: "대전광역시 유성구 테크노4로 29 201호",
+    companyPhone: "042-712-5035",
     defaultWorkPlace: "주식회사 더큰코리아 본사"
   },
   koreahouse_jamsil: {
@@ -15,7 +15,7 @@ const WORKPLACES = {
     companyName: "한국의집 롯데월드몰점",
     companyRepresentative: "박병호",
     companyAddress: "서울특별시 송파구 올림픽로 300, 롯데월드몰 5층",
-    companyPhone: "070-5015-7233",
+    companyPhone: "042-712-5035",
     defaultWorkPlace: "한국의집 롯데월드몰점"
   },
   gilchaejeong_apgujeong: {
@@ -23,7 +23,7 @@ const WORKPLACES = {
     companyName: "길채정 압구정",
     companyRepresentative: "박병호",
     companyAddress: "서울특별시 강남구 압구정로 343, 갤러리아백화점",
-    companyPhone: "070-5015-7233",
+    companyPhone: "042-712-5035",
     defaultWorkPlace: "길채정 압구정"
   },
   sobagongbang_pyeongchon: {
@@ -31,7 +31,7 @@ const WORKPLACES = {
     companyName: "소바공방 평촌점",
     companyRepresentative: "박병호",
     companyAddress: "경기도 안양시 동안구 시민대로 180, 롯데백화점 평촌점",
-    companyPhone: "070-5015-7233",
+    companyPhone: "042-712-5035",
     defaultWorkPlace: "소바공방 평촌점"
   },
   koreahouse_hyojonggang_paju: {
@@ -39,7 +39,7 @@ const WORKPLACES = {
   companyName: "한국의집 효종갱 파주",
   companyRepresentative: "박병호",
   companyAddress: "경기도 파주시 필승로 200, 파주프리미엄아울렛",
-  companyPhone: "070-5015-7233",
+  companyPhone: "042-712-5035",
   defaultWorkPlace: "한국의집 효종갱 파주"
 }
 };
