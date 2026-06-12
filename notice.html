@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>공지사항</title>
+
+  <link rel="stylesheet" href="notice.css">
+</head>
+
+<body>
+
+  <header class="top">
+    <button class="back" onclick="history.back()">←</button>
+    <h1>공지사항</h1>
+    <p>근무기강, 출퇴근, 위생교육 등 직원 공지</p>
+  </header>
+
+  <main class="wrap">
+
+    <section class="card admin-card">
+      <h2>공지 등록</h2>
+
+      <label>공지 구분</label>
+      <select id="category">
+        <option>일반공지</option>
+        <option>인사공지</option>
+        <option>근무기강</option>
+        <option>출퇴근 준수</option>
+        <option>위생교육</option>
+        <option>긴급공지</option>
+      </select>
+
+      <label>대상</label>
+      <select id="target">
+        <option>전체 직원</option>
+        <option>홀 직원</option>
+        <option>주방 직원</option>
+        <option>관리자</option>
+      </select>
+
+      <label>제목</label>
+      <input id="title" type="text" placeholder="공지 제목 입력">
+
+      <label>내용</label>
+      <textarea id="content" placeholder="공지 내용을 입력하세요"></textarea>
+
+      <label>중요 공지</label>
+      <select id="important">
+        <option value="N">아니오</option>
+        <option value="Y">예</option>
+      </select>
+
+      <label>작성자</label>
+      <input id="writer" type="text" value="관리자">
+
+      <button class="primary" onclick="saveNotice()">공지 등록</button>
+    </section>
+
+    <section class="card">
+      <h2>공지 목록</h2>
+      <div id="noticeList" class="notice-list">
+        불러오는 중...
+      </div>
+    </section>
+
+  </main>
+
+  <script src="notice.js"></script>
+</body>
+</html>
