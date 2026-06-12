@@ -222,7 +222,7 @@ function renderContractHtml(c, result, signature, isSigned) {
       isSigned
         ? `
           <div class="bottom-buttons">
-            <button class="blue" onclick="window.print()">인쇄 / PDF 저장</button>
+           <button class="blue" onclick="printContract()">인쇄 / PDF 저장</button>
           </div>
         `
         : renderSignatureInput()
@@ -374,4 +374,17 @@ function won(v) {
 
 function showError(message) {
   document.getElementById("loading").innerHTML = message;
+}
+function printContract(){
+
+  const isMobile =
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if(isMobile){
+    alert("휴대폰에서는 브라우저 메뉴의 공유 또는 인쇄 기능에서 PDF 저장을 선택해 주세요.");
+  }
+
+  setTimeout(function(){
+    window.print();
+  }, 300);
 }
