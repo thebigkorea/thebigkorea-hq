@@ -377,14 +377,31 @@ function showError(message) {
 }
 function printContract(){
 
-  const isMobile =
-    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const ua = navigator.userAgent;
 
-  if(isMobile){
-    alert("휴대폰에서는 브라우저 메뉴의 공유 또는 인쇄 기능에서 PDF 저장을 선택해 주세요.");
+  const isKakao =
+    ua.includes("KAKAOTALK");
+
+  const isSamsung =
+    ua.includes("SamsungBrowser");
+
+  if(isKakao){
+
+    alert(
+      "카카오톡 브라우저에서는 PDF 저장이 제한될 수 있습니다.\n우측 상단 메뉴 → 외부 브라우저 열기 후 다시 시도해 주세요."
+    );
+
+    return;
   }
 
-  setTimeout(function(){
-    window.print();
-  }, 300);
+  if(isSamsung){
+
+    setTimeout(()=>{
+      window.print();
+    },500);
+
+    return;
+  }
+
+  window.print();
 }
