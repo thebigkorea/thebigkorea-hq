@@ -206,13 +206,7 @@
         완료 계약서 확인
       </a>
 
-      <a
-        class="btn sub"
-        href="https://thebigkorea.github.io/thebigkorea-hq/"
-      >
-        더큰코리아 본사
-      </a>
-
+      
     </div>
 
     <div class="footer">
@@ -240,7 +234,10 @@
     document
       .getElementById("viewContractBtn")
       .href =
-      `contract-result.html?id=${id}&v=${Date.now()}`;
+      document
+  .getElementById("viewContractBtn")
+  .href =
+  `contract-view.html?id=${encodeURIComponent(id)}&v=${Date.now()}`;
 
   </script>
 
