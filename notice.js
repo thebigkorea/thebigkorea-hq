@@ -63,10 +63,19 @@ function renderNotices(list){
           작성자: ${n.writer}
         </div>
 
-        <button class="delete-btn"
+        <div class="notice-buttons">
+
+         <button class="delete-btn"
           onclick="deleteNotice('${n.noticeId}')">
           삭제
-        </button>
+         </button>
+
+         <button class="kakao-btn"
+         onclick="copyNoticeLink('${n.noticeId}')">
+         링크 복사
+         </button>
+
+        </div>
       </div>
     `;
   }).join("");
@@ -219,4 +228,18 @@ function getNoticeImage(type){
   }
 
   return base + "notice-main.png";
+}
+function copyNoticeLink(noticeId){
+
+  const url =
+    "https://thebigkorea.github.io/thebigkorea-hq/notice-view.html?id="
+    + encodeURIComponent(noticeId);
+
+  navigator.clipboard.writeText(url)
+    .then(() => {
+      alert("공지 링크가 복사되었습니다.");
+    })
+    .catch(() => {
+      prompt("아래 링크를 복사하세요.", url);
+    });
 }
