@@ -87,7 +87,7 @@ function renderTrips() {
 
               <button
                 class="btn approve"
-                onclick="approveTrip('${trip.createdAt}')">
+                onclick="approveTrip('${trip.id}')">
                 승인
               </button>
 
@@ -102,40 +102,28 @@ function renderTrips() {
   });
 }
 
-async function approveTrip(createdAt) {
+async function approveTrip(id){
 
-  if (!confirm("출장을 승인하시겠습니까?")) {
+  if(!id){
+    alert("출장 ID가 없습니다.");
     return;
   }
 
-  try {
+  const res = await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"approveTrip",
+      tripId:id
+    })
+  });
 
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "approveTrip",
-        createdAt
-      })
-    });
+  const result = await res.json();
 
-    const data = await res.json();
-
-    if (data.success) {
-
-      alert("출장 승인 완료");
-
-      loadTrips();
-
-    } else {
-
-      alert(data.message || "오류가 발생했습니다.");
-    }
-
-  } catch (err) {
-
-    console.log(err);
-
-    alert("서버 연결 실패");
+  if(result.success){
+    alert("출장 승인 완료");
+    loadTrips();
+  }else{
+    alert(result.message || "승인 실패");
   }
 }
 
