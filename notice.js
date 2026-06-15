@@ -90,8 +90,12 @@ async function saveNotice(){
     document.getElementById("important").value;
 
   const writer =
-    document.getElementById("writer").value.trim()
-    || "관리자";
+  document.getElementById("writer").value.trim()
+  || "관리자";
+
+  const noticeType =
+  document.getElementById("noticeType").value;
+    
 
   if(!title){
     alert("제목을 입력하세요.");
@@ -113,7 +117,8 @@ async function saveNotice(){
         title,
         content,
         important,
-        writer
+        writer,
+        noticeType
       })
     });
 
@@ -190,4 +195,28 @@ function escapeHtml(str){
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function getNoticeImage(type){
+
+  const base =
+    "https://thebigkorea.github.io/thebigkorea-hq/images/";
+
+  if(type === "emergency"){
+    return base + "notice-emergency.png";
+  }
+
+  if(type === "hygiene"){
+    return base + "notice-hygiene.png";
+  }
+
+  if(type === "hr"){
+    return base + "notice-hr.png";
+  }
+
+  if(type === "sales"){
+    return base + "notice-sales.png";
+  }
+
+  return base + "notice-main.png";
 }
