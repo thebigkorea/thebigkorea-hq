@@ -109,9 +109,16 @@ async function saveNotice(){
   const noticeType =
   document.getElementById("noticeType").value;
 
-  const fileUrl =
-  document.getElementById("fileUrl").value.trim();
-    
+  const fileInput =
+  document.getElementById("fileUpload");
+
+  let fileData = null;
+
+  if(fileInput.files && fileInput.files.length > 0){
+    fileData = await fileToBase64(fileInput.files[0]);
+  }
+
+      
 
   if(!title){
     alert("제목을 입력하세요.");
@@ -134,7 +141,8 @@ async function saveNotice(){
         content,
         important,
         writer,
-        noticeType
+        noticeType,
+        fileData
       })
     });
 
@@ -146,6 +154,7 @@ async function saveNotice(){
       document.getElementById("title").value = "";
       document.getElementById("content").value = "";
       document.getElementById("important").value = "N";
+      document.getElementById("fileUpload").value = "";
 
       loadNotices();
     }else{
@@ -262,4 +271,23 @@ ${url}`;
     .catch(() => {
       prompt("아래 내용을 복사하세요.", text);
     });
+}
+function fileToBase64(file){
+
+  return new Promise((resolve,reject) => {
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      resolve({
+        name: file.name,
+        type: file.type,
+        data: reader.result.split(",")[1]
+      });
+    };
+
+    reader.onerror = reject;
+
+    reader.readAsDataURL(file);
+  });
 }
