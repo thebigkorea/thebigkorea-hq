@@ -1,6 +1,8 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycby8SCh-WsBXjBp1V-WsVKomUSWxlsWsnCUIMtNA8xTCNcnOqVGaQ-GCvyNY7XnzoLGgug/exec";
 
+  let ALL_NOTICES = [];
+
 document.addEventListener("DOMContentLoaded", () => {
   loadNotices();
 });
@@ -19,7 +21,9 @@ async function loadNotices(){
       return;
     }
 
-    renderNotices(data.notices || []);
+    ALL_NOTICES = data.notices || [];
+
+    renderNotices(ALL_NOTICES);
 
   }catch(err){
     box.innerHTML = "서버 연결 오류가 발생했습니다.";
@@ -234,15 +238,28 @@ function getNoticeImage(type){
 }
 function copyNoticeLink(noticeId){
 
+  const notice =
+    ALL_NOTICES.find(n => n.noticeId === noticeId);
+
+  if(!notice){
+    alert("공지 정보를 찾을 수 없습니다.");
+    return;
+  }
+
   const url =
     "https://thebigkorea.github.io/thebigkorea-hq/notice-view.html?id="
     + encodeURIComponent(noticeId);
 
-  navigator.clipboard.writeText(url)
+  const text =
+`${notice.title}
+
+${url}`;
+
+  navigator.clipboard.writeText(text)
     .then(() => {
       alert("공지 링크가 복사되었습니다.");
     })
     .catch(() => {
-      prompt("아래 링크를 복사하세요.", url);
+      prompt("아래 내용을 복사하세요.", text);
     });
 }
