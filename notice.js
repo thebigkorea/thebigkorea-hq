@@ -99,6 +99,9 @@ async function saveNotice(){
   const content =
     document.getElementById("content").value.trim();
 
+  const expireDate =
+    document.getElementById("expireDate").value;  
+
   const important =
     document.getElementById("important").value;
 
@@ -133,6 +136,7 @@ async function saveNotice(){
         target,
         title,
         content,
+        expireDate,
         important,
         writer,
         noticeType,
@@ -143,17 +147,17 @@ async function saveNotice(){
     const data = await res.json();
 
     if(data.success){
-      alert("공지사항이 등록되었습니다.");
+  alert("공지사항이 등록되었습니다.");
 
-      document.getElementById("title").value = "";
-      document.getElementById("content").value = "";
-      document.getElementById("important").value = "N";
-      document.getElementById("fileUpload").value = "";
+  document.getElementById("title").value = "";
+  document.getElementById("content").value = "";
+  document.getElementById("important").value = "N";
+  document.getElementById("fileUrl").value = "";
 
-      loadNotices();
-    }else{
-      alert(data.message || "등록 실패");
-    }
+  await loadNotices();
+}else{
+  alert(data.message || "등록 실패");
+}
 
   }catch(err){
     alert("서버 연결 오류가 발생했습니다.");
