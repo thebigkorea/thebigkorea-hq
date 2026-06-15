@@ -109,14 +109,8 @@ async function saveNotice(){
   const noticeType =
   document.getElementById("noticeType").value;
 
-  const fileInput =
-  document.getElementById("fileUpload");
-
-  let fileData = null;
-
-  if(fileInput.files && fileInput.files.length > 0){
-    fileData = await fileToBase64(fileInput.files[0]);
-  }
+  const fileUrl =
+  document.getElementById("fileUrl").value.trim();
 
       
 
@@ -142,7 +136,7 @@ async function saveNotice(){
         important,
         writer,
         noticeType,
-        fileData
+        fileUrl
       })
     });
 
