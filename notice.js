@@ -225,6 +225,10 @@ function getNoticeImage(type){
     return base + "notice-emergency.png";
   }
 
+  if(type === "discipline"){
+    return base + "notice-discipline.png";
+  }
+
   if(type === "hygiene"){
     return base + "notice-hygiene.png";
   }

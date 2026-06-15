@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>공지사항</title>
+
+  <meta property="og:title"
+        content="더큰코리아 공지사항">
+
+  <meta property="og:description"
+        content="공지사항 내용을 확인하세요.">
+
+  <meta property="og:image"
+        content="https://thebigkorea.github.io/thebigkorea-hq/images/notice-main.png">
+
+  <meta property="og:type"
+        content="website">
+
+  <link rel="stylesheet"
+        href="notice.css">
+
+  <style>
+
+    body{
+      margin:0;
+      background:#f4f6f9;
+      font-family:
+      "Pretendard",
+      sans-serif;
+    }
+
+    .view-wrap{
+      max-width:900px;
+      margin:0 auto;
+      padding:20px;
+    }
+
+    .view-card{
+      background:#fff;
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow:
+      0 4px 20px rgba(0,0,0,.08);
+    }
+
+    .view-image{
+      width:100%;
+      display:block;
+    }
+
+    .view-body{
+      padding:25px;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:6px 12px;
+      border-radius:30px;
+      background:#0b1a3a;
+      color:#fff;
+      font-size:13px;
+      margin-bottom:15px;
+    }
+
+    .title{
+      font-size:28px;
+      font-weight:700;
+      margin-bottom:15px;
+    }
+
+    .info{
+      color:#777;
+      font-size:14px;
+      margin-bottom:25px;
+    }
+
+    .content{
+      line-height:1.8;
+      white-space:pre-wrap;
+      font-size:16px;
+    }
+
+    .file-btn{
+      display:inline-block;
+      margin-top:30px;
+      padding:14px 20px;
+      border-radius:12px;
+      background:#0b1a3a;
+      color:#fff;
+      text-decoration:none;
+      font-weight:600;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="view-wrap">
+
+    <div class="view-card">
+
+      <img
+        id="noticeImage"
+        class="view-image"
+        src=""
+      >
+
+      <div class="view-body">
+
+        <div
+          id="noticeCategory"
+          class="badge">
+        </div>
+
+        <div
+          id="noticeTitle"
+          class="title">
+        </div>
+
+        <div
+          id="noticeInfo"
+          class="info">
+        </div>
+
+        <div
+          id="noticeContent"
+          class="content">
+        </div>
+
+        <a
+          id="fileButton"
+          class="file-btn"
+          target="_blank"
+          style="display:none;">
+          첨부파일 보기
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+<script>
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycby8SCh-WsBXjBp1V-WsVKomUSWxlsWsnCUIMtNA8xTCNcnOqVGaQ-GCvyNY7XnzoLGgug/exec";
+
+loadNotice();
+
+async function loadNotice(){
+
+  const id =
+    new URLSearchParams(location.search)
+    .get("id");
+
+  if(!id){
+    alert("공지번호가 없습니다.");
+    return;
+  }
+
+  try{
+
+    const res =
+      await fetch(
+        API_URL + "?action=getNotices"
+      );
+
+    const data =
+      await res.json();
+
+    if(!data.success){
+      alert("공지 조회 실패");
+      return;
+    }
+
+    const notice =
+      (data.notices || [])
+      .find(n => n.noticeId === id);
+
+    if(!notice){
+      alert("공지사항이 없습니다.");
+      return;
+    }
+
+    renderNotice(notice);
+
+  }catch(err){
+    alert("서버 연결 오류");
+  }
+}
+
+function renderNotice(n){
+
+  document.title =
+    n.title;
+
+  document
+    .getElementById("noticeImage")
+    .src =
+    n.imageUrl;
+
+  document
+    .getElementById("noticeCategory")
+    .innerText =
+    n.category;
+
+  document
+    .getElementById("noticeTitle")
+    .innerText =
+    n.title;
+
+  document
+    .getElementById("noticeInfo")
+    .innerText =
+    "작성자: "
+    + n.writer
+    + " / 대상: "
+    + n.target
+    + " / 작성일: "
+    + formatDate(n.createdAt);
+
+  document
+    .getElementById("noticeContent")
+    .innerText =
+    n.content;
+
+  if(n.fileUrl){
+
+    const btn =
+      document.getElementById("fileButton");
+
+    btn.href =
+      n.fileUrl;
+
+    btn.style.display =
+      "inline-block";
+  }
+}
+
+function formatDate(value){
+
+  if(!value) return "";
+
+  const d =
+    new Date(value);
+
+  if(isNaN(d.getTime())){
+    return value;
+  }
+
+  return d.toLocaleDateString(
+    "ko-KR",
+    {
+      year:"numeric",
+      month:"2-digit",
+      day:"2-digit"
+    }
+  );
+}
+
+</script>
+
+</body>
+</html>
