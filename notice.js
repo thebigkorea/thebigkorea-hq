@@ -104,6 +104,9 @@ async function saveNotice(){
 
   const noticeType =
   document.getElementById("noticeType").value;
+
+  const fileUrl =
+  document.getElementById("fileUrl").value.trim();
     
 
   if(!title){
