@@ -36,6 +36,41 @@
   gap:10px;
 }
 
+.nav-dropdown{
+  position:relative;
+}
+
+.dropdown-menu{
+  display:none;
+  position:absolute;
+  top:42px;
+  right:0;
+  min-width:190px;
+  background:#fffaf2;
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow:0 14px 30px rgba(60,38,20,.18);
+  padding:10px;
+  z-index:999;
+}
+
+.dropdown-menu a{
+  display:block;
+  padding:12px 14px;
+  border-radius:12px;
+  font-size:14px;
+  font-weight:800;
+}
+
+.dropdown-menu a:hover{
+  background:#efe4d4;
+}
+
+.nav-dropdown:hover .dropdown-menu{
+  display:block;
+}
+
+
 .quick-btn-color{
   display:flex !important;
   align-items:center;
@@ -668,13 +703,45 @@
   </div>
 </div>
 
-      <nav class="nav">
-        <a href="#main">주요업무</a>
-        <a href="#stores">지점관리</a>
-        <a href="#sales">영업실적</a>
-        <a href="#hr">인사관리</a>
-        <a href="#admin">관리자</a>
-      </nav>
+      .nav-dropdown{
+  position:relative;
+}
+
+.nav-dropdown > a{
+  display:block;
+}
+
+.dropdown-menu{
+  display:none;
+  position:absolute;
+  top:42px;
+  right:0;
+  min-width:190px;
+  background:#fffaf2;
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow:0 14px 30px rgba(60,38,20,.18);
+  padding:10px;
+  z-index:999;
+}
+
+.dropdown-menu a{
+  display:block;
+  padding:12px 14px;
+  border-radius:12px;
+  font-size:14px;
+  font-weight:800;
+  white-space:nowrap;
+  color:var(--brown-dark);
+}
+
+.dropdown-menu a:hover{
+  background:#efe4d4;
+}
+
+.nav-dropdown:hover .dropdown-menu{
+  display:block;
+}
     </div>
   </header>
 
