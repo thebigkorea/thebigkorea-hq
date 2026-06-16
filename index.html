@@ -703,45 +703,60 @@
   </div>
 </div>
 
-      .nav-dropdown{
-  position:relative;
-}
+      <nav class="nav">
 
-.nav-dropdown > a{
-  display:block;
-}
+  <div class="nav-dropdown">
+    <a href="#main">업무관리 ▾</a>
+    <div class="dropdown-menu">
+      <a href="trip.html" target="_blank">출장신청</a>
+      <a href="vehicle.html" target="_blank">법인차량관리</a>
+      <a href="store-opening.html" target="_blank">신규점포 개설관리</a>
+      <a href="design-task.html" target="_blank">디자인팀 업무관리</a>
+      <a href="notice.html" target="_blank">공지사항</a>
+    </div>
+  </div>
 
-.dropdown-menu{
-  display:none;
-  position:absolute;
-  top:42px;
-  right:0;
-  min-width:190px;
-  background:#fffaf2;
-  border:1px solid var(--line);
-  border-radius:16px;
-  box-shadow:0 14px 30px rgba(60,38,20,.18);
-  padding:10px;
-  z-index:999;
-}
+  <div class="nav-dropdown">
+    <a href="#stores">지점관리 ▾</a>
+    <div class="dropdown-menu">
+      <a href="https://thebigkorea.github.io/koreahouse-intranet/" target="_blank">한국의집 잠실</a>
+      <a href="https://thebigkorea.github.io/gilchaejeong-apgujeong-intranet/" target="_blank">압구정 길채정</a>
+      <a href="https://thebigkorea.github.io/sobagongbang-pyeongchon-intranet/" target="_blank">평촌 소바공방</a>
+    </div>
+  </div>
 
-.dropdown-menu a{
-  display:block;
-  padding:12px 14px;
-  border-radius:12px;
-  font-size:14px;
-  font-weight:800;
-  white-space:nowrap;
-  color:var(--brown-dark);
-}
+  <div class="nav-dropdown">
+    <a href="#sales">영업관리 ▾</a>
+    <div class="dropdown-menu">
+      <a href="https://sites.google.com/view/koreafnb/%EA%B2%8C%EC%8B%9C%ED%8C%90" target="_blank">영업실적 조회</a>
+      <a href="store-manager.html" target="_blank">매장점검</a>
+      <a href="store-dashboard.html" target="_blank">본사대시보드</a>
+      <a href="https://thebigkorea.github.io/thebigkorea-settlement/settlement.html" target="_blank">점포별 월정산</a>
+    </div>
+  </div>
 
-.dropdown-menu a:hover{
-  background:#efe4d4;
-}
+  <div class="nav-dropdown">
+    <a href="#hr">인사관리 ▾</a>
+    <div class="dropdown-menu">
+      <a href="employee-info.html" target="_blank">직원정보 입력</a>
+      <a href="employee-admin.html" target="_blank">직원정보 조회</a>
+      <a href="regular-contract.html" target="_blank">정규직 계약</a>
+      <a href="part-contract.html" target="_blank">계약직·알바 계약</a>
+      <a href="service-contract.html" target="_blank">용역계약</a>
+      <a href="contract-admin.html" target="_blank">계약관리</a>
+    </div>
+  </div>
 
-.nav-dropdown:hover .dropdown-menu{
-  display:block;
-}
+  <div class="nav-dropdown">
+    <a href="#admin">관리자 ▾</a>
+    <div class="dropdown-menu">
+      <a href="hr-list.html" target="_blank">인사관리대장</a>
+      <a href="trip-admin.html" target="_blank">출장현황</a>
+      <a href="vehicle-admin.html" target="_blank">차량 관리자</a>
+    </div>
+  </div>
+
+</nav>
     </div>
   </header>
 
