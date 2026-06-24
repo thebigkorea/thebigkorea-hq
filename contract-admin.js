@@ -391,37 +391,40 @@ function renderPartAdmin(c, signature, result) {
   const company = getCompanyInfo(c);
 
   const empName = getVal(c, ["empName", "name", "employeeName"]);
-  const startDate = getVal(c, ["startDate", "joinDate"]);
-  const endDate = getVal(c, ["endDate"]);
+  const startDate = getVal(c, ["startDate", "contractStartDate", "periodStart", "joinDate"]);
+  const endDate = getVal(c, ["endDate", "contractEndDate", "periodEnd"]);
   const workPlace = getVal(c, ["workPlace", "workplace", "store"], company.companyName);
   const jobDuty = getVal(c, ["jobDuty", "workDetail"]);
   const workDays = getVal(c, ["workDays", "weeklyDays"]);
   const workTime = getVal(c, ["workTime"]);
   const breakTime = getVal(c, ["breakTime", "restTime"]);
-  const hourPay = getVal(c, ["hourPay"]);
-  const totalPay = getVal(c, ["totalPay", "salary", "monthlySalary"]);
+  const hourPay = getVal(c, ["hourPay", "hourlyPay", "hourlyWage"]);
+  const weeklyHolidayPay = getVal(c, ["weeklyHolidayPay"], "포함");
+  const insurance = getVal(c, ["insurance"], "가입");
+  const bankName = getVal(c, ["bankName", "bank"]);
+  const bankAccount = getVal(c, ["bankAccount", "account"]);
 
   return `
     <h1>계약직 근로계약서</h1>
 
     <p>
-      <strong>${company.companyName}</strong>과 근로자
-      <strong>${empName}</strong>은 다음과 같이 근로계약을 체결한다.
+      <strong>${company.companyName}</strong>(이하 “회사”라 한다)과 근로자
+      <strong>${empName}</strong>
+      (이하 “직원”이라 한다)은 다음과 같이 근로계약을 체결하고 이를 성실히 이행할 것을 약정한다.
     </p>
 
-    <h3>근로계약기간</h3>
-    <p>${startDate}부터 ${endDate}까지</p>
+    <h3>제1조 계약기간</h3>
+    <p>계약 시작일 : ${startDate}</p>
+    <p>계약 종료일 : ${endDate}</p>
 
-    <h3>근무장소</h3>
-    <p>${workPlace}</p>
+    <h3>제2조 근무장소 및 업무내용</h3>
+    <p>① 근무장소 : ${workPlace}</p>
+    <p>② 업무내용 : ${jobDuty}</p>
 
-    <h3>업무내용</h3>
-    <p>${jobDuty}</p>
-
-    <h3>근로시간</h3>
+    <h3>제3조 근로시간 및 휴게</h3>
     <table class="detail-table">
       <tr>
-        <th>근무일수</th>
+        <th>주 근무일수</th>
         <th>근무시간</th>
         <th>휴게시간</th>
       </tr>
@@ -432,11 +435,54 @@ function renderPartAdmin(c, signature, result) {
       </tr>
     </table>
 
-    <h3>임금</h3>
-    <p>시급 : ${won(hourPay)}</p>
-    <p>환산액 : ${won(totalPay)}</p>
+    <h3>제4조 휴일 및 휴가</h3>
+    <p>① 법정유급휴일은 주휴일 및 근로자의 날로 한다.</p>
+    <p>② 회사는 근로기준법이 정하는 바에 따라 연차휴가를 부여한다.</p>
 
-    ${signAdminBox(c, signature, result, company, "사업주", "근로자")}
+    <h3>제5조 임금</h3>
+    <table class="detail-table">
+      <tr>
+        <th>시급</th>
+        <th>주휴수당</th>
+        <th>4대보험</th>
+      </tr>
+      <tr>
+        <td>${won(hourPay)}</td>
+        <td>${weeklyHolidayPay}</td>
+        <td>${insurance}</td>
+      </tr>
+    </table>
+
+    <h3>제6조 임금지급방법</h3>
+    <p>
+      회사는 매월 1일부터 말일까지의 기간 동안 산정한 급여를 익월 10일에
+      직원 명의의 은행계좌로 지급한다.
+    </p>
+    <p>급여은행 : ${bankName}</p>
+    <p>계좌번호 : ${bankAccount}</p>
+
+    <h3>제7조 제출서류</h3>
+    <p>직원은 채용과 동시에 주민등록등본, 보건증, 통장사본, 신분증사본 등 회사가 요청하는 서류를 제출한다.</p>
+
+    <h3>제8조 퇴직급여</h3>
+    <p>회사는 근로자퇴직급여보장법이 정한 바에 따라 퇴직급여를 지급한다.</p>
+
+    <h3>제9조 퇴직절차</h3>
+    <p>직원은 퇴직하고자 할 경우 사직원을 사전 제출하여야 한다.</p>
+
+    <h3>제10조 신의성실의무</h3>
+    <p>직원은 회사의 경영방침에 따라 신의와 성실로 근무하여야 하며, 회사의 영업기밀사항을 외부에 누설하여서는 아니 된다.</p>
+
+    <h3>제11조 CCTV 설치 동의</h3>
+    <p>직원은 방범, 화재예방, 시설안전관리 목적의 CCTV 설치 및 운영에 대해 충분히 설명을 듣고 이해 및 동의한다.</p>
+
+    <h3>제12조 전자계약 및 계약서 교부 확인</h3>
+    <p>회사와 직원은 본 계약이 전자문서 및 전자서명 방식으로 체결될 수 있음을 확인하며, 전자서명은 자필서명 또는 날인과 동일한 효력을 가진다.</p>
+
+    <h3>제13조 기타사항</h3>
+    <p>본 계약서에 명시되지 않은 사항은 근로기준법, 관계 법령, 취업규칙 및 판례가 정하는 바에 따른다.</p>
+
+    ${signAdminBox(c, signature, result, company, "회사", "근로자")}
   `;
 }
 
