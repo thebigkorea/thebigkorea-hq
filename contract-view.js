@@ -70,10 +70,138 @@ async function loadContractView() {
   }
 }
 
+function renderServiceView(c, result, signature, isSigned) {
+  const companyName = getVal(c, ["companyName"], "주식회사 더큰코리아");
+  const empName = getVal(c, ["empName", "name", "employeeName"]);
+  const startDate = getVal(c, ["startDate", "contractStartDate", "periodStart", "joinDate"]);
+  const endDate = getVal(c, ["endDate", "contractEndDate", "periodEnd"]);
+  const workPlace = getVal(c, ["workPlace", "workplace", "store", "workLocation"]);
+  const jobDuty = getVal(c, ["jobDuty", "workDetail", "job", "duty", "memo"]);
+  const totalPay = getVal(c, ["totalPay", "salary", "monthlySalary"]);
+  const payType = getVal(c, ["payType"], "월별");
+  const withholding = getVal(c, ["withholding"], "3.3% 원천징수 후 지급");
+  const payDate = getVal(c, ["payDate"], "익월 10일");
+  const bankName = getVal(c, ["bankName", "bank", "salaryBank"]);
+  const bankAccount = getVal(c, ["bankAccount", "account", "salaryAccount"]);
+
+  const residentNo = getVal(c, ["residentNo", "rrn", "ssn"]);
+  const address = getVal(c, ["address"]);
+  const phone = getVal(c, ["phone"]);
+  const companyRepresentative = getVal(c, ["companyRepresentative"], "박병호");
+  const companyAddress = getVal(c, ["companyAddress"], "");
+  const companyPhone = getVal(c, ["companyPhone"], "");
+
+  return `
+    <h1>사업소득자 용역계약서</h1>
+
+    <p>
+      <strong>${companyName}</strong>(이하 “사업자”라 한다)와 용역제공자
+      <strong>${empName}</strong>(이하 “제공자”라 한다)은 다음과 같이 용역계약을 체결한다.
+    </p>
+
+    <h3>제1조 계약기간</h3>
+    <p>${startDate}부터 ${endDate}까지</p>
+
+    <h3>제2조 용역장소 및 용역내용</h3>
+    <p>① 용역장소 : ${workPlace}</p>
+    <p>② 용역내용 : ${jobDuty}</p>
+
+    <h3>제3조 용역비</h3>
+    <table>
+      <tr>
+        <th>지급기준</th>
+        <th>용역비</th>
+        <th>원천징수</th>
+        <th>지급일</th>
+      </tr>
+      <tr>
+        <td>${payType}</td>
+        <td>${won(totalPay)}</td>
+        <td>${withholding}</td>
+        <td>${payDate}</td>
+      </tr>
+    </table>
+
+    <h3>제4조 지급방법</h3>
+    <p>사업자는 제공자 명의의 은행계좌로 용역비를 지급한다.</p>
+    <p>지급은행 : ${bankName}</p>
+    <p>계좌번호 : ${bankAccount}</p>
+
+    <h3>제5조 독립 용역제공자 지위</h3>
+    <p>제공자는 근로기준법상 근로자가 아닌 독립적인 용역제공자로서, 본 계약은 고용계약이 아닌 용역계약임을 확인한다.</p>
+
+    <h3>제6조 세금 및 신고</h3>
+    <p>사업자는 관계 법령에 따라 용역비 지급 시 원천징수세액을 공제할 수 있으며, 제공자는 이에 필요한 개인정보 및 계좌정보를 제공한다.</p>
+
+    <h3>제7조 비밀유지</h3>
+    <p>제공자는 용역 수행 과정에서 알게 된 사업자의 영업정보, 고객정보, 운영정보를 제3자에게 누설하여서는 아니 된다.</p>
+
+    <h3>제8조 전자계약 및 전자서명</h3>
+    <p>본 계약은 전자문서 및 전자서명 방식으로 체결될 수 있으며, 전자서명은 자필서명 또는 날인과 동일한 효력을 가진다.</p>
+
+    <h3>제9조 기타사항</h3>
+    <p>본 계약서에 명시되지 않은 사항은 민법, 상법 및 관계 법령에 따른다.</p>
+
+    <h3>사업자 및 제공자 서명</h3>
+
+    <div class="sign-area">
+      <div class="sign-box">
+        <h3>[사업자]</h3>
+        <p>상호 : ${companyName}</p>
+        <p>
+          대표자 : ${companyRepresentative}
+          <img class="stamp" src="stamp.png" alt="회사 직인">
+        </p>
+        <p>주소 : ${companyAddress}</p>
+        <p>연락처 : ${companyPhone}</p>
+      </div>
+
+      <div class="sign-box">
+        <h3>[제공자]</h3>
+        <p>성명 : ${empName}</p>
+        <p>주민등록번호 : ${residentNo}</p>
+        <p>주소 : ${address}</p>
+        <p>연락처 : ${phone}</p>
+        ${
+          isSigned
+            ? `
+              <p>서명일시 : ${result.signedAt || c.signedAt || ""}</p>
+              ${signature ? `<img class="signature-img" src="${signature}" alt="전자서명">` : ""}
+            `
+            : `
+              <p style="margin-top:24px;">아래 전자서명란에 서명 후 완료 버튼을 눌러주세요.</p>
+            `
+        }
+      </div>
+    </div>
+
+    ${
+      isSigned
+        ? `<div class="bottom-buttons"><button class="blue" onclick="printContract()">인쇄 / PDF 저장</button></div>`
+        : renderSignatureInput()
+    }
+  `;
+}
+
 function renderContractHtml(c, result, signature, isSigned) {
   const companyName = getVal(c, ["companyName"], "주식회사 더큰코리아");
-  const contractType =getVal(c, ["contractType","employmentType","type","contractKind"], "");
-  const hourPay =getVal(c, [ "hourPay","hourlyPay","hourlyWage"]);
+
+  const contractType = getVal(c, [
+    "contractType",
+    "employmentType",
+    "type",
+    "contractKind"
+  ], "");
+
+  const isService =
+    contractType.includes("용역") ||
+    contractType.includes("사업소득");
+
+  if (isService) {
+    return renderServiceView(c, result, signature, isSigned);
+  }
+
+  const hourPay = getVal(c, ["hourPay", "hourlyPay", "hourlyWage"]);
   const empName = getVal(c, ["empName", "name", "employeeName"]);
   const workPlace = getVal(c, ["workPlace", "workplace", "store", "workLocation"]);
   const jobDuty = getVal(c, ["jobDuty", "workDetail", "job", "duty", "memo"]);
@@ -81,10 +209,8 @@ function renderContractHtml(c, result, signature, isSigned) {
   const monthHour = getVal(c, ["monthHour", "monthlyHours", "standardHours"]);
   const workTime = getVal(c, ["workTime", "workingHours"]);
   const breakTime = getVal(c, ["breakTime", "restTime"]);
-
-  
-const basePay =
-getVal(c, ["basePay","baseSalary","basicSalary"]);
+ 
+  const basePay =getVal(c, ["basePay","baseSalary","basicSalary"]);
   const overtimePay = getVal(c, ["overtimePay", "overPay", "extensionPay"]);
   const dutyPay = getVal(c, ["dutyPay", "jobPay"]);
   const positionPay = getVal(c, ["positionPay", "rankPay"]);
@@ -102,6 +228,10 @@ getVal(c, ["basePay","baseSalary","basicSalary"]);
   const companyRepresentative = getVal(c, ["companyRepresentative"], "박병호");
   const companyAddress = getVal(c, ["companyAddress"], "");
   const companyPhone = getVal(c, ["companyPhone"], "");
+
+  if (isService) {
+  return renderServiceView(c, result, signature, isSigned);
+}
 
   return `
     <h1>근 로 계 약 서</h1>
