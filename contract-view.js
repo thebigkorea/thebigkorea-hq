@@ -72,6 +72,8 @@ async function loadContractView() {
 
 function renderContractHtml(c, result, signature, isSigned) {
   const companyName = getVal(c, ["companyName"], "주식회사 더큰코리아");
+  const contractType = getVal(c, ["contractType"]);
+  const hourPay =getVal(c, [ "hourPay","hourlyPay","hourlyWage"]);
   const empName = getVal(c, ["empName", "name", "employeeName"]);
   const workPlace = getVal(c, ["workPlace", "workplace", "store", "workLocation"]);
   const jobDuty = getVal(c, ["jobDuty", "workDetail", "job", "duty", "memo"]);
@@ -80,7 +82,9 @@ function renderContractHtml(c, result, signature, isSigned) {
   const workTime = getVal(c, ["workTime", "workingHours"]);
   const breakTime = getVal(c, ["breakTime", "restTime"]);
 
-  const basePay = getVal(c, ["basePay", "baseSalary", "basicSalary"]);
+  
+const basePay =
+getVal(c, ["basePay","baseSalary","basicSalary"]);
   const overtimePay = getVal(c, ["overtimePay", "overPay", "extensionPay"]);
   const dutyPay = getVal(c, ["dutyPay", "jobPay"]);
   const positionPay = getVal(c, ["positionPay", "rankPay"]);
@@ -109,8 +113,21 @@ function renderContractHtml(c, result, signature, isSigned) {
     </p>
 
     <h3>제1조 계약기간</h3>
+
+${
+  contractType.includes("계약")
+  ? `
+    <p>계약 시작일 : ${c.startDate || c.contractStartDate || ""}</p>
+    <p>계약 종료일 : ${c.endDate || c.contractEndDate || ""}</p>
+  `
+  : `
     <p>입사일 : ${joinDate}</p>
-    <p>입사일로부터 기간의 정함이 없는 근로계약을 체결한다. 수습기간은 3개월로 한다.</p>
+    <p>
+      입사일로부터 기간의 정함이 없는 근로계약을 체결한다.
+      수습기간은 3개월로 한다.
+    </p>
+  `
+}
 
     <h3>제2조 근무장소 및 업무내용</h3>
     <p>① 근무장소 : ${workPlace}</p>
@@ -136,25 +153,52 @@ function renderContractHtml(c, result, signature, isSigned) {
     <p>① 법정유급휴일은 주휴일 및 근로자의 날로 한다.</p>
     <p>② 회사는 근로기준법이 정하는 바에 따라 연차휴가를 부여한다.</p>
 
-    <h3>제5조 임금</h3>
-    <table>
-      <tr>
-        <th>기본급</th>
-        <th>연장수당</th>
-        <th>직무수당</th>
-        <th>직책수당</th>
-        <th>식대</th>
-        <th>월급총액</th>
-      </tr>
-      <tr>
-        <td>${won(basePay)}</td>
-        <td>${won(overtimePay)}</td>
-        <td>${won(dutyPay)}</td>
-        <td>${won(positionPay)}</td>
-        <td>${won(mealPay)}</td>
-        <td><strong>${won(totalPay)}</strong></td>
-      </tr>
-    </table>
+    
+   ${
+  contractType && contractType.includes("계약")
+  ? `
+  
+<h3>제5조 임금</h3>
+
+<table>
+<tr>
+<th>시급</th>
+<th>주휴수당</th>
+<th>4대보험</th>
+</tr>
+
+<tr>
+<td>${won(hourPay)}</td>
+<td>${c.weeklyHolidayPay || "포함"}</td>
+<td>${c.insurance || "가입"}</td>
+</tr>
+</table>
+`
+:
+`
+<h3>제5조 임금</h3>
+
+<table>
+<tr>
+<th>기본급</th>
+<th>연장수당</th>
+<th>직무수당</th>
+<th>직책수당</th>
+<th>식대</th>
+<th>월급총액</th>
+</tr>
+
+<tr>
+<td>${won(basePay)}</td>
+<td>${won(overtimePay)}</td>
+<td>${won(dutyPay)}</td>
+<td>${won(positionPay)}</td>
+<td>${won(mealPay)}</td>
+<td><strong>${won(totalPay)}</strong></td>
+</tr>
+</table>
+`
+}
 
     <h3>제6조 임금지급방법</h3>
     <p>
