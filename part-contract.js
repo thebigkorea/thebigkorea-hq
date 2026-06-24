@@ -423,11 +423,17 @@ async function postData(data) {
 
 function val(id) {
   const el = document.getElementById(id);
-  return el ? el.value.trim() : "";
+  if (!el) {
+    console.log("ID 없음:", id);
+    return "";
+  }
+  return (el.value || "").trim();
 }
 
 function moneyVal(id) {
-  return String(document.getElementById(id).value || "").replace(/[^0-9]/g, "");
+  const el = document.getElementById(id);
+  if (!el) return "";
+  return String(el.value || "").replace(/[^0-9]/g, "");
 }
 
 function won(v) {
