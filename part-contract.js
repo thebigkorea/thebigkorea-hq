@@ -158,6 +158,11 @@ function getData() {
     endDate: val("endDate"),
     joinDate: val("startDate"),
 
+    contractStartDate: val("startDate"),
+    contractEndDate: val("endDate"),
+    periodStart: val("startDate"),
+    periodEnd: val("endDate"),
+
     workDays: val("workDays"),
     weeklyDays: val("workDays"),
 
@@ -177,6 +182,11 @@ function getData() {
     workTime: makeWorkTime(),
 
     hourPay: moneyVal("hourPay"),
+    hourlyPay: moneyVal("hourPay"),
+    hourlyWage: moneyVal("hourPay"),
+    basicPay: moneyVal("hourPay"),
+    basePay: moneyVal("hourPay"),
+
     totalPay: moneyVal("totalPay"),
     salary: moneyVal("totalPay"),
     monthlySalary: moneyVal("totalPay"),
