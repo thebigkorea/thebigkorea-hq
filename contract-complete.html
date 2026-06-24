@@ -224,22 +224,19 @@
   </div>
 
   <script>
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
 
-    const params =
-      new URLSearchParams(location.search);
+  const btn = document.getElementById("viewContractBtn");
 
-    const id =
-      params.get("id");
-
-    document
-      .getElementById("viewContractBtn")
-      .href =
-      document
-  .getElementById("viewContractBtn")
-  .href =
-  `contract-view.html?id=${encodeURIComponent(id)}&v=${Date.now()}`;
-
-  </script>
+  if (id) {
+    btn.href =
+      `contract-view.html?id=${encodeURIComponent(id)}&v=${Date.now()}`;
+  } else {
+    btn.href = "contract-admin.html";
+    btn.innerText = "계약 관리로 이동";
+  }
+</script>
 
 </body>
 </html>
