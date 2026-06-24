@@ -490,35 +490,79 @@ function renderServiceAdmin(c, signature, result) {
   const company = getCompanyInfo(c);
 
   const empName = getVal(c, ["empName", "name", "employeeName"]);
-  const startDate = getVal(c, ["startDate", "joinDate"]);
-  const endDate = getVal(c, ["endDate"]);
+  const startDate = getVal(c, ["startDate", "contractStartDate", "periodStart", "joinDate"]);
+  const endDate = getVal(c, ["endDate", "contractEndDate", "periodEnd"]);
   const workPlace = getVal(c, ["workPlace", "workplace", "store"], company.companyName);
   const jobDuty = getVal(c, ["jobDuty", "workDetail"]);
   const totalPay = getVal(c, ["totalPay", "salary", "monthlySalary"]);
-  const payType = getVal(c, ["payType"]);
-  const withholding = getVal(c, ["withholding"]);
-  const payDate = getVal(c, ["payDate"]);
+  const payType = getVal(c, ["payType"], "월별");
+  const withholding = getVal(c, ["withholding"], "3.3% 원천징수 후 지급");
+  const payDate = getVal(c, ["payDate"], "익월 10일");
+  const bankName = getVal(c, ["bankName", "bank"]);
+  const bankAccount = getVal(c, ["bankAccount", "account"]);
 
   return `
     <h1>사업소득자 용역계약서</h1>
 
     <p>
-      <strong>${company.companyName}</strong>과 용역제공자
-      <strong>${empName}</strong>은 다음과 같이 용역계약을 체결한다.
+      <strong>${company.companyName}</strong>(이하 “사업자”라 한다)와 용역제공자
+      <strong>${empName}</strong>(이하 “제공자”라 한다)은 다음과 같이 용역계약을 체결한다.
     </p>
 
-    <h3>계약기간</h3>
+    <h3>제1조 계약기간</h3>
     <p>${startDate}부터 ${endDate}까지</p>
 
-    <h3>용역장소 및 업무내용</h3>
-    <p>용역장소 : ${workPlace}</p>
-    <p>업무내용 : ${jobDuty}</p>
+    <h3>제2조 용역장소 및 용역내용</h3>
+    <p>① 용역장소 : ${workPlace}</p>
+    <p>② 용역내용 : ${jobDuty}</p>
 
-    <h3>용역비</h3>
-    <p>지급기준 : ${payType}</p>
-    <p>용역비 : ${won(totalPay)}</p>
-    <p>원천징수 : ${withholding}</p>
-    <p>지급일 : ${payDate}</p>
+    <h3>제3조 용역비</h3>
+    <table class="detail-table">
+      <tr>
+        <th>지급기준</th>
+        <th>용역비</th>
+        <th>원천징수</th>
+        <th>지급일</th>
+      </tr>
+      <tr>
+        <td>${payType}</td>
+        <td>${won(totalPay)}</td>
+        <td>${withholding}</td>
+        <td>${payDate}</td>
+      </tr>
+    </table>
+
+    <h3>제4조 지급방법</h3>
+    <p>사업자는 제공자 명의의 은행계좌로 용역비를 지급한다.</p>
+    <p>지급은행 : ${bankName}</p>
+    <p>계좌번호 : ${bankAccount}</p>
+
+    <h3>제5조 독립 용역제공자 지위</h3>
+    <p>
+      제공자는 근로기준법상 근로자가 아닌 독립적인 용역제공자로서,
+      본 계약은 고용계약이 아닌 용역계약임을 확인한다.
+    </p>
+
+    <h3>제6조 세금 및 신고</h3>
+    <p>
+      사업자는 관계 법령에 따라 용역비 지급 시 원천징수세액을 공제할 수 있으며,
+      제공자는 이에 필요한 개인정보 및 계좌정보를 제공한다.
+    </p>
+
+    <h3>제7조 비밀유지</h3>
+    <p>
+      제공자는 용역 수행 과정에서 알게 된 사업자의 영업정보, 고객정보,
+      운영정보를 제3자에게 누설하여서는 아니 된다.
+    </p>
+
+    <h3>제8조 전자계약 및 전자서명</h3>
+    <p>
+      본 계약은 전자문서 및 전자서명 방식으로 체결될 수 있으며,
+      전자서명은 자필서명 또는 날인과 동일한 효력을 가진다.
+    </p>
+
+    <h3>제9조 기타사항</h3>
+    <p>본 계약서에 명시되지 않은 사항은 민법, 상법 및 관계 법령에 따른다.</p>
 
     ${signAdminBox(c, signature, result, company, "사업자", "제공자")}
   `;
