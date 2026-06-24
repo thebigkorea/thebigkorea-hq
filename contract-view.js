@@ -72,7 +72,7 @@ async function loadContractView() {
 
 function renderContractHtml(c, result, signature, isSigned) {
   const companyName = getVal(c, ["companyName"], "주식회사 더큰코리아");
-  const contractType = getVal(c, ["contractType"]);
+  const contractType =getVal(c, ["contractType","employmentType","type","contractKind"], "");
   const hourPay =getVal(c, [ "hourPay","hourlyPay","hourlyWage"]);
   const empName = getVal(c, ["empName", "name", "employeeName"]);
   const workPlace = getVal(c, ["workPlace", "workplace", "store", "workLocation"]);
@@ -115,6 +115,7 @@ getVal(c, ["basePay","baseSalary","basicSalary"]);
     <h3>제1조 계약기간</h3>
 
 ${
+  contractType &&
   contractType.includes("계약")
   ? `
     <p>계약 시작일 : ${c.startDate || c.contractStartDate || ""}</p>
@@ -157,7 +158,7 @@ ${
    ${
   contractType && contractType.includes("계약")
   ? `
-  
+
 <h3>제5조 임금</h3>
 
 <table>
