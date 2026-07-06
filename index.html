@@ -762,6 +762,16 @@
   transform:translateY(-1px);
   box-shadow:0 8px 18px rgba(60,38,20,.12);
 }
+
+.card-buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.card-buttons .full{
+    grid-column:1 / -1;
+}
 /* 본사 주요업무 카드별 아이콘 색상 */
 
 .card:nth-child(1) .icon{
@@ -900,6 +910,7 @@
   color:#7c2d12;
   border:1px solid #fed7aa;
 }
+
    
 
   </style>
@@ -1208,6 +1219,12 @@
 
            <a class="btn" href="contract-admin.html" target="_blank">
              계약관리
+           </a>
+
+           <a class="btn full"
+             href="https://docs.google.com/spreadsheets/d/112xBTK2vY-LygksJ1Ia3nVCw9-Edue69q67nR5CS460/edit?gid=1011221428#gid=1011221428"
+             target="_blank">
+            전자계약관리대장
            </a>
          </div>
         </div>
