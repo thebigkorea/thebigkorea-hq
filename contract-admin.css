@@ -492,3 +492,26 @@ td {
     grid-template-columns: 1fr;
   }
 }
+.header-buttons{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:20px;
+}
+
+.ledger-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:12px 22px;
+    background:#1f3d68;
+    color:#fff;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:700;
+    font-size:15px;
+    transition:.2s;
+}
+
+.ledger-btn:hover{
+    background:#2d568d;
+}
