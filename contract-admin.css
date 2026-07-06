@@ -293,27 +293,124 @@ td {
 }
 
 @media print {
-  body * {
-    visibility: hidden;
+
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
   }
 
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  #modal,
+  #modal *,
   #contractDetail,
   #contractDetail * {
-    visibility: visible;
+    visibility: visible !important;
   }
 
-  #contractDetail {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    border: none;
-    padding: 20px;
+  #modal {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    background: #fff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .modal-content {
+    position: static !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
   .modal-header,
-  .modal-buttons {
+  .modal-buttons,
+  .container {
     display: none !important;
+  }
+
+  #contractDetail,
+  .contract-detail {
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    font-size: 14px !important;
+    line-height: 1.65 !important;
+  }
+
+  .contract-detail h1 {
+    font-size: 26px !important;
+    margin: 0 0 22px !important;
+  }
+
+  .contract-detail h3 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .detail-table,
+  .contract-detail table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+  }
+
+  .contract-detail th,
+  .contract-detail td {
+    font-size: 12px !important;
+    padding: 7px !important;
+    white-space: normal !important;
+    word-break: keep-all !important;
+  }
+
+  .sign-admin-box {
+    display: block !important;
+    margin-top: 24px !important;
+  }
+
+  .sign-admin-box > div {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 16px !important;
+  }
+
+  .company-stamp {
+    width: 100px !important;
+  }
+
+  .signature-img {
+    max-width: 180px !important;
+    max-height: 70px !important;
   }
 }
 .contract-detail {
