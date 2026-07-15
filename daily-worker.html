@@ -602,6 +602,78 @@
           </div>
 
           <div class="card">
+  <div class="card-header">
+    <div>
+      <h4>점포별 일용직 사용현황</h4>
+      <p>조회기간 동안 점포별 사용 인원, 근무 건수와 수당을 비교합니다.</p>
+    </div>
+
+    <div style="display:flex; align-items:end; gap:8px;">
+      <div>
+        <label for="storeSummaryStart">시작일</label>
+        <input id="storeSummaryStart" type="date" style="width:145px;">
+      </div>
+
+      <div>
+        <label for="storeSummaryEnd">종료일</label>
+        <input id="storeSummaryEnd" type="date" style="width:145px;">
+      </div>
+
+      <button
+        class="btn btn-primary"
+        onclick="loadStoreSummary()">
+        조회
+      </button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>점포</th>
+          <th>사용 인원</th>
+          <th>근무 건수</th>
+          <th>총수당</th>
+          <th>미지급 건수</th>
+          <th>미지급 금액</th>
+        </tr>
+      </thead>
+
+      <tbody id="storeSummaryBody">
+        <tr>
+          <td colspan="6" class="table-empty">
+            점포별 현황을 불러오는 중입니다.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="summary-bar">
+    <span>
+      점포 수
+      <strong id="storeSummaryStoreCount">0개</strong>
+    </span>
+
+    <span>
+      전체 사용 인원
+      <strong id="storeSummaryWorkerCount">0명</strong>
+    </span>
+
+    <span>
+      전체 근무
+      <strong id="storeSummaryWorkCount">0건</strong>
+    </span>
+
+    <span>
+      전체 수당
+      <strong id="storeSummaryTotalAmount">0원</strong>
+    </span>
+  </div>
+</div>
+
+          <div class="card">
             <div class="card-header">
               <div>
                 <h4>최근 근무내역</h4>
@@ -962,13 +1034,17 @@
     }
 
     function setDefaultDates() {
-      const today = getLocalDateText(new Date());
-      const firstDay = today.substring(0, 8) + "01";
+  const today = getLocalDateText(new Date());
+  const firstDay = today.substring(0, 8) + "01";
 
-      document.getElementById("date").value = today;
-      document.getElementById("ledgerStart").value = firstDay;
-      document.getElementById("ledgerEnd").value = today;
-    }
+  document.getElementById("date").value = today;
+
+  document.getElementById("ledgerStart").value = firstDay;
+  document.getElementById("ledgerEnd").value = today;
+
+  document.getElementById("storeSummaryStart").value = firstDay;
+  document.getElementById("storeSummaryEnd").value = today;
+}
 
     async function loadDashboard() {
       const today = getLocalDateText(new Date());
@@ -1016,6 +1092,7 @@
         setText("dashboardUpdatedAt", "최종 조회 " + new Date().toLocaleString("ko-KR"));
 
         renderRecent(allList.slice(0, 10));
+        loadStoreSummary();
       } catch (err) {
         setText("statTodayCount", "오류");
         setText("statTodayAmount", "오류");
@@ -1025,6 +1102,127 @@
         document.getElementById("recentBody").innerHTML = '<tr><td colspan="7" class="table-empty">자료 조회 중 오류가 발생했습니다.</td></tr>';
       }
     }
+
+    async function loadStoreSummary() {
+  const body = document.getElementById("storeSummaryBody");
+
+  const startDate =
+    document.getElementById("storeSummaryStart").value;
+
+  const endDate =
+    document.getElementById("storeSummaryEnd").value;
+
+  body.innerHTML = `
+    <tr>
+      <td colspan="6" class="table-empty">
+        점포별 현황을 불러오는 중입니다.
+      </td>
+    </tr>
+  `;
+
+  try {
+    const url =
+      API_URL +
+      "?action=getDailyWorkerStoreSummary" +
+      "&startDate=" + encodeURIComponent(startDate) +
+      "&endDate=" + encodeURIComponent(endDate);
+
+    const json = await fetchJson(url);
+
+    if (!json.success) {
+      throw new Error(json.message || "점포별 현황 조회 실패");
+    }
+
+    renderStoreSummary(json.data || [], json.totals || {});
+  } catch (err) {
+    console.error("점포별 현황 조회 오류:", err);
+
+    body.innerHTML = `
+      <tr>
+        <td colspan="6" class="table-empty">
+          점포별 현황을 불러오지 못했습니다.
+          Apps Script 배포 상태를 확인해주세요.
+        </td>
+      </tr>
+    `;
+
+    setText("storeSummaryStoreCount", "0개");
+    setText("storeSummaryWorkerCount", "0명");
+    setText("storeSummaryWorkCount", "0건");
+    setText("storeSummaryTotalAmount", "0원");
+  }
+}
+
+
+function renderStoreSummary(list, totals) {
+  const body = document.getElementById("storeSummaryBody");
+
+  if (!list.length) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="6" class="table-empty">
+          조회기간에 등록된 근무내역이 없습니다.
+        </td>
+      </tr>
+    `;
+  } else {
+    body.innerHTML = list.map(function(item) {
+      return `
+        <tr>
+          <td class="left">
+            <strong>${escapeHtml(item.store || "-")}</strong>
+          </td>
+
+          <td>
+            ${Number(item.workerCount || 0).toLocaleString("ko-KR")}명
+          </td>
+
+          <td>
+            ${Number(item.workCount || 0).toLocaleString("ko-KR")}건
+          </td>
+
+          <td class="money">
+            ${formatMoney(item.totalAmount)}
+          </td>
+
+          <td>
+            ${
+              Number(item.unpaidCount || 0) > 0
+                ? '<span class="status-badge status-unpaid">' +
+                  Number(item.unpaidCount).toLocaleString("ko-KR") +
+                  '건</span>'
+                : '<span class="status-badge status-paid">0건</span>'
+            }
+          </td>
+
+          <td class="money">
+            ${formatMoney(item.unpaidAmount)}
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  setText(
+    "storeSummaryStoreCount",
+    Number(totals.storeCount || 0).toLocaleString("ko-KR") + "개"
+  );
+
+  setText(
+    "storeSummaryWorkerCount",
+    Number(totals.workerCount || 0).toLocaleString("ko-KR") + "명"
+  );
+
+  setText(
+    "storeSummaryWorkCount",
+    Number(totals.workCount || 0).toLocaleString("ko-KR") + "건"
+  );
+
+  setText(
+    "storeSummaryTotalAmount",
+    formatMoney(totals.totalAmount || 0)
+  );
+}
 
     function renderRecent(list) {
       const body = document.getElementById("recentBody");
