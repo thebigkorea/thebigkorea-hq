@@ -1625,7 +1625,27 @@ function renderJobSummary(list, totals) {
               <td>${escapeHtml(item.bank || "-")}</td>
               <td>${escapeHtml(item.account || "-")}</td>
               <td>${payBadge(item.payStatus)}</td>
-              <td><button class="btn btn-light btn-small" onclick="openEditModal(${item.rowNumber})">수정</button></td>
+              <td>
+
+  <button
+    class="btn btn-light btn-small"
+    onclick="openEditModal(${item.rowNumber})">
+    수정
+  </button>
+
+  ${
+    item.payStatus === "미지급"
+      ? `
+      <button
+        class="btn btn-success btn-small"
+        onclick="markPaid(${item.rowNumber})">
+        지급완료
+      </button>
+      `
+      : ""
+  }
+
+</td>
             </tr>`;
         }).join("");
       }
