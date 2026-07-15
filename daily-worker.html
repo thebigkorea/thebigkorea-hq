@@ -1121,18 +1121,65 @@
 </section>
 
         <!-- 근무자 관리 -->
-        <section id="page-workers" class="page-section">
-          <div class="page-heading">
-            <div><h3>근무자 관리</h3><p>일용직 인명정보와 누적 근무내역을 관리할 화면입니다.</p></div>
-          </div>
-          <div class="card">
-            <div class="placeholder">
-              <div class="placeholder-icon">♙</div>
-              <h4>근무자 관리 화면 준비</h4>
-              <p>다음 단계에서 성명·전화 검색, 은행·계좌 수정,<br>누적 근무횟수와 총지급액 조회 기능을 연결합니다.</p>
-            </div>
-          </div>
-        </section>
+        <!-- 근무자 관리 -->
+<section id="page-workers" class="page-section">
+  <div class="page-heading">
+    <div>
+      <h3>근무자 관리</h3>
+      <p>성명 또는 전화번호로 일용직 인명정보를 조회합니다.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="search-inline">
+        <div>
+          <label for="workerManageKeyword">성명 · 전화번호</label>
+          <input
+            id="workerManageKeyword"
+            type="text"
+            placeholder="예: 홍길동 또는 01012345678"
+            onkeydown="if(event.key === 'Enter') loadWorkerManage()"
+          >
+        </div>
+
+        <button
+          class="btn btn-primary"
+          onclick="loadWorkerManage()"
+        >
+          조회
+        </button>
+      </div>
+
+      <div id="workerManageNotice" class="notice"></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>성명</th>
+            <th>전화번호</th>
+            <th>주민등록번호</th>
+            <th>은행</th>
+            <th>계좌번호</th>
+            <th>최근 업무</th>
+            <th>최근 수당</th>
+            <th>최종 등록일</th>
+          </tr>
+        </thead>
+
+        <tbody id="workerManageBody">
+          <tr>
+            <td colspan="8" class="table-empty">
+              성명 또는 전화번호를 입력하고 조회하세요.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
       </div>
     </main>
   </div>
@@ -1573,6 +1620,109 @@ function renderJobSummary(list, totals) {
         showNotice("searchNotice", "err", "검색 중 오류가 발생했습니다. 배포 URL 또는 권한을 확인해주세요.");
       }
     }
+
+    async function loadWorkerManage() {
+  const keyword =
+    document.getElementById("workerManageKeyword").value.trim();
+
+  const body =
+    document.getElementById("workerManageBody");
+
+  clearNotice("workerManageNotice");
+
+  if (!keyword) {
+    showNotice(
+      "workerManageNotice",
+      "err",
+      "성명 또는 전화번호를 입력해주세요."
+    );
+    return;
+  }
+
+  body.innerHTML = `
+    <tr>
+      <td colspan="8" class="table-empty">
+        근무자 정보를 불러오는 중입니다.
+      </td>
+    </tr>
+  `;
+
+  try {
+    const json = await fetchJson(
+      API_URL +
+      "?action=searchWorker&keyword=" +
+      encodeURIComponent(keyword)
+    );
+
+    const list =
+      json.success && Array.isArray(json.data)
+        ? json.data
+        : [];
+
+    if (!list.length) {
+      body.innerHTML = `
+        <tr>
+          <td colspan="8" class="table-empty">
+            검색된 근무자가 없습니다.
+          </td>
+        </tr>
+      `;
+
+      showNotice(
+        "workerManageNotice",
+        "err",
+        "등록된 근무자 정보를 찾지 못했습니다."
+      );
+      return;
+    }
+
+    showNotice(
+      "workerManageNotice",
+      "ok",
+      list.length + "명의 근무자를 찾았습니다."
+    );
+
+    body.innerHTML = list.map(function(worker) {
+      return `
+        <tr>
+          <td><strong>${escapeHtml(worker.name || "")}</strong></td>
+          <td>${escapeHtml(formatPhone(worker.phone || ""))}</td>
+          <td>${escapeHtml(worker.rrn || "-")}</td>
+          <td>${escapeHtml(worker.bank || "-")}</td>
+          <td>${escapeHtml(worker.account || "-")}</td>
+          <td>${escapeHtml(worker.lastJob || "-")}</td>
+          <td class="money">
+            ${
+              worker.lastAllowance
+                ? formatMoney(
+                    normalizeAllowance(worker.lastAllowance)
+                  )
+                : "-"
+            }
+          </td>
+          <td>${escapeHtml(worker.lastDate || "-")}</td>
+        </tr>
+      `;
+    }).join("");
+
+  } catch (err) {
+    console.error("근무자 조회 오류:", err);
+
+    body.innerHTML = `
+      <tr>
+        <td colspan="8" class="table-empty">
+          근무자 정보를 불러오지 못했습니다.
+        </td>
+      </tr>
+    `;
+
+    showNotice(
+      "workerManageNotice",
+      "err",
+      "근무자 조회 중 오류가 발생했습니다."
+    );
+  }
+}
 
     function selectWorker(index) {
       const worker = (window.__workerSearchResults || [])[index];
