@@ -182,6 +182,7 @@
     }
 
     .quick-btn {
+      position:relative;
       min-height:102px;
       padding:15px;
       background:#fcfbf9;
@@ -274,6 +275,7 @@
     }
 
     .task {
+      position:relative;
       min-height:44px;
       padding:11px 13px;
       border-radius:11px;
@@ -311,6 +313,26 @@
     .task.placeholder::after {
       content:"준비 중";
       font-size:10px;
+    }
+
+    .badge-new {
+      position:absolute;
+      top:-8px;
+      right:-7px;
+      z-index:3;
+      min-width:24px;
+      height:24px;
+      padding:0 7px;
+      border-radius:999px;
+      background:#df342f;
+      color:white;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      font-weight:900;
+      line-height:24px;
+      box-shadow:0 4px 10px rgba(0,0,0,.2);
     }
 
     .wide {
@@ -516,6 +538,7 @@
           <span class="ico">📝</span>
           <strong>일용직 관리</strong>
           <small>통합 근무내역</small>
+          <span id="hqDailyUnpaidBadgeTop" class="badge-new">0</span>
         </a>
       </div>
     </section>
@@ -834,6 +857,7 @@
                      target="_blank"
                      href="https://thebigkorea.github.io/thebigkorea-hq/daily-worker.html">
                     일용직 관리
+                    <span id="koreaDailyUnpaidBadge" class="badge-new">0</span>
                   </a>
                 </div>
               </div>
@@ -876,6 +900,7 @@
                      target="_blank"
                      href="https://thebigkorea.github.io/thebigkorea-hq/daily-worker.html">
                     일용직 관리
+                    <span id="gilchaejeongDailyUnpaidBadge" class="badge-new">0</span>
                   </a>
                 </div>
               </div>
@@ -918,6 +943,7 @@
                      target="_blank"
                      href="https://thebigkorea.github.io/thebigkorea-hq/daily-worker.html">
                     일용직 관리
+                    <span id="sobaDailyUnpaidBadge" class="badge-new">0</span>
                   </a>
                 </div>
               </div>
@@ -979,6 +1005,61 @@
       new Intl.DateTimeFormat("ko-KR", {
         dateStyle:"full"
       }).format(new Date());
+
+    const KOREA_API_URL =
+      "https://script.google.com/macros/s/AKfycbz_NFlMRhx_mP_0maccpd62iWNHGMVo-pAZCHg7s8-tM26QvKlIVrPL6TmElRgM6XIS/exec";
+    const SOBA_API_URL =
+      "https://script.google.com/macros/s/AKfycbwYnfRshHZs5kFl_3gvyYRlOgkfIPKx997vIjNg1hecxreYcetFFK_uS_ael9tuefP4/exec";
+    const GILCHAEJEONG_API_URL =
+      "https://script.google.com/macros/s/AKfycbzjJ4xzZl96Wi4AcYrfKrEzIl-gY5iEZCUEiZ_th51mD2Kq97G13z883QIMjFf99sQE3w/exec";
+
+    const unpaidCounts = { korea:0, gilchaejeong:0, soba:0 };
+
+    function showUnpaidBadge(id, count) {
+      const badge = document.getElementById(id);
+      if (!badge) return;
+
+      if (count > 0) {
+        badge.textContent = count > 99 ? "99+" : String(count);
+        badge.style.display = "flex";
+      } else {
+        badge.textContent = "0";
+        badge.style.display = "none";
+      }
+    }
+
+    function updateTotalUnpaidBadge() {
+      const total = unpaidCounts.korea + unpaidCounts.gilchaejeong + unpaidCounts.soba;
+      showUnpaidBadge("hqDailyUnpaidBadgeTop", total);
+    }
+
+    async function loadUnpaidBadge(apiUrl, badgeId, key, label) {
+      try {
+        const response = await fetch(
+          apiUrl + "?action=getDailyUnpaidCount&t=" + Date.now(),
+          { cache:"no-store" }
+        );
+        const data = await response.json();
+        const count = Number(data.count || data.unpaidCount || 0);
+
+        unpaidCounts[key] = count;
+        showUnpaidBadge(badgeId, count);
+        updateTotalUnpaidBadge();
+      } catch (error) {
+        console.log(label + " 미지급 배지 조회 실패", error);
+        unpaidCounts[key] = 0;
+        showUnpaidBadge(badgeId, 0);
+        updateTotalUnpaidBadge();
+      }
+    }
+
+    function loadDailyUnpaidBadges() {
+      loadUnpaidBadge(KOREA_API_URL, "koreaDailyUnpaidBadge", "korea", "한국의집");
+      loadUnpaidBadge(GILCHAEJEONG_API_URL, "gilchaejeongDailyUnpaidBadge", "gilchaejeong", "압구정 길채정");
+      loadUnpaidBadge(SOBA_API_URL, "sobaDailyUnpaidBadge", "soba", "평촌 소바공방");
+    }
+
+    document.addEventListener("DOMContentLoaded", loadDailyUnpaidBadges);
   </script>
 </body>
 </html>
