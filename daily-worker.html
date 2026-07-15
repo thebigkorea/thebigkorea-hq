@@ -1048,6 +1048,9 @@
         <button class="btn btn-primary" onclick="loadTaxData()">
           조회
         </button>
+        <button class="btn btn-success" onclick="downloadTaxCsv()">
+         엑셀 다운로드
+       </button>
       </div>
     </div>
 
@@ -1854,6 +1857,92 @@ function renderTaxData() {
   setText("taxCount", list.length + "건");
   setText("taxAmount", formatMoney(sumAllowance(list)));
 } 
+
+function downloadTaxCsv() {
+  const store = document.getElementById("taxStore").value;
+
+  const list = taxData.filter(function(item) {
+    if (store && item.store !== store) return false;
+
+    const name = String(item.name || "").trim();
+    return name && name !== "NO";
+  });
+
+  if (!list.length) {
+    alert("다운로드할 세무자료가 없습니다.");
+    return;
+  }
+
+  const rows = [
+    [
+      "날짜",
+      "매장",
+      "성명",
+      "주민등록번호",
+      "업무",
+      "지급액",
+      "지급상태"
+    ]
+  ];
+
+  list.forEach(function(item) {
+    rows.push([
+      item.date || "",
+      item.store || "",
+      item.name || "",
+      item.rrn || "",
+      item.job || "",
+      normalizeAllowance(item.allowance),
+      String(item.payStatus || "").trim()
+    ]);
+  });
+
+  const csv = rows
+    .map(function(row) {
+      return row.map(function(value) {
+        const text = String(value == null ? "" : value)
+          .replace(/"/g, '""');
+
+        return '"' + text + '"';
+      }).join(",");
+    })
+    .join("\n");
+
+  const bom = "\uFEFF";
+  const blob = new Blob([bom + csv], {
+    type: "text/csv;charset=utf-8;"
+  });
+
+  const startDate =
+    document.getElementById("taxStart").value || "";
+
+  const endDate =
+    document.getElementById("taxEnd").value || "";
+
+  const storeName =
+    store || "전체매장";
+
+  const fileName =
+    "일용직_세무자료_" +
+    storeName +
+    "_" +
+    startDate +
+    "_" +
+    endDate +
+    ".csv";
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = fileName;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+}
 
     async function markPaid(rowNumber) {
       const allJson = await fetchJson(API_URL + "?action=getDailyWorkerList");
