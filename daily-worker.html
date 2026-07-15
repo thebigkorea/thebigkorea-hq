@@ -379,8 +379,15 @@
     .result-item p { margin: 7px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 
     .filter-grid {
-      display: grid;
-      grid-template-columns: 150px 150px 170px 150px minmax(220px, 1fr) auto;
+  display: grid;
+  grid-template-columns:
+      140px
+      140px
+      170px
+      150px
+      150px
+      minmax(220px,1fr)
+      auto;
       gap: 10px;
       align-items: end;
     }
@@ -880,6 +887,18 @@
                 <div>
                   <label>매장</label>
                   <select id="ledgerStore" onchange="renderLedger()">
+                    <div>
+                      <label>업무</label>
+                      <select id="ledgerJob" onchange="renderLedger()">
+                        <option value="">전체 업무</option>
+                        <option value="홀">홀</option>
+                        <option value="설거지">설거지</option>
+                        <option value="주방">주방</option>
+                        <option value="전처리">전처리</option>
+                        <option value="퇴식">퇴식</option>
+                        <option value="기타">기타</option>
+                     </select>
+                  </div>
                     <option value="">전체 매장</option>
                     <option value="한국의집">한국의집</option>
                     <option value="더큰코리아 본사">더큰코리아 본사</option>
@@ -1546,11 +1565,13 @@ function renderJobSummary(list, totals) {
 
     function getFilteredLedger() {
       const store = document.getElementById("ledgerStore").value;
+      const job = document.getElementById("ledgerJob").value;
       const payStatus = document.getElementById("ledgerPayStatus").value;
       const keyword = normalizeSearch(document.getElementById("ledgerKeyword").value);
 
       return ledgerData.filter(function(item) {
         if (store && item.store !== store) return false;
+        if (job && item.job !== job) return false;
         if (payStatus && item.payStatus !== payStatus) return false;
 
         if (keyword) {
