@@ -990,7 +990,17 @@
         const todayList = todayJson.success ? (todayJson.data || []) : [];
         const monthList = monthJson.success ? (monthJson.data || []) : [];
         const allList = unpaidJson.success ? (unpaidJson.data || []) : [];
-        const unpaidList = allList.filter(function(item) { return item.payStatus !== "지급완료"; });
+        console.table(allList.map(r => ({
+  name: r.name,
+  payStatus: r.payStatus,
+  row: r.rowNumber
+})));
+
+
+        const unpaidList = allList.filter(function(item) {
+        const payStatus = String(item.payStatus || "").trim();
+          return payStatus !== "지급완료";
+         });
 
         setText("statTodayCount", todayList.length + "건");
         setText("statTodayAmount", formatMoney(sumAllowance(todayList)));
@@ -1239,8 +1249,9 @@
         if (!json.success) throw new Error(json.message || "조회 실패");
 
         const list = (json.data || []).filter(function(item) {
-          return item.payStatus !== "지급완료";
-        });
+           const payStatus = String(item.payStatus || "").trim();
+           return payStatus !== "지급완료";
+         });
 
         setText("unpaidPageCount", list.length + "건");
         setText("unpaidPageAmount", formatMoney(sumAllowance(list)));
