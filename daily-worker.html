@@ -1012,6 +1012,7 @@
 
         <!-- 세무자료 -->
         <!-- 세무자료 -->
+<!-- 세무자료 -->
 <section id="page-tax" class="page-section">
   <div class="page-heading">
     <div>
@@ -1021,8 +1022,13 @@
   </div>
 
   <div class="card">
+
+    <!-- 검색조건 -->
     <div class="card-body">
-      <div class="filter-grid" style="grid-template-columns:150px 150px 190px auto;">
+      <div
+        class="filter-grid"
+        style="grid-template-columns:150px 150px 190px auto;"
+      >
         <div>
           <label>시작일</label>
           <input id="taxStart" type="date">
@@ -1043,21 +1049,27 @@
             <option value="길채정 압구정점">길채정 압구정점</option>
             <option value="기타">기타</option>
           </select>
-       <div style="display:flex; gap:8px;">
-  <button
-      class="btn btn-primary"
-      onclick="loadTaxData()">
-      조회
-  </button>
+        </div>
 
-  <button
-      class="btn btn-success"
-      onclick="createTaxReport()">
-      신고자료 생성
-  </button>
-</div>
+        <div style="display:flex; gap:8px;">
+          <button
+            class="btn btn-primary"
+            onclick="loadTaxData()"
+          >
+            조회
+          </button>
+
+          <button
+            class="btn btn-success"
+            onclick="createTaxReport()"
+          >
+            신고자료 생성
+          </button>
+        </div>
+      </div>
     </div>
 
+    <!-- 조회 결과 -->
     <div class="table-wrap">
       <table>
         <thead>
@@ -1082,10 +1094,19 @@
       </table>
     </div>
 
+    <!-- 합계 -->
     <div class="summary-bar">
-      <span>조회건수 <strong id="taxCount">0건</strong></span>
-      <span>총지급액 <strong id="taxAmount">0원</strong></span>
+      <span>
+        조회건수
+        <strong id="taxCount">0건</strong>
+      </span>
+
+      <span>
+        총지급액
+        <strong id="taxAmount">0원</strong>
+      </span>
     </div>
+
   </div>
 </section>
 
