@@ -882,42 +882,65 @@
           <div class="card">
             <div class="card-body">
               <div class="filter-grid">
-                <div><label>시작일</label><input id="ledgerStart" type="date"></div>
-                <div><label>종료일</label><input id="ledgerEnd" type="date"></div>
-                <div>
-                  <label>매장</label>
-                  <select id="ledgerStore" onchange="renderLedger()">
-                    <div>
-                      <label>업무</label>
-                      <select id="ledgerJob" onchange="renderLedger()">
-                        <option value="">전체 업무</option>
-                        <option value="홀">홀</option>
-                        <option value="설거지">설거지</option>
-                        <option value="주방">주방</option>
-                        <option value="전처리">전처리</option>
-                        <option value="퇴식">퇴식</option>
-                        <option value="기타">기타</option>
-                     </select>
-                  </div>
-                    <option value="">전체 매장</option>
-                    <option value="한국의집">한국의집</option>
-                    <option value="더큰코리아 본사">더큰코리아 본사</option>
-                    <option value="소바공방 평촌점">소바공방 평촌점</option>
-                    <option value="길채정 압구정점">길채정 압구정점</option>
-                    <option value="기타">기타</option>
-                  </select>
-                </div>
-                <div>
-                  <label>지급상태</label>
-                  <select id="ledgerPayStatus" onchange="renderLedger()">
-                    <option value="">전체</option>
-                    <option value="미지급">미지급</option>
-                    <option value="지급완료">지급완료</option>
-                  </select>
-                </div>
-                <div><label>성명 · 전화번호</label><input id="ledgerKeyword" type="text" placeholder="검색어" oninput="renderLedger()"></div>
-                <button class="btn btn-primary" onclick="loadLedger()">조회</button>
-              </div>
+  <div>
+    <label>시작일</label>
+    <input id="ledgerStart" type="date">
+  </div>
+
+  <div>
+    <label>종료일</label>
+    <input id="ledgerEnd" type="date">
+  </div>
+
+  <div>
+    <label>매장</label>
+    <select id="ledgerStore" onchange="renderLedger()">
+      <option value="">전체 매장</option>
+      <option value="한국의집">한국의집</option>
+      <option value="더큰코리아 본사">더큰코리아 본사</option>
+      <option value="소바공방 평촌점">소바공방 평촌점</option>
+      <option value="길채정 압구정점">길채정 압구정점</option>
+      <option value="기타">기타</option>
+    </select>
+  </div>
+
+  <div>
+    <label>업무</label>
+    <select id="ledgerJob" onchange="renderLedger()">
+      <option value="">전체 업무</option>
+      <option value="홀">홀</option>
+      <option value="설거지">설거지</option>
+      <option value="주방">주방</option>
+      <option value="전처리">전처리</option>
+      <option value="퇴식">퇴식</option>
+      <option value="기타">기타</option>
+    </select>
+  </div>
+
+  <div>
+    <label>지급상태</label>
+    <select id="ledgerPayStatus" onchange="renderLedger()">
+      <option value="">전체</option>
+      <option value="미지급">미지급</option>
+      <option value="지급완료">지급완료</option>
+    </select>
+  </div>
+
+  <div>
+    <label>성명 · 전화번호</label>
+    <input
+      id="ledgerKeyword"
+      type="text"
+      placeholder="검색어"
+      oninput="renderLedger()">
+  </div>
+
+  <button
+    class="btn btn-primary"
+    onclick="loadLedger()">
+    조회
+  </button>
+</div>
             </div>
 
             <div class="table-wrap">
