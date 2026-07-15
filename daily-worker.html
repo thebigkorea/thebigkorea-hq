@@ -1842,7 +1842,6 @@ setText("ledgerUnpaidCount", unpaidCount + "건");
 }
 
 async function createTaxReport() {
-
   const startDate =
     document.getElementById("taxStart").value;
 
@@ -1852,46 +1851,42 @@ async function createTaxReport() {
   const store =
     document.getElementById("taxStore").value;
 
-  if(!startDate || !endDate){
-    alert("기간을 선택하세요.");
+  if (!startDate || !endDate) {
+    alert("시작일과 종료일을 선택해주세요.");
     return;
   }
 
-  try{
-
-    const res = await fetch(API_URL,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        action:"makeDailyTaxReport",
-        startDate,
-        endDate,
-        store
-      })
-    });
-
-    const json = await res.json();
-
-    if(json.success){
-
-      alert(json.message);
-
-    }else{
-
-      alert(json.message || "생성 실패");
-
-    }
-
-  }catch(err){
-
-    console.error(err);
-
-    alert("신고자료 생성 중 오류가 발생했습니다.");
-
+  if (startDate > endDate) {
+    alert("시작일이 종료일보다 늦습니다.");
+    return;
   }
 
+  if (!confirm("선택한 기간의 신고자료를 생성하시겠습니까?")) {
+    return;
+  }
+
+  try {
+    const json = await postJson({
+      action: "makeDailyTaxReport",
+      startDate: startDate,
+      endDate: endDate,
+      store: store
+    });
+
+    if (!json.success) {
+      throw new Error(json.message || "신고자료 생성 실패");
+    }
+
+    alert(json.message || "신고자료가 생성되었습니다.");
+
+  } catch (err) {
+    console.error("신고자료 생성 오류:", err);
+
+    alert(
+      "신고자료 생성 중 오류가 발생했습니다.\n" +
+      "Apps Script 새 버전 배포 여부를 확인해주세요."
+    );
+  }
 }
 
 function renderTaxData() {
