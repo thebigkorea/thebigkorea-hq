@@ -674,6 +674,55 @@
 </div>
 
           <div class="card">
+  <div class="card-header">
+    <div>
+      <h4>업무별 일용직 사용현황</h4>
+      <p>위 점포별 현황과 동일한 조회기간을 기준으로 표시합니다.</p>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>업무</th>
+          <th>사용 인원</th>
+          <th>근무 건수</th>
+          <th>총수당</th>
+          <th>평균 일당</th>
+          <th>미지급 건수</th>
+        </tr>
+      </thead>
+
+      <tbody id="jobSummaryBody">
+        <tr>
+          <td colspan="6" class="table-empty">
+            업무별 현황을 불러오는 중입니다.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="summary-bar">
+    <span>
+      업무 구분
+      <strong id="jobSummaryCount">0개</strong>
+    </span>
+
+    <span>
+      전체 근무
+      <strong id="jobSummaryWorkCount">0건</strong>
+    </span>
+
+    <span>
+      전체 수당
+      <strong id="jobSummaryTotalAmount">0원</strong>
+    </span>
+  </div>
+</div>
+
+          <div class="card">
             <div class="card-header">
               <div>
                 <h4>최근 근무내역</h4>
@@ -1134,6 +1183,7 @@
     }
 
     renderStoreSummary(json.data || [], json.totals || {});
+    renderJobSummary(json.jobData || [], json.totals || {});
   } catch (err) {
     console.error("점포별 현황 조회 오류:", err);
 
@@ -1145,6 +1195,22 @@
         </td>
       </tr>
     `;
+
+    const jobBody = document.getElementById("jobSummaryBody");
+
+if (jobBody) {
+  jobBody.innerHTML = `
+    <tr>
+      <td colspan="6" class="table-empty">
+        업무별 현황을 불러오지 못했습니다.
+      </td>
+    </tr>
+  `;
+}
+
+setText("jobSummaryCount", "0개");
+setText("jobSummaryWorkCount", "0건");
+setText("jobSummaryTotalAmount", "0원");
 
     setText("storeSummaryStoreCount", "0개");
     setText("storeSummaryWorkerCount", "0명");
@@ -1221,6 +1287,86 @@ function renderStoreSummary(list, totals) {
   setText(
     "storeSummaryTotalAmount",
     formatMoney(totals.totalAmount || 0)
+  );
+}
+
+function renderJobSummary(list, totals) {
+  const body = document.getElementById("jobSummaryBody");
+
+  if (!body) return;
+
+  if (!list.length) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="6" class="table-empty">
+          조회기간에 등록된 업무별 근무내역이 없습니다.
+        </td>
+      </tr>
+    `;
+
+    setText("jobSummaryCount", "0개");
+    setText("jobSummaryWorkCount", "0건");
+    setText("jobSummaryTotalAmount", "0원");
+    return;
+  }
+
+  body.innerHTML = list.map(function(item) {
+    const unpaidCount = Number(item.unpaidCount || 0);
+
+    return `
+      <tr>
+        <td class="left">
+          <strong>${escapeHtml(item.job || "기타")}</strong>
+        </td>
+
+        <td>
+          ${Number(item.workerCount || 0).toLocaleString("ko-KR")}명
+        </td>
+
+        <td>
+          ${Number(item.workCount || 0).toLocaleString("ko-KR")}건
+        </td>
+
+        <td class="money">
+          ${formatMoney(item.totalAmount || 0)}
+        </td>
+
+        <td class="money">
+          ${formatMoney(item.averageAmount || 0)}
+        </td>
+
+        <td>
+          ${
+            unpaidCount > 0
+              ? `<span class="status-badge status-unpaid">${unpaidCount}건</span>`
+              : `<span class="status-badge status-paid">0건</span>`
+          }
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  const totalWorkCount = list.reduce(function(sum, item) {
+    return sum + Number(item.workCount || 0);
+  }, 0);
+
+  const totalAmount = list.reduce(function(sum, item) {
+    return sum + Number(item.totalAmount || 0);
+  }, 0);
+
+  setText(
+    "jobSummaryCount",
+    list.length.toLocaleString("ko-KR") + "개"
+  );
+
+  setText(
+    "jobSummaryWorkCount",
+    totalWorkCount.toLocaleString("ko-KR") + "건"
+  );
+
+  setText(
+    "jobSummaryTotalAmount",
+    formatMoney(totalAmount)
   );
 }
 
