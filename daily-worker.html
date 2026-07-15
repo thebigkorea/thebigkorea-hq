@@ -998,9 +998,15 @@
 
 
         const unpaidList = allList.filter(function(item) {
-        const payStatus = String(item.payStatus || "").trim();
-          return payStatus !== "지급완료";
-         });
+  const payStatus = String(item.payStatus || "").trim();
+  const name = String(item.name || "").trim();
+
+  return (
+    name !== "NO" &&
+    name !== "" &&
+    payStatus === "미지급"
+  );
+});
 
         setText("statTodayCount", todayList.length + "건");
         setText("statTodayAmount", formatMoney(sumAllowance(todayList)));
@@ -1249,9 +1255,15 @@
         if (!json.success) throw new Error(json.message || "조회 실패");
 
         const list = (json.data || []).filter(function(item) {
-           const payStatus = String(item.payStatus || "").trim();
-           return payStatus !== "지급완료";
-         });
+  const payStatus = String(item.payStatus || "").trim();
+  const name = String(item.name || "").trim();
+
+  return (
+    name !== "NO" &&
+    name !== "" &&
+    payStatus === "미지급"
+  );
+});
 
         setText("unpaidPageCount", list.length + "건");
         setText("unpaidPageAmount", formatMoney(sumAllowance(list)));
