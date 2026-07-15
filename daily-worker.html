@@ -958,6 +958,7 @@
             <div class="summary-bar">
               <span>조회건수 <strong id="ledgerCount">0건</strong></span>
               <span>총수당 <strong id="ledgerAmount">0원</strong></span>
+              <span>미지급 <strong id="ledgerUnpaidCount">0건</strong></span>
             </div>
           </div>
         </section>
@@ -1650,8 +1651,13 @@ function renderJobSummary(list, totals) {
         }).join("");
       }
 
-      setText("ledgerCount", list.length + "건");
-      setText("ledgerAmount", formatMoney(sumAllowance(list)));
+      const unpaidCount = list.filter(function(item) {
+  return String(item.payStatus || "").trim() === "미지급";
+}).length;
+
+setText("ledgerCount", list.length + "건");
+setText("ledgerAmount", formatMoney(sumAllowance(list)));
+setText("ledgerUnpaidCount", unpaidCount + "건");
     }
 
     async function loadUnpaid() {
