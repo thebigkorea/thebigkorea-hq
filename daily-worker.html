@@ -1011,18 +1011,76 @@
         </section>
 
         <!-- 세무자료 -->
-        <section id="page-tax" class="page-section">
-          <div class="page-heading">
-            <div><h3>세무자료</h3><p>기간별 신고자료 조회 및 엑셀 생성 기능을 구성할 화면입니다.</p></div>
-          </div>
-          <div class="card">
-            <div class="placeholder">
-              <div class="placeholder-icon">▤</div>
-              <h4>세무자료 화면 준비</h4>
-              <p>다음 단계에서 기간검색, 근로자별 합계, 신고자료 생성,<br>엑셀 다운로드 기능을 연결합니다.</p>
-            </div>
-          </div>
-        </section>
+        <!-- 세무자료 -->
+<section id="page-tax" class="page-section">
+  <div class="page-heading">
+    <div>
+      <h3>세무자료</h3>
+      <p>기간과 매장을 선택해 일용직 신고자료를 조회합니다.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="filter-grid" style="grid-template-columns:150px 150px 190px auto;">
+        <div>
+          <label>시작일</label>
+          <input id="taxStart" type="date">
+        </div>
+
+        <div>
+          <label>종료일</label>
+          <input id="taxEnd" type="date">
+        </div>
+
+        <div>
+          <label>매장</label>
+          <select id="taxStore" onchange="renderTaxData()">
+            <option value="">전체 매장</option>
+            <option value="한국의집">한국의집</option>
+            <option value="더큰코리아 본사">더큰코리아 본사</option>
+            <option value="소바공방 평촌점">소바공방 평촌점</option>
+            <option value="길채정 압구정점">길채정 압구정점</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" onclick="loadTaxData()">
+          조회
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>날짜</th>
+            <th>매장</th>
+            <th>성명</th>
+            <th>주민등록번호</th>
+            <th>업무</th>
+            <th>지급액</th>
+            <th>지급상태</th>
+          </tr>
+        </thead>
+
+        <tbody id="taxBody">
+          <tr>
+            <td colspan="7" class="table-empty">
+              조회 버튼을 눌러주세요.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="summary-bar">
+      <span>조회건수 <strong id="taxCount">0건</strong></span>
+      <span>총지급액 <strong id="taxAmount">0원</strong></span>
+    </div>
+  </div>
+</section>
 
         <!-- 근무자 관리 -->
         <section id="page-workers" class="page-section">
@@ -1080,6 +1138,7 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbz_NFlMRhx_mP_0maccpd62iWNHGMVo-pAZCHg7s8-tM26QvKlIVrPL6TmElRgM6XIS/exec";
 
     let ledgerData = [];
+    let taxData = [];
     let currentPage = "dashboard";
 
     const PAGE_INFO = {
@@ -1116,6 +1175,7 @@
       if (page === "dashboard") loadDashboard();
       if (page === "ledger" && ledgerData.length === 0) loadLedger();
       if (page === "unpaid") loadUnpaid();
+      if (page === "tax" && taxData.length === 0) loadTaxData();
     }
 
     function refreshCurrentPage() {
@@ -1136,6 +1196,9 @@
 
   document.getElementById("storeSummaryStart").value = firstDay;
   document.getElementById("storeSummaryEnd").value = today;
+
+  document.getElementById("taxStart").value = firstDay;
+  document.getElementById("taxEnd").value = today;
 }
 
     async function loadDashboard() {
@@ -1706,6 +1769,91 @@ setText("ledgerUnpaidCount", unpaidCount + "건");
         body.innerHTML = '<tr><td colspan="9" class="table-empty">미지급 내역 조회 중 오류가 발생했습니다.</td></tr>';
       }
     }
+
+   async function loadTaxData() {
+  const startDate = document.getElementById("taxStart").value;
+  const endDate = document.getElementById("taxEnd").value;
+  const body = document.getElementById("taxBody");
+
+  body.innerHTML = `
+    <tr>
+      <td colspan="7" class="table-empty">
+        세무자료를 불러오는 중입니다.
+      </td>
+    </tr>
+  `;
+
+  try {
+    const url =
+      API_URL +
+      "?action=getDailyWorkerList" +
+      "&startDate=" + encodeURIComponent(startDate) +
+      "&endDate=" + encodeURIComponent(endDate);
+
+    const json = await fetchJson(url);
+
+    if (!json.success) {
+      throw new Error(json.message || "조회 실패");
+    }
+
+    taxData = json.data || [];
+    renderTaxData();
+
+  } catch (err) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="7" class="table-empty">
+          세무자료 조회 중 오류가 발생했습니다.
+        </td>
+      </tr>
+    `;
+
+    setText("taxCount", "0건");
+    setText("taxAmount", "0원");
+  }
+}
+
+
+function renderTaxData() {
+  const body = document.getElementById("taxBody");
+  const store = document.getElementById("taxStore").value;
+
+  const list = taxData.filter(function(item) {
+    if (store && item.store !== store) return false;
+
+    const name = String(item.name || "").trim();
+    return name && name !== "NO";
+  });
+
+  if (!list.length) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="7" class="table-empty">
+          조회 조건에 맞는 세무자료가 없습니다.
+        </td>
+      </tr>
+    `;
+  } else {
+    body.innerHTML = list.map(function(item) {
+      return `
+        <tr>
+          <td>${escapeHtml(item.date || "")}</td>
+          <td>${escapeHtml(item.store || "")}</td>
+          <td><strong>${escapeHtml(item.name || "")}</strong></td>
+          <td>${escapeHtml(item.rrn || "-")}</td>
+          <td>${escapeHtml(item.job || "-")}</td>
+          <td class="money">
+            ${formatMoney(normalizeAllowance(item.allowance))}
+          </td>
+          <td>${payBadge(item.payStatus)}</td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  setText("taxCount", list.length + "건");
+  setText("taxAmount", formatMoney(sumAllowance(list)));
+} 
 
     async function markPaid(rowNumber) {
       const allJson = await fetchJson(API_URL + "?action=getDailyWorkerList");
