@@ -178,10 +178,11 @@ async function loadProjects() {
 
 function fillProjectSelects() {
   const selects = [
-    "taskProjectId",
-    "scheduleProjectId",
-    "expenseProjectId"
-  ];
+  "taskProjectId",
+  "scheduleProjectId",
+  "expenseProjectId",
+  "expenseLookupProjectId"
+];
 
   selects.forEach(id => {
     const select = document.getElementById(id);
@@ -656,7 +657,7 @@ async function saveExpense() {
       document.getElementById("expenseAmount").value = "";
       document.getElementById("expenseMemo").value = "";
 
-       await loadExpenses();
+      
 
     } else {
       alert(data.message || "저장 실패");
@@ -689,7 +690,7 @@ async function loadExpenses(){
   );
 
   const projectId =
-    val("expenseProjectId");
+  val("expenseLookupProjectId");
 
   if(!projectId){
 

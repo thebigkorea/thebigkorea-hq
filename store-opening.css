@@ -485,3 +485,46 @@ textarea{
   }
 
 }
+/* 상단 메뉴 6개 한 줄 */
+.tabs{
+  grid-template-columns:repeat(6, minmax(0, 1fr));
+}
+
+/* 출납 조회조건 */
+.expense-lookup-row{
+  display:grid;
+  grid-template-columns:minmax(300px, 1fr) 220px;
+  gap:16px;
+  align-items:end;
+}
+
+.expense-lookup-row .primary{
+  min-height:52px;
+  margin:0;
+}
+
+.expense-list-title{
+  margin-top:30px !important;
+  padding-top:25px;
+  border-top:1px solid #e6ded5;
+}
+
+@media(max-width:1000px){
+
+  .tabs{
+    grid-template-columns:repeat(3, 1fr);
+  }
+
+}
+
+@media(max-width:760px){
+
+  .tabs{
+    grid-template-columns:repeat(2, 1fr);
+  }
+
+  .expense-lookup-row{
+    grid-template-columns:1fr;
+  }
+
+}

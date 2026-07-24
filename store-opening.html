@@ -36,12 +36,30 @@
   </section>
 
   <section class="tabs">
-    <button class="tab active" onclick="showTab('list', this)">현황</button>
-    <button class="tab" onclick="showTab('project', this)">점포등록</button>
-    <button class="tab" onclick="showTab('task', this)">업무등록</button>
-    <button class="tab" onclick="showTab('schedule', this)">일정표</button>
-    <button class="tab" onclick="showTab('expense', this)">출납대장</button>
-  </section>
+  <button class="tab active" onclick="showTab('list', this)">
+    현황
+  </button>
+
+  <button class="tab" onclick="showTab('project', this)">
+    점포등록
+  </button>
+
+  <button class="tab" onclick="showTab('task', this)">
+    업무등록
+  </button>
+
+  <button class="tab" onclick="showTab('schedule', this)">
+    일정표
+  </button>
+
+  <button class="tab" onclick="showTab('expenseSave', this)">
+    출납내역 저장
+  </button>
+
+  <button class="tab" onclick="showTab('expenseLookup', this)">
+    출납내역 조회
+  </button>
+</section>
 
   <section id="list" class="panel active">
     <h2>점포 개설 현황</h2>
@@ -206,21 +224,24 @@
 
   </section>
 
-  <section id="expense" class="panel">
+  <section id="expenseSave" class="panel">
 
-  <h2>점포 개설 출납대장</h2>
+  <h2>출납내역 저장</h2>
 
   <div class="form-grid">
 
-    <label>점포 선택
+    <label>
+      점포 선택
       <select id="expenseProjectId"></select>
     </label>
 
-    <label>지출일자
+    <label>
+      지출일자
       <input type="date" id="expenseDate">
     </label>
 
-    <label>비용구분
+    <label>
+      비용구분
       <select id="expenseCategory">
         <option>계약금</option>
         <option>보증금</option>
@@ -239,15 +260,24 @@
       </select>
     </label>
 
-    <label>거래처
-      <input type="text" id="expenseVendor" placeholder="예: 인테리어 업체, 장비업체">
+    <label>
+      거래처
+      <input
+        type="text"
+        id="expenseVendor"
+        placeholder="예: 인테리어 업체, 장비업체">
     </label>
 
-    <label>지출금액
-      <input type="text" id="expenseAmount" placeholder="예: 1,000,000">
+    <label>
+      지출금액
+      <input
+        type="text"
+        id="expenseAmount"
+        placeholder="예: 1,000,000">
     </label>
 
-    <label>결제수단
+    <label>
+      결제수단
       <select id="expensePayMethod">
         <option>계좌이체</option>
         <option>법인카드</option>
@@ -257,7 +287,8 @@
       </select>
     </label>
 
-    <label>비용부담
+    <label>
+      비용부담
       <select id="expenseShareType">
         <option>본사부담</option>
         <option>점포부담</option>
@@ -266,7 +297,8 @@
       </select>
     </label>
 
-    <label>증빙여부
+    <label>
+      증빙여부
       <select id="expenseProof">
         <option>세금계산서</option>
         <option>카드영수증</option>
@@ -280,20 +312,46 @@
 
   <label class="full-label">
     메모
-    <textarea id="expenseMemo" placeholder="비용 배분 기준, 정산 예정일, 특이사항"></textarea>
+    <textarea
+      id="expenseMemo"
+      placeholder="비용 배분 기준, 정산 예정일, 특이사항"></textarea>
   </label>
 
-  <button id="saveExpenseBtn" class="primary" onclick="saveExpense()">
-  출납 내역 저장
-</button>
+  <button
+    id="saveExpenseBtn"
+    class="primary"
+    onclick="saveExpense()">
+    출납 내역 저장
+  </button>
 
-<button id="loadExpenseBtn" class="primary" onclick="loadExpenses()">
-  출납 내역 조회
-</button>
+</section>
 
-  <h2 style="margin-top:30px;">출납 내역</h2>
 
-  <div id="expenseSummary" class="summary" style="margin-bottom:16px;">
+<section id="expenseLookup" class="panel">
+
+  <h2>출납내역 조회</h2>
+
+  <div class="expense-lookup-row">
+
+    <label>
+      점포 선택
+      <select id="expenseLookupProjectId"></select>
+    </label>
+
+    <button
+      id="loadExpenseBtn"
+      class="primary"
+      onclick="loadExpenses()">
+      출납 내역 조회
+    </button>
+
+  </div>
+
+  <div
+    id="expenseSummary"
+    class="summary"
+    style="margin-top:24px; margin-bottom:20px;">
+
     <div class="summary-card">
       <strong id="expenseTotal">0원</strong>
       <span>총 지출액</span>
@@ -308,7 +366,10 @@
       <strong id="expenseStore">0원</strong>
       <span>점포부담</span>
     </div>
+
   </div>
+
+  <h2 class="expense-list-title">항목별 출납 내역</h2>
 
   <div id="expenseList" class="project-list"></div>
 
