@@ -3,10 +3,13 @@ const API_URL =
 
 let projects = [];
 let tasks = [];
+let checklistItems = [];
 
 document.addEventListener("DOMContentLoaded", () => {
 
   loadProjects();
+
+  loadChecklistItems();
 
   setupChecklistTaskLinks();
 
@@ -1325,3 +1328,623 @@ function printScheduleReport() {
 
   window.print();
 }
+const CHECKLIST_GROUPS = [
+
+  {
+    groupName: "계약·승인",
+    taskCategory: "계약",
+    number: "01",
+    description:
+      "계약 체결부터 브랜드·유통사 승인까지"
+  },
+
+  {
+    groupName: "도면·시설",
+    taskCategory: "도면",
+    number: "02",
+    description:
+      "시설조건과 공사범위를 사전에 확정합니다."
+  },
+
+  {
+    groupName: "공사",
+    taskCategory: "공사",
+    number: "03",
+    description:
+      "철수부터 공사완료까지 일정을 관리합니다."
+  },
+
+  {
+    groupName: "집기·장비·물품",
+    taskCategory: "집기/장비",
+    number: "04",
+    description:
+      "영업에 필요한 장비와 물품을 준비합니다."
+  },
+
+  {
+    groupName: "인허가",
+    taskCategory: "인허가",
+    number: "05",
+    description:
+      "영업에 필요한 신고와 행정절차를 완료합니다."
+  },
+
+  {
+    groupName: "채용",
+    taskCategory: "채용",
+    number: "06",
+    description:
+      "오픈일에 맞춰 필요한 인력을 확보합니다."
+  }
+
+];
+
+
+async function loadChecklistItems() {
+
+  const box =
+    document.getElementById(
+      "openingChecklist"
+    );
+
+  if (!box) return;
+
+  box.innerHTML = `
+    <div class="checklist-loading">
+      체크리스트를 불러오는 중입니다...
+    </div>
+  `;
+
+  try {
+
+    const data = await api({
+      action: "getChecklistItems"
+    });
+
+    if (
+      !data ||
+      data.success === false
+    ) {
+
+      box.innerHTML = `
+        <div class="checklist-loading">
+          ${
+            data && data.message
+              ? safeText(data.message)
+              : "체크리스트를 불러오지 못했습니다."
+          }
+        </div>
+      `;
+
+      return;
+    }
+
+    checklistItems =
+      Array.isArray(data.items)
+        ? data.items
+        : [];
+
+    renderChecklistItems();
+
+  } catch (err) {
+
+    console.error(err);
+
+    box.innerHTML = `
+      <div class="checklist-loading">
+        체크리스트를 불러오지 못했습니다.
+      </div>
+    `;
+  }
+}
+
+
+function renderChecklistItems() {
+
+  const box =
+    document.getElementById(
+      "openingChecklist"
+    );
+
+  if (!box) return;
+
+  const countElement =
+    document.getElementById(
+      "checklistTotalCount"
+    );
+
+  if (countElement) {
+    countElement.textContent =
+      checklistItems.length;
+  }
+
+  box.innerHTML =
+    CHECKLIST_GROUPS
+      .map(group => {
+
+        const groupItems =
+          checklistItems
+            .filter(item =>
+              item.groupName ===
+              group.groupName
+            )
+            .sort((a, b) =>
+              Number(a.sortOrder || 0) -
+              Number(b.sortOrder || 0)
+            );
+
+        const itemHtml =
+          groupItems.length
+            ? groupItems
+                .map(item =>
+                  renderChecklistItem(item)
+                )
+                .join("")
+            : `
+              <div class="checklist-empty">
+                등록된 항목이 없습니다.
+              </div>
+            `;
+
+        return `
+          <section
+            class="checklist-group"
+            data-group-name="${safeText(group.groupName)}">
+
+            <div class="checklist-group-title">
+
+              <span class="checklist-icon">
+                ${group.number}
+              </span>
+
+              <div class="checklist-group-info">
+
+                <h3>
+                  ${safeText(group.groupName)}
+                </h3>
+
+                <p>
+                  ${safeText(group.description)}
+                </p>
+
+              </div>
+
+              <button
+                type="button"
+                class="checklist-add-button"
+                onclick="openChecklistModalForAdd('${group.groupName}')">
+                + 신규항목
+              </button>
+
+            </div>
+
+            <div class="checklist-items">
+              ${itemHtml}
+            </div>
+
+          </section>
+        `;
+
+      })
+      .join("");
+}
+
+
+function renderChecklistItem(item) {
+
+  return `
+    <div
+      class="checklist-item"
+      data-checklist-id="${safeText(item.checklistId)}">
+
+      <label class="checklist-task-link">
+
+        <input type="checkbox">
+
+        <span class="checkmark"></span>
+
+        <span class="checklist-content">
+
+          <strong>
+            ${safeText(item.title)}
+          </strong>
+
+          <small>
+            ${safeText(item.description || "-")}
+          </small>
+
+        </span>
+
+      </label>
+
+      <button
+        type="button"
+        class="checklist-edit-button"
+        onclick="openChecklistModalForEdit('${item.checklistId}')">
+        수정
+      </button>
+
+    </div>
+  `;
+}
+
+
+function getChecklistGroup(groupName) {
+
+  return CHECKLIST_GROUPS.find(
+    group =>
+      group.groupName === groupName
+  );
+}
+
+
+function openChecklistModalForAdd(
+  groupName
+) {
+
+  const group =
+    getChecklistGroup(groupName);
+
+  if (!group) return;
+
+  const sameGroupItems =
+    checklistItems.filter(
+      item =>
+        item.groupName === groupName
+    );
+
+  const maxOrder =
+    sameGroupItems.reduce(
+      (max, item) =>
+        Math.max(
+          max,
+          Number(item.sortOrder || 0)
+        ),
+      0
+    );
+
+  document.getElementById(
+    "checklistModalTitle"
+  ).textContent =
+    "체크리스트 신규항목 추가";
+
+  document.getElementById(
+    "checklistId"
+  ).value = "";
+
+  document.getElementById(
+    "checklistGroupName"
+  ).value =
+    group.groupName;
+
+  document.getElementById(
+    "checklistTaskCategory"
+  ).value =
+    group.taskCategory;
+
+  document.getElementById(
+    "checklistSortOrder"
+  ).value =
+    maxOrder + 1;
+
+  document.getElementById(
+    "checklistTitle"
+  ).value = "";
+
+  document.getElementById(
+    "checklistDescription"
+  ).value = "";
+
+  document.getElementById(
+    "disableChecklistBtn"
+  ).classList.add("hidden");
+
+  openChecklistModal();
+}
+
+
+function openChecklistModalForEdit(
+  checklistId
+) {
+
+  const item =
+    checklistItems.find(
+      row =>
+        row.checklistId === checklistId
+    );
+
+  if (!item) {
+    alert(
+      "수정할 체크리스트 항목을 찾지 못했습니다."
+    );
+    return;
+  }
+
+  document.getElementById(
+    "checklistModalTitle"
+  ).textContent =
+    "체크리스트 항목 수정";
+
+  document.getElementById(
+    "checklistId"
+  ).value =
+    item.checklistId;
+
+  document.getElementById(
+    "checklistGroupName"
+  ).value =
+    item.groupName;
+
+  document.getElementById(
+    "checklistTaskCategory"
+  ).value =
+    item.taskCategory;
+
+  document.getElementById(
+    "checklistSortOrder"
+  ).value =
+    Number(item.sortOrder || 1);
+
+  document.getElementById(
+    "checklistTitle"
+  ).value =
+    item.title || "";
+
+  document.getElementById(
+    "checklistDescription"
+  ).value =
+    item.description || "";
+
+  document.getElementById(
+    "disableChecklistBtn"
+  ).classList.remove("hidden");
+
+  openChecklistModal();
+}
+
+
+function openChecklistModal() {
+
+  const modal =
+    document.getElementById(
+      "checklistModal"
+    );
+
+  if (!modal) return;
+
+  modal.classList.remove("hidden");
+
+  document.body.classList.add(
+    "modal-open"
+  );
+
+  setTimeout(() => {
+
+    document.getElementById(
+      "checklistTitle"
+    )?.focus();
+
+  }, 50);
+}
+
+
+function closeChecklistModal() {
+
+  const modal =
+    document.getElementById(
+      "checklistModal"
+    );
+
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+
+  document.body.classList.remove(
+    "modal-open"
+  );
+}
+
+
+async function saveChecklistItemFromModal() {
+
+  const checklistId =
+    val("checklistId");
+
+  const groupName =
+    val("checklistGroupName");
+
+  const taskCategory =
+    val("checklistTaskCategory");
+
+  const title =
+    val("checklistTitle");
+
+  const description =
+    val("checklistDescription");
+
+  const sortOrder =
+    val("checklistSortOrder");
+
+  if (!title) {
+    alert("업무명을 입력하세요.");
+    return;
+  }
+
+  setButtonLoading(
+    "saveChecklistBtn",
+    true,
+    "저장",
+    "저장 중..."
+  );
+
+  try {
+
+    const response = await fetch(
+      API_URL,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          action: "saveChecklistItem",
+          checklistId: checklistId,
+          groupName: groupName,
+          taskCategory: taskCategory,
+          title: title,
+          description: description,
+          sortOrder: sortOrder,
+          useYn: "Y"
+        })
+      }
+    );
+
+    const data =
+      await response.json();
+
+    if (!data.success) {
+      alert(
+        data.message ||
+        "체크리스트 저장에 실패했습니다."
+      );
+      return;
+    }
+
+    alert(
+      data.message ||
+      "체크리스트가 저장되었습니다."
+    );
+
+    closeChecklistModal();
+
+    await loadChecklistItems();
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      "체크리스트 저장 중 오류가 발생했습니다."
+    );
+
+  } finally {
+
+    setButtonLoading(
+      "saveChecklistBtn",
+      false,
+      "저장",
+      "저장 중..."
+    );
+
+  }
+}
+
+
+async function disableChecklistItem() {
+
+  const checklistId =
+    val("checklistId");
+
+  if (!checklistId) return;
+
+  const confirmed =
+    confirm(
+      "이 항목을 사용중지하시겠습니까?\n체크리스트 화면에서 숨겨집니다."
+    );
+
+  if (!confirmed) return;
+
+  setButtonLoading(
+    "disableChecklistBtn",
+    true,
+    "사용중지",
+    "처리 중..."
+  );
+
+  try {
+
+    const response = await fetch(
+      API_URL,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          action: "saveChecklistItem",
+          checklistId: checklistId,
+          groupName:
+            val("checklistGroupName"),
+          taskCategory:
+            val("checklistTaskCategory"),
+          title:
+            val("checklistTitle"),
+          description:
+            val("checklistDescription"),
+          sortOrder:
+            val("checklistSortOrder"),
+          useYn: "N"
+        })
+      }
+    );
+
+    const data =
+      await response.json();
+
+    if (!data.success) {
+      alert(
+        data.message ||
+        "사용중지 처리에 실패했습니다."
+      );
+      return;
+    }
+
+    alert(
+      data.message ||
+      "사용중지 처리되었습니다."
+    );
+
+    closeChecklistModal();
+
+    await loadChecklistItems();
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      "사용중지 처리 중 오류가 발생했습니다."
+    );
+
+  } finally {
+
+    setButtonLoading(
+      "disableChecklistBtn",
+      false,
+      "사용중지",
+      "처리 중..."
+    );
+
+  }
+}
+
+
+document.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (event.key !== "Escape") {
+      return;
+    }
+
+    const modal =
+      document.getElementById(
+        "checklistModal"
+      );
+
+    if (
+      modal &&
+      !modal.classList.contains(
+        "hidden"
+      )
+    ) {
+      closeChecklistModal();
+    }
+
+  }
+);

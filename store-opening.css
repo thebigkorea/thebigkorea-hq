@@ -1278,3 +1278,280 @@ textarea{
   }
 
 }
+/* ========================================
+   체크리스트 추가·수정 관리
+======================================== */
+
+.checklist-loading,
+.checklist-empty{
+  grid-column:1 / -1;
+  padding:25px 18px;
+  color:#81746a;
+  text-align:center;
+}
+
+.checklist-empty{
+  border-top:1px solid #eee8e1;
+  background:#fcfaf7;
+  font-size:13px;
+}
+
+/* 카테고리 제목 */
+.checklist-group-title{
+  align-items:center;
+}
+
+.checklist-group-info{
+  flex:1;
+  min-width:0;
+}
+
+/* 신규항목 버튼 */
+.checklist-add-button{
+  flex:0 0 auto;
+  min-height:36px;
+  padding:8px 12px;
+  border:1px solid #713313;
+  border-radius:9px;
+  background:#fff;
+  color:#713313;
+  font-size:12px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:.18s;
+}
+
+.checklist-add-button:hover{
+  background:#713313;
+  color:#fff;
+}
+
+/* 동적으로 생성되는 체크리스트 항목 */
+.checklist-item{
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) auto;
+  align-items:center;
+  gap:8px;
+  margin:0;
+  padding:0;
+  cursor:default;
+}
+
+.checklist-task-link{
+  min-width:0;
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:16px 8px 16px 17px;
+  cursor:pointer;
+}
+
+.checklist-task-link .checklist-content{
+  flex:1;
+  min-width:0;
+}
+
+/* 수정 버튼 */
+.checklist-edit-button{
+  min-width:54px;
+  min-height:34px;
+  margin-right:14px;
+  padding:7px 11px;
+  border:1px solid #d6c9bc;
+  border-radius:9px;
+  background:#f8f4ef;
+  color:#6c3b22;
+  font-size:12px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:.18s;
+}
+
+.checklist-edit-button:hover{
+  border-color:#713313;
+  background:#713313;
+  color:#fff;
+}
+
+/* 모달이 열렸을 때 배경 스크롤 방지 */
+body.modal-open{
+  overflow:hidden;
+}
+
+/* 체크리스트 관리 모달 */
+.checklist-modal{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.checklist-modal.hidden{
+  display:none !important;
+}
+
+.checklist-modal-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(30,20,14,.55);
+  backdrop-filter:blur(2px);
+}
+
+.checklist-modal-card{
+  position:relative;
+  z-index:1;
+  width:min(720px, 100%);
+  max-height:calc(100vh - 40px);
+  overflow-y:auto;
+  padding:26px;
+  border-radius:20px;
+  background:#fff;
+  box-shadow:0 25px 70px rgba(24,15,10,.28);
+}
+
+.checklist-modal-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:22px;
+  padding-bottom:18px;
+  border-bottom:1px solid #e8e0d7;
+}
+
+.checklist-modal-header h2{
+  margin:0;
+  color:#3b2115;
+  font-size:24px;
+}
+
+.checklist-modal-header p{
+  margin:7px 0 0;
+  color:#81756c;
+  font-size:14px;
+}
+
+.checklist-modal-close{
+  flex:0 0 40px;
+  width:40px;
+  height:40px;
+  border:0;
+  border-radius:11px;
+  background:#f0ebe5;
+  color:#5a4638;
+  font-size:27px;
+  line-height:1;
+  cursor:pointer;
+}
+
+.checklist-modal-close:hover{
+  background:#713313;
+  color:#fff;
+}
+
+.checklist-modal-grid{
+  display:grid;
+  grid-template-columns:1.2fr 1fr .65fr;
+  gap:14px;
+}
+
+.checklist-modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:22px;
+  padding-top:18px;
+  border-top:1px solid #e8e0d7;
+}
+
+.checklist-save-button,
+.checklist-cancel-button,
+.checklist-disable-button{
+  min-width:105px;
+  min-height:45px;
+  padding:10px 16px;
+  border:0;
+  border-radius:11px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.checklist-save-button{
+  background:#713313;
+  color:#fff;
+}
+
+.checklist-save-button:hover{
+  background:#8a3b17;
+}
+
+.checklist-cancel-button{
+  background:#ebe7e2;
+  color:#40372f;
+}
+
+.checklist-disable-button{
+  margin-right:auto;
+  background:#fff0f0;
+  color:#b42318;
+  border:1px solid #efc3c0;
+}
+
+.checklist-disable-button:hover{
+  background:#b42318;
+  color:#fff;
+}
+
+.checklist-save-button:disabled,
+.checklist-disable-button:disabled{
+  cursor:wait;
+}
+
+@media(max-width:760px){
+
+  .checklist-group-title{
+    flex-wrap:wrap;
+  }
+
+  .checklist-add-button{
+    width:100%;
+    margin-top:5px;
+  }
+
+  .checklist-modal{
+    align-items:flex-end;
+    padding:0;
+  }
+
+  .checklist-modal-card{
+    width:100%;
+    max-height:92vh;
+    padding:21px 17px;
+    border-radius:20px 20px 0 0;
+  }
+
+  .checklist-modal-grid{
+    grid-template-columns:1fr;
+  }
+
+  .checklist-modal-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+
+  .checklist-disable-button{
+    grid-column:1 / -1;
+    grid-row:2;
+    width:100%;
+    margin:0;
+  }
+
+  .checklist-save-button,
+  .checklist-cancel-button{
+    width:100%;
+  }
+
+}
