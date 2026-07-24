@@ -531,9 +531,28 @@
     업무현황 조회
   </button>
 
+  <button
+  type="button"
+  class="primary schedule-print-button"
+  onclick="printScheduleReport()">
+  A4 인쇄
+</button>
+
 </div>
 
-  <div id="scheduleList"></div>
+  <div
+  id="printScheduleHeader"
+  class="print-schedule-header">
+
+  <h1 id="printScheduleStoreName">
+    신규점포 업무 진행현황
+  </h1>
+
+  <p id="printScheduleDate"></p>
+
+</div>
+
+<div id="scheduleList"></div>
 
 </section>
 

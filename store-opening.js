@@ -1233,3 +1233,95 @@ function setupChecklistTaskLinks() {
     }
   );
 }
+function printScheduleReport() {
+
+  const projectSelect =
+    document.getElementById(
+      "scheduleProjectId"
+    );
+
+  const scheduleList =
+    document.getElementById(
+      "scheduleList"
+    );
+
+  if (
+    !projectSelect ||
+    !projectSelect.value
+  ) {
+    alert("인쇄할 점포를 선택하세요.");
+    return;
+  }
+
+  if (
+    !scheduleList ||
+    !scheduleList.querySelector(
+      ".task-dashboard"
+    )
+  ) {
+    alert("먼저 업무현황을 조회하세요.");
+    return;
+  }
+
+  const selectedOption =
+    projectSelect.options[
+      projectSelect.selectedIndex
+    ];
+
+  const storeName =
+    selectedOption
+      ? selectedOption.textContent.trim()
+      : "선택 점포";
+
+  const today =
+    new Date();
+
+  const printDate =
+    today.getFullYear() + "년 " +
+    String(today.getMonth() + 1)
+      .padStart(2, "0") + "월 " +
+    String(today.getDate())
+      .padStart(2, "0") + "일";
+
+  document.getElementById(
+    "printScheduleStoreName"
+  ).textContent =
+    storeName + " 개설 업무 진행현황";
+
+  document.getElementById(
+    "printScheduleDate"
+  ).textContent =
+    "출력일 : " + printDate;
+
+  document.body.classList.add(
+    "printing-schedule"
+  );
+
+  const originalTitle =
+    document.title;
+
+  document.title =
+    storeName + " 개설 업무 진행현황";
+
+  const finishPrint = function() {
+
+    document.body.classList.remove(
+      "printing-schedule"
+    );
+
+    document.title =
+      originalTitle;
+
+    window.removeEventListener(
+      "afterprint",
+      finishPrint
+    );
+  };
+
+  window.addEventListener(
+    "afterprint",
+    finishPrint
+  );
+
+  window.print();
+}

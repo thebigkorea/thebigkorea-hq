@@ -1084,3 +1084,197 @@ textarea{
   }
 
 }
+.print-schedule-header{
+  display:none;
+}
+
+.schedule-print-button{
+  min-height:52px;
+  margin:0;
+  background:#4f463f;
+}
+
+.schedule-print-button:hover{
+  background:#332d28;
+}
+
+/* 조회·인쇄 버튼을 포함한 4열 */
+.schedule-project-filter{
+  grid-template-columns:
+    minmax(300px, 480px)
+    minmax(280px, 1fr)
+    170px
+    140px;
+}
+@media print{
+
+  @page{
+    size:A4 portrait;
+    margin:12mm;
+  }
+
+  *{
+    -webkit-print-color-adjust:exact !important;
+    print-color-adjust:exact !important;
+  }
+
+  body{
+    margin:0;
+    background:#fff !important;
+    color:#111;
+    font-family:"Malgun Gothic", Arial, sans-serif;
+  }
+
+  body.printing-schedule .header,
+  body.printing-schedule .summary,
+  body.printing-schedule .tabs,
+  body.printing-schedule .panel:not(#schedule),
+  body.printing-schedule .schedule-project-filter{
+    display:none !important;
+  }
+
+  body.printing-schedule .wrap{
+    width:100%;
+    max-width:none;
+    margin:0;
+    padding:0;
+  }
+
+  body.printing-schedule #schedule{
+    display:block !important;
+    margin:0;
+    padding:0;
+    border:0;
+    border-radius:0;
+    box-shadow:none;
+  }
+
+  body.printing-schedule #schedule > h2{
+    display:none;
+  }
+
+  body.printing-schedule .print-schedule-header{
+    display:block;
+    margin:0 0 8mm;
+    padding-bottom:5mm;
+    border-bottom:2px solid #713313;
+  }
+
+  body.printing-schedule .print-schedule-header h1{
+    margin:0;
+    color:#3a2115;
+    font-size:22pt;
+  }
+
+  body.printing-schedule .print-schedule-header p{
+    margin:3mm 0 0;
+    color:#666;
+    font-size:9pt;
+  }
+
+  body.printing-schedule .task-dashboard{
+    grid-template-columns:repeat(3, 1fr);
+    gap:3mm;
+    margin:0 0 6mm;
+  }
+
+  body.printing-schedule .task-stat{
+    min-height:22mm;
+    padding:4mm;
+    border-radius:3mm;
+    box-shadow:none;
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+
+  body.printing-schedule .task-stat span{
+    font-size:8.5pt;
+  }
+
+  body.printing-schedule .task-stat strong{
+    margin-top:2mm;
+    font-size:18pt;
+  }
+
+  body.printing-schedule .task-section{
+    margin-top:6mm;
+  }
+
+  body.printing-schedule .task-section-title{
+    margin-bottom:3mm;
+    break-after:avoid;
+    page-break-after:avoid;
+  }
+
+  body.printing-schedule .task-section-title h3{
+    font-size:15pt;
+  }
+
+  body.printing-schedule .task-section-title p{
+    margin-top:1mm;
+    font-size:8.5pt;
+  }
+
+  body.printing-schedule .active-task-list{
+    gap:3mm;
+  }
+
+  body.printing-schedule .active-task-card{
+    display:block;
+    padding:4mm;
+    border-radius:3mm;
+    box-shadow:none;
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+
+  body.printing-schedule .task-actions{
+    display:none !important;
+  }
+
+  body.printing-schedule .task-detail-grid{
+    grid-template-columns:repeat(4, 1fr);
+    gap:2mm;
+  }
+
+  body.printing-schedule .active-task-card h4{
+    margin:2mm 0 3mm;
+    font-size:12pt;
+  }
+
+  body.printing-schedule .task-detail-grid span{
+    font-size:7.5pt;
+  }
+
+  body.printing-schedule .task-detail-grid strong{
+    font-size:8.5pt;
+  }
+
+  body.printing-schedule .completed-task-list{
+    grid-template-columns:repeat(2, 1fr);
+    gap:3mm;
+  }
+
+  body.printing-schedule .completed-task-card{
+    padding:4mm;
+    border-radius:3mm;
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+
+  body.printing-schedule .completed-task-card h4{
+    font-size:11pt;
+  }
+
+  body.printing-schedule .completed-task-meta{
+    font-size:8pt;
+    line-height:1.55;
+  }
+
+  body.printing-schedule .completed-progress{
+    margin-top:3mm;
+    padding-top:2mm;
+    font-size:9pt;
+  }
+
+}
