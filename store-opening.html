@@ -513,16 +513,25 @@
 
   <div class="schedule-project-filter">
 
-    <label>
-      점포 선택
-      <select id="scheduleProjectId"></select>
-    </label>
+  <label>
+    점포 선택
+    <select id="scheduleProjectId"></select>
+  </label>
 
-    <p>
-      점포를 선택하면 해당 점포의 미시작·진행중·지연·완료 업무 전체가 표시됩니다.
-    </p>
+  <p>
+    점포를 선택한 후 조회 버튼을 누르면
+    미시작·진행중·지연·완료 업무 전체가 표시됩니다.
+  </p>
 
-  </div>
+  <button
+    type="button"
+    id="scheduleSearchBtn"
+    class="primary schedule-search-button"
+    onclick="loadSchedule()">
+    업무현황 조회
+  </button>
+
+</div>
 
   <div id="scheduleList"></div>
 

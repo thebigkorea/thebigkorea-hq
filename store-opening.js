@@ -10,20 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   setupChecklistTaskLinks();
 
-  const scheduleProjectId =
-    document.getElementById(
-      "scheduleProjectId"
-    );
-
-  if (scheduleProjectId) {
-
-    scheduleProjectId.addEventListener(
-      "change",
-      loadSchedule
-    );
-
-  }
-
 });
 
 function showTab(id, btn) {
@@ -36,9 +22,7 @@ function showTab(id, btn) {
   document.getElementById(id).classList.add("active");
   btn.classList.add("active");
 
-  if (id === "schedule") {
-    loadSchedule();
-  }
+  
 
   if (id === "list") {
     loadProjects();
