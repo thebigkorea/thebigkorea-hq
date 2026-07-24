@@ -140,13 +140,18 @@ async function loadProjects() {
 
   document.getElementById("totalProjects").textContent = projects.length;
 
-  let progressSum = 0;
+  let activeProjectCount = 0;
   const list = document.getElementById("projectList");
   list.innerHTML = "";
 
   projects.forEach(p => {
     const progress = Number(p.progress || 0);
-    progressSum += progress;
+    if (
+  p.status !== "오픈완료" &&
+  progress < 100
+) {
+  activeProjectCount++;
+}
 
     list.innerHTML += `
       <div class="project-card">
@@ -169,9 +174,7 @@ async function loadProjects() {
   });
 
   document.getElementById("avgProgress").textContent =
-    projects.length
-      ? Math.round(progressSum / projects.length) + "%"
-      : "0%";
+  activeProjectCount; 
 
   fillProjectSelects();
 }
@@ -449,8 +452,8 @@ function renderSchedule(list) {
   if (!projectId) {
 
     box.innerHTML = `
-      <div class="project-card">
-        점포를 선택하면 업무 일정이 표시됩니다.
+      <div class="schedule-empty">
+        점포를 선택하면 해당 점포의 전체 업무 진행상황이 표시됩니다.
       </div>
     `;
 
@@ -460,57 +463,381 @@ function renderSchedule(list) {
   if (!list || list.length === 0) {
 
     box.innerHTML = `
-      <div class="project-card">
-        등록된 업무 일정이 없습니다.
+      <div class="schedule-empty">
+        등록된 업무가 없습니다.
       </div>
     `;
 
     return;
   }
 
-  const ingList =
-    list.filter(t => t.status !== "완료");
+  const normalizedList =
+    list.map(item => {
+
+      const progress =
+        Math.max(
+          0,
+          Math.min(
+            100,
+            Number(item.progress || 0)
+          )
+        );
+
+      let displayStatus =
+        item.status || "예정";
+
+      if (
+        displayStatus !== "완료" &&
+        progress === 0
+      ) {
+        displayStatus = "미시작";
+      }
+
+      return {
+        ...item,
+        progress: progress,
+        displayStatus: displayStatus
+      };
+    });
+
+  const plannedList =
+    normalizedList.filter(item =>
+      item.displayStatus === "미시작" ||
+      item.displayStatus === "예정"
+    );
+
+  const workingList =
+    normalizedList.filter(item =>
+      item.displayStatus === "진행중"
+    );
+
+  const delayedList =
+    normalizedList.filter(item =>
+      item.displayStatus === "지연"
+    );
 
   const doneList =
-    list.filter(t => t.status === "완료");
+    normalizedList.filter(item =>
+      item.status === "완료"
+    );
+
+  const unfinishedList =
+    normalizedList
+      .filter(item => item.status !== "완료")
+      .sort((a, b) => {
+
+        const statusOrder = {
+          "지연": 0,
+          "진행중": 1,
+          "미시작": 2,
+          "예정": 3
+        };
+
+        const orderA =
+          statusOrder[a.displayStatus] ?? 9;
+
+        const orderB =
+          statusOrder[b.displayStatus] ?? 9;
+
+        if (orderA !== orderB) {
+          return orderA - orderB;
+        }
+
+        const dateA =
+          a.date || "9999-12-31";
+
+        const dateB =
+          b.date || "9999-12-31";
+
+        return dateA.localeCompare(dateB);
+      });
+
+  doneList.sort((a, b) => {
+
+    const dateA =
+      a.date || "1900-01-01";
+
+    const dateB =
+      b.date || "1900-01-01";
+
+    return dateB.localeCompare(dateA);
+  });
+
+  const totalProgress =
+    normalizedList.reduce(
+      (sum, item) => sum + item.progress,
+      0
+    );
+
+  const averageProgress =
+    normalizedList.length
+      ? Math.round(
+          totalProgress /
+          normalizedList.length
+        )
+      : 0;
 
   box.innerHTML = `
 
-    <div style="
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:20px;
-      align-items:start;
-    ">
+    <div class="task-dashboard">
 
-      <div>
-
-        <h3 style="
-          margin-bottom:14px;
-          color:#2563eb;
-        ">
-          진행중 업무
-        </h3>
-
-        ${renderTaskColumn(ingList, false)}
-
+      <div class="task-stat task-stat-total">
+        <span>전체 업무</span>
+        <strong>${normalizedList.length}</strong>
       </div>
 
-      <div>
+      <div class="task-stat task-stat-waiting">
+        <span>미시작·예정</span>
+        <strong>${plannedList.length}</strong>
+      </div>
 
-        <h3 style="
-          margin-bottom:14px;
-          color:#16a34a;
-        ">
-          완료 업무
-        </h3>
+      <div class="task-stat task-stat-working">
+        <span>진행중</span>
+        <strong>${workingList.length}</strong>
+      </div>
 
-        ${renderTaskColumn(doneList, true)}
+      <div class="task-stat task-stat-delayed">
+        <span>지연</span>
+        <strong>${delayedList.length}</strong>
+      </div>
 
+      <div class="task-stat task-stat-done">
+        <span>완료</span>
+        <strong>${doneList.length}</strong>
+      </div>
+
+      <div class="task-stat task-stat-progress">
+        <span>업무 진행률</span>
+        <strong>${averageProgress}%</strong>
       </div>
 
     </div>
 
+    <section class="task-section">
+
+      <div class="task-section-title">
+        <div>
+          <h3>처리할 업무</h3>
+          <p>
+            지연 업무부터 우선 표시합니다.
+          </p>
+        </div>
+
+        <span class="task-count task-count-active">
+          ${unfinishedList.length}건
+        </span>
+      </div>
+
+      <div class="active-task-list">
+        ${
+          unfinishedList.length
+            ? unfinishedList
+                .map(renderActiveTaskCard)
+                .join("")
+            : `
+              <div class="schedule-empty">
+                처리할 업무가 없습니다.
+              </div>
+            `
+        }
+      </div>
+
+    </section>
+
+    <section class="task-section completed-task-section">
+
+      <div class="task-section-title">
+        <div>
+          <h3>완료 업무</h3>
+          <p>
+            최근 완료 업무부터 표시합니다.
+          </p>
+        </div>
+
+        <span class="task-count task-count-done">
+          ${doneList.length}건
+        </span>
+      </div>
+
+      <div class="completed-task-list">
+        ${
+          doneList.length
+            ? doneList
+                .map(renderCompletedTaskCard)
+                .join("")
+            : `
+              <div class="schedule-empty">
+                완료된 업무가 없습니다.
+              </div>
+            `
+        }
+      </div>
+
+    </section>
+  `;
+}
+
+function getTaskStatusClass(status) {
+
+  if (status === "완료") {
+    return "done";
+  }
+
+  if (status === "지연") {
+    return "delayed";
+  }
+
+  if (status === "진행중") {
+    return "working";
+  }
+
+  return "waiting";
+}
+
+
+function renderActiveTaskCard(task) {
+
+  const statusClass =
+    getTaskStatusClass(task.displayStatus);
+
+  return `
+    <article class="active-task-card ${statusClass}">
+
+      <div class="task-main-info">
+
+        <div class="task-top-line">
+
+          <span class="task-status-badge ${statusClass}">
+            ${task.displayStatus}
+          </span>
+
+          <span class="task-category">
+            ${safeText(task.category || "업무")}
+          </span>
+
+          <span class="task-date">
+            마감 ${safeText(task.date || "-")}
+          </span>
+
+        </div>
+
+        <h4>
+          ${safeText(task.title || "업무명 없음")}
+        </h4>
+
+        <div class="task-detail-grid">
+
+          <span>
+            담당자
+            <strong>
+              ${safeText(task.owner || "-")}
+            </strong>
+          </span>
+
+          <span>
+            중요도
+            <strong>
+              ${safeText(task.priority || "보통")}
+            </strong>
+          </span>
+
+          <span>
+            지연사유
+            <strong>
+              ${safeText(task.delayReason || "-")}
+            </strong>
+          </span>
+
+          <span>
+            관리자 메모
+            <strong>
+              ${safeText(task.adminMemo || "-")}
+            </strong>
+          </span>
+
+        </div>
+
+        <div class="task-progress-line">
+
+          <div class="task-progress-label">
+            <span>진행률</span>
+            <strong>${task.progress}%</strong>
+          </div>
+
+          <div class="progress-wrap">
+            <div
+              class="progress-bar"
+              style="width:${task.progress}%">
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="task-actions">
+
+        <button
+          type="button"
+          class="task-action-button edit"
+          onclick="updateTaskProgress('${safeText(task.taskId)}')">
+          진행수정
+        </button>
+
+        <button
+          type="button"
+          class="task-action-button delay"
+          onclick="delayTask('${safeText(task.taskId)}')">
+          지연등록
+        </button>
+
+        <button
+          type="button"
+          class="task-action-button complete"
+          onclick="completeTask('${safeText(task.taskId)}')">
+          완료처리
+        </button>
+
+      </div>
+
+    </article>
+  `;
+}
+
+
+function renderCompletedTaskCard(task) {
+
+  return `
+    <article class="completed-task-card">
+
+      <div class="task-top-line">
+
+        <span class="task-status-badge done">
+          완료
+        </span>
+
+        <span class="task-category">
+          ${safeText(task.category || "업무")}
+        </span>
+
+      </div>
+
+      <h4>
+        ${safeText(task.title || "업무명 없음")}
+      </h4>
+
+      <div class="completed-task-meta">
+        담당자 : ${safeText(task.owner || "-")}<br>
+        완료일 : ${safeText(task.date || "-")}<br>
+        최종수정 : ${safeText(task.updatedAt || "-")}
+      </div>
+
+      <div class="completed-progress">
+        <span>진행률</span>
+        <strong>100%</strong>
+      </div>
+
+    </article>
   `;
 }
 
