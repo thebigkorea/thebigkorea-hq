@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadProjects();
 
+  setupChecklistTaskLinks();
+
   const scheduleProjectId =
     document.getElementById(
       "scheduleProjectId"
@@ -1119,4 +1121,131 @@ function setButtonLoading(btnId, isLoading, text, loadingText) {
   btn.disabled = isLoading;
   btn.textContent = isLoading ? loadingText : text;
   btn.style.opacity = isLoading ? "0.65" : "1";
+}
+function setupChecklistTaskLinks() {
+
+  const checklist =
+    document.querySelector(
+      ".opening-checklist"
+    );
+
+  if (!checklist) return;
+
+  checklist.addEventListener(
+    "change",
+    function(event) {
+
+      const checkbox =
+        event.target;
+
+      if (
+        !checkbox.matches(
+          '.checklist-item input[type="checkbox"]'
+        )
+      ) {
+        return;
+      }
+
+      if (!checkbox.checked) {
+        return;
+      }
+
+      const item =
+        checkbox.closest(
+          ".checklist-item"
+        );
+
+      const group =
+        checkbox.closest(
+          ".checklist-group"
+        );
+
+      if (!item || !group) {
+        return;
+      }
+
+      const titleElement =
+        item.querySelector(
+          ".checklist-content strong"
+        );
+
+      const groupTitleElement =
+        group.querySelector(
+          ".checklist-group-title h3"
+        );
+
+      const taskTitle =
+        titleElement
+          ? titleElement.textContent.trim()
+          : "";
+
+      const groupTitle =
+        groupTitleElement
+          ? groupTitleElement.textContent.trim()
+          : "";
+
+      const categoryMap = {
+        "계약·승인": "계약",
+        "도면·시설": "도면",
+        "공사": "공사",
+        "집기·장비·물품": "집기/장비",
+        "인허가": "인허가",
+        "채용": "채용"
+      };
+
+      const taskCategory =
+        categoryMap[groupTitle] || "";
+
+      const taskTabButton =
+        document.getElementById(
+          "taskTabButton"
+        );
+
+      const categorySelect =
+        document.getElementById(
+          "taskCategory"
+        );
+
+      const titleInput =
+        document.getElementById(
+          "taskTitle"
+        );
+
+      if (taskTabButton) {
+        showTab(
+          "task",
+          taskTabButton
+        );
+      }
+
+      if (
+        categorySelect &&
+        taskCategory
+      ) {
+        categorySelect.value =
+          taskCategory;
+      }
+
+      if (titleInput) {
+
+        titleInput.value =
+          taskTitle;
+
+        titleInput.focus();
+      }
+
+      /*
+       * 이 체크박스는 완료처리가 아니라
+       * 업무등록 화면으로 이동하는 기능이므로
+       * 체크상태를 다시 해제합니다.
+       */
+      checkbox.checked = false;
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    }
+  );
 }

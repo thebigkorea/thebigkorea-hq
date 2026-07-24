@@ -37,16 +37,20 @@
 
   <section class="tabs">
   <button class="tab active" onclick="showTab('list', this)">
-    현황
+    개설 체크리스트
   </button>
 
   <button class="tab" onclick="showTab('project', this)">
     점포등록
   </button>
 
-  <button class="tab" onclick="showTab('task', this)">
-    업무등록
-  </button>
+  <button
+  type="button"
+  id="taskTabButton"
+  class="tab"
+  onclick="showTab('task', this)">
+  업무등록
+</button>
 
  <button class="tab" onclick="showTab('schedule', this)">
   업무현황
@@ -69,9 +73,9 @@
       <h2>신규점포 개설 업무 체크리스트</h2>
 
       <p>
-        파주 효종갱 개설 업무를 기준으로 정리한
-        신규점포 표준 체크리스트입니다.
-      </p>
+  필요한 업무를 체크하면 업무등록 화면으로 이동하며
+  업무구분과 업무명이 자동으로 입력됩니다.
+</p>
     </div>
 
     <div class="checklist-total">
