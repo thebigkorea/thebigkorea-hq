@@ -193,3 +193,295 @@ textarea{
   }
 
 }
+/* ========================================
+   신규점포 개설관리 와이드 화면 개선
+======================================== */
+
+body{
+  background:#f5f1e9;
+  color:#231f1b;
+}
+
+/* 상단 제목 */
+.header{
+  padding:38px 3%;
+  border-radius:0;
+  background:#f5f1e9;
+  color:#6f2c0f;
+  border-bottom:1px solid #e3d8c8;
+}
+
+.header h1{
+  font-size:36px;
+  font-weight:800;
+  letter-spacing:-1.5px;
+}
+
+.header p{
+  margin-top:10px;
+  color:#806f60;
+  font-size:17px;
+  opacity:1;
+}
+
+/* 화면 전체 너비 사용 */
+.wrap{
+  width:96%;
+  max-width:none;
+  margin:0 auto;
+  padding:24px 0 50px;
+}
+
+/* 상단 현황 요약 */
+.summary{
+  grid-template-columns:repeat(3, 1fr);
+  gap:18px;
+  margin-bottom:22px;
+}
+
+.summary-card{
+  position:relative;
+  min-height:125px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  padding:25px 30px;
+  text-align:left;
+  border-radius:20px;
+  border:1px solid #ebe4da;
+  border-left:7px solid #7c2d12;
+  background:#fff;
+  box-shadow:0 10px 25px rgba(69,45,24,.08);
+}
+
+.summary-card:nth-child(2){
+  border-left-color:#178f4f;
+}
+
+.summary-card:nth-child(3){
+  border-left-color:#2768cf;
+}
+
+.summary-card strong{
+  font-size:34px;
+  line-height:1;
+  color:#241b15;
+}
+
+.summary-card span{
+  margin-top:12px;
+  color:#6f655d;
+  font-size:16px;
+  font-weight:bold;
+}
+
+/* 메뉴 탭 5개를 한 줄로 표시 */
+.tabs{
+  grid-template-columns:repeat(5, 1fr);
+  gap:10px;
+  margin-bottom:24px;
+  padding:8px;
+  border-radius:18px;
+  background:#fff;
+  box-shadow:0 8px 22px rgba(69,45,24,.07);
+}
+
+.tab{
+  min-height:56px;
+  padding:14px 18px;
+  border-radius:13px;
+  background:#ede9e4;
+  color:#312820;
+  font-size:16px;
+  transition:.2s;
+}
+
+.tab:hover{
+  background:#e2d8cd;
+}
+
+.tab.active{
+  background:#713313;
+  color:#fff;
+  box-shadow:0 6px 14px rgba(113,51,19,.23);
+}
+
+/* 각 업무 영역 */
+.panel{
+  padding:30px;
+  border:1px solid #ebe4da;
+  border-radius:22px;
+  background:#fff;
+  box-shadow:0 12px 30px rgba(69,45,24,.08);
+}
+
+.panel h2{
+  margin:0 0 25px;
+  color:#382116;
+  font-size:27px;
+  letter-spacing:-1px;
+}
+
+/* 큰 화면에서는 입력 항목 4열 */
+.form-grid{
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:20px 16px;
+}
+
+label{
+  color:#3b3028;
+  font-size:15px;
+}
+
+input,
+select,
+textarea{
+  min-height:52px;
+  margin-top:8px;
+  padding:13px 15px;
+  border:1px solid #dcd5cc;
+  border-radius:12px;
+  background:#fff;
+  color:#222;
+  font-size:15px;
+  outline:none;
+  transition:.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#8a3b17;
+  box-shadow:0 0 0 3px rgba(138,59,23,.11);
+}
+
+textarea{
+  min-height:105px;
+  resize:vertical;
+}
+
+.full-label{
+  margin-top:20px;
+}
+
+/* 저장·조회 버튼 */
+.primary{
+  min-height:56px;
+  margin-top:18px;
+  border-radius:13px;
+  background:#713313;
+  font-size:17px;
+  box-shadow:0 7px 15px rgba(113,51,19,.18);
+  transition:.2s;
+}
+
+.primary:hover{
+  background:#8a3b17;
+  transform:translateY(-1px);
+}
+
+/* 목록은 큰 화면에서 3열 */
+.project-list{
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:16px;
+}
+
+.project-card{
+  padding:20px;
+  border:1px solid #e4ddd4;
+  border-left:5px solid #7c2d12;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 7px 18px rgba(69,45,24,.06);
+}
+
+.project-title{
+  margin-bottom:10px;
+  color:#3b2114;
+  font-size:19px;
+}
+
+.project-meta{
+  color:#665c54;
+  font-size:15px;
+  line-height:1.8;
+}
+
+.progress-wrap{
+  height:11px;
+  margin-top:14px;
+  background:#ebe6df;
+}
+
+.progress-bar{
+  background:linear-gradient(90deg,#713313,#bb652c);
+}
+
+.schedule-item{
+  padding:17px;
+  border-left:6px solid #7c2d12;
+  background:#fff8ef;
+  box-shadow:0 5px 14px rgba(69,45,24,.05);
+}
+
+/* 출납대장 내부 요약카드는 조금 작게 */
+#expenseSummary .summary-card{
+  min-height:110px;
+}
+
+/* 노트북 화면 */
+@media(max-width:1300px){
+
+  .form-grid{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+
+  .project-list{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+/* 휴대폰 화면 */
+@media(max-width:760px){
+
+  .header{
+    padding:25px 18px;
+  }
+
+  .header h1{
+    font-size:27px;
+  }
+
+  .header p{
+    font-size:14px;
+  }
+
+  .wrap{
+    width:100%;
+    padding:16px;
+  }
+
+  .summary{
+    grid-template-columns:1fr;
+  }
+
+  .summary-card{
+    min-height:100px;
+  }
+
+  .tabs{
+    grid-template-columns:repeat(2, 1fr);
+  }
+
+  .form-grid,
+  .project-list{
+    grid-template-columns:1fr;
+  }
+
+  .panel{
+    padding:20px 16px;
+  }
+
+}
