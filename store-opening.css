@@ -870,3 +870,198 @@ textarea{
   }
 
 }
+/* ========================================
+   신규점포 표준 업무 체크리스트
+======================================== */
+
+.checklist-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:25px;
+  margin-bottom:25px;
+  padding-bottom:22px;
+  border-bottom:1px solid #e6ded5;
+}
+
+.checklist-header h2{
+  margin-bottom:8px;
+}
+
+.checklist-header p{
+  margin:0;
+  color:#7b6e64;
+  line-height:1.6;
+}
+
+.checklist-total{
+  min-width:125px;
+  padding:16px 20px;
+  border-radius:15px;
+  background:#713313;
+  color:#fff;
+  text-align:center;
+}
+
+.checklist-total strong{
+  display:block;
+  font-size:28px;
+}
+
+.checklist-total span{
+  display:block;
+  margin-top:4px;
+  font-size:13px;
+}
+
+.opening-checklist{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:18px;
+  align-items:start;
+}
+
+.checklist-group{
+  overflow:hidden;
+  border:1px solid #e4ddd4;
+  border-radius:17px;
+  background:#fff;
+  box-shadow:0 7px 18px rgba(69,45,24,.06);
+}
+
+.checklist-group-title{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:18px;
+  background:#f5f0e9;
+  border-bottom:1px solid #e6ded5;
+}
+
+.checklist-icon{
+  min-width:42px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:12px;
+  background:#713313;
+  color:#fff;
+  font-weight:bold;
+}
+
+.checklist-group-title h3{
+  margin:0;
+  color:#362116;
+  font-size:19px;
+}
+
+.checklist-group-title p{
+  margin:5px 0 0;
+  color:#83766b;
+  font-size:12px;
+  line-height:1.4;
+}
+
+.checklist-item{
+  position:relative;
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  margin:0;
+  padding:16px 17px;
+  border-bottom:1px solid #eee8e1;
+  cursor:pointer;
+  transition:.18s;
+}
+
+.checklist-item:last-child{
+  border-bottom:0;
+}
+
+.checklist-item:hover{
+  background:#fffaf5;
+}
+
+.checklist-item input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.checkmark{
+  position:relative;
+  flex:0 0 24px;
+  width:24px;
+  height:24px;
+  margin-top:1px;
+  border:2px solid #c9bbae;
+  border-radius:7px;
+  background:#fff;
+}
+
+.checklist-item input:checked + .checkmark{
+  border-color:#168c4d;
+  background:#168c4d;
+}
+
+.checklist-item input:checked + .checkmark::after{
+  content:"";
+  position:absolute;
+  left:7px;
+  top:3px;
+  width:6px;
+  height:11px;
+  border:solid #fff;
+  border-width:0 2px 2px 0;
+  transform:rotate(45deg);
+}
+
+.checklist-content{
+  min-width:0;
+}
+
+.checklist-content strong{
+  display:block;
+  color:#32251d;
+  font-size:15px;
+  line-height:1.4;
+}
+
+.checklist-content small{
+  display:block;
+  margin-top:5px;
+  color:#84776d;
+  font-size:12px;
+  font-weight:normal;
+  line-height:1.5;
+}
+
+.checklist-item input:checked ~ .checklist-content strong{
+  color:#8d847c;
+  text-decoration:line-through;
+}
+
+@media(max-width:1300px){
+
+  .opening-checklist{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+@media(max-width:760px){
+
+  .checklist-header{
+    align-items:flex-start;
+  }
+
+  .checklist-total{
+    min-width:90px;
+  }
+
+  .opening-checklist{
+    grid-template-columns:1fr;
+  }
+
+}
