@@ -196,28 +196,81 @@ function fillProjectSelects() {
 }
 
 async function loadSchedule() {
-  const box = document.getElementById("scheduleList");
+
+  const box =
+    document.getElementById("scheduleList");
+
   if (!box) return;
 
-  
-  const projectId = val("scheduleProjectId");
+  const projectSelect =
+    document.getElementById("scheduleProjectId");
 
-  box.innerHTML = "일정을 불러오는 중입니다...";
+  const projectId =
+    projectSelect
+      ? String(projectSelect.value || "").trim()
+      : "";
+
+  if (!projectId) {
+
+    box.innerHTML = `
+      <div class="schedule-empty">
+        점포를 선택하면 해당 점포의 전체 업무 진행상황이 표시됩니다.
+      </div>
+    `;
+
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="schedule-empty">
+      업무현황을 불러오는 중입니다...
+    </div>
+  `;
 
   try {
-    const data = await api({
-  action: "getOpeningSchedule",
-  projectId: projectId
-});
 
-    const schedules = data.schedules || [];
+    const data = await api({
+      action: "getOpeningSchedule",
+      projectId: projectId
+    });
+
+    console.log(
+      "선택한 점포 ID:",
+      projectId
+    );
+
+    console.log(
+      "업무현황 서버 응답:",
+      data
+    );
+
+    if (!data || data.success === false) {
+
+      box.innerHTML = `
+        <div class="schedule-empty">
+          ${data && data.message
+            ? data.message
+            : "업무현황을 불러오지 못했습니다."}
+        </div>
+      `;
+
+      return;
+    }
+
+    const schedules =
+      Array.isArray(data.schedules)
+        ? data.schedules
+        : [];
+
     renderSchedule(schedules);
 
   } catch (err) {
+
     console.error(err);
+
     box.innerHTML = `
-      <div class="project-card">
-        일정표를 불러오지 못했습니다.
+      <div class="schedule-empty">
+        업무현황을 불러오지 못했습니다.
       </div>
     `;
   }
