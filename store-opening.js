@@ -780,43 +780,145 @@ function renderExpenses(){
     return;
   }
 
-  expenses.sort((a, b) => {
-    const da = a.expenseDate || "1900-01-01";
-    const db = b.expenseDate || "1900-01-01";
+  const categoryOrder = [
+    "계약금",
+    "보증금",
+    "권리금",
+    "설계비",
+    "공사비",
+    "전기/가스/수도",
+    "집기/장비",
+    "POS/전산",
+    "초도물품",
+    "인허가/수수료",
+    "교육비",
+    "인건비",
+    "교통/출장비",
+    "기타"
+  ];
 
-    return db.localeCompare(da);
+  const groupedExpenses = {};
+
+  expenses.forEach(item => {
+
+    const category =
+      item.category || "미분류";
+
+    if(!groupedExpenses[category]){
+      groupedExpenses[category] = [];
+    }
+
+    groupedExpenses[category].push(item);
   });
 
-  box.innerHTML = expenses.map(item => {
+  Object.keys(groupedExpenses).forEach(category => {
 
-    const amount =
-      Number(String(item.amount || "0")
-      .replace(/,/g,""));
+    groupedExpenses[category].sort((a, b) => {
 
-    return `
+      const da =
+        a.expenseDate || "1900-01-01";
 
-      <div class="project-card">
+      const db =
+        b.expenseDate || "1900-01-01";
 
-        <div class="project-title">
-          ${item.category || "-"}
+      return db.localeCompare(da);
+    });
+  });
+
+  const categories =
+    Object.keys(groupedExpenses).sort((a, b) => {
+
+      const indexA =
+        categoryOrder.indexOf(a);
+
+      const indexB =
+        categoryOrder.indexOf(b);
+
+      const orderA =
+        indexA === -1
+          ? categoryOrder.length
+          : indexA;
+
+      const orderB =
+        indexB === -1
+          ? categoryOrder.length
+          : indexB;
+
+      return orderA - orderB;
+    });
+
+  box.innerHTML =
+    categories.map(category => {
+
+      const categoryItems =
+        groupedExpenses[category];
+
+      const categoryTotal =
+        categoryItems.reduce((sum, item) => {
+
+          const amount =
+            Number(String(item.amount || "0")
+            .replace(/,/g,""));
+
+          return sum + amount;
+
+        }, 0);
+
+      const itemCards =
+        categoryItems.map(item => {
+
+          const amount =
+            Number(String(item.amount || "0")
+            .replace(/,/g,""));
+
+          return `
+            <div class="project-card">
+
+              <div class="project-title">
+                ${item.expenseDate || "-"}
+              </div>
+
+              <div class="project-meta">
+
+                거래처 : ${item.vendor || "-"}<br>
+                금액 : ${amount.toLocaleString()}원<br>
+                결제수단 : ${item.payMethod || "-"}<br>
+                비용부담 : ${item.shareType || "-"}<br>
+                증빙 : ${item.proof || "-"}<br>
+                메모 : ${item.memo || "-"}
+
+              </div>
+
+            </div>
+          `;
+
+        }).join("");
+
+      return `
+        <div
+          style="
+            grid-column: 1 / -1;
+            margin-top: 18px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            background: #8c2f0f;
+            color: #ffffff;
+          "
+        >
+          <strong style="font-size:22px;">
+            ${category}
+          </strong>
+
+          <span style="margin-left:12px;">
+            ${categoryItems.length}건 ·
+            합계 ${categoryTotal.toLocaleString()}원
+          </span>
         </div>
 
-        <div class="project-meta">
+        ${itemCards}
+      `;
 
-          지출일자 : ${item.expenseDate || "-"}<br>
-          거래처 : ${item.vendor || "-"}<br>
-          금액 : ${amount.toLocaleString()}원<br>
-          결제수단 : ${item.payMethod || "-"}<br>
-          비용부담 : ${item.shareType || "-"}<br>
-          증빙 : ${item.proof || "-"}<br>
-          메모 : ${item.memo || "-"}
-
-        </div>
-
-      </div>
-
-    `;
-  }).join("");
+    }).join("");
 }
 
 function setButtonLoading(btnId, isLoading, text, loadingText) {
