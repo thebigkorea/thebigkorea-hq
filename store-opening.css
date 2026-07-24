@@ -841,3 +841,32 @@ textarea{
   }
 
 }
+.schedule-project-filter{
+  display:grid;
+  grid-template-columns:minmax(320px, 520px) 1fr;
+  align-items:end;
+  gap:24px;
+  margin-bottom:25px;
+}
+
+.schedule-project-filter p{
+  margin:0 0 14px;
+  padding:14px 17px;
+  border-radius:12px;
+  background:#f5f1eb;
+  color:#75675c;
+  line-height:1.5;
+}
+
+@media(max-width:760px){
+
+  .schedule-project-filter{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .schedule-project-filter p{
+    margin:0;
+  }
+
+}

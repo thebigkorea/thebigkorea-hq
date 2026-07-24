@@ -48,9 +48,9 @@
     업무등록
   </button>
 
-  <button class="tab" onclick="showTab('schedule', this)">
-    일정표
-  </button>
+ <button class="tab" onclick="showTab('schedule', this)">
+  업무현황
+</button>
 
   <button class="tab" onclick="showTab('expenseSave', this)">
     출납내역 저장
@@ -206,23 +206,24 @@
 
   <section id="schedule" class="panel">
 
-    <h2>일정표</h2>
+  <h2>점포별 업무 진행현황</h2>
 
-    <div class="form-grid">
+  <div class="schedule-project-filter">
 
-      <label>조회월
-        <input type="month" id="scheduleMonth">
-      </label>
+    <label>
+      점포 선택
+      <select id="scheduleProjectId"></select>
+    </label>
 
-      <label>점포 선택
-        <select id="scheduleProjectId"></select>
-      </label>
+    <p>
+      점포를 선택하면 해당 점포의 미시작·진행중·지연·완료 업무 전체가 표시됩니다.
+    </p>
 
-    </div>
+  </div>
 
-    <div id="scheduleList"></div>
+  <div id="scheduleList"></div>
 
-  </section>
+</section>
 
   <section id="expenseSave" class="panel">
 

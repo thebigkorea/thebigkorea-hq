@@ -5,19 +5,16 @@ let projects = [];
 let tasks = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-  setDefaultMonth();
   loadProjects();
 
-  const scheduleMonth = document.getElementById("scheduleMonth");
+  
   const scheduleProjectId = document.getElementById("scheduleProjectId");
 
   if (scheduleMonth) {
     scheduleMonth.addEventListener("change", loadSchedule);
   }
 
-  if (scheduleProjectId) {
-    scheduleProjectId.addEventListener("change", loadSchedule);
-  }
+  
 });
 
 function showTab(id, btn) {
@@ -62,16 +59,6 @@ async function api(params) {
   }
 }
 
-function setDefaultMonth() {
-  const el = document.getElementById("scheduleMonth");
-  if (!el) return;
-
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, "0");
-
-  el.value = `${yyyy}-${mm}`;
-}
 
 async function saveProject() {
   if (!val("storeName")) {
@@ -212,17 +199,16 @@ async function loadSchedule() {
   const box = document.getElementById("scheduleList");
   if (!box) return;
 
-  const month = val("scheduleMonth");
+  
   const projectId = val("scheduleProjectId");
 
   box.innerHTML = "일정을 불러오는 중입니다...";
 
   try {
     const data = await api({
-      action: "getOpeningSchedule",
-      month: month,
-      projectId: projectId
-    });
+  action: "getOpeningSchedule",
+  projectId: projectId
+});
 
     const schedules = data.schedules || [];
     renderSchedule(schedules);
