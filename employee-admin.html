@@ -23,9 +23,10 @@ body{
 .header h1{margin:0;font-size:28px}
 .header p{margin:8px 0 0;color:rgba(255,255,255,.85)}
 .wrap{
-  max-width:1100px;
+  width:min(1540px,calc(100% - 40px));
+  max-width:none;
   margin:0 auto;
-  padding:22px;
+  padding:22px 0;
 }
 .card{
   background:#fff;
@@ -65,21 +66,81 @@ button{
 }
 button.gray{background:#64748b}
 button.green{background:#197857}
-.table-wrap{overflow-x:auto}
+table button{
+  height:38px;
+  min-width:64px;
+  margin-top:0;
+  padding:0 14px;
+  border-radius:10px;
+  font-size:13px;
+}
+.table-wrap{
+  width:100%;
+  overflow-x:auto;
+}
+
 table{
   width:100%;
+  min-width:1220px;
   border-collapse:collapse;
-  min-width:950px;
+  table-layout:auto;
 }
-th,td{
+
+th,
+td{
   border-bottom:1px solid #e5e7eb;
-  padding:12px 10px;
+  padding:13px 12px;
   text-align:left;
   font-size:14px;
+  vertical-align:middle;
+  white-space:nowrap;
 }
 th{
   background:#eef3f8;
   font-weight:900;
+}
+th:nth-child(1),
+td:nth-child(1){
+  min-width:210px;
+}
+
+th:nth-child(2),
+td:nth-child(2){
+  min-width:90px;
+}
+
+th:nth-child(3),
+td:nth-child(3){
+  min-width:135px;
+}
+
+th:nth-child(4),
+td:nth-child(4){
+  min-width:135px;
+}
+
+th:nth-child(5),
+td:nth-child(5){
+  min-width:90px;
+}
+
+th:nth-child(6),
+td:nth-child(6){
+  min-width:160px;
+}
+
+th:nth-child(7),
+td:nth-child(7),
+th:nth-child(8),
+td:nth-child(8){
+  min-width:115px;
+}
+
+th:nth-child(9),
+td:nth-child(9){
+  width:82px;
+  min-width:82px;
+  text-align:center;
 }
 tr:hover{background:#fafafa}
 .status{
@@ -112,8 +173,24 @@ textarea{
 }
 .hidden{display:none}
 @media(max-width:760px){
-  .search-grid,.detail-grid{grid-template-columns:1fr}
-  button{width:100%}
+  .wrap{
+    width:calc(100% - 20px);
+    padding:14px 0;
+  }
+
+  .search-grid,
+  .detail-grid{
+    grid-template-columns:1fr;
+  }
+
+  .search-grid > button,
+  #detailCard > button{
+    width:100%;
+  }
+
+  table button{
+    width:auto;
+  }
 }
 </style>
 
