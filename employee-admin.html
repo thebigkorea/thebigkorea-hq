@@ -375,10 +375,43 @@ async function searchEmployees(){
       return;
     }
 
-    const list = result.rows || [];
+    const storeOrder = [
+  "주식회사 더큰코리아 본사",
+  "한국의집 롯데월드몰점",
+  "소바공방 평촌점",
+  "길채정 압구정점",
+  "고궁 롯데부여아울렛점"
+];
 
-    renderResults(list);
-    setStatus(list.length + "건 조회되었습니다.");
+const list = (result.rows || []).sort(function(a, b) {
+  const aStore = String(a.workplace || "").trim();
+  const bStore = String(b.workplace || "").trim();
+
+  const aIndex = storeOrder.indexOf(aStore);
+  const bIndex = storeOrder.indexOf(bStore);
+
+  const aOrder =
+    aIndex === -1
+      ? storeOrder.length
+      : aIndex;
+
+  const bOrder =
+    bIndex === -1
+      ? storeOrder.length
+      : bIndex;
+
+  if (aOrder !== bOrder) {
+    return aOrder - bOrder;
+  }
+
+  return String(a.name || "").localeCompare(
+    String(b.name || ""),
+    "ko"
+  );
+});
+
+renderResults(list);
+setStatus(list.length + "건 조회되었습니다.");
 
   }catch(e){
     console.error(e);
