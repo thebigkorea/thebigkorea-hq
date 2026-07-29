@@ -6,178 +6,559 @@
 <title>매장점검 대시보드</title>
 
 <style>
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  background:#f4f6f9;
-  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;
-  color:#222;
+* {
+  box-sizing: border-box;
 }
 
-.header{
-  background:linear-gradient(135deg,#2b1d12,#7c2d12);
-  color:#fff;
-  padding:30px 20px;
-  border-bottom-left-radius:28px;
-  border-bottom-right-radius:28px;
+:root {
+  --brand: #7a2e12;
+  --brand-dark: #32180f;
+  --brand-light: #a94b20;
+  --bg: #f3f6fa;
+  --card: #ffffff;
+  --line: #e3e8ef;
+  --text: #182230;
+  --muted: #667085;
+  --danger: #c62828;
+  --warning: #d97706;
+  --success: #15803d;
+  --info: #2563eb;
+  --shadow: 0 12px 30px rgba(25, 36, 61, 0.08);
 }
 
-.header h1{margin:0;font-size:28px}
-.header p{margin:8px 0 0;opacity:.8}
-
-.container{
-  max-width:1400px;
-  margin:0 auto;
-  padding:20px;
+body {
+  margin: 0;
+  background: var(--bg);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Noto Sans KR",
+    sans-serif;
+  color: var(--text);
 }
 
-.summary{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-bottom:20px;
+button,
+select,
+input,
+textarea {
+  font: inherit;
 }
 
-.card{
-  background:#fff;
-  border-radius:22px;
-  padding:24px;
-  box-shadow:0 4px 16px rgba(0,0,0,.08);
+.header {
+  background:
+    linear-gradient(
+      120deg,
+      var(--brand-dark),
+      var(--brand),
+      #943814
+    );
+  color: #fff;
+  padding: 28px clamp(22px, 3vw, 54px);
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  box-shadow:
+    0 10px 26px rgba(70, 27, 11, 0.18);
 }
 
-.summary .card{text-align:center}
-
-.summary strong{
-  display:block;
-  font-size:34px;
-  color:#7c2d12;
-  margin-bottom:6px;
+.header-inner {
+  max-width: 1900px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-.summary span{
-  color:#666;
-  font-size:14px;
+.header h1 {
+  margin: 0;
+  font-size: clamp(25px, 2vw, 34px);
+  letter-spacing: -0.5px;
 }
 
-.tab-row{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-bottom:16px;
+.header p {
+  margin: 8px 0 0;
+  opacity: 0.8;
+  font-size: 14px;
 }
 
-.tab-btn{
-  border:none;
-  background:#eee;
-  color:#333;
-  border-radius:999px;
-  padding:10px 16px;
-  font-weight:800;
-  cursor:pointer;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.tab-btn.active{
-  background:#7c2d12;
-  color:#fff;
+.updated-at {
+  font-size: 13px;
+  opacity: 0.85;
 }
 
-.tab-btn span{
-  display:inline-block;
-  min-width:22px;
-  margin-left:6px;
-  padding:2px 7px;
-  border-radius:999px;
-  background:#fff;
-  color:#7c2d12;
-  font-size:12px;
+.refresh-btn {
+  border:
+    1px solid rgba(255, 255, 255, 0.35);
+  background:
+    rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-radius: 12px;
+  padding: 10px 15px;
+  font-weight: 800;
+  cursor: pointer;
 }
 
-.filter-box{
-  display:grid;
-  grid-template-columns:160px 180px 150px 1fr;
-  gap:10px;
-  margin-bottom:16px;
+.refresh-btn:hover {
+  background:
+    rgba(255, 255, 255, 0.22);
 }
 
-select,input,textarea{
-  border:1px solid #ddd;
-  border-radius:10px;
-  padding:10px;
-  font-size:14px;
+.container {
+  width: min(97%, 1900px);
+  margin: 0 auto;
+  padding: 22px 0 36px;
 }
 
-textarea{
-  width:100%;
-  min-height:70px;
+.summary {
+  display: grid;
+  grid-template-columns:
+    repeat(6, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
-.table-wrap{
-  overflow-x:auto;
+.summary-card {
+  position: relative;
+  background: #fff;
+  border:
+    1px solid rgba(227, 232, 239, 0.9);
+  border-radius: 20px;
+  padding: 20px 18px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:1150px;
+.summary-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: var(--brand);
 }
 
-th,td{
-  padding:12px 10px;
-  border-bottom:1px solid #eee;
-  text-align:left;
-  font-size:14px;
-  vertical-align:top;
+.summary-card.warning::before {
+  background: var(--warning);
 }
 
-th{background:#fafafa}
-
-.badge{
-  display:inline-block;
-  padding:5px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:bold;
+.summary-card.danger::before {
+  background: var(--danger);
 }
 
-.normal{background:#f1f5f9;color:#475569}
-.important{background:#fff7ed;color:#c2410c}
-.urgent{background:#fee2e2;color:#b91c1c}
-
-.status-badge{
-  display:inline-block;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:800;
-  background:#eef2ff;
-  color:#3730a3;
+.summary-card.success::before {
+  background: var(--success);
 }
 
-.save-btn{
-  border:none;
-  background:#7c2d12;
-  color:#fff;
-  border-radius:10px;
-  padding:10px 14px;
-  cursor:pointer;
-  font-weight:bold;
+.summary-card.info::before {
+  background: var(--info);
 }
 
-.small-text{
-  color:#777;
-  font-size:12px;
-  margin:8px 0 12px;
+.summary-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
 }
 
-@media(max-width:1000px){
-  .summary{grid-template-columns:repeat(2,1fr)}
-  .filter-box{grid-template-columns:1fr 1fr}
+.summary-icon {
+  font-size: 18px;
 }
 
-@media(max-width:700px){
-  .summary{grid-template-columns:1fr}
-  .filter-box{grid-template-columns:1fr}
+.summary-card strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 32px;
+  line-height: 1;
+  color: var(--brand-dark);
+}
+
+.summary-card small {
+  display: block;
+  margin-top: 8px;
+  color: #98a2b3;
+  font-size: 11px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr) 310px;
+  gap: 18px;
+  align-items: start;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 14px;
+}
+
+.section-head h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.result-count {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.tab-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.tab-btn {
+  border: 1px solid transparent;
+  background: #edf1f6;
+  color: #344054;
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.tab-btn:hover {
+  transform: translateY(-1px);
+  background: #e5eaf1;
+}
+
+.tab-btn.active {
+  background: var(--brand);
+  color: #fff;
+  box-shadow:
+    0 6px 14px rgba(122, 46, 18, 0.22);
+}
+
+.tab-btn span {
+  display: inline-block;
+  min-width: 22px;
+  margin-left: 5px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--brand);
+  font-size: 11px;
+}
+
+.filter-box {
+  display: grid;
+  grid-template-columns:
+    170px 190px 160px minmax(260px, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.filter-box select,
+.filter-box input,
+textarea,
+td select {
+  border: 1px solid #d8dee8;
+  border-radius: 11px;
+  padding: 10px 11px;
+  background: #fff;
+  color: var(--text);
+  outline: none;
+}
+
+.filter-box select:focus,
+.filter-box input:focus,
+textarea:focus,
+td select:focus {
+  border-color: #b46b4b;
+  box-shadow:
+    0 0 0 3px rgba(122, 46, 18, 0.09);
+}
+
+textarea {
+  width: 100%;
+  min-height: 74px;
+  resize: vertical;
+}
+
+.small-text {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 6px 0 12px;
+}
+
+.table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  max-height:
+    calc(100vh - 390px);
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 1230px;
+}
+
+th,
+td {
+  padding: 13px 11px;
+  border-bottom:
+    1px solid #edf0f4;
+  text-align: left;
+  font-size: 13px;
+  vertical-align: top;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #f8fafc;
+  color: #475467;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+tbody tr:hover td {
+  background: #fffaf7;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.urgent-row td:first-child {
+  box-shadow:
+    inset 4px 0 0 var(--danger);
+}
+
+.badge,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.normal {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.important {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.urgent {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.status-badge {
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.save-btn {
+  border: none;
+  background:
+    linear-gradient(
+      135deg,
+      var(--brand),
+      var(--brand-light)
+    );
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 900;
+  box-shadow:
+    0 5px 12px rgba(122, 46, 18, 0.18);
+}
+
+.save-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.side-stack {
+  display: grid;
+  gap: 16px;
+  position: sticky;
+  top: 18px;
+}
+
+.side-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.side-card h3 {
+  margin: 0 0 14px;
+  font-size: 16px;
+}
+
+.store-status {
+  display: grid;
+  gap: 10px;
+}
+
+.store-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  align-items: center;
+  padding: 11px 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.store-name {
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.store-meta {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.store-count {
+  min-width: 30px;
+  text-align: center;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #fff0e9;
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.side-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom:
+    1px solid #edf0f4;
+  font-size: 13px;
+}
+
+.side-stat:last-child {
+  border-bottom: none;
+}
+
+.side-stat strong {
+  font-size: 16px;
+}
+
+.empty-side {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 1450px) {
+  .summary {
+    grid-template-columns:
+      repeat(3, 1fr);
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .side-stack {
+    position: static;
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .filter-box {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .summary {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .side-stack {
+    grid-template-columns: 1fr;
+  }
+
+  .header-inner {
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: 94%;
+  }
+
+  .summary {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .summary-card {
+    padding: 17px 14px;
+  }
+
+  .summary-card strong {
+    font-size: 27px;
+  }
+
+  .filter-box {
+    grid-template-columns: 1fr;
+  }
+
+  .header-actions {
+    display: none;
+  }
+
+  .card {
+    padding: 14px;
+  }
 }
 </style>
 </head>
@@ -185,83 +566,333 @@ th{background:#fafafa}
 <body>
 
 <div class="header">
-  <h1>매장점검 대시보드</h1>
-  <p>더큰코리아 본사 통합 모니터링</p>
+
+  <div class="header-inner">
+
+    <div>
+      <h1>매장점검 통합 대시보드</h1>
+
+      <p>
+        더큰코리아 본사 · 전 점포 운영현황 통합 모니터링
+      </p>
+    </div>
+
+    <div class="header-actions">
+
+      <span
+        class="updated-at"
+        id="updatedAt">
+        최종 조회 전
+      </span>
+
+      <button
+        type="button"
+        class="refresh-btn"
+        onclick="loadDashboard()">
+        ↻ 최신자료 새로고침
+      </button>
+
+    </div>
+
+  </div>
+
 </div>
 
 <div class="container">
 
   <div class="summary">
-    <div class="card">
+
+    <div class="summary-card info">
+
+      <div class="summary-label">
+        <span>오늘 등록</span>
+        <span class="summary-icon">＋</span>
+      </div>
+
       <strong id="todayCount">0</strong>
-      <span>오늘 등록</span>
+
+      <small>
+        오늘 새로 접수된 점검사항
+      </small>
+
     </div>
-    <div class="card">
+
+    <div class="summary-card warning">
+
+      <div class="summary-label">
+        <span>본사 미확인</span>
+        <span class="summary-icon">●</span>
+      </div>
+
       <strong id="pendingCount">0</strong>
-      <span>미확인</span>
+
+      <small>
+        확인이 필요한 신규 내역
+      </small>
+
     </div>
-    <div class="card">
+
+    <div class="summary-card danger">
+
+      <div class="summary-label">
+        <span>긴급사항</span>
+        <span class="summary-icon">!</span>
+      </div>
+
       <strong id="urgentCount">0</strong>
-      <span>긴급</span>
+
+      <small>
+        즉시 확인이 필요한 내역
+      </small>
+
     </div>
-    <div class="card">
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        <span>진행 중</span>
+        <span class="summary-icon">↻</span>
+      </div>
+
+      <strong id="activeCount">0</strong>
+
+      <small>
+        완료되지 않은 전체 내역
+      </small>
+
+    </div>
+
+    <div class="summary-card success">
+
+      <div class="summary-label">
+        <span>처리 완료</span>
+        <span class="summary-icon">✓</span>
+      </div>
+
+      <strong id="doneCount">0</strong>
+
+      <small>
+        확인완료·조치완료 내역
+      </small>
+
+    </div>
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        <span>전체 건수</span>
+        <span class="summary-icon">≡</span>
+      </div>
+
       <strong id="totalCount">0</strong>
-      <span>전체 건수</span>
+
+      <small>
+        전 점포 누적 등록 건수
+      </small>
+
     </div>
+
   </div>
 
-  <div class="card">
+  <div class="dashboard-grid">
 
-    <div class="tab-row">
-      <button class="tab-btn active" onclick="setViewMode('active', this)">진행중 <span id="badgeActive">0</span></button>
-      <button class="tab-btn" onclick="setViewMode('미확인', this)">미확인 <span id="badgePending">0</span></button>
-      <button class="tab-btn" onclick="setViewMode('확인사항', this)">확인사항 <span id="badgeCheck">0</span></button>
-      <button class="tab-btn" onclick="setViewMode('보완요청', this)">보완사항 <span id="badgeSupplement">0</span></button>
-      <button class="tab-btn" onclick="setViewMode('조치필요', this)">조치사항 <span id="badgeAction">0</span></button>
-      <button class="tab-btn" onclick="setViewMode('done', this)">완료내역 <span id="badgeDone">0</span></button>
-      <button class="tab-btn" onclick="setViewMode('all', this)">전체 <span id="badgeAll">0</span></button>
+    <div class="card">
+
+      <div class="section-head">
+
+        <h2>통합 점검내역</h2>
+
+        <span
+          class="result-count"
+          id="resultCount">
+          0건 조회
+        </span>
+
+      </div>
+
+      <div class="tab-row">
+
+        <button
+          class="tab-btn active"
+          onclick="setViewMode('active', this)">
+          진행중
+          <span id="badgeActive">0</span>
+        </button>
+
+        <button
+          class="tab-btn"
+          onclick="setViewMode('미확인', this)">
+          미확인
+          <span id="badgePending">0</span>
+        </button>
+
+        <button
+          class="tab-btn"
+          onclick="setViewMode('확인사항', this)">
+          확인사항
+          <span id="badgeCheck">0</span>
+        </button>
+
+        <button
+          class="tab-btn"
+          onclick="setViewMode('보완요청', this)">
+          보완사항
+          <span id="badgeSupplement">0</span>
+        </button>
+
+        <button
+          class="tab-btn"
+          onclick="setViewMode('조치필요', this)">
+          조치사항
+          <span id="badgeAction">0</span>
+        </button>
+
+        <button
+          class="tab-btn"
+          onclick="setViewMode('done', this)">
+          완료내역
+          <span id="badgeDone">0</span>
+        </button>
+
+        <button
+          class="tab-btn"
+          onclick="setViewMode('all', this)">
+          전체
+          <span id="badgeAll">0</span>
+        </button>
+
+      </div>
+
+      <div class="filter-box">
+
+        <select
+          id="brandFilter"
+          onchange="applyFilters()">
+
+          <option value="">
+            전체 브랜드
+          </option>
+
+          <option value="한국의집">
+            한국의집
+          </option>
+
+          <option value="길채정">
+            길채정
+          </option>
+
+          <option value="소바공방">
+            소바공방
+          </option>
+
+          <option value="효종갱">
+            효종갱
+          </option>
+
+        </select>
+
+        <select
+          id="storeFilter"
+          onchange="applyFilters()">
+
+          <option value="">
+            전체 점포
+          </option>
+
+        </select>
+
+        <input
+          type="month"
+          id="monthFilter"
+          onchange="applyFilters()">
+
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="점포명, 내용, 본사피드백 검색"
+          oninput="applyFilters()">
+
+      </div>
+
+      <div class="small-text">
+        기본 화면은 확인완료·조치완료 건을 제외한 진행중 내역만 표시됩니다.
+      </div>
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>등록일</th>
+              <th>점포명</th>
+              <th>구분</th>
+              <th>긴급도</th>
+              <th>내용</th>
+              <th>본사피드백</th>
+              <th>조치상태</th>
+              <th>저장</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="tbody">
+
+            <tr>
+              <td colspan="8">
+                불러오는 중...
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
     </div>
 
-    <div class="filter-box">
-      <select id="brandFilter" onchange="applyFilters()">
-        <option value="">전체 브랜드</option>
-        <option value="한국의집">한국의집</option>
-        <option value="길채정">길채정</option>
-        <option value="소바공방">소바공방</option>
-      </select>
+    <aside class="side-stack">
 
-      <select id="storeFilter" onchange="applyFilters()">
-        <option value="">전체 점포</option>
-      </select>
+      <div class="side-card">
 
-      <input type="month" id="monthFilter" onchange="applyFilters()">
+        <h3>점포별 미확인 현황</h3>
 
-      <input type="text" id="searchInput" placeholder="점포명, 내용, 본사피드백 검색" oninput="applyFilters()">
-    </div>
+        <div
+          class="store-status"
+          id="storeStatus">
 
-    <div class="small-text">
-      기본 화면은 확인완료·조치완료 건을 제외한 진행중 내역만 표시됩니다.
-    </div>
+          <div class="empty-side">
+            자료를 불러오는 중입니다.
+          </div>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>등록일</th>
-            <th>점포명</th>
-            <th>구분</th>
-            <th>긴급도</th>
-            <th>내용</th>
-            <th>본사피드백</th>
-            <th>조치상태</th>
-            <th>저장</th>
-          </tr>
-        </thead>
-        <tbody id="tbody">
-          <tr><td colspan="8">불러오는 중...</td></tr>
-        </tbody>
-      </table>
-    </div>
+        </div>
+
+      </div>
+
+      <div class="side-card">
+
+        <h3>처리 현황</h3>
+
+        <div class="side-stat">
+          <span>진행 중</span>
+          <strong id="sideActive">0</strong>
+        </div>
+
+        <div class="side-stat">
+          <span>완료</span>
+          <strong id="sideDone">0</strong>
+        </div>
+
+        <div class="side-stat">
+          <span>완료율</span>
+          <strong id="completionRate">0%</strong>
+        </div>
+
+      </div>
+
+    </aside>
 
   </div>
 
@@ -269,46 +900,166 @@ th{background:#fafafa}
 
 <script>
 const API_URL =
-"https://script.google.com/macros/s/AKfycby1RoQvXt51KjoasIG-_MmD7SiMau10eRWAYiq4Vk1k2s9yRVsuEBrBVEFvmW7aX765/exec";
+  "https://script.google.com/macros/s/AKfycby1RoQvXt51KjoasIG-_MmD7SiMau10eRWAYiq4Vk1k2s9yRVsuEBrBVEFvmW7aX765/exec";
 
 let allLogs = [];
 let currentViewMode = "active";
 
-function setViewMode(mode, btn){
+function setViewMode(mode, btn) {
+
   currentViewMode = mode;
 
-  document.querySelectorAll(".tab-btn").forEach(b => {
-    b.classList.remove("active");
-  });
+  document
+    .querySelectorAll(".tab-btn")
+    .forEach(button => {
+      button.classList.remove("active");
+    });
 
   btn.classList.add("active");
+
   applyFilters();
 }
 
-async function loadDashboard(){
-  try{
-    const res = await fetch(API_URL + "?action=getDashboard&t=" + Date.now());
-    const data = await res.json();
 
-    allLogs = data.logs || [];
+async function loadDashboard() {
 
-    document.getElementById("todayCount").textContent = data.todayCount || 0;
-    document.getElementById("pendingCount").textContent = data.pendingCount || 0;
-    document.getElementById("urgentCount").textContent = data.urgentCount || 0;
-    document.getElementById("totalCount").textContent = data.totalCount || 0;
+  try {
+
+    const response =
+      await fetch(
+        API_URL +
+        "?action=getDashboard&t=" +
+        Date.now()
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        "HTTP 오류: " +
+        response.status
+      );
+    }
+
+    const data =
+      await response.json();
+
+    if (data.ok === false) {
+      throw new Error(
+        data.message ||
+        "대시보드 조회 실패"
+      );
+    }
+
+    allLogs =
+      Array.isArray(data.logs)
+        ? data.logs
+        : [];
+
+    document
+      .getElementById("todayCount")
+      .textContent =
+        Number(data.todayCount || 0);
+
+    document
+      .getElementById("pendingCount")
+      .textContent =
+        Number(data.pendingCount || 0);
+
+    document
+      .getElementById("urgentCount")
+      .textContent =
+        Number(data.urgentCount || 0);
+
+    document
+      .getElementById("totalCount")
+      .textContent =
+        Number(
+          data.totalCount ||
+          allLogs.length ||
+          0
+        );
+
+    const doneCount =
+      allLogs.filter(log =>
+        [
+          "확인완료",
+          "조치완료"
+        ].includes(
+          log.status || ""
+        )
+      ).length;
+
+    const activeCount =
+      allLogs.length -
+      doneCount;
+
+    document
+      .getElementById("activeCount")
+      .textContent =
+        activeCount;
+
+    document
+      .getElementById("doneCount")
+      .textContent =
+        doneCount;
+
+    document
+      .getElementById("sideActive")
+      .textContent =
+        activeCount;
+
+    document
+      .getElementById("sideDone")
+      .textContent =
+        doneCount;
+
+    document
+      .getElementById("completionRate")
+      .textContent =
+        allLogs.length
+          ? Math.round(
+              doneCount /
+              allLogs.length *
+              100
+            ) + "%"
+          : "0%";
+
+    document
+      .getElementById("updatedAt")
+      .textContent =
+        "최종 조회 " +
+        new Date().toLocaleString(
+          "ko-KR",
+          {
+            hour: "2-digit",
+            minute: "2-digit"
+          }
+        );
 
     makeStoreFilter();
+    renderStoreStatus();
     updateTabBadges();
     applyFilters();
 
-  }catch(e){
-    console.log(e);
-    document.getElementById("tbody").innerHTML =
-      "<tr><td colspan='8'>대시보드를 불러오지 못했습니다.</td></tr>";
+  } catch (error) {
+
+    console.error(error);
+
+    document
+      .getElementById("tbody")
+      .innerHTML =
+        `
+          <tr>
+            <td colspan="8">
+              대시보드를 불러오지 못했습니다.
+            </td>
+          </tr>
+        `;
   }
 }
 
-function updateTabBadges(){
+
+function updateTabBadges() {
+
   const counts = {
     active: 0,
     pending: 0,
@@ -320,207 +1071,796 @@ function updateTabBadges(){
   };
 
   allLogs.forEach(log => {
-    const status = log.status || "미확인";
 
-    if(status !== "확인완료" && status !== "조치완료") counts.active++;
-    if(status === "미확인") counts.pending++;
-    if(status === "확인사항") counts.check++;
-    if(status === "보완요청") counts.supplement++;
-    if(status === "조치필요") counts.action++;
-    if(status === "확인완료" || status === "조치완료") counts.done++;
+    const status =
+      log.status ||
+      "미확인";
+
+    if (
+      status !== "확인완료" &&
+      status !== "조치완료"
+    ) {
+      counts.active++;
+    }
+
+    if (
+      status === "미확인" ||
+      status === "본사미확인"
+    ) {
+      counts.pending++;
+    }
+
+    if (
+      status === "확인사항"
+    ) {
+      counts.check++;
+    }
+
+    if (
+      status === "보완요청"
+    ) {
+      counts.supplement++;
+    }
+
+    if (
+      status === "조치필요"
+    ) {
+      counts.action++;
+    }
+
+    if (
+      status === "확인완료" ||
+      status === "조치완료"
+    ) {
+      counts.done++;
+    }
+
   });
 
-  setBadgeText("badgeActive", counts.active);
-  setBadgeText("badgePending", counts.pending);
-  setBadgeText("badgeCheck", counts.check);
-  setBadgeText("badgeSupplement", counts.supplement);
-  setBadgeText("badgeAction", counts.action);
-  setBadgeText("badgeDone", counts.done);
-  setBadgeText("badgeAll", counts.all);
+  setBadgeText(
+    "badgeActive",
+    counts.active
+  );
+
+  setBadgeText(
+    "badgePending",
+    counts.pending
+  );
+
+  setBadgeText(
+    "badgeCheck",
+    counts.check
+  );
+
+  setBadgeText(
+    "badgeSupplement",
+    counts.supplement
+  );
+
+  setBadgeText(
+    "badgeAction",
+    counts.action
+  );
+
+  setBadgeText(
+    "badgeDone",
+    counts.done
+  );
+
+  setBadgeText(
+    "badgeAll",
+    counts.all
+  );
 }
 
-function setBadgeText(id, count){
-  const el = document.getElementById(id);
-  if(el) el.textContent = count;
+
+function setBadgeText(id, count) {
+
+  const element =
+    document.getElementById(id);
+
+  if (element) {
+    element.textContent = count;
+  }
 }
 
-function makeStoreFilter(){
-  const storeFilter = document.getElementById("storeFilter");
-  const currentValue = storeFilter.value;
 
-  const stores = [...new Set(
-    allLogs.map(log => log.store).filter(Boolean)
-  )].sort();
+function makeStoreFilter() {
 
-  storeFilter.innerHTML = `<option value="">전체 점포</option>` +
-    stores.map(store => `<option value="${escapeHtml(store)}">${escapeHtml(store)}</option>`).join("");
+  const storeFilter =
+    document.getElementById(
+      "storeFilter"
+    );
 
-  storeFilter.value = currentValue;
+  const currentValue =
+    storeFilter.value;
+
+  const stores = [
+    ...new Set(
+      allLogs
+        .map(log => log.store)
+        .filter(Boolean)
+    )
+  ].sort();
+
+  storeFilter.innerHTML =
+    `
+      <option value="">
+        전체 점포
+      </option>
+    ` +
+    stores
+      .map(store =>
+        `
+          <option
+            value="${escapeHtml(store)}">
+            ${escapeHtml(store)}
+          </option>
+        `
+      )
+      .join("");
+
+  storeFilter.value =
+    currentValue;
 }
 
-function applyFilters(){
-  const brandFilter = document.getElementById("brandFilter").value;
-  const storeFilter = document.getElementById("storeFilter").value;
-  const monthFilter = document.getElementById("monthFilter").value;
-  const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
 
-  const filteredLogs = allLogs.filter(log => {
-    const status = log.status || "미확인";
+function applyFilters() {
 
-    if(currentViewMode === "active"){
-      if(status === "확인완료" || status === "조치완료") return false;
-    }
+  const brandFilter =
+    document
+      .getElementById("brandFilter")
+      .value;
 
-    if(currentViewMode === "done"){
-      if(status !== "확인완료" && status !== "조치완료") return false;
-    }
+  const storeFilter =
+    document
+      .getElementById("storeFilter")
+      .value;
 
-    if(
-      currentViewMode !== "active" &&
-      currentViewMode !== "done" &&
-      currentViewMode !== "all"
-    ){
-      if(status !== currentViewMode) return false;
-    }
+  const monthFilter =
+    document
+      .getElementById("monthFilter")
+      .value;
 
-    if(brandFilter && log.brand !== brandFilter) return false;
-    if(storeFilter && log.store !== storeFilter) return false;
+  const keyword =
+    document
+      .getElementById("searchInput")
+      .value
+      .trim()
+      .toLowerCase();
 
-    if(monthFilter){
-      const logDate = String(log.date || "");
-      if(!logDate.startsWith(monthFilter)) return false;
-    }
+  const filteredLogs =
+    allLogs.filter(log => {
 
-    if(keyword){
-      const searchTarget = [
-        log.store,
-        log.brand,
-        log.category,
-        log.priority,
-        log.content,
-        log.feedback,
-        log.status
-      ].join(" ").toLowerCase();
+      const status =
+        log.status ||
+        "미확인";
 
-      if(!searchTarget.includes(keyword)) return false;
-    }
+      if (
+        currentViewMode ===
+        "active"
+      ) {
 
-    return true;
-  });
+        if (
+          status === "확인완료" ||
+          status === "조치완료"
+        ) {
+          return false;
+        }
+      }
+
+      if (
+        currentViewMode ===
+        "done"
+      ) {
+
+        if (
+          status !== "확인완료" &&
+          status !== "조치완료"
+        ) {
+          return false;
+        }
+      }
+
+      if (
+        currentViewMode !== "active" &&
+        currentViewMode !== "done" &&
+        currentViewMode !== "all"
+      ) {
+
+        if (
+          currentViewMode === "미확인"
+        ) {
+
+          if (
+            status !== "미확인" &&
+            status !== "본사미확인"
+          ) {
+            return false;
+          }
+
+        } else if (
+          status !== currentViewMode
+        ) {
+          return false;
+        }
+      }
+
+      if (
+        brandFilter &&
+        log.brand !== brandFilter
+      ) {
+        return false;
+      }
+
+      if (
+        storeFilter &&
+        log.store !== storeFilter
+      ) {
+        return false;
+      }
+
+      if (monthFilter) {
+
+        const logDate =
+          String(
+            log.date || ""
+          );
+
+        if (
+          !logDate.startsWith(
+            monthFilter
+          )
+        ) {
+          return false;
+        }
+      }
+
+      if (keyword) {
+
+        const searchTarget = [
+          log.store,
+          log.brand,
+          log.category,
+          log.priority,
+          log.content,
+          log.feedback,
+          log.status
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        if (
+          !searchTarget.includes(
+            keyword
+          )
+        ) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+  document
+    .getElementById("resultCount")
+    .textContent =
+      filteredLogs.length +
+      "건 조회";
 
   renderTable(filteredLogs);
 }
 
-function renderTable(logs){
-  const tbody = document.getElementById("tbody");
 
-  if(logs.length === 0){
-    tbody.innerHTML = "<tr><td colspan='8'>조회된 내역이 없습니다.</td></tr>";
+function renderTable(logs) {
+
+  const tbody =
+    document.getElementById(
+      "tbody"
+    );
+
+  if (logs.length === 0) {
+
+    tbody.innerHTML =
+      `
+        <tr>
+          <td colspan="8">
+            조회된 내역이 없습니다.
+          </td>
+        </tr>
+      `;
+
     return;
   }
 
-  tbody.innerHTML = logs.map(log => {
-    let badgeClass = "normal";
-    if(log.priority === "중요") badgeClass = "important";
-    if(log.priority === "긴급") badgeClass = "urgent";
+  tbody.innerHTML =
+    logs
+      .map(log => {
 
-    const status = log.status || "미확인";
-    const isDoneView = currentViewMode === "done";
+        let badgeClass =
+          "normal";
 
-    return `
-      <tr style="background:${log.priority === "긴급" ? "#fff5f5" : "#fff"};">
+        if (
+          log.priority === "중요"
+        ) {
+          badgeClass =
+            "important";
+        }
 
-        <td>${escapeHtml(log.date || "")}</td>
+        if (
+          log.priority === "긴급"
+        ) {
+          badgeClass =
+            "urgent";
+        }
 
-        <td>
-          ${escapeHtml(log.store || "")}<br>
-          <small>${escapeHtml(log.brand || "")}</small>
-        </td>
+        const status =
+          log.status ||
+          "미확인";
 
-        <td>${escapeHtml(log.category || "")}</td>
+        const isDone =
+          status === "확인완료" ||
+          status === "조치완료";
 
-        <td>
-          <span class="badge ${badgeClass}">
-            ${escapeHtml(log.priority || "일반")}
-          </span>
-        </td>
+        const uniqueKey =
+          makeUniqueKey(log);
 
-        <td style="white-space:pre-line;">
-          ${escapeHtml(log.content || "")}
-        </td>
+        return `
+          <tr
+            class="${
+              log.priority === "긴급"
+                ? "urgent-row"
+                : ""
+            }">
 
-        <td>
-          ${
-            isDoneView
-            ? `<div style="white-space:pre-line;">${escapeHtml(log.feedback || "-")}</div>`
-            : `<textarea id="feedback_${log.row}">${escapeHtml(log.feedback || "")}</textarea>`
-          }
-        </td>
+            <td>
+              ${escapeHtml(
+                log.date || ""
+              )}
+            </td>
 
-        <td>
-          ${
-            isDoneView
-            ? `<span class="status-badge">${escapeHtml(status)}</span>`
-            : `
-              <select id="status_${log.row}">
-                <option value="미확인" ${status==="미확인"?"selected":""}>미확인</option>
-                <option value="확인사항" ${status==="확인사항"?"selected":""}>확인사항</option>
-                <option value="보완요청" ${status==="보완요청"?"selected":""}>보완요청</option>
-                <option value="조치필요" ${status==="조치필요"?"selected":""}>조치필요</option>
-                <option value="확인완료" ${status==="확인완료"?"selected":""}>확인완료</option>
-                <option value="조치완료" ${status==="조치완료"?"selected":""}>조치완료</option>
-              </select>
-            `
-          }
-        </td>
+            <td>
+              <strong>
+                ${escapeHtml(
+                  log.store || ""
+                )}
+              </strong>
 
-        <td>
-          ${
-            isDoneView
-            ? "-"
-            : `<button class="save-btn" onclick="saveFeedback(${log.row})">저장</button>`
-          }
-        </td>
+              <br>
 
-      </tr>
-    `;
-  }).join("");
+              <small>
+                ${escapeHtml(
+                  log.brand || ""
+                )}
+              </small>
+            </td>
+
+            <td>
+              ${escapeHtml(
+                log.category || ""
+              )}
+            </td>
+
+            <td>
+
+              <span
+                class="badge ${badgeClass}">
+
+                ${escapeHtml(
+                  log.priority ||
+                  "일반"
+                )}
+
+              </span>
+
+            </td>
+
+            <td
+              style="white-space:pre-line;">
+
+              ${escapeHtml(
+                log.content || ""
+              )}
+
+            </td>
+
+            <td>
+
+              ${
+                isDone
+                  ? `
+                    <div
+                      style="white-space:pre-line;">
+
+                      ${escapeHtml(
+                        log.feedback || "-"
+                      )}
+
+                    </div>
+                  `
+                  : `
+                    <textarea
+                      id="feedback_${uniqueKey}">${escapeHtml(
+                        log.feedback || ""
+                      )}</textarea>
+                  `
+              }
+
+            </td>
+
+            <td>
+
+              ${
+                isDone
+                  ? `
+                    <span
+                      class="status-badge">
+
+                      ${escapeHtml(status)}
+
+                    </span>
+                  `
+                  : `
+                    <select
+                      id="status_${uniqueKey}">
+
+                      <option
+                        value="미확인"
+                        ${
+                          status === "미확인" ||
+                          status === "본사미확인"
+                            ? "selected"
+                            : ""
+                        }>
+                        미확인
+                      </option>
+
+                      <option
+                        value="확인사항"
+                        ${
+                          status === "확인사항"
+                            ? "selected"
+                            : ""
+                        }>
+                        확인사항
+                      </option>
+
+                      <option
+                        value="보완요청"
+                        ${
+                          status === "보완요청"
+                            ? "selected"
+                            : ""
+                        }>
+                        보완요청
+                      </option>
+
+                      <option
+                        value="조치필요"
+                        ${
+                          status === "조치필요"
+                            ? "selected"
+                            : ""
+                        }>
+                        조치필요
+                      </option>
+
+                      <option
+                        value="확인완료"
+                        ${
+                          status === "확인완료"
+                            ? "selected"
+                            : ""
+                        }>
+                        확인완료
+                      </option>
+
+                      <option
+                        value="조치완료"
+                        ${
+                          status === "조치완료"
+                            ? "selected"
+                            : ""
+                        }>
+                        조치완료
+                      </option>
+
+                    </select>
+                  `
+              }
+
+            </td>
+
+            <td>
+
+              ${
+                isDone
+                  ? "-"
+                  : `
+                    <button
+                      type="button"
+                      class="save-btn"
+                      onclick="saveFeedback(
+                        '${escapeJs(uniqueKey)}',
+                        '${escapeJs(log.sourceKey || "")}',
+                        '${escapeJs(log.logId || "")}',
+                        ${Number(log.row || 0)}
+                      )">
+                      저장
+                    </button>
+                  `
+              }
+
+            </td>
+
+          </tr>
+        `;
+      })
+      .join("");
 }
 
-async function saveFeedback(row){
-  const feedback = document.getElementById("feedback_" + row).value;
-  const status = document.getElementById("status_" + row).value;
 
-  try{
-    const res = await fetch(API_URL, {
-      method:"POST",
-      body:JSON.stringify({
-        action:"updateFeedback",
-        row:row,
-        feedback:feedback,
-        status:status
-      })
-    });
+function makeUniqueKey(log) {
 
-    const data = await res.json();
-    alert(data.message || "저장완료");
+  const rawKey =
+    [
+      log.sourceKey || "SOURCE",
+      log.logId || "",
+      log.row || ""
+    ].join("_");
 
-    loadDashboard();
+  return rawKey.replace(
+    /[^a-zA-Z0-9가-힣_-]/g,
+    "_"
+  );
+}
 
-  }catch(e){
-    console.log(e);
-    alert("저장 중 오류가 발생했습니다.");
+
+async function saveFeedback(
+  uniqueKey,
+  sourceKey,
+  logId,
+  row
+) {
+
+  const feedbackElement =
+    document.getElementById(
+      "feedback_" +
+      uniqueKey
+    );
+
+  const statusElement =
+    document.getElementById(
+      "status_" +
+      uniqueKey
+    );
+
+  if (
+    !feedbackElement ||
+    !statusElement
+  ) {
+
+    alert(
+      "저장할 입력항목을 찾지 못했습니다."
+    );
+
+    return;
+  }
+
+  const feedback =
+    feedbackElement.value.trim();
+
+  const status =
+    statusElement.value;
+
+  try {
+
+    const response =
+      await fetch(API_URL, {
+
+        method: "POST",
+
+        body: JSON.stringify({
+          action:
+            "updateFeedback",
+
+          row: row,
+
+          sourceKey:
+            sourceKey,
+
+          logId:
+            logId,
+
+          feedback:
+            feedback,
+
+          status:
+            status
+        })
+      });
+
+    if (!response.ok) {
+      throw new Error(
+        "HTTP 오류: " +
+        response.status
+      );
+    }
+
+    const data =
+      await response.json();
+
+    if (data.ok === false) {
+
+      throw new Error(
+        data.message ||
+        "저장에 실패했습니다."
+      );
+    }
+
+    alert(
+      data.message ||
+      "저장완료"
+    );
+
+    await loadDashboard();
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "저장 중 오류가 발생했습니다.\n" +
+      error.message
+    );
   }
 }
 
-function escapeHtml(text){
-  return String(text)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+
+function renderStoreStatus() {
+
+  const target =
+    document.getElementById(
+      "storeStatus"
+    );
+
+  const storeMap = {};
+
+  allLogs.forEach(log => {
+
+    const store =
+      log.store ||
+      "점포 미지정";
+
+    if (!storeMap[store]) {
+
+      storeMap[store] = {
+        total: 0,
+        pending: 0,
+        urgent: 0
+      };
+    }
+
+    storeMap[store].total++;
+
+    const isDone =
+      log.status === "확인완료" ||
+      log.status === "조치완료";
+
+    if (!isDone) {
+      storeMap[store].pending++;
+    }
+
+    if (
+      log.priority === "긴급" &&
+      !isDone
+    ) {
+      storeMap[store].urgent++;
+    }
+  });
+
+  const entries =
+    Object
+      .entries(storeMap)
+      .sort(
+        (a, b) =>
+          b[1].pending -
+          a[1].pending
+      );
+
+  if (!entries.length) {
+
+    target.innerHTML =
+      `
+        <div class="empty-side">
+          등록된 점검내역이 없습니다.
+        </div>
+      `;
+
+    return;
+  }
+
+  target.innerHTML =
+    entries
+      .map(([store, count]) => {
+
+        return `
+          <div class="store-row">
+
+            <span class="store-name">
+              ${escapeHtml(store)}
+            </span>
+
+            <span class="store-count">
+              ${count.pending}
+            </span>
+
+            <span class="store-meta">
+
+              전체 ${count.total}건
+
+              ${
+                count.urgent
+                  ? ` · 긴급 ${count.urgent}건`
+                  : ""
+              }
+
+            </span>
+
+          </div>
+        `;
+      })
+      .join("");
 }
+
+
+function escapeJs(text) {
+
+  return String(text)
+    .replaceAll(
+      "\\",
+      "\\\\"
+    )
+    .replaceAll(
+      "'",
+      "\\'"
+    )
+    .replaceAll(
+      "\n",
+      " "
+    )
+    .replaceAll(
+      "\r",
+      " "
+    );
+}
+
+
+function escapeHtml(text) {
+
+  return String(text)
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
+}
+
 
 loadDashboard();
 </script>
