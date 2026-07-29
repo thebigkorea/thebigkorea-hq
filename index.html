@@ -990,7 +990,7 @@
 
 
   /* ================================
-     지점별 Apps Script API 주소
+     지점별 일용직 미지급 API
   ================================= */
 
   const KOREA_API_URL =
@@ -1002,12 +1002,13 @@
   const GILCHAEJEONG_API_URL =
     "https://script.google.com/macros/s/AKfycbzjJ4xzZl96Wi4AcYrfKrEzIl-gY5iEZCUEiZ_th51mD2Kq97G13z883QIMjFf99sQE3w/exec";
 
-  /*
-   * 효종갱 매장점검 Apps Script 웹앱 주소를
-   * 아래 따옴표 안에 넣으세요.
-   */
-  const HYOJONG_API_URL =
-  "https://script.google.com/macros/s/AKfycbydrBidRu8BNrPGd2JKC6KSIT7pTXrNVleWJf70giDrtrFs7G1iwh7cvn9gn6bNdPRw8g/exec";
+
+  /* ================================
+     매장점검 통합 대시보드 API
+  ================================= */
+
+  const STORE_DASHBOARD_API_URL =
+    "https://script.google.com/macros/s/AKfycby1RoQvXt51KjoasIG-_MmD7SiMau10eRWAYiq4Vk1k2s9yRVsuEBrBVEFvmW7aX765/exec";
 
 
   /* ================================
@@ -1015,7 +1016,8 @@
   ================================= */
 
   function showBadge(id, count) {
-    const badge = document.getElementById(id);
+    const badge =
+      document.getElementById(id);
 
     if (!badge) {
       return;
@@ -1068,14 +1070,15 @@
     label
   ) {
     try {
-      const response = await fetch(
-        apiUrl +
-          "?action=getDailyUnpaidCount&t=" +
-          Date.now(),
-        {
-          cache: "no-store"
-        }
-      );
+      const response =
+        await fetch(
+          apiUrl +
+            "?action=getDailyUnpaidCount&t=" +
+            Date.now(),
+          {
+            cache: "no-store"
+          }
+        );
 
       if (!response.ok) {
         throw new Error(
@@ -1137,118 +1140,17 @@
      매장점검대시보드 미확인 배지
   ================================= */
 
-  const inspectionCounts = {
-    korea: 0,
-    gilchaejeong: 0,
-    soba: 0,
-    hyojong: 0
-  };
-
-  function updateInspectionBadge() {
-    const total =
-      inspectionCounts.korea +
-      inspectionCounts.gilchaejeong +
-      inspectionCounts.soba +
-      inspectionCounts.hyojong;
-
-    showBadge(
-      "storeDashboardBadge",
-      total
-    );
-  }
-
-
-  /*
-   * 지점 API가 반환하는 형태가 조금 달라도
-   * 본사 미확인 건수를 찾도록 처리합니다.
-   */
-  function getInspectionPendingCount(data) {
-    if (!data) {
-      return 0;
-    }
-
-    const result =
-      data.result ||
-      data.data ||
-      data;
-
-    const directCount =
-      result.pendingCount ??
-      result.unconfirmedCount ??
-      result.uncheckedCount ??
-      result.hqUncheckedCount ??
-      result.headOfficeUncheckedCount ??
-      result.summary?.pendingCount ??
-      result.summary?.unconfirmedCount ??
-      result.summary?.uncheckedCount ??
-      result.summary?.hqUncheckedCount;
-
-    if (
-      directCount !== undefined &&
-      directCount !== null &&
-      directCount !== ""
-    ) {
-      const count = Number(directCount);
-
-      return Number.isFinite(count)
-        ? count
-        : 0;
-    }
-
-    const list =
-      result.logs ||
-      result.items ||
-      result.reports ||
-      result.records ||
-      result.recentLogs ||
-      [];
-
-    if (!Array.isArray(list)) {
-      return 0;
-    }
-
-    return list.filter(function(item) {
-      const status = String(
-        item.hqStatus ||
-        item.headOfficeStatus ||
-        item.status ||
-        item.reviewStatus ||
-        ""
-      )
-        .trim()
-        .replace(/\s+/g, "");
-
-      return (
-        status === "" ||
-        status === "본사미확인" ||
-        status === "미확인" ||
-        status === "확인전" ||
-        status === "접수"
-      );
-    }).length;
-  }
-
-
-  async function loadInspectionCount(
-    apiUrl,
-    key,
-    label
-  ) {
-    if (!apiUrl) {
-      inspectionCounts[key] = 0;
-      updateInspectionBadge();
-      return;
-    }
-
+  async function loadStoreDashboardBadge() {
     try {
-      const response = await fetch(
-        apiUrl +
-          "?action=getStoreManagerDashboard&t=" +
-          Date.now(),
-        {
-          cache: "no-store"
-        }
-      );
+      const response =
+        await fetch(
+          STORE_DASHBOARD_API_URL +
+            "?action=getDashboard&t=" +
+            Date.now(),
+          {
+            cache: "no-store"
+          }
+        );
 
       if (!response.ok) {
         throw new Error(
@@ -1259,48 +1161,29 @@
       const data =
         await response.json();
 
-      inspectionCounts[key] =
-        getInspectionPendingCount(data);
+      if (data.ok === false) {
+        throw new Error(
+          data.message ||
+          "매장점검 현황 조회 실패"
+        );
+      }
+
+      showBadge(
+        "storeDashboardBadge",
+        Number(data.pendingCount || 0)
+      );
 
     } catch (error) {
       console.log(
-        label +
-          " 매장점검 배지 조회 실패",
+        "매장점검대시보드 배지 조회 실패",
         error
       );
 
-      inspectionCounts[key] = 0;
-
-    } finally {
-      updateInspectionBadge();
+      showBadge(
+        "storeDashboardBadge",
+        0
+      );
     }
-  }
-
-
-  function loadInspectionBadges() {
-    loadInspectionCount(
-      KOREA_API_URL,
-      "korea",
-      "한국의집"
-    );
-
-    loadInspectionCount(
-      GILCHAEJEONG_API_URL,
-      "gilchaejeong",
-      "압구정 길채정"
-    );
-
-    loadInspectionCount(
-      SOBA_API_URL,
-      "soba",
-      "평촌 소바공방"
-    );
-
-    loadInspectionCount(
-      HYOJONG_API_URL,
-      "hyojong",
-      "파주 효종갱"
-    );
   }
 
 
@@ -1308,13 +1191,21 @@
      최초 실행
   ================================= */
 
-  document.addEventListener(
-    "DOMContentLoaded",
-    function() {
-      loadDailyUnpaidBadges();
-      loadInspectionBadges();
-    }
-  );
+  function initializePortalBadges() {
+    loadDailyUnpaidBadges();
+    loadStoreDashboardBadge();
+  }
+
+  if (
+    document.readyState === "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializePortalBadges
+    );
+  } else {
+    initializePortalBadges();
+  }
 </script>
 </body>
 </html>
