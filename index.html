@@ -720,19 +720,25 @@
             <h4>점포 운영관리</h4>
 
             <div class="links">
-              <a class="task primary" target="_blank" href="store-manager.html">
-                매장점검
-              </a>
+              <a class="task primary"
+   target="_blank"
+   href="store-dashboard.html">
 
-              <a class="task"
-                 target="_blank"
-                 href="https://script.google.com/macros/s/AKfycbwR3107hlEmIvpa1NvU0ElZHf3qlsrZBnthiBTLYb2bVL26LX0VE5yXr4yRf4IUCpqGDw/exec">
-                경영대시보드
-              </a>
+  매장점검대시보드
 
-              <a class="task" target="_blank" href="store-dashboard.html">
-                본사대시보드
-              </a>
+  <span
+    id="storeDashboardBadge"
+    class="badge-new">
+    0
+  </span>
+
+</a>
+
+<a class="task"
+   target="_blank"
+   href="https://script.google.com/macros/s/AKfycbwR3107hlEmIvpa1NvU0ElZHf3qlsrZBnthiBTLYb2bVL26LX0VE5yXr4yRf4IUCpqGDw/exec">
+  경영대시보드
+</a>
 
               <a class="task placeholder" href="#">주간보고</a>
               <a class="task placeholder" href="#">운영자료</a>
@@ -977,65 +983,338 @@
   </footer>
 
   <script>
-    document.getElementById("today").textContent =
-      new Intl.DateTimeFormat("ko-KR", {
-        dateStyle:"full"
-      }).format(new Date());
+  document.getElementById("today").textContent =
+    new Intl.DateTimeFormat("ko-KR", {
+      dateStyle: "full"
+    }).format(new Date());
 
-    const KOREA_API_URL =
-      "https://script.google.com/macros/s/AKfycbz_NFlMRhx_mP_0maccpd62iWNHGMVo-pAZCHg7s8-tM26QvKlIVrPL6TmElRgM6XIS/exec";
-    const SOBA_API_URL =
-      "https://script.google.com/macros/s/AKfycbwYnfRshHZs5kFl_3gvyYRlOgkfIPKx997vIjNg1hecxreYcetFFK_uS_ael9tuefP4/exec";
-    const GILCHAEJEONG_API_URL =
-      "https://script.google.com/macros/s/AKfycbzjJ4xzZl96Wi4AcYrfKrEzIl-gY5iEZCUEiZ_th51mD2Kq97G13z883QIMjFf99sQE3w/exec";
 
-    const unpaidCounts = { korea:0, gilchaejeong:0, soba:0 };
+  /* ================================
+     지점별 Apps Script API 주소
+  ================================= */
 
-    function showUnpaidBadge(id, count) {
-      const badge = document.getElementById(id);
-      if (!badge) return;
+  const KOREA_API_URL =
+    "https://script.google.com/macros/s/AKfycbz_NFlMRhx_mP_0maccpd62iWNHGMVo-pAZCHg7s8-tM26QvKlIVrPL6TmElRgM6XIS/exec";
 
-      if (count > 0) {
-        badge.textContent = count > 99 ? "99+" : String(count);
-        badge.style.display = "flex";
-      } else {
-        badge.textContent = "0";
-        badge.style.display = "none";
-      }
+  const SOBA_API_URL =
+    "https://script.google.com/macros/s/AKfycbwYnfRshHZs5kFl_3gvyYRlOgkfIPKx997vIjNg1hecxreYcetFFK_uS_ael9tuefP4/exec";
+
+  const GILCHAEJEONG_API_URL =
+    "https://script.google.com/macros/s/AKfycbzjJ4xzZl96Wi4AcYrfKrEzIl-gY5iEZCUEiZ_th51mD2Kq97G13z883QIMjFf99sQE3w/exec";
+
+  /*
+   * 효종갱 매장점검 Apps Script 웹앱 주소를
+   * 아래 따옴표 안에 넣으세요.
+   */
+  const HYOJONG_API_URL =
+  "https://script.google.com/macros/s/AKfycbydrBidRu8BNrPGd2JKC6KSIT7pTXrNVleWJf70giDrtrFs7G1iwh7cvn9gn6bNdPRw8g/exec";
+
+
+  /* ================================
+     공통 배지 표시
+  ================================= */
+
+  function showBadge(id, count) {
+    const badge = document.getElementById(id);
+
+    if (!badge) {
+      return;
     }
 
-    function updateTotalUnpaidBadge() {
-      const total = unpaidCounts.korea + unpaidCounts.gilchaejeong + unpaidCounts.soba;
-      showUnpaidBadge("hqDailyUnpaidBadgeTop", total);
-    }
+    const safeCount =
+      Number.isFinite(Number(count))
+        ? Number(count)
+        : 0;
 
-    async function loadUnpaidBadge(apiUrl, badgeId, key, label) {
-      try {
-        const response = await fetch(
-          apiUrl + "?action=getDailyUnpaidCount&t=" + Date.now(),
-          { cache:"no-store" }
+    if (safeCount > 0) {
+      badge.textContent =
+        safeCount > 99
+          ? "99+"
+          : String(safeCount);
+
+      badge.style.display = "flex";
+    } else {
+      badge.textContent = "0";
+      badge.style.display = "none";
+    }
+  }
+
+
+  /* ================================
+     일용직 미지급 배지
+  ================================= */
+
+  const unpaidCounts = {
+    korea: 0,
+    gilchaejeong: 0,
+    soba: 0
+  };
+
+  function updateTotalUnpaidBadge() {
+    const total =
+      unpaidCounts.korea +
+      unpaidCounts.gilchaejeong +
+      unpaidCounts.soba;
+
+    showBadge(
+      "hqDailyUnpaidBadgeTop",
+      total
+    );
+  }
+
+  async function loadUnpaidBadge(
+    apiUrl,
+    key,
+    label
+  ) {
+    try {
+      const response = await fetch(
+        apiUrl +
+          "?action=getDailyUnpaidCount&t=" +
+          Date.now(),
+        {
+          cache: "no-store"
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "HTTP " + response.status
         );
-        const data = await response.json();
-        const count = Number(data.count || data.unpaidCount || 0);
-
-        unpaidCounts[key] = count;
-        showUnpaidBadge(badgeId, count);
-        updateTotalUnpaidBadge();
-      } catch (error) {
-        console.log(label + " 미지급 배지 조회 실패", error);
-        unpaidCounts[key] = 0;
-        showUnpaidBadge(badgeId, 0);
-        updateTotalUnpaidBadge();
       }
+
+      const data =
+        await response.json();
+
+      const count =
+        Number(
+          data.count ||
+          data.unpaidCount ||
+          0
+        );
+
+      unpaidCounts[key] =
+        Number.isFinite(count)
+          ? count
+          : 0;
+
+    } catch (error) {
+      console.log(
+        label +
+          " 미지급 배지 조회 실패",
+        error
+      );
+
+      unpaidCounts[key] = 0;
+
+    } finally {
+      updateTotalUnpaidBadge();
+    }
+  }
+
+  function loadDailyUnpaidBadges() {
+    loadUnpaidBadge(
+      KOREA_API_URL,
+      "korea",
+      "한국의집"
+    );
+
+    loadUnpaidBadge(
+      GILCHAEJEONG_API_URL,
+      "gilchaejeong",
+      "압구정 길채정"
+    );
+
+    loadUnpaidBadge(
+      SOBA_API_URL,
+      "soba",
+      "평촌 소바공방"
+    );
+  }
+
+
+  /* ================================
+     매장점검대시보드 미확인 배지
+  ================================= */
+
+  const inspectionCounts = {
+    korea: 0,
+    gilchaejeong: 0,
+    soba: 0,
+    hyojong: 0
+  };
+
+  function updateInspectionBadge() {
+    const total =
+      inspectionCounts.korea +
+      inspectionCounts.gilchaejeong +
+      inspectionCounts.soba +
+      inspectionCounts.hyojong;
+
+    showBadge(
+      "storeDashboardBadge",
+      total
+    );
+  }
+
+
+  /*
+   * 지점 API가 반환하는 형태가 조금 달라도
+   * 본사 미확인 건수를 찾도록 처리합니다.
+   */
+  function getInspectionPendingCount(data) {
+    if (!data) {
+      return 0;
     }
 
-    function loadDailyUnpaidBadges() {
-      loadUnpaidBadge(KOREA_API_URL, "koreaDailyUnpaidBadge", "korea", "한국의집");
-      loadUnpaidBadge(GILCHAEJEONG_API_URL, "gilchaejeongDailyUnpaidBadge", "gilchaejeong", "압구정 길채정");
-      loadUnpaidBadge(SOBA_API_URL, "sobaDailyUnpaidBadge", "soba", "평촌 소바공방");
+    const result =
+      data.result ||
+      data.data ||
+      data;
+
+    const directCount =
+      result.pendingCount ??
+      result.unconfirmedCount ??
+      result.uncheckedCount ??
+      result.hqUncheckedCount ??
+      result.headOfficeUncheckedCount ??
+      result.summary?.pendingCount ??
+      result.summary?.unconfirmedCount ??
+      result.summary?.uncheckedCount ??
+      result.summary?.hqUncheckedCount;
+
+    if (
+      directCount !== undefined &&
+      directCount !== null &&
+      directCount !== ""
+    ) {
+      const count = Number(directCount);
+
+      return Number.isFinite(count)
+        ? count
+        : 0;
     }
 
-    document.addEventListener("DOMContentLoaded", loadDailyUnpaidBadges);
-  </script>
+    const list =
+      result.logs ||
+      result.items ||
+      result.reports ||
+      result.records ||
+      result.recentLogs ||
+      [];
+
+    if (!Array.isArray(list)) {
+      return 0;
+    }
+
+    return list.filter(function(item) {
+      const status = String(
+        item.hqStatus ||
+        item.headOfficeStatus ||
+        item.status ||
+        item.reviewStatus ||
+        ""
+      )
+        .trim()
+        .replace(/\s+/g, "");
+
+      return (
+        status === "" ||
+        status === "본사미확인" ||
+        status === "미확인" ||
+        status === "확인전" ||
+        status === "접수"
+      );
+    }).length;
+  }
+
+
+  async function loadInspectionCount(
+    apiUrl,
+    key,
+    label
+  ) {
+    if (!apiUrl) {
+      inspectionCounts[key] = 0;
+      updateInspectionBadge();
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        apiUrl +
+          "?action=getStoreManagerDashboard&t=" +
+          Date.now(),
+        {
+          cache: "no-store"
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "HTTP " + response.status
+        );
+      }
+
+      const data =
+        await response.json();
+
+      inspectionCounts[key] =
+        getInspectionPendingCount(data);
+
+    } catch (error) {
+      console.log(
+        label +
+          " 매장점검 배지 조회 실패",
+        error
+      );
+
+      inspectionCounts[key] = 0;
+
+    } finally {
+      updateInspectionBadge();
+    }
+  }
+
+
+  function loadInspectionBadges() {
+    loadInspectionCount(
+      KOREA_API_URL,
+      "korea",
+      "한국의집"
+    );
+
+    loadInspectionCount(
+      GILCHAEJEONG_API_URL,
+      "gilchaejeong",
+      "압구정 길채정"
+    );
+
+    loadInspectionCount(
+      SOBA_API_URL,
+      "soba",
+      "평촌 소바공방"
+    );
+
+    loadInspectionCount(
+      HYOJONG_API_URL,
+      "hyojong",
+      "파주 효종갱"
+    );
+  }
+
+
+  /* ================================
+     최초 실행
+  ================================= */
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+      loadDailyUnpaidBadges();
+      loadInspectionBadges();
+    }
+  );
+</script>
 </body>
 </html>
