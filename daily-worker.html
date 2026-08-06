@@ -1235,6 +1235,34 @@
       </button>
     </div>
 
+    <div
+  style="
+    display:flex;
+    gap:8px;
+    padding:14px 20px;
+    border-bottom:1px solid #e5e7eb;
+    background:#f8fafc;
+  "
+>
+  <button
+    type="button"
+    id="storeDetailDateBtn"
+    class="btn btn-primary btn-small"
+    onclick="changeStoreDetailView('date')"
+  >
+    날짜별 상세
+  </button>
+
+  <button
+    type="button"
+    id="storeDetailJobBtn"
+    class="btn btn-light btn-small"
+    onclick="changeStoreDetailView('job')"
+  >
+    업무별 상세
+  </button>
+</div>
+
     <div class="table-wrap">
       <table>
         <thead>
@@ -1618,6 +1646,13 @@ function renderStoreSummary(list, totals) {
   );
 }
 
+let currentStoreDetailList = [];
+let currentStoreDetailTotals = {};
+let currentStoreDetailStore = "";
+let currentStoreDetailStartDate = "";
+let currentStoreDetailEndDate = "";
+let currentStoreDetailView = "date";
+
 async function showStoreDetail(store) {
 
   const startDate =
@@ -1759,17 +1794,92 @@ function renderStoreDetailModal(
   endDate
 ) {
 
+  currentStoreDetailStore =
+    store || "";
+
+  currentStoreDetailList =
+    Array.isArray(list)
+      ? list
+      : [];
+
+  currentStoreDetailTotals =
+    totals || {};
+
+  currentStoreDetailStartDate =
+    startDate || "";
+
+  currentStoreDetailEndDate =
+    endDate || "";
+
+  currentStoreDetailView =
+    "date";
+
+  updateStoreDetailViewButtons();
+
+  renderStoreDetailRows();
+}
+
+
+function changeStoreDetailView(mode) {
+
+  currentStoreDetailView =
+    mode === "job"
+      ? "job"
+      : "date";
+
+  updateStoreDetailViewButtons();
+
+  renderStoreDetailRows();
+}
+
+
+function updateStoreDetailViewButtons() {
+
+  const dateBtn =
+    document.getElementById(
+      "storeDetailDateBtn"
+    );
+
+  const jobBtn =
+    document.getElementById(
+      "storeDetailJobBtn"
+    );
+
+  if (dateBtn) {
+    dateBtn.className =
+      currentStoreDetailView === "date"
+        ? "btn btn-primary btn-small"
+        : "btn btn-light btn-small";
+  }
+
+  if (jobBtn) {
+    jobBtn.className =
+      currentStoreDetailView === "job"
+        ? "btn btn-primary btn-small"
+        : "btn btn-light btn-small";
+  }
+}
+
+
+function renderStoreDetailRows() {
+
   const body =
     document.getElementById(
       "storeDetailBody"
     );
+
+  const list =
+    currentStoreDetailList || [];
+
+  const totals =
+    currentStoreDetailTotals || {};
 
   document
     .getElementById(
       "storeDetailTitle"
     )
     .textContent =
-      store +
+      currentStoreDetailStore +
       " 일용직 사용내역";
 
   document
@@ -1778,9 +1888,15 @@ function renderStoreDetailModal(
     )
     .textContent =
       "조회기간: " +
-      (startDate || "전체") +
+      (
+        currentStoreDetailStartDate ||
+        "전체"
+      ) +
       " ~ " +
-      (endDate || "전체");
+      (
+        currentStoreDetailEndDate ||
+        "전체"
+      );
 
   if (!list.length) {
 
@@ -1795,76 +1911,21 @@ function renderStoreDetailModal(
       </tr>
     `;
 
+  } else if (
+    currentStoreDetailView === "job"
+  ) {
+
+    renderStoreDetailByJob(
+      body,
+      list
+    );
+
   } else {
 
-    body.innerHTML =
+    renderStoreDetailByDate(
+      body,
       list
-        .map(function(item) {
-
-          const payStatus =
-            String(
-              item.payStatus ||
-              "미지급"
-            ).trim();
-
-          const statusClass =
-            payStatus === "지급완료"
-              ? "status-paid"
-              : "status-unpaid";
-
-          return `
-            <tr>
-              <td>
-                ${escapeHtml(
-                  item.date || "-"
-                )}
-              </td>
-
-              <td class="left">
-                <strong>
-                  ${escapeHtml(
-                    item.name || "-"
-                  )}
-                </strong>
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  item.job || "-"
-                )}
-              </td>
-
-              <td class="money">
-                ${formatMoney(
-                  item.allowance || 0
-                )}
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  item.phone || "-"
-                )}
-              </td>
-
-              <td>
-                <span
-                  class="status-badge ${statusClass}"
-                >
-                  ${escapeHtml(
-                    payStatus
-                  )}
-                </span>
-              </td>
-
-              <td class="left">
-                ${escapeHtml(
-                  item.memo || "-"
-                )}
-              </td>
-            </tr>
-          `;
-        })
-        .join("");
+    );
   }
 
   setText(
@@ -1906,6 +1967,245 @@ function renderStoreDetailModal(
       totals.unpaidAmount || 0
     )
   );
+}
+
+
+function renderStoreDetailByDate(
+  body,
+  list
+) {
+
+  const sortedList =
+    list
+      .slice()
+      .sort(function(a, b) {
+
+        return String(
+          b.date || ""
+        ).localeCompare(
+          String(a.date || "")
+        );
+      });
+
+  body.innerHTML =
+    sortedList
+      .map(function(item) {
+
+        return createStoreDetailRow(
+          item
+        );
+      })
+      .join("");
+}
+
+
+function renderStoreDetailByJob(
+  body,
+  list
+) {
+
+  const grouped = {};
+
+  list.forEach(function(item) {
+
+    const job =
+      String(
+        item.job || "미분류"
+      ).trim() || "미분류";
+
+    if (!grouped[job]) {
+
+      grouped[job] = {
+        list: [],
+        totalAmount: 0,
+        unpaidCount: 0,
+        unpaidAmount: 0,
+        workers: new Set()
+      };
+    }
+
+    const allowance =
+      Number(
+        item.allowance || 0
+      );
+
+    const payStatus =
+      String(
+        item.payStatus || "미지급"
+      ).trim();
+
+    grouped[job]
+      .list
+      .push(item);
+
+    grouped[job]
+      .totalAmount +=
+        allowance;
+
+    grouped[job]
+      .workers
+      .add(
+        String(
+          item.phone ||
+          item.name ||
+          ""
+        )
+      );
+
+    if (
+      payStatus !== "지급완료"
+    ) {
+
+      grouped[job]
+        .unpaidCount += 1;
+
+      grouped[job]
+        .unpaidAmount +=
+          allowance;
+    }
+  });
+
+  const jobs =
+    Object
+      .keys(grouped)
+      .sort(function(a, b) {
+
+        return (
+          grouped[b].totalAmount -
+          grouped[a].totalAmount
+        );
+      });
+
+  let html = "";
+
+  jobs.forEach(function(job) {
+
+    const group =
+      grouped[job];
+
+    html += `
+      <tr>
+        <td
+          colspan="7"
+          style="
+            background:#eef4ff;
+            color:#183b77;
+            font-weight:800;
+            text-align:left;
+            padding:14px 16px;
+            border-top:2px solid #cbdaf5;
+          "
+        >
+          ${escapeHtml(job)}
+
+          <span
+            style="
+              margin-left:14px;
+              color:#475569;
+              font-weight:700;
+            "
+          >
+            ${group.workers.size.toLocaleString("ko-KR")}명
+            ·
+            ${group.list.length.toLocaleString("ko-KR")}건
+            ·
+            합계 ${formatMoney(group.totalAmount)}
+            ·
+            미지급 ${group.unpaidCount.toLocaleString("ko-KR")}건
+            (${formatMoney(group.unpaidAmount)})
+          </span>
+        </td>
+      </tr>
+    `;
+
+    group
+      .list
+      .slice()
+      .sort(function(a, b) {
+
+        return String(
+          b.date || ""
+        ).localeCompare(
+          String(a.date || "")
+        );
+      })
+      .forEach(function(item) {
+
+        html +=
+          createStoreDetailRow(
+            item
+          );
+      });
+  });
+
+  body.innerHTML = html;
+}
+
+
+function createStoreDetailRow(item) {
+
+  const payStatus =
+    String(
+      item.payStatus ||
+      "미지급"
+    ).trim();
+
+  const statusClass =
+    payStatus === "지급완료"
+      ? "status-paid"
+      : "status-unpaid";
+
+  return `
+    <tr>
+      <td>
+        ${escapeHtml(
+          item.date || "-"
+        )}
+      </td>
+
+      <td class="left">
+        <strong>
+          ${escapeHtml(
+            item.name || "-"
+          )}
+        </strong>
+      </td>
+
+      <td>
+        ${escapeHtml(
+          item.job || "-"
+        )}
+      </td>
+
+      <td class="money">
+        ${formatMoney(
+          item.allowance || 0
+        )}
+      </td>
+
+      <td>
+        ${escapeHtml(
+          item.phone || "-"
+        )}
+      </td>
+
+      <td>
+        <span
+          class="status-badge ${statusClass}"
+        >
+          ${escapeHtml(
+            payStatus
+          )}
+        </span>
+      </td>
+
+      <td class="left">
+        ${escapeHtml(
+          item.memo || "-"
+        )}
+      </td>
+    </tr>
+  `;
 }
 
 function closeStoreDetailModal() {
