@@ -1444,8 +1444,17 @@ function renderStoreSummary(list, totals) {
       return `
         <tr>
           <td class="left">
-            <strong>${escapeHtml(item.store || "-")}</strong>
-          </td>
+  <a href="javascript:void(0)"
+     onclick="showStoreDetail('${escapeHtml(item.store || "")}')"
+     style="
+       color:#2563eb;
+       font-weight:700;
+       text-decoration:underline;
+       cursor:pointer;
+     ">
+     ${escapeHtml(item.store || "-")}
+  </a>
+</td>
 
           <td>
             ${Number(item.workerCount || 0).toLocaleString("ko-KR")}명
@@ -1496,6 +1505,39 @@ function renderStoreSummary(list, totals) {
     "storeSummaryTotalAmount",
     formatMoney(totals.totalAmount || 0)
   );
+}
+
+async function showStoreDetail(store){
+
+  const startDate =
+    document.getElementById("storeSummaryStart").value;
+
+  const endDate =
+    document.getElementById("storeSummaryEnd").value;
+
+  const url =
+    API_URL +
+    "?action=getDailyWorkerStoreDetail" +
+    "&store=" + encodeURIComponent(store) +
+    "&startDate=" + encodeURIComponent(startDate) +
+    "&endDate=" + encodeURIComponent(endDate);
+
+  try{
+
+    const json = await fetchJson(url);
+
+    if(!json.success){
+      alert(json.message || "조회 실패");
+      return;
+    }
+
+    renderStoreDetailModal(store, json.data || []);
+
+  }catch(err){
+    console.error(err);
+    alert("상세조회 중 오류가 발생했습니다.");
+  }
+
 }
 
 function renderJobSummary(list, totals) {
