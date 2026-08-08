@@ -1,0 +1,1827 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1">
+
+  <meta
+    name="theme-color"
+    content="#3a2517">
+
+  <title>
+    외국인 근로자 비자별 채용안내
+  </title>
+
+  <style>
+
+    :root {
+
+      --brown:#49301f;
+      --brown2:#805529;
+
+      --cream:#f5efe6;
+
+      --paper:#ffffff;
+
+      --ink:#241812;
+
+      --muted:#75685d;
+
+      --line:#e5ddd2;
+
+      --green:#168551;
+
+      --yellow:#a86600;
+
+      --orange:#c15b18;
+
+      --red:#c52b2b;
+
+      --shadow:
+        0 12px 32px
+        rgba(58,37,23,.09);
+
+    }
+
+
+    * {
+
+      box-sizing:border-box;
+
+    }
+
+
+    body {
+
+      margin:0;
+
+      font-family:
+        Pretendard,
+        "Noto Sans KR",
+        "Segoe UI",
+        sans-serif;
+
+      color:var(--ink);
+
+      background:#f7f6f3;
+
+    }
+
+
+    a {
+
+      color:inherit;
+
+      text-decoration:none;
+
+    }
+
+
+    /* 상단 */
+
+    .top {
+
+      position:sticky;
+
+      top:0;
+
+      z-index:20;
+
+      background:
+        rgba(255,255,255,.96);
+
+      border-bottom:
+        1px solid var(--line);
+
+    }
+
+
+    .top-inner {
+
+      max-width:1320px;
+
+      height:72px;
+
+      margin:auto;
+
+      padding:0 28px;
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:
+        space-between;
+
+      gap:20px;
+
+    }
+
+
+    .brand {
+
+      display:flex;
+
+      align-items:center;
+
+      gap:12px;
+
+    }
+
+
+    .mark {
+
+      width:40px;
+
+      height:40px;
+
+      border-radius:12px;
+
+      background:var(--brown);
+
+      color:#f1d59e;
+
+      display:grid;
+
+      place-items:center;
+
+      font-weight:900;
+
+    }
+
+
+    .brand strong {
+
+      display:block;
+
+      font-size:18px;
+
+    }
+
+
+    .brand small {
+
+      display:block;
+
+      margin-top:3px;
+
+      color:var(--muted);
+
+      font-size:12px;
+
+    }
+
+
+    .home {
+
+      padding:10px 15px;
+
+      border-radius:10px;
+
+      background:#f2ece5;
+
+      color:var(--brown);
+
+      font-size:13px;
+
+      font-weight:800;
+
+    }
+
+
+    /* 제목 */
+
+    .hero {
+
+      background:var(--brown);
+
+      color:white;
+
+    }
+
+
+    .hero-inner {
+
+      max-width:1320px;
+
+      margin:auto;
+
+      padding:44px 28px;
+
+    }
+
+
+    .eyebrow {
+
+      color:#e5c78f;
+
+      font-size:12px;
+
+      font-weight:850;
+
+      letter-spacing:.18em;
+
+    }
+
+
+    .hero h1 {
+
+      margin:10px 0 10px;
+
+      font-size:36px;
+
+      letter-spacing:-.05em;
+
+    }
+
+
+    .hero p {
+
+      margin:0;
+
+      color:#e0d9d2;
+
+      line-height:1.7;
+
+    }
+
+
+    main {
+
+      max-width:1320px;
+
+      margin:auto;
+
+      padding:28px;
+
+    }
+
+
+    /* 안내 */
+
+    .warning {
+
+      padding:20px;
+
+      margin-bottom:20px;
+
+      background:#fff8e8;
+
+      border:
+        1px solid #ecd69d;
+
+      border-radius:16px;
+
+      color:#68471f;
+
+      line-height:1.7;
+
+      font-size:14px;
+
+    }
+
+
+    /* 검색 */
+
+    .search-box {
+
+      padding:20px;
+
+      margin-bottom:20px;
+
+      background:white;
+
+      border:
+        1px solid var(--line);
+
+      border-radius:18px;
+
+      box-shadow:var(--shadow);
+
+    }
+
+
+    .search-row {
+
+      display:grid;
+
+      grid-template-columns:
+        2fr 1fr auto;
+
+      gap:10px;
+
+    }
+
+
+    input,
+    select,
+    button {
+
+      min-height:46px;
+
+      border-radius:10px;
+
+      border:
+        1px solid var(--line);
+
+      padding:
+        0 13px;
+
+      font:inherit;
+
+    }
+
+
+    input,
+    select {
+
+      background:white;
+
+    }
+
+
+    button {
+
+      cursor:pointer;
+
+      border:none;
+
+      background:var(--brown);
+
+      color:white;
+
+      font-weight:850;
+
+    }
+
+
+    .legend {
+
+      display:flex;
+
+      flex-wrap:wrap;
+
+      gap:8px;
+
+      margin-top:14px;
+
+    }
+
+
+    .legend span {
+
+      padding:
+        7px 10px;
+
+      border-radius:100px;
+
+      font-size:12px;
+
+      font-weight:850;
+
+    }
+
+
+    .green {
+
+      background:#e7f6ed;
+
+      color:var(--green);
+
+    }
+
+
+    .yellow {
+
+      background:#fff4d9;
+
+      color:var(--yellow);
+
+    }
+
+
+    .orange {
+
+      background:#fff0e6;
+
+      color:var(--orange);
+
+    }
+
+
+    .red {
+
+      background:#fdeaea;
+
+      color:var(--red);
+
+    }
+
+
+    /* 표 */
+
+    .table-box {
+
+      overflow:auto;
+
+      background:white;
+
+      border:
+        1px solid var(--line);
+
+      border-radius:18px;
+
+      box-shadow:var(--shadow);
+
+    }
+
+
+    table {
+
+      width:100%;
+
+      min-width:1000px;
+
+      border-collapse:
+        collapse;
+
+    }
+
+
+    th,
+    td {
+
+      padding:
+        15px 14px;
+
+      text-align:left;
+
+      vertical-align:top;
+
+      border-bottom:
+        1px solid var(--line);
+
+      font-size:14px;
+
+      line-height:1.55;
+
+    }
+
+
+    th {
+
+      background:#f1ebe4;
+
+      color:#55463c;
+
+      font-size:13px;
+
+    }
+
+
+    tbody tr:hover {
+
+      background:#fcfaf7;
+
+    }
+
+
+    .visa {
+
+      font-size:16px;
+
+      font-weight:900;
+
+      white-space:nowrap;
+
+    }
+
+
+    .status {
+
+      display:inline-block;
+
+      min-width:120px;
+
+      padding:
+        7px 10px;
+
+      border-radius:100px;
+
+      text-align:center;
+
+      font-size:12px;
+
+      font-weight:900;
+
+      white-space:nowrap;
+
+    }
+
+
+    .detail {
+
+      padding:
+        8px 11px;
+
+      min-height:auto;
+
+      background:#f1ebe4;
+
+      color:var(--brown);
+
+      border:
+        1px solid var(--line);
+
+      white-space:nowrap;
+
+    }
+
+
+    /* 하단 */
+
+    .bottom-grid {
+
+      display:grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap:18px;
+
+      margin-top:22px;
+
+    }
+
+
+    .info {
+
+      padding:22px;
+
+      background:white;
+
+      border:
+        1px solid var(--line);
+
+      border-radius:18px;
+
+    }
+
+
+    .info h2 {
+
+      margin:
+        0 0 14px;
+
+      font-size:18px;
+
+    }
+
+
+    .info ol,
+    .info ul {
+
+      margin:0;
+
+      padding-left:20px;
+
+      line-height:1.9;
+
+      font-size:14px;
+
+    }
+
+
+    .official {
+
+      display:flex;
+
+      flex-wrap:wrap;
+
+      gap:8px;
+
+      margin-top:14px;
+
+    }
+
+
+    .official a {
+
+      padding:
+        10px 12px;
+
+      border:
+        1px solid var(--line);
+
+      border-radius:10px;
+
+      background:#f7f5f2;
+
+      font-size:13px;
+
+      font-weight:800;
+
+    }
+
+
+    .updated {
+
+      margin-top:16px;
+
+      color:var(--muted);
+
+      font-size:12px;
+
+    }
+
+
+    /* 상세 팝업 */
+
+    dialog {
+
+      width:
+        min(
+          700px,
+          calc(100% - 30px)
+        );
+
+      padding:0;
+
+      border:none;
+
+      border-radius:20px;
+
+      box-shadow:
+        0 30px 80px
+        rgba(0,0,0,.28);
+
+    }
+
+
+    dialog::backdrop {
+
+      background:
+        rgba(20,15,12,.52);
+
+    }
+
+
+    .modal-head {
+
+      padding:
+        20px 22px;
+
+      background:var(--brown);
+
+      color:white;
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:
+        space-between;
+
+    }
+
+
+    .modal-head h2 {
+
+      margin:0;
+
+      font-size:21px;
+
+    }
+
+
+    .modal-close {
+
+      width:36px;
+
+      height:36px;
+
+      min-height:36px;
+
+      padding:0;
+
+      border-radius:50%;
+
+      background:
+        rgba(255,255,255,.15);
+
+      font-size:20px;
+
+    }
+
+
+    .modal-body {
+
+      padding:24px;
+
+    }
+
+
+    .modal-body p {
+
+      line-height:1.75;
+
+    }
+
+
+    .modal-body ul {
+
+      line-height:1.9;
+
+    }
+
+
+    footer {
+
+      max-width:1320px;
+
+      margin:auto;
+
+      padding:
+        15px 28px 40px;
+
+      color:var(--muted);
+
+      font-size:12px;
+
+    }
+
+
+    @media
+    (max-width:700px) {
+
+      .top-inner {
+
+        padding:
+          0 16px;
+
+      }
+
+
+      .hero-inner {
+
+        padding:
+          32px 18px;
+
+      }
+
+
+      .hero h1 {
+
+        font-size:28px;
+
+      }
+
+
+      main {
+
+        padding:18px;
+
+      }
+
+
+      .search-row {
+
+        grid-template-columns:
+          1fr;
+
+      }
+
+
+      .bottom-grid {
+
+        grid-template-columns:
+          1fr;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<header class="top">
+
+  <div class="top-inner">
+
+    <div class="brand">
+
+      <span class="mark">
+        大
+      </span>
+
+      <span>
+
+        <strong>
+          더큰코리아 본사 업무포털
+        </strong>
+
+        <small>
+          외국인 근로자 채용안내
+        </small>
+
+      </span>
+
+    </div>
+
+
+    <a
+      class="home"
+      href="index.html">
+
+      ← 본사 업무포털
+
+    </a>
+
+  </div>
+
+</header>
+
+
+<section class="hero">
+
+  <div class="hero-inner">
+
+    <div class="eyebrow">
+      FOREIGN WORKER · VISA GUIDE
+    </div>
+
+    <h1>
+      외국인 근로자 비자별 채용 가능 여부
+    </h1>
+
+    <p>
+      외국인 지원자 채용 전 체류자격과
+      취업 가능 여부를 1차 확인하는
+      본사 내부 업무자료입니다.
+    </p>
+
+  </div>
+
+</section>
+
+
+<main>
+
+
+  <div class="warning">
+
+    <strong>
+      ⚠ 채용 전 반드시 확인하세요.
+    </strong>
+
+    <br>
+
+    아래 내용은 채용 담당자의
+    1차 판단을 위한 내부 참고자료입니다.
+
+    같은 비자라도 세부 체류자격,
+    체류기간, 시간제취업 허가,
+    지정 사업장 및 실제 담당업무 등에 따라
+    취업 가능 여부가 달라질 수 있습니다.
+
+    외국인 근로자를 실제 근무시키기 전
+    외국인등록증 또는 국내거소신고증과
+    필요한 취업허가를 확인하세요.
+
+  </div>
+
+
+  <section class="search-box">
+
+    <div class="search-row">
+
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="비자 검색 예: F-6, D-2, 결혼이민, 유학"
+        oninput="filterVisa()">
+
+
+      <select
+        id="statusFilter"
+        onchange="filterVisa()">
+
+        <option value="">
+          전체 판단
+        </option>
+
+        <option value="green">
+          채용 가능
+        </option>
+
+        <option value="yellow">
+          조건부 / 확인 필요
+        </option>
+
+        <option value="orange">
+          본사 확인 필수
+        </option>
+
+        <option value="red">
+          원칙적 채용 불가
+        </option>
+
+      </select>
+
+
+      <button
+        type="button"
+        onclick="resetSearch()">
+
+        초기화
+
+      </button>
+
+    </div>
+
+
+    <div class="legend">
+
+      <span class="green">
+        🟢 채용 가능
+      </span>
+
+      <span class="yellow">
+        🟡 조건부 / 확인 필요
+      </span>
+
+      <span class="orange">
+        🟠 본사 확인 필수
+      </span>
+
+      <span class="red">
+        🔴 채용 불가
+      </span>
+
+    </div>
+
+  </section>
+
+
+  <div class="table-box">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            비자
+          </th>
+
+          <th>
+            체류자격
+          </th>
+
+          <th>
+            음식점 홀·주방
+          </th>
+
+          <th>
+            채용 판단
+          </th>
+
+          <th>
+            핵심 확인사항
+          </th>
+
+          <th>
+            상세
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="visaTable">
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <div class="bottom-grid">
+
+
+    <section class="info">
+
+      <h2>
+        채용 담당자 확인 순서
+      </h2>
+
+      <ol>
+
+        <li>
+          외국인등록증 또는
+          국내거소신고증 확인
+        </li>
+
+        <li>
+          체류자격
+          (F-6, D-2 등) 확인
+        </li>
+
+        <li>
+          체류기간 만료 여부 확인
+        </li>
+
+        <li>
+          D-2·D-4는
+          시간제취업 허가 확인
+        </li>
+
+        <li>
+          F-4는 실제 업무가
+          취업제한 직종인지 확인
+        </li>
+
+        <li>
+          E-9 등은
+          허용업종·고용허가·근무처 확인
+        </li>
+
+        <li>
+          불명확하면
+          근무 시작 전 본사 확인
+        </li>
+
+      </ol>
+
+    </section>
+
+
+    <section class="info">
+
+      <h2>
+        공식 확인처
+      </h2>
+
+      <p
+        style="
+          margin:0;
+          color:#75685d;
+          line-height:1.7;
+          font-size:14px;
+        ">
+
+        체류자격 및 외국인 고용제도는
+        변경될 수 있으므로
+        실제 채용 시 공식기관의 최신 내용을
+        다시 확인하십시오.
+
+      </p>
+
+
+      <div class="official">
+
+        <a
+          href="https://www.hikorea.go.kr/"
+          target="_blank">
+
+          하이코리아
+
+        </a>
+
+
+        <a
+          href="https://www.immigration.go.kr/"
+          target="_blank">
+
+          출입국·외국인정책본부
+
+        </a>
+
+
+        <a
+          href="https://www.work24.go.kr/"
+          target="_blank">
+
+          고용24
+
+        </a>
+
+
+        <a
+          href="https://www.moel.go.kr/"
+          target="_blank">
+
+          고용노동부
+
+        </a>
+
+      </div>
+
+
+      <div class="updated">
+
+        내부자료 기준일 :
+        2026년 8월
+
+      </div>
+
+    </section>
+
+
+  </div>
+
+
+</main>
+
+
+<dialog id="visaModal">
+
+  <div class="modal-head">
+
+    <h2 id="modalTitle">
+      비자 상세
+    </h2>
+
+    <button
+      class="modal-close"
+      onclick="closeModal()">
+
+      ×
+
+    </button>
+
+  </div>
+
+
+  <div
+    class="modal-body"
+    id="modalBody">
+
+  </div>
+
+</dialog>
+
+
+<footer>
+
+  더큰코리아 본사 임직원 전용
+  · 외국인 근로자 채용안내
+
+</footer>
+
+
+<script>
+
+
+const visaData = [
+
+
+  {
+
+    visa:"F-5",
+
+    name:"영주",
+
+    work:"가능",
+
+    status:"green",
+
+    statusText:"🟢 채용 가능",
+
+    check:
+      "체류자격 및 신분 확인 후 일반 근로자로 채용 가능",
+
+    detail:
+      "F-5 영주 체류자격은 취업활동의 제한이 매우 적어 일반적인 음식점 홀·주방 직원으로 채용할 수 있습니다.",
+
+    list:[
+      "외국인등록증 확인",
+      "F-5 체류자격 확인",
+      "일반 근로자와 동일하게 근로계약 진행"
+    ]
+
+  },
+
+
+  {
+
+    visa:"F-6",
+
+    name:"결혼이민",
+
+    work:"가능",
+
+    status:"green",
+
+    statusText:"🟢 채용 가능",
+
+    check:
+      "F-6 체류자격과 체류기간 확인",
+
+    detail:
+      "F-6 결혼이민 체류자격은 취업활동이 가능하므로 일반적인 음식점 홀·주방 직원으로 채용할 수 있습니다.",
+
+    list:[
+      "외국인등록증에서 F-6 확인",
+      "체류기간 확인",
+      "일반 근로계약 진행"
+    ]
+
+  },
+
+
+  {
+
+    visa:"F-2",
+
+    name:"거주",
+
+    work:"유형별 상이",
+
+    status:"yellow",
+
+    statusText:"🟡 세부자격 확인",
+
+    check:
+      "F-2 세부 유형별 취업 제한 여부 확인",
+
+    detail:
+      "F-2 거주는 여러 세부 체류자격이 있으므로 F-2라는 표시만 보고 일률적으로 판단하지 않습니다.",
+
+    list:[
+      "세부 체류자격 확인",
+      "취업활동 제한 여부 확인",
+      "애매한 경우 본사 확인"
+    ]
+
+  },
+
+
+  {
+
+    visa:"F-4",
+
+    name:"재외동포",
+
+    work:"업무별 확인",
+
+    status:"yellow",
+
+    statusText:"🟡 직종 확인 필요",
+
+    check:
+      "실제 담당업무가 취업제한 직종에 해당하는지 확인",
+
+    detail:
+      "F-4 재외동포는 취업이 가능하지만 취업활동이 제한되는 직종이 존재하므로 실제 담당업무를 기준으로 확인해야 합니다.",
+
+    list:[
+      "국내거소신고증 또는 외국인등록증 확인",
+      "실제 담당업무 확인",
+      "취업제한 직종 해당 여부 확인"
+    ]
+
+  },
+
+
+  {
+
+    visa:"H-2",
+
+    name:"방문취업",
+
+    work:"조건 확인",
+
+    status:"orange",
+
+    statusText:"🟠 본사 확인 필수",
+
+    check:
+      "취업 가능 업종 및 현재 체류자격 확인",
+
+    detail:
+      "H-2 방문취업은 취업 가능 업종과 관련 절차를 확인한 뒤 채용해야 합니다.",
+
+    list:[
+      "현재 체류자격 유효 여부 확인",
+      "취업 가능 업종 확인",
+      "본사 확인 후 근무 시작"
+    ]
+
+  },
+
+
+  {
+
+    visa:"D-2",
+
+    name:"유학",
+
+    work:"조건부 가능",
+
+    status:"yellow",
+
+    statusText:"🟡 허가 후 가능",
+
+    check:
+      "시간제취업 허가와 허용 근무시간 확인",
+
+    detail:
+      "D-2 유학생은 학업 목적의 체류자격이므로 시간제취업 요건과 허가를 갖춘 경우에만 아르바이트가 가능합니다.",
+
+    list:[
+      "시간제취업 허가 확인",
+      "허용 근무시간 확인",
+      "허용 근무처 및 업무 확인",
+      "허가 확인 전 출근 금지"
+    ]
+
+  },
+
+
+  {
+
+    visa:"D-4",
+
+    name:"일반연수·어학연수",
+
+    work:"조건부 가능",
+
+    status:"yellow",
+
+    statusText:"🟡 허가 후 가능",
+
+    check:
+      "시간제취업 허가 및 허용시간 확인",
+
+    detail:
+      "D-4 역시 연수 목적 체류자격이므로 시간제취업 허가 등 필요한 요건을 갖춘 경우에만 근무할 수 있습니다.",
+
+    list:[
+      "시간제취업 허가 확인",
+      "허용 근무시간 확인",
+      "허용 업무 확인",
+      "허가 확인 전 출근 금지"
+    ]
+
+  },
+
+
+  {
+
+    visa:"E-7",
+
+    name:"특정활동",
+
+    work:"개별 확인",
+
+    status:"orange",
+
+    statusText:"🟠 직종 확인 필수",
+
+    check:
+      "허가받은 직종·근무처와 실제 업무가 일치하는지 확인",
+
+    detail:
+      "E-7은 특정 전문·기술활동 등을 위해 허가된 체류자격이므로 일반 홀·주방 직원으로 임의 채용하면 안 됩니다.",
+
+    list:[
+      "E-7 세부 유형 확인",
+      "허가 직종 확인",
+      "지정 근무처 확인",
+      "본사 확인 후 채용"
+    ]
+
+  },
+
+
+  {
+
+    visa:"E-9",
+
+    name:"비전문취업",
+
+    work:"고용허가 필요",
+
+    status:"orange",
+
+    statusText:"🟠 본사 확인 필수",
+
+    check:
+      "허용업종·고용허가·지정 사업장 확인",
+
+    detail:
+      "E-9 비전문취업은 고용허가제를 통해 취업하는 체류자격이므로 사업장이 임의로 외국인을 채용하는 방식이 아닙니다.",
+
+    list:[
+      "E-9 허용업종 여부 확인",
+      "고용허가 확인",
+      "외국인의 지정 사업장 확인",
+      "본사 확인 전 근무 금지"
+    ]
+
+  },
+
+
+  {
+
+    visa:"F-3",
+
+    name:"동반",
+
+    work:"원칙적 불가",
+
+    status:"red",
+
+    statusText:"🔴 채용 불가",
+
+    check:
+      "별도의 취업자격 또는 허가가 있는지 확인",
+
+    detail:
+      "F-3 동반은 일반적인 취업을 위한 체류자격이 아니므로 별도 취업 가능 자격이나 허가가 확인되지 않으면 근무시키지 않습니다.",
+
+    list:[
+      "별도 취업자격 확인",
+      "확인되지 않으면 채용 금지"
+    ]
+
+  },
+
+
+  {
+
+    visa:"C-3",
+
+    name:"단기방문",
+
+    work:"불가",
+
+    status:"red",
+
+    statusText:"🔴 채용 불가",
+
+    check:
+      "일반적인 취업활동 불가",
+
+    detail:
+      "C-3 단기방문 체류자격으로 일반 음식점 직원이나 아르바이트로 근무시키면 안 됩니다.",
+
+    list:[
+      "C-3 확인 시 근로채용 진행 금지"
+    ]
+
+  },
+
+
+  {
+
+    visa:"B-1 / B-2",
+
+    name:"사증면제 / 관광통과",
+
+    work:"불가",
+
+    status:"red",
+
+    statusText:"🔴 채용 불가",
+
+    check:
+      "일반적인 취업활동 불가",
+
+    detail:
+      "B-1 또는 B-2 체류 중 일반 음식점 직원으로 근무시키면 안 됩니다.",
+
+    list:[
+      "취업 가능한 체류자격 확인 전 근무 금지"
+    ]
+
+  }
+
+];
+
+
+function renderVisa(
+  list
+) {
+
+  const tbody =
+    document.getElementById(
+      "visaTable"
+    );
+
+
+  tbody.innerHTML =
+    list
+      .map(
+        function(v) {
+
+          return `
+
+            <tr>
+
+              <td class="visa">
+
+                ${v.visa}
+
+              </td>
+
+
+              <td>
+
+                <strong>
+                  ${v.name}
+                </strong>
+
+              </td>
+
+
+              <td>
+
+                ${v.work}
+
+              </td>
+
+
+              <td>
+
+                <span
+                  class="
+                    status
+                    ${v.status}
+                  ">
+
+                  ${v.statusText}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                ${v.check}
+
+              </td>
+
+
+              <td>
+
+                <button
+                  class="detail"
+                  onclick="
+                    openVisa(
+                      '${v.visa}'
+                    )
+                  ">
+
+                  상세보기
+
+                </button>
+
+              </td>
+
+            </tr>
+
+          `;
+
+        }
+      )
+      .join("");
+
+}
+
+
+function filterVisa() {
+
+  const keyword =
+    document
+      .getElementById(
+        "searchInput"
+      )
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const status =
+    document
+      .getElementById(
+        "statusFilter"
+      )
+      .value;
+
+
+  const filtered =
+    visaData.filter(
+      function(v) {
+
+        const text =
+          (
+            v.visa +
+            " " +
+            v.name +
+            " " +
+            v.work +
+            " " +
+            v.check
+          )
+          .toLowerCase();
+
+
+        const keywordOk =
+          !keyword ||
+          text.includes(
+            keyword
+          );
+
+
+        const statusOk =
+          !status ||
+          v.status === status;
+
+
+        return (
+          keywordOk &&
+          statusOk
+        );
+
+      }
+    );
+
+
+  renderVisa(
+    filtered
+  );
+
+}
+
+
+function resetSearch() {
+
+  document
+    .getElementById(
+      "searchInput"
+    )
+    .value = "";
+
+
+  document
+    .getElementById(
+      "statusFilter"
+    )
+    .value = "";
+
+
+  renderVisa(
+    visaData
+  );
+
+}
+
+
+function openVisa(
+  visa
+) {
+
+  const data =
+    visaData.find(
+      function(v) {
+
+        return (
+          v.visa === visa
+        );
+
+      }
+    );
+
+
+  if (!data) {
+    return;
+  }
+
+
+  document
+    .getElementById(
+      "modalTitle"
+    )
+    .textContent =
+      data.visa +
+      " · " +
+      data.name;
+
+
+  document
+    .getElementById(
+      "modalBody"
+    )
+    .innerHTML = `
+
+      <p>
+
+        <span
+          class="
+            status
+            ${data.status}
+          ">
+
+          ${data.statusText}
+
+        </span>
+
+      </p>
+
+
+      <p>
+
+        ${data.detail}
+
+      </p>
+
+
+      <h3>
+        채용 전 확인사항
+      </h3>
+
+
+      <ul>
+
+        ${
+          data.list
+            .map(
+              function(item) {
+
+                return (
+                  "<li>" +
+                  item +
+                  "</li>"
+                );
+
+              }
+            )
+            .join("")
+        }
+
+      </ul>
+
+
+      <p
+        style="
+          margin-top:18px;
+          color:#75685d;
+          font-size:12px;
+        ">
+
+        실제 채용 시에는 최신 체류자격,
+        법령 및 취업허가 상태를
+        다시 확인하십시오.
+
+      </p>
+
+    `;
+
+
+  document
+    .getElementById(
+      "visaModal"
+    )
+    .showModal();
+
+}
+
+
+function closeModal() {
+
+  document
+    .getElementById(
+      "visaModal"
+    )
+    .close();
+
+}
+
+
+renderVisa(
+  visaData
+);
+
+
+</script>
+
+
+</body>
+
+</html>
