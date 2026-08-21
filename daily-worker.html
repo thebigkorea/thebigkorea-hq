@@ -609,6 +609,28 @@
           </div>
 
           <div class="card">
+            <div class="card-header">
+              <div>
+                <h4>최근 근무내역</h4>
+                <p>최근 등록된 자료 10건을 표시합니다.</p>
+              </div>
+              <button class="btn btn-light" onclick="openPage('ledger')">전체 관리대장 보기</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>날짜</th><th>매장</th><th>성명</th><th>업무</th><th>수당</th><th>전화번호</th><th>지급상태</th>
+                  </tr>
+                </thead>
+                <tbody id="recentBody">
+                  <tr><td colspan="7" class="table-empty">자료를 불러오는 중입니다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
   <div class="card-header">
     <div>
       <h4>점포별 일용직 사용현황</h4>
@@ -729,27 +751,6 @@
   </div>
 </div>
 
-          <div class="card">
-            <div class="card-header">
-              <div>
-                <h4>최근 근무내역</h4>
-                <p>최근 등록된 자료 10건을 표시합니다.</p>
-              </div>
-              <button class="btn btn-light" onclick="openPage('ledger')">전체 관리대장 보기</button>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>날짜</th><th>매장</th><th>성명</th><th>업무</th><th>수당</th><th>전화번호</th><th>지급상태</th>
-                  </tr>
-                </thead>
-                <tbody id="recentBody">
-                  <tr><td colspan="7" class="table-empty">자료를 불러오는 중입니다.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
         </section>
 
         <!-- 입력 -->
