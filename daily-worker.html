@@ -315,6 +315,28 @@
       box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
     }
 
+    .check-panel {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      border: 1px solid #fde68a;
+      border-radius: 9px;
+      background: #fffbeb;
+      color: #92400e;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .check-panel input {
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      flex: 0 0 auto;
+    }
+
     .button-row {
       display: flex;
       align-items: center;
@@ -839,8 +861,20 @@
                   </select>
                 </div>
                 <div class="field">
-                  <label for="rrn">주민번호</label>
+                  <label for="rrn">주민번호·외국인등록번호</label>
                   <input id="rrn" type="text" placeholder="예: 610807-2057344" />
+                </div>
+
+                <div class="field span-2">
+                  <label>&nbsp;</label>
+                  <label class="check-panel">
+                    <input id="foreignIdMissing" type="checkbox" onchange="toggleForeignIdFields()" />
+                    외국인등록증 미제출
+                  </label>
+                </div>
+                <div id="managementNoField" class="field" style="display:none;">
+                  <label for="managementNo">내부 관리번호</label>
+                  <input id="managementNo" type="text" readonly placeholder="저장 시 자동발급" />
                 </div>
 
                 <div class="field">
@@ -1030,11 +1064,20 @@
     <div class="card-body">
       <div
         class="filter-grid"
-        style="grid-template-columns:150px 150px 190px auto;"
+        style="grid-template-columns:150px 150px 190px 180px auto;"
       >
         <div>
           <label>시작일</label>
           <input id="taxStart" type="date">
+        </div>
+
+        <div>
+          <label>세무처리 상태</label>
+          <select id="taxStatusFilter" onchange="renderTaxData()">
+            <option value="신고 가능">신고 가능</option>
+            <option value="자료 보완 대기">자료 보완 대기</option>
+            <option value="">전체</option>
+          </select>
         </div>
 
         <div>
@@ -1109,12 +1152,13 @@
             <th>업무</th>
             <th>지급액</th>
             <th>지급상태</th>
+            <th>세무처리</th>
           </tr>
         </thead>
 
         <tbody id="taxBody">
           <tr>
-            <td colspan="7" class="table-empty">
+            <td colspan="8" class="table-empty">
               조회 버튼을 눌러주세요.
             </td>
           </tr>
@@ -1132,6 +1176,11 @@
       <span>
         총지급액
         <strong id="taxAmount">0원</strong>
+      </span>
+
+      <span>
+        자료 보완 대기
+        <strong id="taxPendingCount">0건</strong>
       </span>
     </div>
 
@@ -1181,6 +1230,8 @@
             <th>주민등록번호</th>
             <th>은행</th>
             <th>계좌번호</th>
+            <th>세무처리</th>
+            <th>내부 관리번호</th>
             <th>최근 업무</th>
             <th>최근 수당</th>
             <th>최종 등록일</th>
@@ -1189,7 +1240,7 @@
 
         <tbody id="workerManageBody">
           <tr>
-            <td colspan="8" class="table-empty">
+            <td colspan="10" class="table-empty">
               성명 또는 전화번호를 입력하고 조회하세요.
             </td>
           </tr>
@@ -1362,7 +1413,9 @@
           </select></div>
           <div class="field"><label>수당</label><input id="editAllowance" type="number"></div>
           <div class="field"><label>지급여부</label><select id="editPayStatus"><option value="미지급">미지급</option><option value="지급완료">지급완료</option></select></div>
-          <div class="field"><label>주민번호</label><input id="editRrn" type="text"></div>
+          <div class="field"><label>주민번호·외국인등록번호</label><input id="editRrn" type="text"></div>
+          <div class="field span-2"><label>&nbsp;</label><label class="check-panel"><input id="editForeignIdMissing" type="checkbox" onchange="toggleEditForeignIdFields()">외국인등록증 미제출</label></div>
+          <div id="editManagementNoField" class="field" style="display:none;"><label>내부 관리번호</label><input id="editManagementNo" type="text" readonly placeholder="저장 시 자동발급"></div>
           <div class="field"><label>수취은행</label><input id="editBank" type="text"></div>
           <div class="field span-2"><label>계좌번호</label><input id="editAccount" type="text"></div>
           <div class="field span-4"><label>비고</label><textarea id="editMemo"></textarea></div>
@@ -2351,7 +2404,7 @@ function renderJobSummary(list, totals) {
           return `
             <div class="result-item" onclick="selectWorker(${index})">
               <strong>${escapeHtml(worker.name || "")} / ${escapeHtml(formatPhone(worker.phone || ""))}</strong>
-              <p>은행: ${escapeHtml(worker.bank || "-")}<br>계좌: ${escapeHtml(worker.account || "-")}<br>최근업무: ${escapeHtml(worker.lastJob || "-")} / 최근수당: ${escapeHtml(String(worker.lastAllowance || "-"))}</p>
+              <p>은행: ${escapeHtml(worker.bank || "-")}<br>계좌: ${escapeHtml(worker.account || "-")}<br>세무처리: ${escapeHtml(worker.taxStatus || "신고 가능")}${worker.managementNo ? " / " + escapeHtml(worker.managementNo) : ""}<br>최근업무: ${escapeHtml(worker.lastJob || "-")} / 최근수당: ${escapeHtml(String(worker.lastAllowance || "-"))}</p>
             </div>`;
         }).join("");
 
@@ -2381,7 +2434,7 @@ function renderJobSummary(list, totals) {
 
   body.innerHTML = `
     <tr>
-      <td colspan="8" class="table-empty">
+      <td colspan="10" class="table-empty">
         근무자 정보를 불러오는 중입니다.
       </td>
     </tr>
@@ -2402,7 +2455,7 @@ function renderJobSummary(list, totals) {
     if (!list.length) {
       body.innerHTML = `
         <tr>
-          <td colspan="8" class="table-empty">
+          <td colspan="10" class="table-empty">
             검색된 근무자가 없습니다.
           </td>
         </tr>
@@ -2430,6 +2483,8 @@ function renderJobSummary(list, totals) {
           <td>${escapeHtml(worker.rrn || "-")}</td>
           <td>${escapeHtml(worker.bank || "-")}</td>
           <td>${escapeHtml(worker.account || "-")}</td>
+          <td>${escapeHtml(worker.taxStatus || "신고 가능")}</td>
+          <td>${escapeHtml(worker.managementNo || "-")}</td>
           <td>${escapeHtml(worker.lastJob || "-")}</td>
           <td class="money">
             ${
@@ -2450,7 +2505,7 @@ function renderJobSummary(list, totals) {
 
     body.innerHTML = `
       <tr>
-        <td colspan="8" class="table-empty">
+        <td colspan="10" class="table-empty">
           근무자 정보를 불러오지 못했습니다.
         </td>
       </tr>
@@ -2477,6 +2532,9 @@ function renderJobSummary(list, totals) {
       document.getElementById("rrn").value = worker.rrn || "";
       document.getElementById("bank").value = worker.bank || "";
       document.getElementById("account").value = worker.account || "";
+      document.getElementById("foreignIdMissing").checked = Boolean(worker.foreignIdMissing) || worker.identityStatus === "외국인등록증 미제출";
+      document.getElementById("managementNo").value = worker.managementNo || "";
+      toggleForeignIdFields();
       if (worker.lastJob) document.getElementById("job").value = worker.lastJob;
       if (worker.lastAllowance) document.getElementById("allowance").value = worker.lastAllowance;
     }
@@ -2500,7 +2558,9 @@ function renderJobSummary(list, totals) {
         account: document.getElementById("account").value.trim(),
         phone: document.getElementById("phone").value.trim(),
         memo: document.getElementById("memo").value.trim(),
-        payStatus: document.getElementById("payStatus").value
+        payStatus: document.getElementById("payStatus").value,
+        foreignIdMissing: document.getElementById("foreignIdMissing").checked,
+        managementNo: document.getElementById("managementNo").value.trim()
       };
 
       if (!data.name) {
@@ -2519,6 +2579,7 @@ function renderJobSummary(list, totals) {
         const json = await postJson(data);
 
         if (json.success) {
+          if (json.managementNo) document.getElementById("managementNo").value = json.managementNo;
           showNotice("saveNotice", "ok", json.message || "저장되었습니다.");
           document.getElementById("keyword").value = "";
           document.getElementById("resultBox").innerHTML = "";
@@ -2556,6 +2617,17 @@ function renderJobSummary(list, totals) {
       document.getElementById("account").value = "";
       document.getElementById("memo").value = "";
       document.getElementById("payStatus").value = "미지급";
+      document.getElementById("foreignIdMissing").checked = false;
+      document.getElementById("managementNo").value = "";
+      toggleForeignIdFields();
+    }
+
+    function toggleForeignIdFields() {
+      const checked = document.getElementById("foreignIdMissing").checked;
+      const rrn = document.getElementById("rrn");
+      rrn.disabled = checked;
+      if (checked) rrn.value = "";
+      document.getElementById("managementNoField").style.display = checked ? "block" : "none";
     }
 
     async function loadLedger() {
@@ -2705,7 +2777,7 @@ setText("ledgerUnpaidCount", unpaidCount + "건");
 
   body.innerHTML = `
     <tr>
-      <td colspan="7" class="table-empty">
+      <td colspan="8" class="table-empty">
         세무자료를 불러오는 중입니다.
       </td>
     </tr>
@@ -2730,7 +2802,7 @@ setText("ledgerUnpaidCount", unpaidCount + "건");
   } catch (err) {
     body.innerHTML = `
       <tr>
-        <td colspan="7" class="table-empty">
+        <td colspan="8" class="table-empty">
           세무자료 조회 중 오류가 발생했습니다.
         </td>
       </tr>
@@ -2789,21 +2861,34 @@ async function createTaxReport() {
   }
 }
 
-function renderTaxData() {
-  const body = document.getElementById("taxBody");
-  const store = document.getElementById("taxStore").value;
+function getTaxStatus_(item) {
+  if (item.taxStatus) return String(item.taxStatus).trim();
+  return item.rrn ? "신고 가능" : "자료 보완 대기";
+}
 
-  const list = taxData.filter(function(item) {
+function getFilteredTaxData_(forceReportableOnly) {
+  const store = document.getElementById("taxStore").value;
+  const statusFilter = forceReportableOnly
+    ? "신고 가능"
+    : document.getElementById("taxStatusFilter").value;
+
+  return taxData.filter(function(item) {
     if (store && item.store !== store) return false;
+    if (statusFilter && getTaxStatus_(item) !== statusFilter) return false;
 
     const name = String(item.name || "").trim();
     return name && name !== "NO";
   });
+}
+
+function renderTaxData() {
+  const body = document.getElementById("taxBody");
+  const list = getFilteredTaxData_(false);
 
   if (!list.length) {
     body.innerHTML = `
       <tr>
-        <td colspan="7" class="table-empty">
+        <td colspan="8" class="table-empty">
           조회 조건에 맞는 세무자료가 없습니다.
         </td>
       </tr>
@@ -2821,6 +2906,7 @@ function renderTaxData() {
             ${formatMoney(normalizeAllowance(item.allowance))}
           </td>
           <td>${payBadge(item.payStatus)}</td>
+          <td>${escapeHtml(getTaxStatus_(item))}${item.managementNo ? "<br><span class=\"small-note\">" + escapeHtml(item.managementNo) + "</span>" : ""}</td>
         </tr>
       `;
     }).join("");
@@ -2828,17 +2914,14 @@ function renderTaxData() {
 
   setText("taxCount", list.length + "건");
   setText("taxAmount", formatMoney(sumAllowance(list)));
+  setText("taxPendingCount", taxData.filter(function(item) {
+    return getTaxStatus_(item) === "자료 보완 대기";
+  }).length + "건");
 } 
 
 function downloadTaxCsv() {
   const store = document.getElementById("taxStore").value;
-
-  const list = taxData.filter(function(item) {
-    if (store && item.store !== store) return false;
-
-    const name = String(item.name || "").trim();
-    return name && name !== "NO";
-  });
+  const list = getFilteredTaxData_(true);
 
   if (!list.length) {
     alert("다운로드할 세무자료가 없습니다.");
@@ -2958,6 +3041,9 @@ function downloadTaxCsv() {
       document.getElementById("editBank").value = item.bank || "";
       document.getElementById("editAccount").value = item.account || "";
       document.getElementById("editMemo").value = item.memo || "";
+      document.getElementById("editForeignIdMissing").checked = Boolean(item.foreignIdMissing) || item.identityStatus === "외국인등록증 미제출";
+      document.getElementById("editManagementNo").value = item.managementNo || "";
+      toggleEditForeignIdFields();
       clearNotice("editNotice");
       document.getElementById("editModal").classList.add("open");
     }
@@ -2985,7 +3071,9 @@ function downloadTaxCsv() {
         rrn: document.getElementById("editRrn").value.trim(),
         bank: document.getElementById("editBank").value.trim(),
         account: document.getElementById("editAccount").value.trim(),
-        memo: document.getElementById("editMemo").value.trim()
+        memo: document.getElementById("editMemo").value.trim(),
+        foreignIdMissing: document.getElementById("editForeignIdMissing").checked,
+        managementNo: document.getElementById("editManagementNo").value.trim()
       };
 
       try {
@@ -3006,6 +3094,14 @@ function downloadTaxCsv() {
         btn.disabled = false;
         btn.textContent = "수정 저장";
       }
+    }
+
+    function toggleEditForeignIdFields() {
+      const checked = document.getElementById("editForeignIdMissing").checked;
+      const rrn = document.getElementById("editRrn");
+      rrn.disabled = checked;
+      if (checked) rrn.value = "";
+      document.getElementById("editManagementNoField").style.display = checked ? "block" : "none";
     }
 
     async function fetchJson(url) {
