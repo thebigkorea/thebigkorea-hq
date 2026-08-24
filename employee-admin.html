@@ -631,23 +631,14 @@ const list = filteredRows.sort(function(a, b) {
   const aStore = String(a.workplace || "").trim();
   const bStore = String(b.workplace || "").trim();
 
-  const aIndex = storeOrder.indexOf(aStore);
-  const bIndex = storeOrder.indexOf(bStore);
+  // 1차: 소속 점포명 가나다순 정렬
+  const storeCompare = aStore.localeCompare(bStore, "ko");
 
-  const aOrder =
-    aIndex === -1
-      ? storeOrder.length
-      : aIndex;
-
-  const bOrder =
-    bIndex === -1
-      ? storeOrder.length
-      : bIndex;
-
-  if (aOrder !== bOrder) {
-    return aOrder - bOrder;
+  if (storeCompare !== 0) {
+    return storeCompare;
   }
 
+  // 2차: 같은 점포 안에서는 직원 이름 가나다순 정렬
   return String(a.name || "").localeCompare(
     String(b.name || ""),
     "ko"
