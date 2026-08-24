@@ -147,6 +147,29 @@ td:nth-child(9){
   text-align:center;
 }
 tr:hover{background:#fafafa}
+
+.status-filter{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+
+.status-filter button{
+  margin-top:0;
+  height:40px;
+  padding:0 18px;
+  border-radius:10px;
+  background:#e2e8f0;
+  color:#334155;
+  font-size:13px;
+}
+
+.status-filter button.active{
+  background:#173b72;
+  color:#fff;
+}
+
 .status{
   margin-top:14px;
   padding:13px;
@@ -276,6 +299,13 @@ if (pw !== ADMIN_PASSWORD) {
       <button onclick="searchEmployees()">조회</button>
     </div>
 
+    <div class="status-filter" id="statusFilter">
+      <button type="button" class="active" data-status="" onclick="setStatusFilter('', this)">전체</button>
+      <button type="button" data-status="재직" onclick="setStatusFilter('재직', this)">재직</button>
+      <button type="button" data-status="휴직" onclick="setStatusFilter('휴직', this)">휴직</button>
+      <button type="button" data-status="퇴직" onclick="setStatusFilter('퇴직', this)">퇴직</button>
+    </div>
+
     <div id="status" class="status">검색 조건을 입력하고 조회하세요.</div>
   </section>
 
@@ -374,6 +404,7 @@ const API_URL =
   "https://script.google.com/macros/s/AKfycbzkqmLXXU545mKYlGU8M4socvKJAB34DlzPVEWXurMOlogqtmRDR0rgVRsRWyye4wt6Kw/exec";
 
 let selectedRowId = "";
+let selectedStatus = "";
 
 function val(id){
   return document.getElementById(id).value.trim();
@@ -390,6 +421,22 @@ async function postApi(data){
   });
 
   return await res.json();
+}
+
+function setStatusFilter(status, button){
+  selectedStatus = status;
+
+  document
+    .querySelectorAll("#statusFilter button")
+    .forEach(function(btn){
+      btn.classList.remove("active");
+    });
+
+  if(button){
+    button.classList.add("active");
+  }
+
+  searchEmployees();
 }
 
 async function searchEmployees(){
@@ -419,7 +466,21 @@ async function searchEmployees(){
   "고궁 롯데부여아울렛점"
 ];
 
-const list = (result.rows || []).sort(function(a, b) {
+const filteredRows = (result.rows || []).filter(function(item){
+  const itemStatus = String(item.status || "").trim();
+
+  if (!selectedStatus) {
+    return true;
+  }
+
+  if (selectedStatus === "퇴직") {
+    return itemStatus === "퇴직" || itemStatus === "퇴사";
+  }
+
+  return itemStatus === selectedStatus;
+});
+
+const list = filteredRows.sort(function(a, b) {
   const aStore = String(a.workplace || "").trim();
   const bStore = String(b.workplace || "").trim();
 
@@ -447,7 +508,8 @@ const list = (result.rows || []).sort(function(a, b) {
 });
 
 renderResults(list);
-setStatus(list.length + "건 조회되었습니다.");
+const statusLabel = selectedStatus ? " · " + selectedStatus : "";
+setStatus(list.length + "건 조회되었습니다." + statusLabel);
 
   }catch(e){
     console.error(e);
