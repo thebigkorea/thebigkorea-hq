@@ -351,22 +351,17 @@ if (pw !== ADMIN_PASSWORD) {
         소속
         <select id="workplace">
           <option value="">전체</option>
-          <option>주식회사 더큰코리아 본사</option>
-          <option>한국의집 롯데월드몰점</option>
-          <option>소바공방 평촌점</option>
-          <option>길채정 압구정점</option>
-          <option>고궁 롯데부여아울렛점</option>
         </select>
       </label>
 
       <button onclick="searchEmployees()">조회</button>
     </div>
 
-    <div class="status-filter" id="statusFilter">      
+    <div class="status-filter" id="statusFilter">
+      <button type="button" class="active" data-status="" onclick="setStatusFilter('', this)">전체</button>
       <button type="button" data-status="재직" onclick="setStatusFilter('재직', this)">재직</button>
       <button type="button" data-status="휴직" onclick="setStatusFilter('휴직', this)">휴직</button>
       <button type="button" data-status="퇴직" onclick="setStatusFilter('퇴직', this)">퇴직</button>
-      <button type="button" class="active" data-status="" onclick="setStatusFilter('', this)">전체</button>
     </div>
 
     <div id="status" class="status">검색 조건을 입력하고 조회하세요.</div>
@@ -515,7 +510,7 @@ const API_URL =
   "https://script.google.com/macros/s/AKfycbzkqmLXXU545mKYlGU8M4socvKJAB34DlzPVEWXurMOlogqtmRDR0rgVRsRWyye4wt6Kw/exec";
 
 let selectedRowId = "";
-let selectedStatus = "재직";
+let selectedStatus = "";
 
 function val(id){
   return document.getElementById(id).value.trim();
@@ -532,6 +527,47 @@ async function postApi(data){
   });
 
   return await res.json();
+}
+
+async function loadWorkplaces(){
+  const select = document.getElementById("workplace");
+  if(!select) return;
+
+  try{
+    const result = await postApi({
+      action:"searchEmployees",
+      keyword:"",
+      workplace:""
+    });
+
+    if(!result.success) return;
+
+    const stores = Array.from(
+      new Set(
+        (result.rows || [])
+          .map(function(item){
+            return String(item.workplace || "").trim();
+          })
+          .filter(Boolean)
+      )
+    ).sort(function(a,b){
+      return a.localeCompare(b, "ko");
+    });
+
+    select.innerHTML =
+      '<option value="">전체</option>' +
+      stores.map(function(store){
+        const safe = store
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+        return '<option value="' + safe + '">' + safe + '</option>';
+      }).join("");
+
+  }catch(e){
+    console.error("소속 목록 조회 실패:", e);
+  }
 }
 
 function setStatusFilter(status, button){
@@ -779,7 +815,10 @@ async function updateEmployee(){
   }
 }
 
-window.addEventListener("DOMContentLoaded", searchEmployees);
+window.addEventListener("DOMContentLoaded", async function(){
+  await loadWorkplaces();
+  searchEmployees();
+});
 </script>
 
 </body>
