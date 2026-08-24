@@ -439,11 +439,43 @@ if (pw !== ADMIN_PASSWORD) {
 
         <label>
           재직상태
-          <select id="d_status">
+          <select id="d_status" onchange="toggleHrStatusFields()">
             <option value="재직">재직</option>
             <option value="휴직">휴직</option>
             <option value="퇴직">퇴직</option>
           </select>
+        </label>
+
+        <div id="leaveFields" class="full hidden">
+          <div class="detail-grid">
+            <label>
+              휴직 시작일
+              <input id="d_leaveStartDate" type="date">
+            </label>
+            <label>
+              휴직 종료예정일
+              <input id="d_leaveEndDate" type="date">
+            </label>
+          </div>
+        </div>
+
+        <div id="returnFields" class="full hidden">
+          <div class="detail-grid">
+            <label>
+              복직일
+              <input id="d_returnDate" type="date">
+            </label>
+          </div>
+        </div>
+
+        <label class="full">
+          상태변경 사유
+          <input id="d_statusReason" type="text" placeholder="예: 개인사정 휴직, 휴직 종료 복직, 퇴직 등">
+        </label>
+
+        <label>
+          처리자
+          <input id="d_statusEditor" type="text" placeholder="처리자 이름">
         </label>
 
         <label>
@@ -624,6 +656,24 @@ function renderResults(list){
   `).join("");
 }
 
+function toggleHrStatusFields(){
+  const status = val("d_status");
+  const leaveFields = document.getElementById("leaveFields");
+  const returnFields = document.getElementById("returnFields");
+
+  leaveFields.classList.toggle("hidden", status !== "휴직");
+
+  // 기존 휴직자가 재직으로 변경될 때 복직일을 입력할 수 있게 표시
+  const originalStatus = String(
+    document.getElementById("d_status").dataset.originalStatus || ""
+  ).trim();
+
+  returnFields.classList.toggle(
+    "hidden",
+    !(status === "재직" && (originalStatus === "휴직"))
+  );
+}
+
 function openDetail(item){
   selectedRowId = item.rowId || "";
 
@@ -639,12 +689,22 @@ function openDetail(item){
     statusValue === "퇴사" ? "퇴직" :
     (["재직","휴직","퇴직"].includes(statusValue) ? statusValue : "재직");
 
+  document.getElementById("d_status").dataset.originalStatus =
+    statusValue === "퇴사" ? "퇴직" : statusValue;
+
+  document.getElementById("d_leaveStartDate").value = item.leaveStartDate || "";
+  document.getElementById("d_leaveEndDate").value = item.leaveEndDate || "";
+  document.getElementById("d_returnDate").value = item.returnDate || "";
+  document.getElementById("d_statusReason").value = item.statusReason || "";
+  document.getElementById("d_statusEditor").value = item.statusEditor || "";
+
   document.getElementById("d_joinDate").value = item.joinDate || "";
   document.getElementById("d_leaveDate").value = item.leaveDate || "";
   document.getElementById("d_address").value = item.address || "";
   document.getElementById("d_memo").value = item.memo || "";
 
   document.getElementById("detailStatus").innerText = "";
+  toggleHrStatusFields();
 
   const modal = document.getElementById("detailModal");
   modal.classList.remove("hidden");
@@ -686,6 +746,12 @@ async function updateEmployee(){
     employmentType:val("d_contractType"),
     contractType:val("d_contractType"),
     status:val("d_status"),
+    originalStatus:document.getElementById("d_status").dataset.originalStatus || "",
+    leaveStartDate:val("d_leaveStartDate"),
+    leaveEndDate:val("d_leaveEndDate"),
+    returnDate:val("d_returnDate"),
+    statusReason:val("d_statusReason"),
+    statusEditor:val("d_statusEditor"),
     joinDate:val("d_joinDate"),
     startDate:val("d_joinDate"),
     leaveDate:val("d_leaveDate"),
