@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>점포 직원정보 확인</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;background:#f4f6f9;color:#111}
+.header{background:linear-gradient(135deg,#173b72,#0f2344);color:#fff;padding:24px 18px;border-bottom-left-radius:24px;border-bottom-right-radius:24px}
+.header h1{margin:0;font-size:24px}
+.header p{margin:8px 0 0;opacity:.88}
+.wrap{width:min(1180px,calc(100% - 24px));margin:0 auto;padding:18px 0}
+.card{background:#fff;border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 5px 18px rgba(0,0,0,.08)}
+.toolbar{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+label{font-size:14px;font-weight:800}
+input,select,textarea{width:100%;margin-top:6px;border:1px solid #d7dce5;border-radius:11px;padding:11px;font-size:14px;background:#fff}
+button{border:0;border-radius:11px;padding:12px 16px;background:#173b72;color:#fff;font-weight:800;cursor:pointer}
+button.gray{background:#64748b}
+button.green{background:#197857}
+button.orange{background:#b45309}
+button.red{background:#b91c1c}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.status{margin-top:12px;padding:11px;border-radius:10px;background:#f1f5f9;color:#334155}
+.table-wrap{overflow-x:auto}
+table{width:100%;min-width:1050px;border-collapse:collapse}
+th,td{padding:10px 8px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:13px;white-space:nowrap}
+th{background:#eef3f8}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#e2e8f0;font-size:12px;font-weight:800}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.58);display:flex;align-items:center;justify-content:center;padding:18px;z-index:9999}
+.modal.hidden{display:none}
+.modal-card{width:min(760px,96vw);max-height:92vh;overflow-y:auto;background:#fff;border-radius:18px;padding:20px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.modal-head h2{margin:0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.full{grid-column:1/-1}
+.notice{margin-top:12px;padding:10px;border-radius:10px;background:#f1f5f9}
+@media(max-width:760px){
+  .toolbar,.grid{grid-template-columns:1fr}
+  .wrap{width:calc(100% - 14px)}
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <h1>점포 직원정보 확인</h1>
+  <p id="storeTitle">현재 근무 직원 확인 및 신규직원 등록</p>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <div class="toolbar">
+      <label>
+        점포
+        <select id="storeSelect"></select>
+      </label>
+      <div class="actions">
+        <button type="button" onclick="loadEmployees()">조회</button>
+        <button type="button" class="green" onclick="openNewEmployee()">+ 신규직원 입력</button>
+      </div>
+    </div>
+    <div id="status" class="status">점포를 선택해 주세요.</div>
+  </section>
+
+  <section class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>이름</th>
+            <th>연락처</th>
+            <th>주민번호</th>
+            <th>직위</th>
+            <th>고용형태</th>
+            <th>입사일</th>
+            <th>재직상태</th>
+            <th>확인/수정</th>
+          </tr>
+        </thead>
+        <tbody id="employeeBody">
+          <tr><td colspan="8">조회 결과가 없습니다.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="actions">
+      <button type="button" class="green" onclick="completeStoreReview()">점포 직원정보 확인 완료</button>
+    </div>
+    <div id="reviewStatus" class="status">확인이 끝나면 완료 버튼을 눌러주세요.</div>
+  </section>
+</main>
+
+<div id="employeeModal" class="modal hidden" onclick="backdropClose(event)">
+  <section class="modal-card">
+    <div class="modal-head">
+      <h2 id="modalTitle">직원정보</h2>
+      <button type="button" class="gray" onclick="closeModal()">×</button>
+    </div>
+
+    <div class="grid">
+      <input id="m_rowId" type="hidden">
+      <input id="m_employeeId" type="hidden">
+
+      <label>
+        이름
+        <input id="m_name" type="text">
+      </label>
+
+      <label>
+        연락처
+        <input id="m_phone" type="text">
+      </label>
+
+      <label>
+        주민번호
+        <input id="m_rrn" type="text" placeholder="000000-0000000">
+      </label>
+
+      <label>
+        직위
+        <input id="m_position" type="text">
+      </label>
+
+      <label>
+        고용형태
+        <select id="m_employmentType">
+          <option value="">선택</option>
+          <option value="정규직">정규직</option>
+          <option value="계약직(아르바이트)">계약직(아르바이트)</option>
+          <option value="사업소득자">사업소득자</option>
+        </select>
+      </label>
+
+      <label>
+        입사일
+        <input id="m_joinDate" type="date">
+      </label>
+
+      <label>
+        재직상태
+        <select id="m_status">
+          <option value="재직">재직</option>
+          <option value="휴직">휴직</option>
+          <option value="퇴직">퇴직</option>
+        </select>
+      </label>
+
+      <label>
+        부서
+        <input id="m_department" type="text">
+      </label>
+
+      <label class="full">
+        주소
+        <input id="m_address" type="text">
+      </label>
+
+      <label>
+        은행명
+        <input id="m_bank" type="text">
+      </label>
+
+      <label>
+        계좌번호
+        <input id="m_account" type="text">
+      </label>
+
+      <label class="full">
+        비고
+        <textarea id="m_memo"></textarea>
+      </label>
+
+      <label class="full">
+        수정/등록 사유
+        <input id="m_reason" type="text" placeholder="예: 연락처 변경, 신규입사 등">
+      </label>
+
+      <label>
+        처리자
+        <input id="m_editor" type="text" placeholder="점장 이름">
+      </label>
+    </div>
+
+    <div class="actions" style="margin-top:16px">
+      <button type="button" class="green" onclick="saveEmployee()">저장</button>
+      <button type="button" class="gray" onclick="closeModal()">닫기</button>
+    </div>
+    <div id="modalNotice" class="notice"></div>
+  </section>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzkqmLXXU545mKYlGU8M4socvKJAB34DlzPVEWXurMOlogqtmRDR0rgVRsRWyye4wt6Kw/exec";
+
+let currentEmployees = [];
+let editingNew = false;
+
+function q(name){
+  return new URLSearchParams(location.search).get(name) || "";
+}
+function val(id){ return document.getElementById(id).value.trim(); }
+
+async function postApi(data){
+  const res = await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify(data)
+  });
+  return await res.json();
+}
+
+async function loadStores(){
+  const result = await postApi({
+    action:"searchEmployees",
+    keyword:"",
+    workplace:""
+  });
+
+  const select = document.getElementById("storeSelect");
+  const urlStore = q("store");
+
+  const stores = Array.from(new Set(
+    (result.rows || [])
+      .map(x => String(x.workplace || "").trim())
+      .filter(Boolean)
+      .concat(["길채정 분당점"])
+  )).sort((a,b)=>a.localeCompare(b,"ko"));
+
+  select.innerHTML = stores.map(store=>{
+    const selected = store === urlStore ? " selected" : "";
+    return `<option value="${escapeHtml(store)}"${selected}>${escapeHtml(store)}</option>`;
+  }).join("");
+
+  if(!urlStore && stores.length){
+    select.value = stores[0];
+  }
+
+  loadEmployees();
+}
+
+async function loadEmployees(){
+  const store = val("storeSelect");
+  document.getElementById("storeTitle").textContent =
+    store + " · 현재 근무 직원 확인 및 신규직원 등록";
+
+  document.getElementById("status").textContent = "조회 중입니다...";
+
+  const result = await postApi({
+    action:"searchEmployees",
+    keyword:"",
+    workplace:store
+  });
+
+  if(!result.success){
+    document.getElementById("status").textContent =
+      result.message || "조회 실패";
+    return;
+  }
+
+  currentEmployees = (result.rows || [])
+    .filter(x => ["재직","휴직"].includes(String(x.status || "").trim()))
+    .sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"ko"));
+
+  renderEmployees();
+  document.getElementById("status").textContent =
+    currentEmployees.length + "명 조회되었습니다.";
+}
+
+function renderEmployees(){
+  const body = document.getElementById("employeeBody");
+
+  if(!currentEmployees.length){
+    body.innerHTML = '<tr><td colspan="8">현재 재직/휴직 직원이 없습니다.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = currentEmployees.map((item,index)=>`
+    <tr>
+      <td>${escapeHtml(item.name || "")}</td>
+      <td>${escapeHtml(item.phone || "")}</td>
+      <td>${escapeHtml(item.rrn || item.residentNo || "")}</td>
+      <td>${escapeHtml(item.position || "")}</td>
+      <td>${escapeHtml(item.employmentType || "")}</td>
+      <td>${escapeHtml(item.joinDate || "")}</td>
+      <td><span class="badge">${escapeHtml(item.status || "")}</span></td>
+      <td><button type="button" onclick="openEdit(${index})">확인/수정</button></td>
+    </tr>
+  `).join("");
+}
+
+function openEdit(index){
+  editingNew = false;
+  const item = currentEmployees[index];
+  document.getElementById("modalTitle").textContent = "직원정보 확인/수정";
+  fillModal(item);
+  openModal();
+}
+
+function openNewEmployee(){
+  editingNew = true;
+  document.getElementById("modalTitle").textContent = "신규직원 정보 입력";
+  fillModal({
+    rowId:"",
+    employeeId:"",
+    name:"",
+    phone:"",
+    rrn:"",
+    position:"",
+    employmentType:"",
+    joinDate:"",
+    status:"재직",
+    department:"",
+    address:"",
+    bank:"",
+    account:"",
+    memo:""
+  });
+  openModal();
+}
+
+function fillModal(item){
+  document.getElementById("m_rowId").value = item.rowId || "";
+  document.getElementById("m_employeeId").value = item.employeeId || "";
+  document.getElementById("m_name").value = item.name || "";
+  document.getElementById("m_phone").value = item.phone || "";
+  document.getElementById("m_rrn").value = item.rrn || item.residentNo || "";
+  document.getElementById("m_position").value = item.position || "";
+  document.getElementById("m_employmentType").value = item.employmentType || "";
+  document.getElementById("m_joinDate").value = item.joinDate || "";
+  document.getElementById("m_status").value = item.status || "재직";
+  document.getElementById("m_department").value = item.department || "";
+  document.getElementById("m_address").value = item.address || "";
+  document.getElementById("m_bank").value = item.bank || item.bankName || "";
+  document.getElementById("m_account").value = item.account || item.accountNo || "";
+  document.getElementById("m_memo").value = item.memo || item.note || "";
+  document.getElementById("m_reason").value = "";
+  document.getElementById("m_editor").value = "";
+  document.getElementById("modalNotice").textContent = "";
+}
+
+async function saveEmployee(){
+  const store = val("storeSelect");
+  const name = val("m_name");
+  const phone = val("m_phone");
+  const rrn = val("m_rrn");
+
+  if(!name || !phone || !rrn){
+    document.getElementById("modalNotice").textContent =
+      "이름, 연락처, 주민번호는 필수입니다.";
+    return;
+  }
+
+  document.getElementById("modalNotice").textContent = "저장 중입니다...";
+
+  const payload = {
+    action:"updateEmployee",
+    rowId: val("m_rowId"),
+    employeeId: val("m_employeeId"),
+    workplace: store,
+    workPlace: store,
+    store: store,
+    name: name,
+    empName: name,
+    phone: phone,
+    rrn: rrn,
+    residentNo: rrn,
+    position: val("m_position"),
+    employmentType: val("m_employmentType"),
+    contractType: val("m_employmentType"),
+    joinDate: val("m_joinDate"),
+    startDate: val("m_joinDate"),
+    status: val("m_status"),
+    department: val("m_department"),
+    address: val("m_address"),
+    bank: val("m_bank"),
+    account: val("m_account"),
+    memo: val("m_memo"),
+    note: val("m_memo"),
+    statusReason: val("m_reason"),
+    statusEditor: val("m_editor"),
+    source: editingNew ? "점포 신규직원 입력" : "점포 직원정보 확인"
+  };
+
+  const result = await postApi(payload);
+
+  if(!result.success){
+    document.getElementById("modalNotice").textContent =
+      result.message || "저장 실패";
+    return;
+  }
+
+  document.getElementById("modalNotice").textContent =
+    editingNew ? "신규직원이 등록되었습니다." : "직원정보가 수정되었습니다.";
+
+  await loadEmployees();
+  setTimeout(closeModal, 500);
+}
+
+async function completeStoreReview(){
+  const store = val("storeSelect");
+  const editor = prompt("확인한 점장/담당자 이름을 입력해주세요.");
+  if(!editor) return;
+
+  const result = await postApi({
+    action:"saveStoreEmployeeReview",
+    workplace:store,
+    reviewer:editor
+  });
+
+  document.getElementById("reviewStatus").textContent =
+    result.success
+      ? "직원정보 확인 완료가 기록되었습니다."
+      : (result.message || "확인완료 저장 실패");
+}
+
+function openModal(){
+  document.getElementById("employeeModal").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+function closeModal(){
+  document.getElementById("employeeModal").classList.add("hidden");
+  document.body.style.overflow = "";
+}
+function backdropClose(e){
+  if(e.target.id === "employeeModal") closeModal();
+}
+function escapeHtml(v){
+  return String(v || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;");
+}
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape") closeModal();
+});
+window.addEventListener("DOMContentLoaded",loadStores);
+</script>
+</body>
+</html>
