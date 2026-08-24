@@ -198,6 +198,69 @@ textarea{
   font-size:15px;
   resize:vertical;
 }
+
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.55);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:9999;
+}
+
+.modal-backdrop.hidden{
+  display:none;
+}
+
+.modal-card{
+  width:min(760px, 96vw);
+  max-height:90vh;
+  overflow-y:auto;
+  background:#fff;
+  border-radius:20px;
+  box-shadow:0 24px 70px rgba(0,0,0,.28);
+  padding:22px;
+}
+
+.modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.modal-header h2{
+  margin:0;
+}
+
+.modal-close{
+  margin-top:0;
+  width:42px;
+  min-width:42px;
+  height:42px;
+  padding:0;
+  border-radius:10px;
+  background:#64748b;
+  font-size:20px;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+}
+
+.modal-actions button{
+  margin-top:0;
+}
+
+body.modal-open{
+  overflow:hidden;
+}
+
 .hidden{display:none}
 @media(max-width:1400px){
   .header{
@@ -336,66 +399,82 @@ if (pw !== ADMIN_PASSWORD) {
     </div>
   </section>
 
-  <section id="detailCard" class="card hidden">
-    <h2>직원 상세정보</h2>
+  <div id="detailModal" class="modal-backdrop hidden" onclick="handleModalBackdrop(event)">
+    <section id="detailCard" class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="modal-header">
+        <h2 id="detailTitle">직원 상세정보 수정</h2>
+        <button type="button" class="modal-close" onclick="closeDetail()" aria-label="닫기">×</button>
+      </div>
 
-    <div class="detail-grid">
-      <label>
-        소속
-        <input id="d_workplace" type="text">
-      </label>
+      <div class="detail-grid">
+        <label>
+          소속
+          <input id="d_workplace" type="text">
+        </label>
 
-      <label>
-        이름
-        <input id="d_name" type="text">
-      </label>
+        <label>
+          이름
+          <input id="d_name" type="text">
+        </label>
 
-      <label>
-        연락처
-        <input id="d_phone" type="text">
-      </label>
+        <label>
+          연락처
+          <input id="d_phone" type="text">
+        </label>
 
-      <label>
-        주민번호
-        <input id="d_residentNo" type="text">
-      </label>
+        <label>
+          주민번호
+          <input id="d_residentNo" type="text">
+        </label>
 
-      <label>
-        직위
-        <input id="d_position" type="text">
-      </label>
+        <label>
+          직위
+          <input id="d_position" type="text">
+        </label>
 
-      <label>
-        고용형태
-        <input id="d_contractType" type="text">
-      </label>
+        <label>
+          고용형태
+          <input id="d_contractType" type="text">
+        </label>
 
-      <label>
-        입사일
-        <input id="d_joinDate" type="date">
-      </label>
+        <label>
+          재직상태
+          <select id="d_status">
+            <option value="재직">재직</option>
+            <option value="휴직">휴직</option>
+            <option value="퇴직">퇴직</option>
+          </select>
+        </label>
 
-      <label>
-        퇴사일
-        <input id="d_leaveDate" type="date">
-      </label>
+        <label>
+          입사일
+          <input id="d_joinDate" type="date">
+        </label>
 
-      <label class="full">
-        주소
-        <input id="d_address" type="text">
-      </label>
+        <label>
+          퇴사일
+          <input id="d_leaveDate" type="date">
+        </label>
 
-      <label class="full">
-        비고
-        <textarea id="d_memo"></textarea>
-      </label>
-    </div>
+        <label class="full">
+          주소
+          <input id="d_address" type="text">
+        </label>
 
-    <button class="green" onclick="updateEmployee()">수정 저장</button>
-    <button class="gray" onclick="closeDetail()">닫기</button>
+        <label class="full">
+          비고
+          <textarea id="d_memo"></textarea>
+        </label>
+      </div>
 
-    <div id="detailStatus" class="status"></div>
-  </section>
+      <div class="modal-actions">
+        <button class="green" type="button" onclick="updateEmployee()">수정 저장</button>
+        <button class="gray" type="button" onclick="closeDetail()">닫기</button>
+      </div>
+
+      <div id="detailStatus" class="status"></div>
+    </section>
+  </div>
 
 </main>
 
@@ -554,25 +633,43 @@ function openDetail(item){
   document.getElementById("d_residentNo").value = item.rrn || item.residentNo || "";
   document.getElementById("d_position").value = item.position || "";
   document.getElementById("d_contractType").value = item.employmentType || item.contractType || "";
+
+  const statusValue = String(item.status || "재직").trim();
+  document.getElementById("d_status").value =
+    statusValue === "퇴사" ? "퇴직" :
+    (["재직","휴직","퇴직"].includes(statusValue) ? statusValue : "재직");
+
   document.getElementById("d_joinDate").value = item.joinDate || "";
   document.getElementById("d_leaveDate").value = item.leaveDate || "";
   document.getElementById("d_address").value = item.address || "";
   document.getElementById("d_memo").value = item.memo || "";
 
-  const detail = document.getElementById("detailCard");
+  document.getElementById("detailStatus").innerText = "";
 
-detail.classList.remove("hidden");
-document.getElementById("detailStatus").innerText = "";
-
-detail.scrollIntoView({
-  behavior: "smooth",
-  block: "start"
-});
+  const modal = document.getElementById("detailModal");
+  modal.classList.remove("hidden");
+  document.body.classList.add("modal-open");
 }
 
 function closeDetail(){
-  document.getElementById("detailCard").classList.add("hidden");
+  document.getElementById("detailModal").classList.add("hidden");
+  document.body.classList.remove("modal-open");
 }
+
+function handleModalBackdrop(event){
+  if(event.target.id === "detailModal"){
+    closeDetail();
+  }
+}
+
+document.addEventListener("keydown", function(event){
+  if(event.key === "Escape"){
+    const modal = document.getElementById("detailModal");
+    if(modal && !modal.classList.contains("hidden")){
+      closeDetail();
+    }
+  }
+});
 
 async function updateEmployee(){
   const data = {
@@ -588,6 +685,7 @@ async function updateEmployee(){
     position:val("d_position"),
     employmentType:val("d_contractType"),
     contractType:val("d_contractType"),
+    status:val("d_status"),
     joinDate:val("d_joinDate"),
     startDate:val("d_joinDate"),
     leaveDate:val("d_leaveDate"),
@@ -603,7 +701,8 @@ async function updateEmployee(){
 
     if(result.success){
       document.getElementById("detailStatus").innerText = "수정 저장되었습니다.";
-      searchEmployees();
+      await searchEmployees();
+      closeDetail();
     }else{
       document.getElementById("detailStatus").innerText = result.message || "저장 실패";
     }
