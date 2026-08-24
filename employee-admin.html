@@ -358,10 +358,10 @@ if (pw !== ADMIN_PASSWORD) {
     </div>
 
     <div class="status-filter" id="statusFilter">
-      <button type="button" class="active" data-status="" onclick="setStatusFilter('', this)">전체</button>
-      <button type="button" data-status="재직" onclick="setStatusFilter('재직', this)">재직</button>
-      <button type="button" data-status="휴직" onclick="setStatusFilter('휴직', this)">휴직</button>
+      <button type="button" class="active" data-status="재직" onclick="setStatusFilter('재직', this)">재직</button>
       <button type="button" data-status="퇴직" onclick="setStatusFilter('퇴직', this)">퇴직</button>
+      <button type="button" data-status="휴직" onclick="setStatusFilter('휴직', this)">휴직</button>
+      <button type="button" data-status="" onclick="setStatusFilter('', this)">전체</button>
     </div>
 
     <div id="status" class="status">검색 조건을 입력하고 조회하세요.</div>
@@ -510,7 +510,7 @@ const API_URL =
   "https://script.google.com/macros/s/AKfycbzkqmLXXU545mKYlGU8M4socvKJAB34DlzPVEWXurMOlogqtmRDR0rgVRsRWyye4wt6Kw/exec";
 
 let selectedRowId = "";
-let selectedStatus = "";
+let selectedStatus = "재직";
 
 function val(id){
   return document.getElementById(id).value.trim();
