@@ -314,6 +314,69 @@ body.modal-open{
     width:auto;
   }
 }
+
+.store-dashboard{
+  display:none;
+  margin-bottom:16px;
+}
+.store-dashboard.show{display:block}
+.store-dashboard-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:12px;
+  margin-bottom:12px;
+}
+.store-dashboard-head h2{margin:0}
+.store-dashboard-head p{margin:0;color:#64748b;font-size:13px}
+.store-dashboard-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:12px;
+}
+.store-summary-card{
+  border:1px solid #dbe3ec;
+  border-radius:16px;
+  padding:15px;
+  background:#fff;
+}
+.store-summary-title{
+  font-weight:900;
+  font-size:16px;
+  margin-bottom:12px;
+  padding-bottom:10px;
+  border-bottom:1px solid #edf1f5;
+}
+.store-summary-total{
+  font-size:13px;
+  color:#475569;
+  margin-left:6px;
+}
+.store-summary-types{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.store-type-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 10px;
+  border-radius:999px;
+  background:#f1f5f9;
+  font-size:12px;
+  font-weight:800;
+}
+.store-type-chip strong{font-size:14px}
+.store-dashboard-total{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid #e5e7eb;
+}
+
 </style>
 
 <script>
@@ -373,6 +436,18 @@ if (pw !== ADMIN_PASSWORD) {
     </div>
 
     <div id="status" class="status">검색 조건을 입력하고 조회하세요.</div>
+  </section>
+
+
+  <section id="storeDashboard" class="card store-dashboard">
+    <div class="store-dashboard-head">
+      <div>
+        <h2>점포별 재직인원 현황</h2>
+        <p>전체 소속 조회 시 점포별 고용형태 인원을 보여줍니다.</p>
+      </div>
+    </div>
+    <div id="storeDashboardGrid" class="store-dashboard-grid"></div>
+    <div id="storeDashboardTotal" class="store-dashboard-total"></div>
   </section>
 
   <section class="card">
@@ -659,6 +734,7 @@ async function searchEmployees(){
     if(!result.success){
       setStatus(result.message || "조회 실패");
       renderResults([]);
+      renderStoreDashboard([], workplace);
       return;
     }
 
@@ -703,6 +779,7 @@ const list = filteredRows.sort(function(a, b) {
 });
 
 renderResults(list);
+renderStoreDashboard(list, workplace);
 const statusLabel = selectedStatus ? " · " + selectedStatus : "";
 setStatus(list.length + "건 조회되었습니다." + statusLabel);
 
@@ -716,6 +793,140 @@ function maskRrn(v){
   const s = String(v || "");
   return s.replace(/^(\d{6})-(\d).*/, "$1-$2******");
 }
+
+
+function normalizeEmploymentGroup(item){
+  const raw = String(
+    item.employmentType ||
+    item.contractType ||
+    ""
+  ).replace(/\s+/g,"").trim();
+
+  if(!raw) return "미분류";
+
+  if(
+    raw.includes("정규") ||
+    raw.includes("정직")
+  ) return "정규직";
+
+  if(
+    raw.includes("아르바이트") ||
+    raw.includes("알바") ||
+    raw.includes("시급")
+  ) return "아르바이트";
+
+  if(
+    raw.includes("사업소득")
+  ) return "사업소득자";
+
+  if(
+    raw.includes("용역")
+  ) return "용역";
+
+  if(
+    raw.includes("일용")
+  ) return "일용직";
+
+  if(
+    raw.includes("계약")
+  ) return "계약직";
+
+  if(
+    raw.includes("파견")
+  ) return "파견";
+
+  return raw;
+}
+
+function renderStoreDashboard(list, workplace){
+  const dashboard = document.getElementById("storeDashboard");
+  const grid = document.getElementById("storeDashboardGrid");
+  const totalBox = document.getElementById("storeDashboardTotal");
+
+  if(!dashboard || !grid || !totalBox) return;
+
+  // 사용자가 "소속 = 전체"로 조회했을 때만 표시
+  if(String(workplace || "").trim()){
+    dashboard.classList.remove("show");
+    grid.innerHTML = "";
+    totalBox.innerHTML = "";
+    return;
+  }
+
+  dashboard.classList.add("show");
+
+  const byStore = {};
+  const grand = {};
+  let grandTotal = 0;
+
+  (list || []).forEach(function(item){
+    const store = String(item.workplace || "소속 미지정").trim() || "소속 미지정";
+    const group = normalizeEmploymentGroup(item);
+
+    if(!byStore[store]){
+      byStore[store] = { total:0, groups:{} };
+    }
+
+    byStore[store].total++;
+    byStore[store].groups[group] =
+      Number(byStore[store].groups[group] || 0) + 1;
+
+    grand[group] = Number(grand[group] || 0) + 1;
+    grandTotal++;
+  });
+
+  const preferredGroups = [
+    "정규직","아르바이트","일용직",
+    "용역","사업소득자","계약직","파견","미분류"
+  ];
+
+  function groupOrder(a,b){
+    const ai = preferredGroups.indexOf(a);
+    const bi = preferredGroups.indexOf(b);
+    if(ai === -1 && bi === -1) return a.localeCompare(b,"ko");
+    if(ai === -1) return 1;
+    if(bi === -1) return -1;
+    return ai - bi;
+  }
+
+  const stores = Object.keys(byStore).sort(function(a,b){
+    return a.localeCompare(b,"ko");
+  });
+
+  if(!stores.length){
+    grid.innerHTML = '<div class="empty">표시할 직원이 없습니다.</div>';
+    totalBox.innerHTML = "";
+    return;
+  }
+
+  grid.innerHTML = stores.map(function(store){
+    const data = byStore[store];
+    const chips = Object.keys(data.groups)
+      .sort(groupOrder)
+      .map(function(group){
+        return '<span class="store-type-chip">' +
+          group + ' <strong>' + data.groups[group] + '명</strong></span>';
+      }).join("");
+
+    return '<div class="store-summary-card">' +
+      '<div class="store-summary-title">' +
+        store +
+        '<span class="store-summary-total">총 ' + data.total + '명</span>' +
+      '</div>' +
+      '<div class="store-summary-types">' + chips + '</div>' +
+    '</div>';
+  }).join("");
+
+  totalBox.innerHTML =
+    '<span class="store-type-chip">전체 <strong>' + grandTotal + '명</strong></span>' +
+    Object.keys(grand)
+      .sort(groupOrder)
+      .map(function(group){
+        return '<span class="store-type-chip">' +
+          group + ' <strong>' + grand[group] + '명</strong></span>';
+      }).join("");
+}
+
 
 function renderResults(list){
   const body = document.getElementById("resultBody");
