@@ -26,8 +26,13 @@ body {
   border-radius: 24px;
   padding: 50px;
   margin-bottom: 36px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
+
+
+/* =========================================================
+   입력 화면 로고
+========================================================= */
 
 .top-logo {
   text-align: center;
@@ -36,10 +41,16 @@ body {
 
 .top-logo img {
   width: 260px;
+  max-width: 100%;
   height: auto;
   display: block;
   margin: 0 auto;
 }
+
+
+/* =========================================================
+   실제 발급 재직증명서 로고
+========================================================= */
 
 .certificate-logo {
   text-align: center;
@@ -48,10 +59,16 @@ body {
 
 .certificate-logo img {
   width: 220px;
+  max-width: 100%;
   height: auto;
   display: block;
   margin: 0 auto;
 }
+
+
+/* =========================================================
+   입력 화면 제목
+========================================================= */
 
 h1 {
   text-align: center;
@@ -67,6 +84,11 @@ h1 {
   margin-bottom: 40px;
   font-size: 20px;
 }
+
+
+/* =========================================================
+   입력 폼
+========================================================= */
 
 .form-box {
   display: flex;
@@ -108,6 +130,10 @@ button:active {
   opacity: 0.75;
 }
 
+button:disabled {
+  cursor: not-allowed;
+}
+
 .message {
   text-align: center;
   color: red;
@@ -115,19 +141,30 @@ button:active {
   font-size: 20px;
 }
 
+
+/* =========================================================
+   재직증명서 A4 화면
+========================================================= */
+
 .certificate-paper {
   width: 794px;
   min-height: 1123px;
   margin: 0 auto;
   background: #fff;
   padding: 72px 70px 62px;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
 }
+
+
+/* 발급번호 */
 
 .issue-no {
   font-size: 13px;
   margin-bottom: 42px;
 }
+
+
+/* 증명서 제목 */
 
 .paper-title {
   text-align: center;
@@ -136,6 +173,11 @@ button:active {
   letter-spacing: 16px;
   margin-bottom: 44px;
 }
+
+
+/* =========================================================
+   직원 정보 표
+========================================================= */
 
 .info-table {
   width: 100%;
@@ -158,6 +200,11 @@ button:active {
   font-weight: 800;
 }
 
+
+/* =========================================================
+   증명 문구 / 날짜 / 회사정보
+========================================================= */
+
 .confirm-text,
 .date-text,
 .company-info {
@@ -174,6 +221,11 @@ button:active {
   margin-top: 48px;
   font-size: 17px;
 }
+
+
+/* =========================================================
+   대표이사 / 법인인감
+========================================================= */
 
 .representative-line {
   margin-top: 20px;
@@ -194,6 +246,11 @@ button:active {
   object-fit: contain;
 }
 
+
+/* =========================================================
+   인쇄 / PDF 저장 버튼
+========================================================= */
+
 .print-btn-area {
   width: 794px;
   margin: 24px auto 0;
@@ -211,12 +268,77 @@ button:active {
   font-weight: 800;
 }
 
+
+/* =========================================================
+   모바일
+========================================================= */
+
+@media (max-width: 850px) {
+
+  .wrap {
+    padding: 20px 12px;
+  }
+
+  .card {
+    padding: 30px 22px;
+  }
+
+  .top-logo img {
+    width: 220px;
+  }
+
+  h1 {
+    font-size: 42px;
+  }
+
+  input,
+  select {
+    height: 68px;
+    font-size: 21px;
+  }
+
+  button {
+    font-size: 24px;
+  }
+
+  .certificate-paper {
+    width: 100%;
+    min-height: auto;
+    padding: 45px 30px;
+  }
+
+  .print-btn-area {
+    width: 100%;
+  }
+
+  .certificate-logo img {
+    width: 190px;
+  }
+
+  .paper-title {
+    font-size: 28px;
+    letter-spacing: 10px;
+  }
+
+  .info-table th,
+  .info-table td {
+    font-size: 15px;
+    padding: 10px;
+  }
+}
+
+
+/* =========================================================
+   A4 인쇄 설정
+========================================================= */
+
 @page {
   size: A4;
   margin: 0;
 }
 
 @media print {
+
   html,
   body {
     width: 210mm;
@@ -234,6 +356,10 @@ button:active {
     padding: 0 !important;
   }
 
+  /*
+    입력 화면 요소는 인쇄하지 않음.
+    실제 증명서의 .certificate-logo는 숨기지 않습니다.
+  */
   .card,
   .form-box,
   .top-logo,
@@ -248,9 +374,24 @@ button:active {
   .certificate-paper {
     width: 210mm !important;
     height: 297mm !important;
+    min-height: 297mm !important;
     margin: 0 !important;
     padding: 18mm 20mm 12mm !important;
     box-shadow: none !important;
+  }
+
+  /* PDF / 인쇄용 회사 로고 */
+  .certificate-logo {
+    display: block !important;
+    text-align: center !important;
+    margin-bottom: 14px !important;
+  }
+
+  .certificate-logo img {
+    display: block !important;
+    width: 180px !important;
+    height: auto !important;
+    margin: 0 auto !important;
   }
 
   .paper-title {
@@ -263,5 +404,16 @@ button:active {
     font-size: 15px !important;
     padding: 9px 13px !important;
     height: 40px !important;
+  }
+
+  .confirm-text,
+  .date-text,
+  .company-info {
+    font-size: 15px !important;
+  }
+
+  .small-stamp {
+    width: 58px !important;
+    height: 58px !important;
   }
 }
