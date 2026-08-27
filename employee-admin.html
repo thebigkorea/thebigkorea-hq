@@ -396,7 +396,7 @@ if (pw !== ADMIN_PASSWORD) {
 
 <header class="header">
   <h1>직원정보 관리자 조회</h1>
-  <p>본사 전용 직원정보 조회 및 관리 화면입니다.</p>
+  <p>통합 인사DB 기준 전 점포 직원정보 조회 및 관리 화면입니다.</p>
 </header>
 
 <main class="wrap">
@@ -590,10 +590,12 @@ if (pw !== ADMIN_PASSWORD) {
 
 <script>
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbzkqmLXXU545mKYlGU8M4socvKJAB34DlzPVEWXurMOlogqtmRDR0rgVRsRWyye4wt6Kw/exec";
+  "https://script.google.com/macros/s/AKfycbwRGQcXgYhfkTUiklPrHs4uFe7oHpgn8D_jM2jJPpU74tXr3D_h6vGMq72CHXU0EnAb/exec";
 
 let selectedRowId = "";
 let selectedStatus = "재직";
+let STORE_MAP = {};
+let STORE_ID_MAP = {};
 
 function val(id){
   return document.getElementById(id).value.trim();
@@ -612,47 +614,129 @@ async function postApi(data){
   return await res.json();
 }
 
+async function getApi(params){
+  const query = new URLSearchParams();
+
+  Object.keys(params || {}).forEach(function(key){
+    const value = params[key];
+
+    if(
+      value !== undefined &&
+      value !== null &&
+      String(value) !== ""
+    ){
+      query.set(key, String(value));
+    }
+  });
+
+  query.set("t", String(Date.now()));
+
+  const res = await fetch(
+    API_URL + "?" + query.toString(),
+    { cache:"no-store" }
+  );
+
+  return await res.json();
+}
+
+function normalizeUnifiedEmployee(item){
+  item = item || {};
+
+  return {
+    employeeId: item.employeeId || "",
+    rowId: item.employeeId || "",
+    storeId: item.storeId || "",
+    workplace: item.storeName || item.workplace || "",
+    storeName: item.storeName || item.workplace || "",
+    name: item.name || "",
+    phone: item.phone || "",
+    residentNo: item.residentNo || "",
+    rrn: item.residentNo || item.rrn || "",
+    position: item.position || "",
+    employmentType: item.employmentType || "",
+    contractType: item.employmentType || item.contractType || "",
+    status: item.status || "",
+    joinDate: item.hireDate || item.joinDate || "",
+    hireDate: item.hireDate || item.joinDate || "",
+    leaveDate: item.retireDate || item.leaveDate || "",
+    retireDate: item.retireDate || item.leaveDate || "",
+    address: item.address || "",
+    memo: item.note || item.memo || "",
+    note: item.note || item.memo || "",
+    department: item.department || "",
+    payType: item.payType || "",
+
+    // 기존 관리자 UI 호환용.
+    // 현재 통합 직원원장에 별도 컬럼이 없는 값은 빈값으로 유지합니다.
+    leaveStartDate: item.leaveStartDate || "",
+    leaveEndDate: item.leaveEndDate || "",
+    returnDate: item.returnDate || "",
+    statusReason: item.statusReason || "",
+    statusEditor: item.statusEditor || ""
+  };
+}
+
 async function loadWorkplaces(){
   const select = document.getElementById("workplace");
   if(!select) return;
 
   try{
-    const result = await postApi({
-      action:"searchEmployees",
-      keyword:"",
-      workplace:""
+    const result = await getApi({
+      action:"getStores"
     });
 
-    if(!result.success) return;
+    if(!result.success && !result.ok){
+      throw new Error(
+        result.message || "점포 목록 조회 실패"
+      );
+    }
 
-    const stores = Array.from(
-      new Set(
-        (result.rows || [])
-          .map(function(item){
-            return String(item.workplace || "").trim();
-          })
-          .filter(Boolean)
-          .concat([
-            "길채정 분당점"
-          ])
-      )
-    ).sort(function(a,b){
-      return a.localeCompare(b, "ko");
+    const stores = Array.isArray(result.stores)
+      ? result.stores
+      : [];
+
+    STORE_MAP = {};
+    STORE_ID_MAP = {};
+
+    stores.forEach(function(store){
+      const storeId = String(store.storeId || "").trim();
+      const storeName = String(store.storeName || "").trim();
+
+      if(!storeId || !storeName) return;
+
+      STORE_MAP[storeName] = storeId;
+      STORE_ID_MAP[storeId] = storeName;
     });
 
     select.innerHTML =
       '<option value="">전체</option>' +
       stores.map(function(store){
-        const safe = store
+        const storeId = String(store.storeId || "").trim();
+        const storeName = String(store.storeName || "").trim();
+
+        const safeName = storeName
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;");
-        return '<option value="' + safe + '">' + safe + '</option>';
+
+        return (
+          '<option value="' + safeName +
+          '" data-store-id="' + storeId + '">' +
+          safeName +
+          '</option>'
+        );
       }).join("");
 
   }catch(e){
     console.error("소속 목록 조회 실패:", e);
+
+    select.innerHTML =
+      '<option value="">점포 목록 조회 실패</option>';
+
+    setStatus(
+      "통합 인사DB에서 점포 목록을 불러오지 못했습니다."
+    );
   }
 }
 
@@ -721,71 +805,86 @@ function setStatusFilter(status, button){
 async function searchEmployees(){
   const keyword = val("keyword");
   const workplace = val("workplace");
+  const storeId = workplace
+    ? String(STORE_MAP[workplace] || "")
+    : "";
 
   setStatus("조회 중입니다...");
 
   try{
-    const result = await postApi({
-      action:"searchEmployees",
-      keyword,
-      workplace
+    const result = await getApi({
+      action:"getEmployees",
+      keyword:keyword,
+      storeId:storeId
     });
 
-    if(!result.success){
+    if(!result.ok && !result.success){
       setStatus(result.message || "조회 실패");
       renderResults([]);
       renderStoreDashboard([], workplace);
       return;
     }
 
-    const storeOrder = [
-  "주식회사 더큰코리아 본사",
-  "한국의집 롯데월드몰점",
-  "소바공방 평촌점",
-  "길채정 압구정점",
-  "고궁 롯데부여아울렛점"
-];
+    const rows = Array.isArray(result.employees)
+      ? result.employees.map(normalizeUnifiedEmployee)
+      : [];
 
-const filteredRows = (result.rows || []).filter(function(item){
-  const itemStatus = String(item.status || "").trim();
+    const filteredRows = rows.filter(function(item){
+      const itemStatus = String(item.status || "").trim();
 
-  if (!selectedStatus) {
-    return true;
-  }
+      if(!selectedStatus){
+        return true;
+      }
 
-  if (selectedStatus === "퇴직") {
-    return itemStatus === "퇴직" || itemStatus === "퇴사";
-  }
+      if(selectedStatus === "퇴직"){
+        return (
+          itemStatus === "퇴직" ||
+          itemStatus === "퇴사"
+        );
+      }
 
-  return itemStatus === selectedStatus;
-});
+      return itemStatus === selectedStatus;
+    });
 
-const list = filteredRows.sort(function(a, b) {
-  const aStore = String(a.workplace || "").trim();
-  const bStore = String(b.workplace || "").trim();
+    const list = filteredRows.sort(function(a,b){
+      const aStore =
+        String(a.workplace || "").trim();
+      const bStore =
+        String(b.workplace || "").trim();
 
-  // 1차: 소속 점포명 가나다순 정렬
-  const storeCompare = aStore.localeCompare(bStore, "ko");
+      const storeCompare =
+        aStore.localeCompare(bStore,"ko");
 
-  if (storeCompare !== 0) {
-    return storeCompare;
-  }
+      if(storeCompare !== 0){
+        return storeCompare;
+      }
 
-  // 2차: 같은 점포 안에서는 직원 이름 가나다순 정렬
-  return String(a.name || "").localeCompare(
-    String(b.name || ""),
-    "ko"
-  );
-});
+      return String(a.name || "")
+        .localeCompare(
+          String(b.name || ""),
+          "ko"
+        );
+    });
 
-renderResults(list);
-renderStoreDashboard(list, workplace);
-const statusLabel = selectedStatus ? " · " + selectedStatus : "";
-setStatus(list.length + "건 조회되었습니다." + statusLabel);
+    renderResults(list);
+    renderStoreDashboard(list, workplace);
+
+    const statusLabel =
+      selectedStatus
+        ? " · " + selectedStatus
+        : "";
+
+    setStatus(
+      list.length +
+      "건 조회되었습니다." +
+      statusLabel
+    );
 
   }catch(e){
     console.error(e);
     setStatus("조회 중 오류가 발생했습니다.");
+    renderResults([]);
+    renderStoreDashboard([], workplace);
   }
 }
 
@@ -970,7 +1069,7 @@ function toggleHrStatusFields(){
 }
 
 function openDetail(item){
-  selectedRowId = item.rowId || "";
+  selectedRowId = item.employeeId || item.rowId || "";
 
   document.getElementById("d_workplace").value = item.workplace || "";
   document.getElementById("d_name").value = item.name || "";
@@ -1027,50 +1126,62 @@ document.addEventListener("keydown", function(event){
 });
 
 async function updateEmployee(){
+  const workplace = val("d_workplace");
+  const storeId =
+    String(STORE_MAP[workplace] || "").trim();
+
+  const status = val("d_status");
+  const retireDate =
+    status === "퇴직"
+      ? val("d_leaveDate")
+      : "";
+
   const data = {
-    action:"updateEmployee",
-    rowId:selectedRowId,
-    workplace:val("d_workplace"),
-    workPlace:val("d_workplace"),
+    action:"saveEmployee",
+    employeeId:selectedRowId,
+
+    storeId:storeId,
+    storeName:workplace,
+
     name:val("d_name"),
-    empName:val("d_name"),
     phone:val("d_phone"),
     residentNo:val("d_residentNo"),
-    rrn:val("d_residentNo"),
+
     position:val("d_position"),
     employmentType:val("d_contractType"),
-    contractType:val("d_contractType"),
-    status:val("d_status"),
-    originalStatus:document.getElementById("d_status").dataset.originalStatus || "",
-    leaveStartDate:val("d_leaveStartDate"),
-    leaveEndDate:val("d_leaveEndDate"),
-    returnDate:val("d_returnDate"),
-    statusReason:val("d_statusReason"),
-    statusEditor:val("d_statusEditor"),
-    joinDate:val("d_joinDate"),
-    startDate:val("d_joinDate"),
-    leaveDate:val("d_leaveDate"),
-    endDate:val("d_leaveDate"),
+    status:status,
+
+    hireDate:val("d_joinDate"),
+    retireDate:retireDate,
+
     address:val("d_address"),
-    memo:val("d_memo")
+    note:val("d_memo"),
+
+    source:"직원정보 관리자 수정"
   };
 
-  document.getElementById("detailStatus").innerText = "저장 중입니다...";
+  document.getElementById("detailStatus").innerText =
+    "저장 중입니다...";
 
   try{
     const result = await postApi(data);
 
-    if(result.success){
-      document.getElementById("detailStatus").innerText = "수정 저장되었습니다.";
+    if(result.ok || result.success){
+      document.getElementById("detailStatus").innerText =
+        "통합 인사DB에 수정 저장되었습니다.";
+
       await searchEmployees();
       closeDetail();
+
     }else{
-      document.getElementById("detailStatus").innerText = result.message || "저장 실패";
+      document.getElementById("detailStatus").innerText =
+        result.message || "저장 실패";
     }
 
   }catch(e){
     console.error(e);
-    document.getElementById("detailStatus").innerText = "저장 중 오류가 발생했습니다.";
+    document.getElementById("detailStatus").innerText =
+      "저장 중 오류가 발생했습니다.";
   }
 }
 
