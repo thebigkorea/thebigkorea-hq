@@ -377,6 +377,50 @@ body.modal-open{
   border-top:1px solid #e5e7eb;
 }
 
+.company-summary-card{
+  border:2px solid #173b72;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:14px;
+  background:linear-gradient(135deg,#f8fbff,#eef4fb);
+}
+.company-summary-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+.company-summary-title{
+  font-size:19px;
+  font-weight:900;
+  color:#173b72;
+}
+.company-summary-total{
+  font-size:26px;
+  font-weight:900;
+  color:#0f2344;
+}
+.company-summary-sub{
+  margin-top:4px;
+  font-size:12px;
+  color:#64748b;
+}
+.company-summary-types{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+}
+.company-summary-types .store-type-chip{
+  background:#fff;
+  border:1px solid #d7e2ef;
+  padding:9px 12px;
+  font-size:13px;
+}
+.company-summary-types .store-type-chip strong{
+  font-size:16px;
+}
+
 </style>
 
 <script>
@@ -446,6 +490,7 @@ if (pw !== ADMIN_PASSWORD) {
         <p>전체 소속 조회 시 점포별 고용형태 인원을 보여줍니다.</p>
       </div>
     </div>
+    <div id="companyDashboardSummary" class="company-summary-card"></div>
     <div id="storeDashboardGrid" class="store-dashboard-grid"></div>
     <div id="storeDashboardTotal" class="store-dashboard-total"></div>
   </section>
@@ -964,12 +1009,14 @@ function renderStoreDashboard(list, workplace){
   const dashboard = document.getElementById("storeDashboard");
   const grid = document.getElementById("storeDashboardGrid");
   const totalBox = document.getElementById("storeDashboardTotal");
+  const companyBox = document.getElementById("companyDashboardSummary");
 
-  if(!dashboard || !grid || !totalBox) return;
+  if(!dashboard || !grid || !totalBox || !companyBox) return;
 
   // 사용자가 "소속 = 전체"로 조회했을 때만 표시
   if(String(workplace || "").trim()){
     dashboard.classList.remove("show");
+    companyBox.innerHTML = "";
     grid.innerHTML = "";
     totalBox.innerHTML = "";
     return;
@@ -1016,10 +1063,30 @@ function renderStoreDashboard(list, workplace){
   });
 
   if(!stores.length){
+    companyBox.innerHTML = "";
     grid.innerHTML = '<div class="empty">표시할 직원이 없습니다.</div>';
     totalBox.innerHTML = "";
     return;
   }
+
+  const companyChips = Object.keys(grand)
+    .sort(groupOrder)
+    .map(function(group){
+      return '<span class="store-type-chip">' +
+        group + ' <strong>' + grand[group] + '명</strong></span>';
+    }).join("");
+
+  companyBox.innerHTML =
+    '<div class="company-summary-head">' +
+      '<div>' +
+        '<div class="company-summary-title">더큰코리아 전체 직원 구성</div>' +
+        '<div class="company-summary-sub">현재 조회된 재직 인원 기준</div>' +
+      '</div>' +
+      '<div class="company-summary-total">총 ' + grandTotal + '명</div>' +
+    '</div>' +
+    '<div class="company-summary-types">' +
+      companyChips +
+    '</div>';
 
   grid.innerHTML = stores.map(function(store){
     const data = byStore[store];
@@ -1040,13 +1107,8 @@ function renderStoreDashboard(list, workplace){
   }).join("");
 
   totalBox.innerHTML =
-    '<span class="store-type-chip">전체 <strong>' + grandTotal + '명</strong></span>' +
-    Object.keys(grand)
-      .sort(groupOrder)
-      .map(function(group){
-        return '<span class="store-type-chip">' +
-          group + ' <strong>' + grand[group] + '명</strong></span>';
-      }).join("");
+    '<span class="store-type-chip">전체 점포 <strong>' + stores.length + '개</strong></span>' +
+    '<span class="store-type-chip">전체 재직인원 <strong>' + grandTotal + '명</strong></span>';
 }
 
 
