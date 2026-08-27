@@ -35,7 +35,10 @@ body {
 }
 
 .top-logo img {
-  width: 90px;
+  width: 260px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 .certificate-logo {
@@ -44,8 +47,10 @@ body {
 }
 
 .certificate-logo img {
-  width: 150px;
+  width: 220px;
   height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 h1 {
