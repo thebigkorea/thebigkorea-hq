@@ -1,510 +1,563 @@
 const API_URL =
-"https://script.google.com/macros/s/AKfycbyshRs9k9fBXHjNlHSGvpDM2ueLRVRNL3Ya_3xorvLuZ9HHc4fB8JBa6jEowDRW0ZeO/exec";
+  "https://script.google.com/macros/s/AKfycbwRGQcXgYhfkTUiklPrHs4uFe7oHpgn8D_jM2jJPpU74tXr3D_h6vGMq72CHXU0EnAb/exec";
 
-const WORKPLACES = {
-  hq: {
-    workplaceName: "더큰코리아 본사",
-    companyName: "주식회사 더큰코리아",
-    companyRepresentative: "박병호",
-    companyAddress: "대전광역시 유성구 테크노4로 29 201호",
-    companyPhone: "042-712-5035",
-    defaultWorkPlace: "주식회사 더큰코리아 본사"
-  },
-  koreahouse_jamsil: {
-    workplaceName: "한국의집 잠실롯데월드몰",
-    companyName: "한국의집 롯데월드몰점",
-    companyRepresentative: "박병호",
-    companyAddress: "서울특별시 송파구 올림픽로 300, 롯데월드몰 5층",
-    companyPhone: "042-712-5035",
-    defaultWorkPlace: "한국의집 롯데월드몰점"
-  },
-  gilchaejeong_apgujeong: {
-    workplaceName: "길채정 압구정",
-    companyName: "길채정 압구정",
-    companyRepresentative: "박병호",
-    companyAddress: "서울특별시 강남구 압구정로 343, 갤러리아백화점",
-    companyPhone: "042-712-5035",
-    defaultWorkPlace: "길채정 압구정"
-  },
-  sobagongbang_pyeongchon: {
-    workplaceName: "평촌 소바공방",
-    companyName: "소바공방 평촌점",
-    companyRepresentative: "박병호",
-    companyAddress: "경기도 안양시 동안구 시민대로 180, 롯데백화점 평촌점",
-    companyPhone: "042-712-5035",
-    defaultWorkPlace: "소바공방 평촌점"
-  },
-  koreahouse_hyojonggang_paju: {
-  workplaceName: "한국의집 효종갱 파주",
-  companyName: "한국의집 효종갱 파주",
-  companyRepresentative: "박병호",
-  companyAddress: "경기도 파주시 필승로 200, 파주프리미엄아울렛",
-  companyPhone: "042-712-5035",
-  defaultWorkPlace: "한국의집 효종갱 파주"
-}
-};
+let canvas;
+let ctx;
+let drawing = false;
+let currentContractId = null;
 
-window.onload = function () {
-  setupTimeOptions();
-  setupEvents();
-  applyWorkplace();
-  calcTotalPay();
-  renderPreview();
-};
+document.addEventListener("DOMContentLoaded", async () => {
+  initTimeSelect();
+  initResidentNoAutoBirth();
+  initMoneyInputs();
+  initSignaturePad();
 
-function setupEvents() {
-  document.getElementById("workplaceCode").addEventListener("change", function () {
-    applyWorkplace();
-    renderPreview();
-  });
+  const id = new URLSearchParams(window.location.search).get("id");
+  if (id) {
+    currentContractId = id;
+    await loadContract(id);
+  }
 
-  document.getElementById("residentNo").addEventListener("input", function () {
-    formatResidentNo();
-    autoBirthFromResidentNo();
-    renderPreview();
-  });
+   document.body.classList.remove("loading");
+   
+});
 
-  document.getElementById("phone").addEventListener("input", function () {
-    formatPhone();
-    renderPreview();
-  });
-
-  document.getElementById("jobDuty").addEventListener("change", function () {
-    const wrap = document.getElementById("jobDutyEtcWrap");
-    if (wrap) wrap.style.display = this.value === "기타" ? "flex" : "none";
-    renderPreview();
-  });
-
-  const etc = document.getElementById("jobDutyEtc");
-  if (etc) etc.addEventListener("input", renderPreview);
-
-  document.querySelectorAll(".money").forEach(input => {
-    input.addEventListener("input", function () {
-      formatMoneyInput(this);
-      calcTotalPay();
-    });
-  });
-
-  document.querySelectorAll("input, select").forEach(el => {
-    if (
-      el.id === "residentNo" ||
-      el.id === "phone" ||
-      el.classList.contains("money")
-    ) return;
-
-    el.addEventListener("change", renderPreview);
-    el.addEventListener("input", renderPreview);
-  });
-}
-
-function setupTimeOptions() {
+function initTimeSelect() {
   const start = document.getElementById("startTime");
   const end = document.getElementById("endTime");
+
+  if (!start || !end) return;
 
   start.innerHTML = `<option value="">출근시간 선택</option>`;
   end.innerHTML = `<option value="">퇴근시간 선택</option>`;
 
-  for (let h = 6; h <= 23; h++) {
+  for (let h = 0; h < 24; h++) {
     ["00", "30"].forEach(m => {
-      const time = `${String(h).padStart(2, "0")}:${m}`;
-      start.innerHTML += `<option value="${time}">${time}</option>`;
-      end.innerHTML += `<option value="${time}">${time}</option>`;
+      const t = `${String(h).padStart(2, "0")}:${m}`;
+      start.add(new Option(t, t));
+      end.add(new Option(t, t));
     });
   }
-
-  end.innerHTML += `<option value="24:00">24:00</option>`;
 }
 
-function applyWorkplace() {
-  const code = document.getElementById("workplaceCode").value;
-  const wp = WORKPLACES[code];
+function initResidentNoAutoBirth() {
+  const resident = document.getElementById("residentNo");
+  const birth = document.getElementById("birth");
 
-  document.getElementById("workPlace").value = wp.defaultWorkPlace;
+  if (!resident || !birth) return;
 
-  document.getElementById("workplaceInfo").innerHTML = `
-    <strong>${wp.workplaceName}</strong><br>
-    상호 : ${wp.companyName}<br>
-    대표자 : ${wp.companyRepresentative}<br>
-    주소 : ${wp.companyAddress}<br>
-    연락처 : ${wp.companyPhone}
-  `;
+  resident.addEventListener("input", function () {
+    let v = this.value.replace(/[^0-9]/g, "");
+
+    if (v.length > 6) {
+      v = v.slice(0, 6) + "-" + v.slice(6, 13);
+    }
+
+    this.value = v;
+
+    const nums = v.replace(/[^0-9]/g, "");
+    if (nums.length >= 7) {
+      birth.value = getBirth(v);
+    }
+  });
 }
 
-function formatResidentNo() {
-  const input = document.getElementById("residentNo");
-  let v = input.value.replace(/[^0-9]/g, "").slice(0, 13);
+function getBirth(no) {
+  const n = no.replace(/[^0-9]/g, "");
+  const yy = n.slice(0, 2);
+  const mm = n.slice(2, 4);
+  const dd = n.slice(4, 6);
+  const g = n.slice(6, 7);
 
-  if (v.length > 6) {
-    v = v.slice(0, 6) + "-" + v.slice(6);
+  let c = "19";
+  if (g === "3" || g === "4" || g === "7" || g === "8") c = "20";
+
+  return `${c}${yy}년 ${Number(mm)}월 ${Number(dd)}일`;
+}
+
+function initMoneyInputs() {
+  const ids = [
+    "basePay",
+    "overtimePay",
+    "dutyPay",
+    "positionPay",
+    "mealPay"
+  ];
+
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.addEventListener("input", function () {
+      const n = this.value.replace(/[^0-9]/g, "");
+      this.value = n ? Number(n).toLocaleString() : "";
+      calculateTotalPay();
+    });
+  });
+}
+
+function calculateTotalPay() {
+  const total =
+    numberValue("basePay") +
+    numberValue("overtimePay") +
+    numberValue("dutyPay") +
+    numberValue("positionPay") +
+    numberValue("mealPay");
+
+  const totalInput = document.getElementById("totalPay");
+  if (totalInput) {
+    totalInput.value = total ? total.toLocaleString() : "";
   }
-
-  input.value = v;
 }
 
-function autoBirthFromResidentNo() {
-  const rrn = document.getElementById("residentNo").value.replace(/[^0-9]/g, "");
-  if (rrn.length < 7) return;
-
-  const yy = rrn.substring(0, 2);
-  const mm = rrn.substring(2, 4);
-  const dd = rrn.substring(4, 6);
-  const genderCode = rrn.substring(6, 7);
-
-  let century = "19";
-  if (["3", "4", "7", "8"].includes(genderCode)) century = "20";
-
-  document.getElementById("birth").value = `${century}${yy}-${mm}-${dd}`;
-}
-
-function formatPhone() {
-  const input = document.getElementById("phone");
-  let v = input.value.replace(/[^0-9]/g, "").slice(0, 11);
-
-  if (v.length <= 3) {
-    input.value = v;
-  } else if (v.length <= 7) {
-    input.value = v.slice(0, 3) + "-" + v.slice(3);
-  } else {
-    input.value = v.slice(0, 3) + "-" + v.slice(3, 7) + "-" + v.slice(7);
-  }
-}
-
-function formatMoneyInput(input) {
-  const raw = input.value.replace(/[^0-9]/g, "");
-  input.value = raw ? Number(raw).toLocaleString("ko-KR") : "";
-}
-
-function calcTotalPay() {
-  const ids = ["basePay", "overtimePay", "dutyPay", "positionPay", "mealPay"];
-
-  const total = ids.reduce((sum, id) => {
-    return sum + toNumber(document.getElementById(id).value);
-  }, 0);
-
-  document.getElementById("totalPay").value =
-    total ? total.toLocaleString("ko-KR") : "";
-
-  renderPreview();
-}
-
-function getJobDutyValue() {
-  const job = val("jobDuty");
-  if (job === "기타") return val("jobDutyEtc");
-  return job;
-}
-
-function getData() {
-  const workplaceCode = document.getElementById("workplaceCode").value;
-  const wp = WORKPLACES[workplaceCode];
+function collectData() {
+  calculateTotalPay();
 
   return {
     contractType: "정규직 근로계약서",
 
-    workplaceCode: workplaceCode,
-    workplaceName: wp.workplaceName,
+    empName: value("empName"),
+    residentNo: value("residentNo"),
+    birth: value("birth"),
+    phone: value("phone"),
+    address: value("address"),
 
-    companyName: wp.companyName,
-    companyRepresentative: wp.companyRepresentative,
-    companyAddress: wp.companyAddress,
-    companyPhone: wp.companyPhone,
+    joinDate: formatDate(value("joinDate")),
+    workDays: value("workDays"),
+    monthHour: value("monthHour"),
+    workTime: `${value("startTime")} ~ ${value("endTime")}`,
+    startTime: value("startTime"),
+    endTime: value("endTime"),
+    breakTime: value("breakTime"),
+    workPlace: value("workPlace"),
+    jobDuty: value("jobDuty"),
 
-    empName: val("empName"),
-    name: val("empName"),
-    employeeName: val("empName"),
+    basePay: value("basePay"),
+    overtimePay: value("overtimePay"),
+    dutyPay: value("dutyPay"),
+    positionPay: value("positionPay"),
+    mealPay: value("mealPay"),
+    totalPay: value("totalPay"),
 
-    residentNo: val("residentNo"),
-    rrn: val("residentNo"),
-    birth: val("birth"),
-    phone: val("phone"),
-    address: val("address"),
+    bank: value("bank"),
+    account: value("account"),
 
-    joinDate: val("joinDate"),
-    startDate: val("joinDate"),
-
-    workDays: val("workDays"),
-    weeklyDays: val("workDays"),
-
-    monthHour: val("monthHour"),
-    monthlyHours: val("monthHour"),
-
-    startTime: val("startTime"),
-    endTime: val("endTime"),
-
-    breakTime: val("breakTime"),
-    restTime: val("breakTime"),
-
-    workPlace: val("workPlace"),
-    workplace: val("workPlace"),
-    store: val("workPlace"),
-
-    jobDuty: getJobDutyValue(),
-    workDetail: getJobDutyValue(),
-
-    workTime: makeWorkTime(),
-
-    basePay: moneyVal("basePay"),
-    baseSalary: moneyVal("basePay"),
-
-    overtimePay: moneyVal("overtimePay"),
-    overPay: moneyVal("overtimePay"),
-
-    dutyPay: moneyVal("dutyPay"),
-    jobPay: moneyVal("dutyPay"),
-
-    positionPay: moneyVal("positionPay"),
-    rankPay: moneyVal("positionPay"),
-
-    mealPay: moneyVal("mealPay"),
-    foodPay: moneyVal("mealPay"),
-
-    totalPay: moneyVal("totalPay"),
-    salary: moneyVal("totalPay"),
-    monthlySalary: moneyVal("totalPay"),
-
-    bankName: val("bankName"),
-    bank: val("bankName"),
-
-    bankAccount: val("bankAccount"),
-    account: val("bankAccount")
+    representative: "박병호"
   };
 }
 
-function makeWorkTime() {
-  const start = val("startTime");
-  const end = val("endTime");
-  if (!start && !end) return "";
-  return `${start || ""} ~ ${end || ""}`;
-}
+function validateData(d) {
+  const required = [
+    "empName",
+    "residentNo",
+    "birth",
+    "phone",
+    "address",
+    "joinDate",
+    "workDays",
+    "monthHour",
+    "startTime",
+    "endTime",
+    "breakTime",
+    "workPlace",
+    "jobDuty",
+    "basePay",
+    "totalPay",
+    "bank",
+    "account"
+  ];
 
-function makePreview() {
-  const btn = document.querySelector("button.blue");
-
-  if (btn) {
-    btn.disabled = true;
-    btn.innerText = "계약서 생성 중...";
+  for (const k of required) {
+    if (!d[k]) {
+      alert("필수 항목을 모두 입력해주세요.");
+      return false;
+    }
   }
 
-  renderPreview();
-
-  setTimeout(() => {
-    if (btn) {
-      btn.disabled = false;
-      btn.innerText = "정규직 근로계약서 생성";
-    }
-  }, 400);
+  return true;
 }
 
-function renderPreview() {
-  const c = getData();
-  document.getElementById("preview").innerHTML = renderContractHtml(c);
+function createContract() {
+  const d = collectData();
+
+  if (!validateData(d)) return;
+
+  fillContract(d);
+  setMessage("정규직 근로계약서가 생성되었습니다.");
+  alert("정규직 근로계약서가 생성되었습니다.");
 }
 
-function renderContractHtml(c) {
-  return `
-    <h1>근 로 계 약 서</h1>
+async function saveContractAndCreateLink(event) {
+  const btn = event.target;
+  const d = collectData();
 
-    <p>
-      <strong>${c.companyName}</strong>(이하 “회사”라 한다)과 근로자
-      <strong>${c.empName || "________"}</strong>
-      (이하 “직원”이라 한다)은 다음과 같이 근로계약을 체결하고 이를 성실히 이행할 것을 약정한다.
-    </p>
+  if (!validateData(d)) return;
 
-    <h3>제1조 계약기간</h3>
-    <p>입사일 : ${c.joinDate || "________"}</p>
-    <p>입사일로부터 기간의 정함이 없는 근로계약을 체결한다. 수습기간은 3개월로 한다.</p>
+  fillContract(d);
 
-    <h3>제2조 근무장소 및 업무내용</h3>
-    <p>① 근무장소 : ${c.workPlace || "________"}</p>
-    <p>② 업무내용 : ${c.jobDuty || "________"}</p>
-
-    <h3>제3조 근로시간 및 휴게</h3>
-    <table>
-      <tr>
-        <th>주 근무일수</th>
-        <th>월 기준시간</th>
-        <th>근무시간</th>
-        <th>휴게시간</th>
-      </tr>
-      <tr>
-        <td>${c.workDays || ""}</td>
-        <td>${c.monthHour || ""}</td>
-        <td>${c.workTime || ""}</td>
-        <td>${c.breakTime || ""}</td>
-      </tr>
-    </table>
-
-    <h3>제4조 휴일 및 휴가</h3>
-    <p>① 법정유급휴일은 주휴일 및 근로자의 날로 한다.</p>
-    <p>② 회사는 근로기준법이 정하는 바에 따라 연차휴가를 부여한다.</p>
-
-    <h3>제5조 임금</h3>
-    <table>
-      <tr>
-        <th>기본급</th>
-        <th>연장수당</th>
-        <th>직무수당</th>
-        <th>직책수당</th>
-        <th>식대</th>
-        <th>월급총액</th>
-      </tr>
-      <tr>
-        <td>${won(c.basePay)}</td>
-        <td>${won(c.overtimePay)}</td>
-        <td>${won(c.dutyPay)}</td>
-        <td>${won(c.positionPay)}</td>
-        <td>${won(c.mealPay)}</td>
-        <td><strong>${won(c.totalPay)}</strong></td>
-      </tr>
-    </table>
-
-    <h3>제6조 임금지급방법</h3>
-    <p>
-      회사는 매월 1일부터 말일까지의 기간 동안 산정한 급여를 익월 10일에
-      직원 명의의 은행계좌로 지급한다.
-    </p>
-    <p>급여은행 : ${c.bankName || "________"}</p>
-    <p>계좌번호 : ${c.bankAccount || "________"}</p>
-
-    <h3>제7조 제출서류</h3>
-    <p>직원은 채용과 동시에 주민등록등본, 보건증, 통장사본, 신분증사본 등 회사가 요청하는 서류를 제출한다.</p>
-
-    <h3>제8조 퇴직급여</h3>
-    <p>회사는 근로자퇴직급여보장법이 정한 바에 따라 퇴직급여를 지급한다.</p>
-
-    <h3>제9조 퇴직절차</h3>
-    <p>직원은 퇴직하고자 할 경우 사직원을 사전 제출하여야 한다.</p>
-
-    <h3>제10조 신의성실의무</h3>
-    <p>직원은 회사의 경영방침에 따라 신의와 성실로 근무하여야 하며, 회사의 영업기밀사항을 외부에 누설하여서는 아니 된다.</p>
-
-    <h3>제11조 CCTV 설치 동의</h3>
-    <p>직원은 방범, 화재예방, 시설안전관리 목적의 CCTV 설치 및 운영에 대해 충분히 설명을 듣고 이해 및 동의한다.</p>
-
-    <h3>제12조 전자계약 및 계약서 교부 확인</h3>
-    <p>회사와 직원은 본 계약이 전자문서 및 전자서명 방식으로 체결될 수 있음을 확인하며, 전자서명은 자필서명 또는 날인과 동일한 효력을 가진다.</p>
-
-    <h3>제13조 기타사항</h3>
-    <p>본 계약서에 명시되지 않은 사항은 근로기준법, 관계 법령, 취업규칙 및 판례가 정하는 바에 따른다.</p>
-
-    <h3>사용자 및 근로자 서명</h3>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:20px;">
-      <div style="border:1px solid #cbd5e1;border-radius:16px;padding:20px;min-height:220px;">
-        <h3>[회사]</h3>
-        <p>상호 : ${c.companyName}</p>
-        <p>
-          대표자 : ${c.companyRepresentative}
-          <img src="stamp.png" style="width:90px;vertical-align:middle;margin-left:10px;">
-        </p>
-        <p>주소 : ${c.companyAddress}</p>
-        <p>연락처 : ${c.companyPhone}</p>
-      </div>
-
-      <div style="border:1px solid #cbd5e1;border-radius:16px;padding:20px;min-height:220px;">
-        <h3>[근로자]</h3>
-        <p>성명 : ${c.empName || "________"}</p>
-        <p>주민등록번호 : ${c.residentNo || "________"}</p>
-        <p>주소 : ${c.address || "________"}</p>
-        <p>연락처 : ${c.phone || "________"}</p>
-        <p style="margin-top:30px;">근로자 서명 : ____________________</p>
-      </div>
-    </div>
-  `;
-}
-
-async function saveContract() {
-  const c = getData();
-
-  if (!c.empName) return alert("직원 성명을 입력하세요.");
-  if (!c.residentNo) return alert("주민등록번호를 입력하세요.");
-  if (!c.phone) return alert("연락처를 입력하세요.");
-  if (!c.joinDate) return alert("입사일을 입력하세요.");
-  if (!c.workDays) return alert("주 근무일수를 선택하세요.");
-  if (!c.startTime) return alert("출근시간을 선택하세요.");
-  if (!c.endTime) return alert("퇴근시간을 선택하세요.");
-  if (!c.breakTime) return alert("휴게시간을 선택하세요.");
-  if (!c.jobDuty) return alert("업무내용을 선택하세요.");
-  if (!c.totalPay || Number(c.totalPay) <= 0) return alert("임금 정보를 입력하세요.");
-  if (!c.bankName) return alert("급여은행을 입력하세요.");
-  if (!c.bankAccount) return alert("계좌번호를 입력하세요.");
-
-  const btn = document.getElementById("saveBtn");
   btn.disabled = true;
-  btn.innerText = "계약 저장 중입니다...";
+  btn.innerText = "처리중...";
+  setMessage("계약 저장 및 직원 링크 생성 중입니다...");
 
   try {
     const result = await postData({
       action: "saveContractDraft",
-      ...c,
-      data: c,
-      contract: c
+      contract: d
     });
 
-    if (!result.success) {
-      alert(result.message || "저장에 실패했습니다.");
+    if (!result || !result.success) {
+      alert((result && result.message) ? result.message : "계약 저장 실패");
+      setMessage((result && result.message) ? result.message : "계약 저장 실패");
       return;
     }
 
-    const contractId = result.contractId || result.id || "";
+    currentContractId = result.contractId;
 
     const link =
-      `https://thebigkorea.github.io/thebigkorea-hq/contract-view.html?id=${encodeURIComponent(contractId)}&v=${Date.now()}`;
+      `https://thebigkorea.github.io/hr-system/regular-contract.html?id=${encodeURIComponent(result.contractId)}`;
 
-    const box = document.getElementById("resultBox");
-    box.style.display = "block";
-    box.innerHTML = `
-      <strong>계약서가 저장되었습니다.</strong><br>
-      계약번호 : ${contractId}<br>
-      직원에게 아래 링크를 보내 전자서명을 진행하세요.
-      <input id="workerLink" value="${link}" readonly />
-      <button onclick="copyWorkerLink()">직원 링크 복사</button>
-    `;
+    document.getElementById("contractLinkBox").style.display = "block";
+    document.getElementById("contractLink").value = link;
 
-    btn.innerText = "계약 저장 완료";
-    alert("계약서 저장 및 직원 링크 생성이 완료되었습니다.");
+    setMessage("계약 저장 완료. 직원 링크가 생성되었습니다.");
+    alert("계약 저장 및 직원 링크 생성이 완료되었습니다.");
 
-  } catch (err) {
-    alert("오류 발생: " + err.message);
+  } catch (e) {
+    alert("저장 중 오류가 발생했습니다. Apps Script 배포 또는 인터넷 연결을 확인해주세요.");
+    setMessage("저장 중 오류가 발생했습니다.");
   } finally {
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.innerText = "계약 저장 및 직원 링크 생성";
-    }, 800);
+    btn.disabled = false;
+    btn.innerText = "계약 저장 및 직원 링크 생성";
   }
 }
 
-function copyWorkerLink() {
-  const input = document.getElementById("workerLink");
+async function loadContract(id) {
+  try {
+    const result = await postData({
+      action: "getContractById",
+      contractId: id
+    });
+
+    if (!result.success) {
+      alert(result.message || "계약 조회 실패");
+      return;
+    }
+
+    currentContractId = id;
+
+    fillContract(result.contract || {});
+
+   const forms = document.querySelectorAll(".form-box");
+
+    forms.forEach(box => {
+     box.style.display = "none";
+    });
+
+   const idCardSection =
+     document.getElementById("idCardSection");
+
+    if(idCardSection){
+      idCardSection.style.display = "block";
+    }
+
+    setMessage("계약 내용을 확인한 뒤 전자서명을 진행해주세요.");
+
+  } catch (e) {
+    alert("계약서를 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+function fillContract(d) {
+  text("cEmpName", d.empName);
+  text("cWorkerName", d.empName);
+  text("cResidentNo", d.residentNo);
+  text("cBirth", d.birth);
+  text("cAddress", d.address);
+  text("cPhone", d.phone);
+
+  text("cJoinDate", d.joinDate);
+  text("cWorkPlace", d.workPlace);
+  text("cJobDuty", d.jobDuty);
+  text("cWorkDays", d.workDays);
+  text("cMonthHour", d.monthHour);
+  text("cWorkTime", d.workTime);
+  text("cBreakTime", d.breakTime);
+
+  text("cBasePay", withWon(d.basePay));
+  text("cOvertimePay", withWon(d.overtimePay));
+  text("cDutyPay", withWon(d.dutyPay));
+  text("cPositionPay", withWon(d.positionPay));
+  text("cMealPay", withWon(d.mealPay));
+  text("cTotalPay", withWon(d.totalPay));
+
+  text("cBank", d.bank);
+  text("cAccount", d.account);
+  text("cBank2", d.bank);
+  text("cAccount2", d.account);
+
+  text("cToday", getTodayKorean());
+}
+
+function initSignaturePad() {
+  canvas = document.getElementById("signaturePad");
+  if (!canvas) return;
+
+  ctx = canvas.getContext("2d");
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "#111";
+
+  canvas.addEventListener("mousedown", startDraw);
+  canvas.addEventListener("mousemove", draw);
+  canvas.addEventListener("mouseup", endDraw);
+  canvas.addEventListener("mouseleave", endDraw);
+
+  canvas.addEventListener("touchstart", startDrawTouch, { passive: false });
+  canvas.addEventListener("touchmove", drawTouch, { passive: false });
+  canvas.addEventListener("touchend", endDraw);
+}
+
+function startDraw(e) {
+  drawing = true;
+  document.body.style.overflow = "hidden";
+
+  const p = getPos(e);
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y);
+}
+
+function draw(e) {
+  if (!drawing) return;
+
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y);
+  ctx.stroke();
+}
+
+function endDraw() {
+  drawing = false;
+  document.body.style.overflow = "auto";
+}
+
+function startDrawTouch(e) {
+  e.preventDefault();
+  startDraw(e.touches[0]);
+}
+
+function drawTouch(e) {
+  e.preventDefault();
+  draw(e.touches[0]);
+}
+
+function getPos(e) {
+  const r = canvas.getBoundingClientRect();
+
+  return {
+    x: (e.clientX - r.left) * (canvas.width / r.width),
+    y: (e.clientY - r.top) * (canvas.height / r.height)
+  };
+}
+
+function clearSignature() {
+  if (!ctx || !canvas) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const img = document.getElementById("workerSignatureImage");
+  if (img) {
+    img.src = "";
+    img.style.display = "none";
+  }
+
+  const completeBox = document.getElementById("completeBox");
+  if (completeBox) completeBox.style.display = "none";
+
+  const signedTime = document.getElementById("signedTime");
+  if (signedTime) signedTime.innerText = "";
+}
+
+async function completeElectronicContract(event) {
+  const agree = document.getElementById("agreeCheck");
+
+  if (!agree || !agree.checked) {
+    alert("전자계약 동의 체크를 해주세요.");
+    return;
+  }
+
+  if (isCanvasEmpty()) {
+    alert("전자서명을 입력해주세요.");
+    return;
+  }
+
+  if (!currentContractId) {
+    alert("계약번호가 없습니다. 직원 링크로 다시 접속해주세요.");
+    return;
+  }
+
+  const btn = event.target;
+  btn.disabled = true;
+  btn.innerText = "저장중...";
+
+  const signature = canvas.toDataURL("image/png");
+
+  const img = document.getElementById("workerSignatureImage");
+  if (img) {
+    img.src = signature;
+    img.style.display = "block";
+  }
+
+  const signedTime = document.getElementById("signedTime");
+  if (signedTime) {
+    signedTime.innerText = new Date().toLocaleString() + " 전자서명 완료";
+  }
+
+  try {
+
+  
+  if (!idCardImage) {
+
+    alert("신분증 사진을 등록해주세요.");
+
+    btn.disabled = false;
+    btn.innerText = "전자계약 완료";
+
+    return;
+  }
+
+  const result = await postData({
+    action: "signContract",
+    contractId: currentContractId,
+    signature
+  });
+
+    if (result.success) {
+      const completeBox = document.getElementById("completeBox");
+      if (completeBox) completeBox.style.display = "block";
+
+      btn.innerText = "전자계약 완료됨";
+      setMessage("전자계약이 정상 완료되었습니다.");
+      alert("전자계약이 정상 완료되었습니다.");
+    } else {
+      alert(result.message || "서명 저장 실패");
+      btn.disabled = false;
+      btn.innerText = "전자계약 완료";
+    }
+  } catch (e) {
+    alert("전자서명 저장 중 오류가 발생했습니다.");
+    btn.disabled = false;
+    btn.innerText = "전자계약 완료";
+  }
+}
+
+function copyContractLink() {
+  const input = document.getElementById("contractLink");
+
+  if (!input || !input.value) {
+    alert("복사할 링크가 없습니다.");
+    return;
+  }
+
   input.select();
   document.execCommand("copy");
   alert("직원 링크가 복사되었습니다.");
 }
 
 async function postData(data) {
-  const response = await fetch(API_URL, {
+  const res = await fetch(API_URL, {
     method: "POST",
     body: JSON.stringify(data)
   });
 
-  return await response.json();
+  return await res.json();
 }
 
-function val(id) {
+function value(id) {
   const el = document.getElementById(id);
   return el ? el.value.trim() : "";
 }
 
-function moneyVal(id) {
-  return String(document.getElementById(id).value || "").replace(/[^0-9]/g, "");
+function text(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = val || "";
 }
 
-function toNumber(v) {
-  return Number(String(v || "").replace(/[^0-9]/g, ""));
+function setMessage(msg) {
+  const el = document.getElementById("message");
+  if (el) el.innerText = msg;
 }
 
-function won(v) {
-  const num = Number(String(v || "").replace(/[^0-9]/g, ""));
-  if (!num) return "0원";
-  return num.toLocaleString("ko-KR") + "원";
+function formatDate(v) {
+  if (!v) return "";
+  const [y, m, d] = v.split("-");
+  return `${y}년 ${Number(m)}월 ${Number(d)}일`;
 }
+
+function getTodayKorean() {
+  const today = new Date();
+  return `${today.getFullYear()}년 ${String(today.getMonth() + 1).padStart(2, "0")}월 ${String(today.getDate()).padStart(2, "0")}일`;
+}
+
+function isCanvasEmpty() {
+  const blank = document.createElement("canvas");
+  blank.width = canvas.width;
+  blank.height = canvas.height;
+  return canvas.toDataURL() === blank.toDataURL();
+}
+
+function numberValue(id) {
+  return Number(value(id).replace(/[^0-9]/g, "")) || 0;
+}
+
+function withWon(v) {
+  if (!v) return "0원";
+  return String(v).includes("원") ? v : `${v}원`;
+}
+document.addEventListener("input", function(e) {
+  const el = e.target;
+  if (!el || !el.id) return;
+
+  const moneyIds = [
+    "basePay", "overtimePay", "dutyPay", "positionPay",
+    "mealPay", "totalPay", "hourPay", "servicePay"
+  ];
+
+  if (moneyIds.includes(el.id)) {
+    const n = el.value.replace(/[^0-9]/g, "");
+    el.value = n ? Number(n).toLocaleString() : "";
+  }
+
+  if (el.id === "residentNo") {
+    let n = el.value.replace(/[^0-9]/g, "").slice(0, 13);
+    if (n.length > 6) n = n.slice(0, 6) + "-" + n.slice(6);
+    el.value = n;
+
+    const birth = document.getElementById("birth");
+    if (birth && n.length >= 8) {
+      birth.value = getBirthFromResidentNo(n);
+    }
+  }
+
+  if (el.id === "phone") {
+    let n = el.value.replace(/[^0-9]/g, "").slice(0, 11);
+    if (n.length <= 3) el.value = n;
+    else if (n.length <= 7) el.value = n.slice(0, 3) + "-" + n.slice(3);
+    else el.value = n.slice(0, 3) + "-" + n.slice(3, 7) + "-" + n.slice(7);
+  }
+});
+
+function getBirthFromResidentNo(v) {
+  const n = String(v).replace(/[^0-9]/g, "");
+  const yy = n.slice(0, 2);
+  const mm = n.slice(2, 4);
+  const dd = n.slice(4, 6);
+  const g = n.slice(6, 7);
+
+  let century = "19";
+  if (["3", "4", "7", "8"].includes(g)) century = "20";
+
+  return `${century}${yy}년 ${Number(mm)}월 ${Number(dd)}일`;
+}
+
+
+
 
