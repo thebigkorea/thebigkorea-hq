@@ -631,12 +631,31 @@ async function getApi(params){
 
   query.set("t", String(Date.now()));
 
-  const res = await fetch(
-    API_URL + "?" + query.toString(),
-    { cache:"no-store" }
-  );
+  const controller = new AbortController();
+  const timer = setTimeout(function(){
+    controller.abort();
+  }, 15000);
 
-  return await res.json();
+  try{
+    const res = await fetch(
+      API_URL + "?" + query.toString(),
+      {
+        cache:"no-store",
+        signal:controller.signal
+      }
+    );
+
+    if(!res.ok){
+      throw new Error(
+        "API 응답 오류: HTTP " + res.status
+      );
+    }
+
+    return await res.json();
+
+  }finally{
+    clearTimeout(timer);
+  }
 }
 
 function normalizeUnifiedEmployee(item){
@@ -813,7 +832,7 @@ async function searchEmployees(){
 
   try{
     const result = await getApi({
-      action:"getEmployees",
+      action:"getEmployeesAdmin",
       keyword:keyword,
       storeId:storeId
     });
@@ -882,7 +901,11 @@ async function searchEmployees(){
 
   }catch(e){
     console.error(e);
-    setStatus("조회 중 오류가 발생했습니다.");
+    setStatus(
+      e && e.name === "AbortError"
+        ? "직원 조회가 15초를 초과했습니다. 통합 인사DB 배포 상태를 확인해주세요."
+        : "조회 중 오류가 발생했습니다: " + (e.message || e)
+    );
     renderResults([]);
     renderStoreDashboard([], workplace);
   }
