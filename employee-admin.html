@@ -894,21 +894,40 @@ async function searchEmployees(){
       : [];
 
     const filteredRows = rows.filter(function(item){
-      const itemStatus = String(item.status || "").trim();
 
-      if(!selectedStatus){
-        return true;
-      }
+  const itemStatus =
+    String(item.status || "").trim();
 
-      if(selectedStatus === "퇴직"){
-        return (
-          itemStatus === "퇴직" ||
-          itemStatus === "퇴사"
-        );
-      }
+  const itemWorkplace =
+    String(item.workplace || "").trim();
 
-      return itemStatus === selectedStatus;
-    });
+  /*
+   * 소속을 선택한 경우
+   * 해당 점포 직원만 화면에 표시
+   */
+  if(workplace && itemWorkplace !== workplace){
+    return false;
+  }
+
+  /*
+   * 상태 = 전체
+   */
+  if(!selectedStatus){
+    return true;
+  }
+
+  /*
+   * 퇴직/퇴사 통합
+   */
+  if(selectedStatus === "퇴직"){
+    return (
+      itemStatus === "퇴직" ||
+      itemStatus === "퇴사"
+    );
+  }
+
+  return itemStatus === selectedStatus;
+});
 
     const list = filteredRows.sort(function(a,b){
       const aStore =
