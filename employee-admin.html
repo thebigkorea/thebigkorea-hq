@@ -929,25 +929,53 @@ async function searchEmployees(){
   return itemStatus === selectedStatus;
 });
 
-    const list = filteredRows.sort(function(a,b){
-      const aStore =
-        String(a.workplace || "").trim();
-      const bStore =
-        String(b.workplace || "").trim();
+    /* 직원 정렬
+   1. 점포
+   2. 고용형태 : 정규직 → 아르바이트 → 사업소득자 → 용역 → 기타
+   3. 같은 고용형태에서는 이름 가나다순
+*/
 
-      const storeCompare =
-        aStore.localeCompare(bStore,"ko");
+const employmentOrder = {
+  "정규직": 1,
+  "아르바이트": 2,
+  "사업소득자": 3,
+  "용역": 4
+};
 
-      if(storeCompare !== 0){
-        return storeCompare;
-      }
+const list = filteredRows.sort(function(a, b){
 
-      return String(a.name || "")
-        .localeCompare(
-          String(b.name || ""),
-          "ko"
-        );
-    });
+  /* 1. 점포 순서 */
+  const aStore = String(a.workplace || "").trim();
+  const bStore = String(b.workplace || "").trim();
+
+  const storeCompare = aStore.localeCompare(
+    bStore,
+    "ko"
+  );
+
+  if(storeCompare !== 0){
+    return storeCompare;
+  }
+
+
+  /* 2. 고용형태 순서 */
+  const groupA = normalizeEmploymentGroup(a);
+  const groupB = normalizeEmploymentGroup(b);
+
+  const orderA = employmentOrder[groupA] || 99;
+  const orderB = employmentOrder[groupB] || 99;
+
+  if(orderA !== orderB){
+    return orderA - orderB;
+  }
+
+
+  /* 3. 같은 고용형태에서는 이름 가나다순 */
+  return String(a.name || "").localeCompare(
+    String(b.name || ""),
+    "ko"
+  );
+});
 
     renderResults(list);
     renderStoreDashboard(list, workplace);
