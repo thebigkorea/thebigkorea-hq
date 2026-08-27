@@ -38,7 +38,9 @@
 
     <div class="input-group">
       <label>소속</label>
-      <select id="store"></select>
+      <select id="store">
+        <option value="">점포 불러오는 중...</option>
+      </select>
     </div>
 
     <div class="input-group">
@@ -93,15 +95,17 @@
 
   <!-- =====================================================
        경력증명서 발급 결과
+       처음에는 숨김
   ====================================================== -->
   <div
     class="preview-box"
     id="previewBox"
+    style="display:none;"
   >
 
     <div class="paper">
 
-      <!-- 실제 경력증명서 회사 로고 -->
+      <!-- 회사 로고 -->
       <div class="certificate-logo">
         <img
           src="images/thebigkorea-logo.png"
@@ -109,11 +113,13 @@
         >
       </div>
 
+
       <!-- 발급번호 -->
       <div class="issue-no">
         발급번호 :
         <span id="issueNo">-</span>
       </div>
+
 
       <!-- 증명서 제목 -->
       <h2>경 력 증 명 서</h2>
@@ -178,13 +184,12 @@
         <!-- 회사 / 대표이사 -->
         <div class="sign-area">
 
-          <div id="certStoreName">
-            주식회사 더큰코리아
-          </div>
+          <!-- 실제 소속 점포명 -->
+          <div id="certStoreName"></div>
 
-          <div>
-            주식회사 더큰코리아
-          </div>
+          <!-- 법인명 -->
+          <div>주식회사 더큰코리아</div>
+
 
           <div class="ceo-line">
 
