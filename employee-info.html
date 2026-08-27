@@ -132,7 +132,7 @@ button:disabled{
 
 <header class="header">
   <h1>더큰코리아 직원정보 입력</h1>
-  <p>입력한 직원정보는 더큰코리아 인사관리대장에 저장됩니다.</p>
+  <p>입력한 직원정보는 더큰코리아 통합 인사DB에 저장됩니다.</p>
 </header>
 
 <main class="container">
@@ -145,71 +145,7 @@ button:disabled{
       <label>
   소속
   <select id="workplace">
-
-    <option value="주식회사 더큰코리아 본사">
-      주식회사 더큰코리아 본사
-    </option>
-
-    <option value="한국의집 롯데월드몰점">
-      한국의집 롯데월드몰점
-    </option>
-
-    <option value="한국의집 롯데백화점 동탄점">
-      한국의집 효종갱 롯데백화점 동탄점
-    </option>
-
-    <option value="한국의집 효종갱 롯데의왕타임빌라스점">
-      한국의집 효종갱 롯데의왕타임빌라스점
-    </option>
-
-    <option value="한국의집 효종갱 신세계파주프리미엄아울렛점">
-      한국의집 효종갱 신세계파주프리미엄아울렛점
-    </option>
-
-    <option value="고호재 롯데월드몰점">
-      고호재 롯데월드몰점
-    </option>
-
-    <option value="소바공방 롯데백화점 평촌점">
-      소바공방 롯데백화점 평촌점
-    </option>
-
-    <option value="소바공방 시흥신세계프리미엄아울렛점">
-      소바공방 시흥신세계프리미엄아울렛점
-    </option>
-
-    <option value="길채정 압구정점">
-      길채정 갤러리아백화점 압구정점
-    </option>
-
-    <option value="길채정 분당점">
-      길채정 분당점
-    </option>
-
-    <option value="길채정 갤러리아타임월드점">
-      길채정 갤러리아타임월드점
-    </option>
-
-    <option value="카페그랑떼 롯데아울렛 부여점">
-      카페그랑떼 롯데아울렛 부여점
-    </option>
-
-    <option value="고궁 롯데아울렛 부여점">
-      고궁 롯데아울렛 부여점
-    </option>
-
-    <option value="상궁전 롯데백화점 센텀시티점">
-      상궁전 롯데백화점 센텀시티점
-    </option>
-
-    <option value="더큰식탁">
-      더큰식탁 소바공방 롯데아울렛 부여점
-    </option>
-
-    <option value="기타">
-      기타
-    </option>
-
+    <option value="">점포 불러오는 중...</option>
   </select>
 </label>
 
@@ -310,11 +246,73 @@ button:disabled{
 
 <script>
 const HQ_API_URL =
-  "https://script.google.com/macros/s/AKfycbzkqmLXXU545mKYlGU8M4socvKJAB34DlzPVEWXurMOlogqtmRDR0rgVRsRWyye4wt6Kw/exec";
+  "https://script.google.com/macros/s/AKfycbwRGQcXgYhfkTUiklPrHs4uFe7oHpgn8D_jM2jJPpU74tXr3D_h6vGMq72CHXU0EnAb/exec";
 
 const phoneInput = document.getElementById("phone");
 const rrnInput = document.getElementById("rrn");
 const birthInput = document.getElementById("birth");
+
+let STORE_MAP = {};
+
+window.addEventListener("DOMContentLoaded", loadStoreOptions);
+
+async function loadStoreOptions(){
+  const select = document.getElementById("workplace");
+
+  try{
+    const res = await fetch(
+      HQ_API_URL + "?action=getStores&t=" + Date.now(),
+      { cache:"no-store" }
+    );
+
+    const result = await res.json();
+
+    if(!result.success && !result.ok){
+      throw new Error(result.message || "점포 조회 실패");
+    }
+
+    const stores = Array.isArray(result.stores)
+      ? result.stores
+      : [];
+
+    STORE_MAP = {};
+    select.innerHTML = '<option value="">소속 선택</option>';
+
+    stores.forEach(function(store){
+      const storeId = String(store.storeId || "").trim();
+      const storeName = String(store.storeName || "").trim();
+
+      if(!storeId || !storeName){
+        return;
+      }
+
+      STORE_MAP[storeName] = storeId;
+
+      const option = document.createElement("option");
+      option.value = storeName;
+      option.textContent = storeName;
+      option.dataset.storeId = storeId;
+
+      select.appendChild(option);
+    });
+
+    const other = document.createElement("option");
+    other.value = "기타";
+    other.textContent = "기타";
+    select.appendChild(other);
+
+  }catch(error){
+    console.error("점포 목록 조회 실패", error);
+
+    select.innerHTML =
+      '<option value="">점포 목록을 불러오지 못했습니다.</option>';
+
+    showNotice(
+      "err",
+      "통합 인사DB에서 점포 목록을 불러오지 못했습니다."
+    );
+  }
+}
 
 phoneInput.addEventListener("input", function(){
   this.value = formatPhone(this.value);
@@ -430,6 +428,12 @@ async function saveEmployee(){
   const rrn = formatRRN(val("rrn"));
   const rrnNumber = onlyNumber(rrn);
 
+  if(!workplace){
+    showNotice("err","소속 점포를 선택해주세요.");
+    resetButton();
+    return;
+  }
+
   if(!name){
     showNotice("err","직원명을 입력해주세요.");
     resetButton();
@@ -448,49 +452,66 @@ async function saveEmployee(){
     return;
   }
 
-  const commonData = {
-    action:"saveEmployeeFromContract",
+  const storeSelect = document.getElementById("workplace");
+  const selectedOption =
+    storeSelect.options[storeSelect.selectedIndex];
 
-    workplace: workplace,
-    workPlace: workplace,
-    store: workplace,
+  const storeId =
+    selectedOption && selectedOption.dataset
+      ? String(selectedOption.dataset.storeId || "").trim()
+      : String(STORE_MAP[workplace] || "").trim();
+
+  const commonData = {
+    action: "saveEmployee",
+
+    storeId: storeId,
+    storeName: workplace,
 
     name: name,
-    empName: name,
-    phone: phone,
+    phone: onlyNumber(phone),
 
-    rrn: rrn,
     residentNo: rrn,
-    birth: val("birth"),
+    birthDate: val("birth"),
 
     address: val("address"),
-    bank: val("bank"),
-    account: val("account"),
+    bankName: val("bank"),
+    accountNo: val("account"),
 
     position: val("position"),
     employmentType: val("employmentType"),
-    contractType: val("employmentType"),
 
     department: val("department"),
     status: val("status"),
 
-    joinDate: val("joinDate"),
-    startDate: val("joinDate"),
-    
-    memo: val("memo"),
-    jobDuty: val("memo")
+    hireDate: val("joinDate"),
+
+    note: val("memo"),
+    source: "본사 직원정보 입력"
   };
 
   try{
     const result = await postJson(HQ_API_URL, commonData);
 
-    if(!result.success){
-      showNotice("err", result.message || "본사 인사관리대장 저장 실패");
+    if(!result.success && !result.ok){
+      showNotice(
+        "err",
+        result.message || "통합 인사DB 저장에 실패했습니다."
+      );
       resetButton();
       return;
     }
 
-    showNotice("ok", result.message || "본사 인사관리대장에 저장되었습니다.");
+    const savedEmployeeId =
+      result.employeeId ||
+      (result.employee && result.employee.employeeId) ||
+      "";
+
+    showNotice(
+      "ok",
+      savedEmployeeId
+        ? "통합 인사DB에 저장되었습니다. 직원ID: " + savedEmployeeId
+        : "통합 인사DB에 저장되었습니다."
+    );
     clearForm();
 
   }catch(e){
