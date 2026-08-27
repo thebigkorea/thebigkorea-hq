@@ -144,7 +144,11 @@ function renderCertificate(
     <div class="wrap result-wrap">
       <div class="certificate-paper">
 
-        <div class="issue-no">
+  <div class="certificate-logo">
+    <img src="images/thebigkorea-logo.png" alt="더큰코리아 로고">
+  </div>
+
+  <div class="issue-no">
           발급번호 : ${issueNo}
         </div>
 
