@@ -1075,11 +1075,6 @@ function renderStoreDashboard(list, workplace){
     return;
   }
 
-
-  /* =====================================================
-     전체 / 개별점포 모두 대시보드 표시
-  ====================================================== */
-
   dashboard.classList.add("show");
 
 
@@ -1093,23 +1088,18 @@ function renderStoreDashboard(list, workplace){
 
     const store =
       String(
-        item.workplace ||
-        "소속 미지정"
-      ).trim() ||
-      "소속 미지정";
-
+        item.workplace || "소속 미지정"
+      ).trim() || "소속 미지정";
 
     const group =
       normalizeEmploymentGroup(item);
 
 
     if(!byStore[store]){
-
       byStore[store] = {
         total: 0,
         groups: {}
       };
-
     }
 
 
@@ -1129,25 +1119,23 @@ function renderStoreDashboard(list, workplace){
 
 
     grandTotal++;
-
   });
 
 
+  /* 고용형태 표시 순서 */
   const preferredGroups = [
-
     "정규직",
     "아르바이트",
-    "일용직",
-    "용역",
     "사업소득자",
+    "용역",
+    "일용직",
     "계약직",
     "파견",
     "미분류"
-
   ];
 
 
-  function groupOrder(a,b){
+  function groupOrder(a, b){
 
     const ai =
       preferredGroups.indexOf(a);
@@ -1156,66 +1144,48 @@ function renderStoreDashboard(list, workplace){
       preferredGroups.indexOf(b);
 
 
-    if(
-      ai === -1 &&
-      bi === -1
-    ){
-      return a.localeCompare(
-        b,
-        "ko"
-      );
+    if(ai === -1 && bi === -1){
+      return a.localeCompare(b, "ko");
     }
-
 
     if(ai === -1){
       return 1;
     }
 
-
     if(bi === -1){
       return -1;
     }
 
-
     return ai - bi;
-
   }
 
 
   const stores =
     Object.keys(byStore)
-      .sort(function(a,b){
-
-        return a.localeCompare(
-          b,
-          "ko"
-        );
-
+      .sort(function(a, b){
+        return a.localeCompare(b, "ko");
       });
 
 
-  /* =====================================================
-     직원이 없는 경우
-  ====================================================== */
-
+  /* 직원이 없는 경우 */
   if(!stores.length){
 
     companyBox.innerHTML =
       '<div class="empty">표시할 직원이 없습니다.</div>';
 
     grid.innerHTML = "";
-
     totalBox.innerHTML = "";
 
     return;
-
   }
+
+
+  const selectedWorkplace =
+    String(workplace || "").trim();
 
 
   /* =====================================================
      상단 직원 구성 요약
-     전체 조회 → 더큰코리아 전체 직원 구성
-     점포 조회 → 해당 점포 직원 구성
   ====================================================== */
 
   const companyChips =
@@ -1225,26 +1195,15 @@ function renderStoreDashboard(list, workplace){
 
         return (
           '<span class="store-type-chip">' +
-
             group +
-
             ' <strong>' +
-
             grand[group] +
-
             '명</strong>' +
-
           '</span>'
         );
 
       })
       .join("");
-
-
-  const selectedWorkplace =
-    String(
-      workplace || ""
-    ).trim();
 
 
   const summaryTitle =
@@ -1260,108 +1219,92 @@ function renderStoreDashboard(list, workplace){
 
 
   companyBox.innerHTML =
-
     '<div class="company-summary-head">' +
 
       '<div>' +
 
         '<div class="company-summary-title">' +
-
           summaryTitle +
-
         '</div>' +
 
         '<div class="company-summary-sub">' +
-
           summarySub +
-
         '</div>' +
 
       '</div>' +
 
       '<div class="company-summary-total">' +
-
-        '총 ' +
-        grandTotal +
-        '명' +
-
+        '총 ' + grandTotal + '명' +
       '</div>' +
 
     '</div>' +
 
     '<div class="company-summary-types">' +
-
       companyChips +
-
     '</div>';
 
 
   /* =====================================================
      점포별 카드
+
+     전체 조회 → 점포별 카드 표시
+     개별 점포 → 위 요약과 중복되므로 숨김
   ====================================================== */
 
-  grid.innerHTML =
-    stores.map(function(store){
+  if(selectedWorkplace){
 
-      const data =
-        byStore[store];
+    grid.innerHTML = "";
 
+  }else{
 
-      const chips =
-        Object.keys(data.groups)
-          .sort(groupOrder)
-          .map(function(group){
+    grid.innerHTML =
+      stores.map(function(store){
 
-            return (
-
-              '<span class="store-type-chip">' +
-
-                group +
-
-                ' <strong>' +
-
-                data.groups[group] +
-
-                '명</strong>' +
-
-              '</span>'
-
-            );
-
-          })
-          .join("");
+        const data =
+          byStore[store];
 
 
-      return (
+        const chips =
+          Object.keys(data.groups)
+            .sort(groupOrder)
+            .map(function(group){
 
-        '<div class="store-summary-card">' +
+              return (
+                '<span class="store-type-chip">' +
+                  group +
+                  ' <strong>' +
+                  data.groups[group] +
+                  '명</strong>' +
+                '</span>'
+              );
 
-          '<div class="store-summary-title">' +
+            })
+            .join("");
 
-            store +
 
-            '<span class="store-summary-total">' +
+        return (
+          '<div class="store-summary-card">' +
 
-              '총 ' +
-              data.total +
-              '명' +
+            '<div class="store-summary-title">' +
 
-            '</span>' +
+              store +
 
-          '</div>' +
+              '<span class="store-summary-total">' +
+                '총 ' + data.total + '명' +
+              '</span>' +
 
-          '<div class="store-summary-types">' +
+            '</div>' +
 
-            chips +
+            '<div class="store-summary-types">' +
+              chips +
+            '</div>' +
 
-          '</div>' +
+          '</div>'
+        );
 
-        '</div>'
-
-      );
-
-    })
-    .join("");
+      })
+      .join("");
+  }
 
 
   /* =====================================================
@@ -1370,44 +1313,27 @@ function renderStoreDashboard(list, workplace){
 
   if(selectedWorkplace){
 
-    /*
-     개별 점포 조회에서는
-     위에 이미 전체 인원과 구성 표시가 있으므로
-     중복 합계는 숨김
-    */
-
     totalBox.innerHTML = "";
 
   }else{
 
     totalBox.innerHTML =
-
       '<span class="store-type-chip">' +
-
-        '전체 점포 ' +
-
-        '<strong>' +
-          stores.length +
-          '개' +
-        '</strong>' +
-
+        '전체 점포 <strong>' +
+        stores.length +
+        '개</strong>' +
       '</span>' +
 
       '<span class="store-type-chip">' +
-
-        '전체 재직인원 ' +
-
-        '<strong>' +
-          grandTotal +
-          '명' +
-        '</strong>' +
-
+        '전체 재직인원 <strong>' +
+        grandTotal +
+        '명</strong>' +
       '</span>';
-
   }
-
 }
 
+
+ 
 
 function renderResults(list){
   const body = document.getElementById("resultBody");
