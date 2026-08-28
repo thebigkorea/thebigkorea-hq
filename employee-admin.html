@@ -369,6 +369,17 @@ body.modal-open{
   border-radius:16px;
   padding:15px;
   background:#fff;
+  cursor:pointer;
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+.store-summary-card:hover{
+  transform:translateY(-2px);
+  border-color:#7da2cc;
+  box-shadow:0 8px 20px rgba(23,59,114,.11);
+}
+.store-summary-card:focus-visible{
+  outline:3px solid rgba(47,98,157,.3);
+  outline-offset:2px;
 }
 .store-summary-title{
   font-weight:900;
@@ -537,7 +548,7 @@ if (pw !== ADMIN_PASSWORD) {
     <div id="storeDashboardTotal" class="store-dashboard-total"></div>
   </section>
 
-  <section class="card">
+  <section id="resultSection" class="card">
     <div class="card-head">
       <div>
         <h2>직원 목록</h2>
@@ -912,6 +923,29 @@ function setStatusFilter(status, button){
   }
 
   searchEmployees();
+}
+
+async function selectStoreFromDashboard(card){
+  const workplace = document.getElementById("workplace");
+  const encodedStore = card ? card.getAttribute("data-store") : "";
+  const store = decodeURIComponent(encodedStore || "");
+
+  if(!workplace || !store) return;
+
+  workplace.value = store;
+  await searchEmployees();
+
+  const resultSection = document.getElementById("resultSection");
+  if(resultSection){
+    resultSection.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+}
+
+function handleStoreCardKey(event, card){
+  if(event.key === "Enter" || event.key === " "){
+    event.preventDefault();
+    selectStoreFromDashboard(card);
+  }
 }
 
 async function searchEmployees(){
@@ -1311,6 +1345,9 @@ function renderStoreDashboard(list, workplace){
         const data =
           byStore[store];
 
+        const encodedStore =
+          encodeURIComponent(store).replace(/'/g, "%27");
+
 
         const chips =
           Object.keys(data.groups)
@@ -1331,7 +1368,11 @@ function renderStoreDashboard(list, workplace){
 
 
         return (
-          '<div class="store-summary-card">' +
+          '<div class="store-summary-card" role="button" tabindex="0" ' +
+            'data-store="' + encodedStore + '" ' +
+            'title="' + store + ' 직원 목록 보기" ' +
+            'onclick="selectStoreFromDashboard(this)" ' +
+            'onkeydown="handleStoreCardKey(event,this)">' +
 
             '<div class="store-summary-title">' +
 
