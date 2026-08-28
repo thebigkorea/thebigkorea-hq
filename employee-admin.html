@@ -359,6 +359,18 @@ body.modal-open{
 }
 .store-dashboard-head h2{margin:0}
 .store-dashboard-head p{margin:0;color:#64748b;font-size:13px}
+.dashboard-back-btn{
+  display:none;
+  margin:0;
+  height:40px;
+  padding:0 16px;
+  background:#fff;
+  color:#173b72;
+  border:1px solid #b9cce2;
+  box-shadow:none;
+  white-space:nowrap;
+}
+.dashboard-back-btn.show{display:inline-flex;align-items:center}
 .store-dashboard-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
@@ -542,6 +554,9 @@ if (pw !== ADMIN_PASSWORD) {
         <h2>점포별 재직인원 현황</h2>
         <p>전체 소속 조회 시 점포별 고용형태 인원을 보여줍니다.</p>
       </div>
+      <button id="dashboardBackBtn" class="dashboard-back-btn" type="button" onclick="showAllStores()">
+        ← 전체 점포 보기
+      </button>
     </div>
     <div id="companyDashboardSummary" class="company-summary-card"></div>
     <div id="storeDashboardGrid" class="store-dashboard-grid"></div>
@@ -941,6 +956,19 @@ async function selectStoreFromDashboard(card){
   }
 }
 
+async function showAllStores(){
+  const workplace = document.getElementById("workplace");
+  if(!workplace) return;
+
+  workplace.value = "";
+  await searchEmployees();
+
+  const dashboard = document.getElementById("storeDashboard");
+  if(dashboard){
+    dashboard.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+}
+
 function handleStoreCardKey(event, card){
   if(event.key === "Enter" || event.key === " "){
     event.preventDefault();
@@ -1248,6 +1276,16 @@ function renderStoreDashboard(list, workplace){
         return a.localeCompare(b, "ko");
       });
 
+  const selectedWorkplace =
+    String(workplace || "").trim();
+
+  const backButton =
+    document.getElementById("dashboardBackBtn");
+
+  if(backButton){
+    backButton.classList.toggle("show", Boolean(selectedWorkplace));
+  }
+
 
   /* 직원이 없는 경우 */
   if(!stores.length){
@@ -1260,11 +1298,6 @@ function renderStoreDashboard(list, workplace){
 
     return;
   }
-
-
-  const selectedWorkplace =
-    String(workplace || "").trim();
-
 
   /* =====================================================
      상단 직원 구성 요약
