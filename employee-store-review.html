@@ -364,7 +364,7 @@ async function loadEmployees(){
   currentEmployees = (result.employees || [])
     .map(normalizeEmployee)
     .filter(x => !store || x.workplace === store)
-    .filter(x => ["재직","휴직"].includes(String(x.status || "").trim()))
+    .filter(x => String(x.status || "").trim() === "재직")
     .sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"ko"));
 
   renderEmployees();
@@ -376,7 +376,7 @@ function renderEmployees(){
   const body = document.getElementById("employeeBody");
 
   if(!currentEmployees.length){
-    body.innerHTML = '<tr><td colspan="8">현재 재직/휴직 직원이 없습니다.</td></tr>';
+    body.innerHTML = '<tr><td colspan="8">현재 재직 직원이 없습니다.</td></tr>';
     return;
   }
 
