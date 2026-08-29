@@ -345,6 +345,40 @@
       gap:13px;
     }
 
+    .parttime-grid {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:13px;
+    }
+
+    .parttime-store {
+      padding:18px;
+      background:linear-gradient(145deg,#fffdf9,#f7f1e9);
+      border:1px solid #ddcfbd;
+      border-radius:16px;
+    }
+
+    .parttime-store .store-label {
+      display:block;
+      margin-bottom:7px;
+      color:var(--gold);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.08em;
+    }
+
+    .parttime-store h4 {
+      min-height:42px;
+      margin:0 0 14px;
+      color:var(--brown);
+      font-size:15px;
+      line-height:1.45;
+    }
+
+    .parttime-store .task {
+      justify-content:center;
+    }
+
     .store {
       padding:17px;
       background:#fcfbf9;
@@ -390,6 +424,10 @@
       .store-grid {
         grid-template-columns:1fr;
       }
+
+      .parttime-grid {
+        grid-template-columns:repeat(2,1fr);
+      }
     }
 
     @media (max-width:620px) {
@@ -427,6 +465,10 @@
       .links {
         grid-template-columns:1fr;
       }
+
+      .parttime-grid {
+        grid-template-columns:1fr;
+      }
     }
   </style>
 </head>
@@ -448,6 +490,7 @@
         <a href="#hr">근태·인사</a>
         <a href="#finance">계약·정산</a>
         <a href="#operation">운영지원</a>
+        <a href="#part-time">아르바이트</a>
         <a href="#stores">지점관리</a>
         <a href="#admin">원장·관리자</a>
       </nav>
@@ -540,6 +583,12 @@
           <strong>일용직 관리</strong>
           <small>통합 근무내역</small>
           <span id="hqDailyUnpaidBadgeTop" class="badge-new">0</span>
+        </a>
+
+        <a class="quick-btn" href="#part-time">
+          <span class="ico">🧑‍🍳</span>
+          <strong>아르바이트 매장별 관리</strong>
+          <small>직원·근로내역·급여명세서·급여대장</small>
         </a>
 
         <a class="quick-btn"
@@ -865,6 +914,65 @@
               <a class="task" target="_blank" href="trip-expense.html">
                 이동비 현황
               </a>
+            </div>
+          </div>
+        </article>
+
+        <article class="category wide" id="part-time">
+          <div class="cat-head">
+            <span class="cat-icon">🧑‍🍳</span>
+
+            <div>
+              <h3>아르바이트 매장별 관리</h3>
+              <p>매장별 직원정보, 근로내역, 급여명세서 및 월별 급여대장을 관리합니다.</p>
+            </div>
+          </div>
+
+          <div class="group">
+            <div class="parttime-grid">
+              <div class="parttime-store">
+                <span class="store-label">LOTTE WORLD MALL</span>
+                <h4>한국의집 롯데월드몰점</h4>
+                <a class="task primary"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   href="https://script.google.com/macros/s/AKfycbyEQyfGeLn598KKm6vNfu9l3c4zunUo67ZVfeXaZI8T7aX0rkntYaicC-l3PdQ8YYG_2w/exec">
+                  관리화면 열기
+                </a>
+              </div>
+
+              <div class="parttime-store">
+                <span class="store-label">GALLERIA APGUJEONG</span>
+                <h4>길채정 압구정점</h4>
+                <a class="task primary"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   href="https://script.google.com/macros/s/AKfycbzPPPkbG-BS0M1NFMGkU8aAplXY-ix3knA9OjsUpz9n2HD0BJOwXTHZTdG8wefHrpWC/exec">
+                  관리화면 열기
+                </a>
+              </div>
+
+              <div class="parttime-store">
+                <span class="store-label">SHINSEGAE PAJU</span>
+                <h4>한국의집 효종갱 신세계파주 프리미엄아울렛점</h4>
+                <a class="task primary"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   href="https://script.google.com/macros/s/AKfycbxrQIoPLOsYMbnkAMO4oeBjfWqwQCagCz7EJGGSBM7eLh2hPQGrth7tmTAeFJQzs9_PlQ/exec">
+                  관리화면 열기
+                </a>
+              </div>
+
+              <div class="parttime-store">
+                <span class="store-label">LOTTE PYEONGCHON</span>
+                <h4>소바공방 롯데백화점 평촌점</h4>
+                <a class="task primary"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   href="https://script.google.com/macros/s/AKfycbw18xcPkkzKQJ0VcNgQF-wfc4Utbb7YZCl4Yz3RKgearuU8nveasQSiSUoCLD5_AJHWsw/exec">
+                  관리화면 열기
+                </a>
+              </div>
             </div>
           </div>
         </article>
