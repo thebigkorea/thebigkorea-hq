@@ -1,5 +1,5 @@
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbyshRs9k9fBXHjNlHSGvpDM2ueLRVRNL3Ya_3xorvLuZ9HHc4fB8JBa6jEowDRW0ZeO/exec";
+  "https://script.google.com/macros/s/AKfycbwRGQcXgYhfkTUiklPrHs4uFe7oHpgn8D_jM2jJPpU74tXr3D_h6vGMq72CHXU0EnAb/exec";
 
 let canvas;
 let ctx;
@@ -83,8 +83,16 @@ function initMoneyInput() {
 }
 
 function collectData() {
+  const workplaceCode = value("workplaceCode");
+  const workplaceName = selectedText("workplaceCode") || value("workPlace");
+  const dutyRaw = value("jobDuty");
+  const duty = dutyRaw === "기타" ? (value("jobDutyEtc") || "기타") : dutyRaw;
+
   return {
-    contractType: "계약직(아르바이트) 근로계약서",
+    contractType: value("contractType") || "계약직(아르바이트) 근로계약서",
+    workplaceCode,
+    workplaceName,
+    companyName: "주식회사 더큰코리아",
 
     empName: value("empName"),
     residentNo: value("residentNo"),
@@ -94,21 +102,25 @@ function collectData() {
 
     startDate: formatDate(value("startDate")),
     endDate: formatDate(value("endDate")),
+    startDateRaw: value("startDate"),
+    endDateRaw: value("endDate"),
     workDays: value("workDays"),
     holiday: value("holiday"),
 
     startTime: value("startTime"),
     endTime: value("endTime"),
+    workTime: `${value("startTime")} ~ ${value("endTime")}`,
     breakTime: value("breakTime"),
-    jobDuty: value("jobDuty"),
-    hourPay: value("hourPay"),
-    insurance: value("insurance"),
+    workPlace: value("workPlace") || workplaceName,
+    jobDuty: duty,
 
+    hourPay: value("hourPay"),
+    payType: "시급제",
     weeklyHolidayPay: value("weeklyHolidayPay"),
+    insurance: value("insurance"),
     bankName: value("bankName"),
     bankAccount: value("bankAccount"),
 
-    workPlace: "한국의집 롯데월드몰점",
     representative: "박병호"
   };
 }
@@ -142,12 +154,10 @@ function validateData(d) {
 
 function createContract() {
   const d = collectData();
-
   if (!validateData(d)) return;
 
-  fillContract(d);
-  setMessage("계약직(아르바이트) 근로계약서가 생성되었습니다.");
-  alert("계약직(아르바이트) 근로계약서가 생성되었습니다.");
+  renderCurrentPreview(d);
+  setMessage("계약직·아르바이트 근로계약서가 생성되었습니다.");
 }
 
 async function saveContractAndCreateLink(event) {
@@ -156,7 +166,7 @@ async function saveContractAndCreateLink(event) {
 
   if (!validateData(d)) return;
 
-  fillContract(d);
+  renderCurrentPreview(d);
 
   if (btn) {
     btn.disabled = true;
@@ -174,37 +184,17 @@ async function saveContractAndCreateLink(event) {
     });
 
     if (!result || !result.success) {
-      alert(result?.message || "계약 저장 실패");
-      setMessage(result?.message || "계약 저장 실패");
+      const msg = result?.message || "계약 저장 실패";
+      alert(msg);
+      setMessage(msg);
       return;
     }
 
-    const contractId = result.contractId || result.id || "";
-    if (!contractId) {
-      throw new Error("계약번호가 생성되지 않았습니다.");
-    }
-
-    currentContractId = contractId;
-
-    const link =
-      "https://thebigkorea.github.io/hr-system/contract-view.html?id=" +
-      encodeURIComponent(contractId) +
-      "&v=" + Date.now();
-
-    const resultBox = document.getElementById("resultBox");
-    if (resultBox) {
-      resultBox.style.display = "block";
-      resultBox.innerHTML = `
-        <strong>계약서가 저장되었습니다.</strong><br>
-        계약번호 : ${contractId}<br>
-        직원에게 아래 링크를 보내 전자서명을 진행하세요.
-        <input id="contractLink" value="${link}" readonly />
-        <button type="button" onclick="copyContractLink()">직원 링크 복사</button>
-      `;
-    }
+    currentContractId = result.contractId;
+    showLinkResult(result.contractId);
 
     setMessage("계약 저장 완료. 직원 링크가 생성되었습니다.");
-    alert("계약직·아르바이트 근로계약서 저장 및 직원 링크 생성이 완료되었습니다.");
+    alert("계약 저장 및 직원 링크 생성이 완료되었습니다.");
 
   } catch (e) {
     console.error(e);
@@ -405,18 +395,6 @@ async function completeElectronicContract(event) {
   }
 }
 
-
-
-/* HTML 버튼 이름 호환 - 링크 생성 기능만 연결 */
-function makePreview() {
-  createContract();
-}
-
-function saveContract() {
-  const btn = document.getElementById("saveBtn");
-  saveContractAndCreateLink({ target: btn });
-}
-
 function copyContractLink() {
   const input = document.getElementById("contractLink");
 
@@ -515,4 +493,111 @@ function getBirthFromResidentNo(v) {
   if (["3", "4", "7", "8"].includes(g)) century = "20";
 
   return `${century}${yy}년 ${Number(mm)}월 ${Number(dd)}일`;
+}
+
+
+/* =========================================================
+   현재 입력 HTML 호환 / 미리보기 / 링크 생성
+   - 완료본은 기존 thebigkorea-hq/contract-view.html 사용
+   - contract-view.html의 기존 디자인은 건드리지 않음
+========================================================= */
+function selectedText(id) {
+  const el = document.getElementById(id);
+  if (!el || el.selectedIndex < 0) return "";
+  return (el.options[el.selectedIndex]?.text || "").trim();
+}
+
+function escHtml(v) {
+  return String(v ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function showPreviewHtml(title, rows, d) {
+  const preview = document.getElementById("preview");
+  if (!preview) return;
+
+  const body = rows.map(([label, val]) => `
+    <tr>
+      <th style="width:28%;padding:10px;border:1px solid #d7dee8;background:#f7f9fc;text-align:left;">${escHtml(label)}</th>
+      <td style="padding:10px;border:1px solid #d7dee8;">${escHtml(val || "")}</td>
+    </tr>
+  `).join("");
+
+  preview.innerHTML = `
+    <div style="padding:28px;background:#fff;color:#172033;font-family:Arial,'Noto Sans KR',sans-serif;">
+      <h2 style="margin:0 0 22px;text-align:center;font-size:26px;">${escHtml(title)}</h2>
+      <p style="margin:0 0 20px;line-height:1.7;">
+        <strong>${escHtml(d.workplaceName || d.workPlace || "주식회사 더큰코리아")}</strong>와
+        <strong>${escHtml(d.empName || "")}</strong>은 아래 내용으로 계약을 체결합니다.
+      </p>
+      <table style="width:100%;border-collapse:collapse;font-size:14px;">${body}</table>
+      <div style="margin-top:24px;display:flex;gap:20px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:260px;padding:16px;border:1px solid #d7dee8;border-radius:10px;">
+          <strong>[사업주]</strong><br><br>
+          상호: ${escHtml(d.workplaceName || d.workPlace || "주식회사 더큰코리아")}<br>
+          대표자: ${escHtml(d.representative || "박병호")}
+        </div>
+        <div style="flex:1;min-width:260px;padding:16px;border:1px solid #d7dee8;border-radius:10px;">
+          <strong>[근로자/제공자]</strong><br><br>
+          성명: ${escHtml(d.empName || "")}<br>
+          연락처: ${escHtml(d.phone || "")}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function showLinkResult(contractId) {
+  const link =
+    "https://thebigkorea.github.io/thebigkorea-hq/contract-view.html?id=" +
+    encodeURIComponent(contractId) +
+    "&v=" + Date.now();
+
+  const box = document.getElementById("resultBox");
+  if (box) {
+    box.style.display = "block";
+    box.innerHTML = `
+      <strong>계약서가 저장되었습니다.</strong><br>
+      계약번호 : ${escHtml(contractId)}<br>
+      직원에게 아래 링크를 보내 전자서명을 진행하세요.
+      <input id="contractLink" value="${escHtml(link)}" readonly
+             style="width:100%;box-sizing:border-box;margin:12px 0;padding:12px;">
+      <button type="button" onclick="copyContractLink()"
+              style="width:100%;padding:12px;">직원 링크 복사</button>
+    `;
+  }
+  return link;
+}
+
+function makePreview() {
+  createContract();
+}
+
+function saveContract() {
+  const btn = document.getElementById("saveBtn");
+  saveContractAndCreateLink({ target: btn });
+}
+
+function renderCurrentPreview(d) {
+  showPreviewHtml(
+    d.contractType || "계약직·아르바이트 근로계약서",
+    [
+      ["계약기간", `${d.startDate} ~ ${d.endDate}`],
+      ["근무장소", d.workPlace],
+      ["업무내용", d.jobDuty],
+      ["주 근무일수", d.workDays],
+      ["근무시간", `${d.startTime} ~ ${d.endTime}`],
+      ["휴게시간", d.breakTime],
+      ["시급", d.hourPay ? `${d.hourPay}원` : ""],
+      ["주휴수당", d.weeklyHolidayPay],
+      ["4대보험", d.insurance],
+      ["급여계좌", `${d.bankName || ""} ${d.bankAccount || ""}`.trim()],
+      ["주소", d.address]
+    ],
+    d
+  );
 }
