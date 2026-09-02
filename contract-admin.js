@@ -26,7 +26,7 @@ async function loadContracts() {
 
   tbody.innerHTML = `
     <tr>
-      <td colspan="9">계약 목록을 불러오는 중입니다...</td>
+      <td colspan="10">계약 목록을 불러오는 중입니다...</td>
     </tr>
   `;
 
@@ -38,19 +38,19 @@ async function loadContracts() {
     if (!result.success) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="9">${result.message || "계약 목록을 불러오지 못했습니다."}</td>
+          <td colspan="10">${result.message || "계약 목록을 불러오지 못했습니다."}</td>
         </tr>
       `;
       return;
     }
 
-    allContracts = result.contracts || [];
+    allContracts = result.rows || result.contracts || [];
     renderContracts(allContracts);
 
   } catch (err) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="9">오류가 발생했습니다: ${err.message}</td>
+        <td colspan="10">오류가 발생했습니다: ${err.message}</td>
       </tr>
     `;
   }
@@ -58,41 +58,35 @@ async function loadContracts() {
 
 function searchContracts() {
   const name = document.getElementById("searchName").value.trim();
+  const workplace = document.getElementById("workplaceFilter")?.value || "all";
   const status = document.getElementById("statusFilter").value;
   const type = document.getElementById("typeFilter").value;
 
   const filtered = allContracts.filter(c => {
     const contractType = String(c.contractType || "");
+    const employeeName = String(c.name || c.employeeName || "");
+    const storeName = String(c.store || c.workplace || c.workplaceName || "");
+    const signStatus = String(c.status || c.signStatus || "");
 
-    const matchName =
-      !name || String(c.employeeName || "").includes(name);
-
-    const matchStatus =
-      status === "all" || c.status === status;
+    const matchName = !name || employeeName.includes(name);
+    const matchWorkplace =
+      workplace === "all" ||
+      storeName.includes(workplace) ||
+      workplace.includes(storeName);
+    const matchStatus = status === "all" || signStatus === status;
 
     let matchType = false;
-
-    if (type === "all") {
-      matchType = true;
-    } else if (type === "정규직") {
-      matchType = contractType.includes("정규직");
-    } else if (type === "아르바이트") {
-      matchType =
-        contractType.includes("아르바이트") ||
-        contractType.includes("계약직");
-    } else if (type === "계약직") {
-      matchType =
-        contractType.includes("계약직") ||
-        contractType.includes("아르바이트");
+    if (type === "all") matchType = true;
+    else if (type === "정규직") matchType = contractType.includes("정규직");
+    else if (type === "아르바이트" || type === "계약직") {
+      matchType = contractType.includes("아르바이트") || contractType.includes("계약직");
     } else if (type === "용역") {
-      matchType =
-        contractType.includes("용역") ||
-        contractType.includes("사업소득");
+      matchType = contractType.includes("용역") || contractType.includes("사업소득");
     } else {
       matchType = contractType.includes(type);
     }
 
-    return matchName && matchStatus && matchType;
+    return matchName && matchWorkplace && matchStatus && matchType;
   });
 
   renderContracts(filtered);
@@ -100,6 +94,8 @@ function searchContracts() {
 
 function resetSearch() {
   document.getElementById("searchName").value = "";
+  const workplace = document.getElementById("workplaceFilter");
+  if (workplace) workplace.value = "all";
   document.getElementById("statusFilter").value = "all";
   document.getElementById("typeFilter").value = "all";
   renderContracts(allContracts);
@@ -109,44 +105,62 @@ function renderContracts(list) {
   const tbody = document.getElementById("contractTableBody");
   tbody.innerHTML = "";
 
+  updateStats(list || []);
+
   if (!list || list.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="9">조회된 계약이 없습니다.</td>
+        <td colspan="10">조회된 계약이 없습니다.</td>
       </tr>
     `;
     return;
   }
 
   list.forEach(c => {
-    const isDone = c.status === "서명완료";
+    const status = c.status || c.signStatus || "";
+    const isDone = status === "서명완료";
+    const employeeName = c.name || c.employeeName || "";
+    const workplace = c.store || c.workplace || c.workplaceName || "";
+    const joinDate = c.startDate || c.joinDate || "";
+    const viewLink = c.contractUrl || c.workerLink || "";
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${c.contractId || ""}</td>
+      <td>${workplace}</td>
       <td>${displayContractType(c.contractType)}</td>
-      <td>
-        <span class="badge ${isDone ? "done" : "wait"}">
-          ${c.status || ""}
-        </span>
-      </td>
-      <td>${c.employeeName || ""}</td>
+      <td><span class="badge ${isDone ? "done" : "wait"}">${status}</span></td>
+      <td>${employeeName}</td>
       <td>${c.phone || ""}</td>
-      <td>${c.joinDate || ""}</td>
+      <td>${joinDate}</td>
       <td>${c.createdAt || ""}</td>
       <td>${c.signedAt || "-"}</td>
       <td>
         <div class="action-buttons">
           <button onclick="openContract('${c.contractId}')">원본보기</button>
-          <button class="green" onclick="copyViewLink('${c.workerLink || ""}', '${c.contractId || ""}')">
-            완료본 링크복사
-          </button>
+          <button class="green" onclick="copyViewLink('${viewLink}', '${c.contractId || ""}')">완료본 링크복사</button>
         </div>
       </td>
     `;
-
     tbody.appendChild(tr);
   });
+}
+
+
+function updateStats(list) {
+  const rows = Array.isArray(list) ? list : [];
+  const total = rows.length;
+  const wait = rows.filter(c => String(c.status || c.signStatus || "") === "서명대기").length;
+  const done = rows.filter(c => String(c.status || c.signStatus || "") === "서명완료").length;
+
+  const now = new Date();
+  const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const month = rows.filter(c => String(c.createdAt || "").startsWith(ym)).length;
+
+  document.getElementById("totalCount").textContent = total;
+  document.getElementById("waitCount").textContent = wait;
+  document.getElementById("doneCount").textContent = done;
+  document.getElementById("monthCount").textContent = month;
 }
 
 function displayContractType(type) {
@@ -447,12 +461,23 @@ function printContract() {
 }
 
 function copyWorkerLink() {
-  if (!selectedContract || !selectedContract.workerLink) {
+  if (!selectedContract) {
     alert("복사할 직원 링크가 없습니다.");
     return;
   }
 
-  const viewLink = makeViewLink(selectedContract.workerLink, selectedContract.contractId);
+  const rawLink =
+    selectedContract.contractUrl ||
+    selectedContract.workerLink ||
+    "";
+
+  const viewLink = makeViewLink(rawLink, selectedContract.contractId);
+
+  if (!viewLink) {
+    alert("복사할 직원 링크가 없습니다.");
+    return;
+  }
+
   copyText(viewLink);
   alert("완료된 계약서 열람 링크가 복사되었습니다.");
 }
@@ -479,7 +504,7 @@ function makeViewLink(link, contractId) {
 
   if (!id) return "";
 
-  return `https://thebigkorea.github.io/hr-system/contract-view.html?id=${encodeURIComponent(id)}&v=${Date.now()}`;
+  return `https://thebigkorea.github.io/thebigkorea-hq/contract-view.html?id=${encodeURIComponent(id)}&v=${Date.now()}`;
 }
 
 function copyText(text) {
