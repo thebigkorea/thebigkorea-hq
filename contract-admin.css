@@ -1,89 +1,139 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  padding: 36px;
-  background: #f3f4f6;
+  padding: 0;
+  background: #f4f7fb;
   font-family: "Pretendard", "Noto Sans KR", sans-serif;
   color: #1e293b;
 }
 
 .container {
-  max-width: 1600px;
+  width: min(96vw, 1540px);
+  max-width: 1540px;
   margin: 0 auto;
+  padding: 18px 18px 28px;
 }
 
 header {
   text-align: center;
-  margin-bottom: 34px;
+  margin: 0 0 14px;
+  padding: 8px 0 0;
 }
 
 header h1 {
   margin: 0;
-  font-size: 50px;
+  font-size: 38px;
+  line-height: 1.15;
+  letter-spacing: -1.5px;
   color: #1f3d68;
   font-weight: 900;
 }
 
 header p {
-  margin-top: 10px;
-  font-size: 20px;
+  margin: 6px 0 0;
+  font-size: 15px;
   color: #64748b;
-  letter-spacing: 3px;
+  letter-spacing: 5px;
+}
+
+.header-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px 0 12px;
+}
+
+.ledger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  background: #1f3d68;
+  color: #fff;
+  border-radius: 9px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: .2s;
+}
+
+.ledger-btn:hover {
+  background: #2d568d;
 }
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
-  margin-bottom: 26px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 14px;
 }
 
 .stats div {
+  min-height: 92px;
+  padding: 14px 10px;
+  border-radius: 16px;
   background: white;
-  border-radius: 22px;
-  padding: 24px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.08);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .stats strong {
   display: block;
-  font-size: 40px;
+  font-size: 31px;
+  line-height: 1;
+  margin-bottom: 8px;
   color: #1f3d68;
   font-weight: 900;
 }
 
 .stats span {
   display: block;
-  margin-top: 8px;
-  font-size: 17px;
+  margin-top: 0;
+  font-size: 14px;
   color: #64748b;
   font-weight: 800;
 }
 
 .search-box {
   display: grid;
-  grid-template-columns: 1.5fr 1.3fr 1fr 1fr 0.8fr 0.8fr;
-  gap: 14px;
-  margin-bottom: 26px;
+  grid-template-columns:
+    minmax(180px, 1.15fr)
+    minmax(170px, .95fr)
+    minmax(150px, .78fr)
+    minmax(150px, .78fr)
+    150px
+    150px;
+  gap: 10px;
+  margin: 0 0 14px;
+  align-items: stretch;
 }
 
 .search-box input,
 .search-box select {
-  height: 60px;
+  width: 100%;
+  min-width: 0;
+  height: 50px;
   border: 1px solid #cbd5e1;
-  border-radius: 14px;
-  padding: 0 16px;
-  font-size: 18px;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 14px;
   background: white;
 }
 
 button {
-  height: 60px;
+  height: 50px;
   border: none;
-  border-radius: 14px;
+  border-radius: 10px;
   background: #1f3d68;
   color: white;
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 900;
   cursor: pointer;
 }
@@ -100,40 +150,95 @@ button:active {
   transform: scale(0.98);
 }
 
+.search-box button {
+  width: 100%;
+  min-width: 0;
+  height: 50px;
+  padding: 0 14px;
+  font-size: 14px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
 .table-wrap {
+  width: 100%;
   background: white;
-  border-radius: 22px;
+  border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: visible;
 }
 
 .table-wrap table {
   width: 100%;
+  min-width: 1320px;
+  table-layout: fixed;
   border-collapse: collapse;
-  min-width: 1300px;
 }
 
-th {
+.table-wrap th,
+.table-wrap td {
+  padding: 11px 8px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  vertical-align: middle;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-wrap th {
   background: #1f3d68;
   color: white;
-  padding: 16px;
-  font-size: 16px;
-  white-space: nowrap;
+  font-size: 13px;
+  position: sticky;
+  top: 0;
+  z-index: 3;
 }
 
-td {
-  padding: 14px;
+.table-wrap td {
   border-bottom: 1px solid #e5e7eb;
-  text-align: center;
-  font-size: 15px;
-  white-space: nowrap;
 }
+
+.table-wrap th:nth-child(1),
+.table-wrap td:nth-child(1) { width: 205px; }
+
+.table-wrap th:nth-child(2),
+.table-wrap td:nth-child(2) { width: 215px; }
+
+.table-wrap th:nth-child(3),
+.table-wrap td:nth-child(3) { width: 205px; }
+
+.table-wrap th:nth-child(4),
+.table-wrap td:nth-child(4) { width: 90px; }
+
+.table-wrap th:nth-child(5),
+.table-wrap td:nth-child(5) { width: 90px; }
+
+.table-wrap th:nth-child(6),
+.table-wrap td:nth-child(6) { width: 115px; }
+
+.table-wrap th:nth-child(7),
+.table-wrap td:nth-child(7) { width: 100px; }
+
+.table-wrap th:nth-child(8),
+.table-wrap td:nth-child(8) { width: 145px; }
+
+.table-wrap th:nth-child(9),
+.table-wrap td:nth-child(9) { width: 145px; }
+
+.table-wrap th:nth-child(10),
+.table-wrap td:nth-child(10) { width: 150px; }
 
 .badge {
-  display: inline-block;
-  padding: 7px 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 66px;
+  padding: 6px 8px;
   border-radius: 999px;
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 900;
 }
 
@@ -150,33 +255,41 @@ td {
 .action-buttons {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: nowrap;
 }
 
 .action-buttons button {
-  height: 40px;
-  padding: 0 12px;
-  font-size: 14px;
-  border-radius: 10px;
+  min-width: 66px;
+  height: 32px;
+  padding: 0 8px;
+  font-size: 11px;
+  border-radius: 8px;
+  white-space: nowrap;
 }
 
+/* 계약서 원본 보기 모달 */
 .modal {
   display: none;
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.55);
   z-index: 999;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 36px;
 }
 
 .modal-content {
-  max-width: 1100px;
+  width: 90%;
+  max-width: 1200px;
+  max-height: none;
   margin: 0 auto;
   background: white;
   border-radius: 24px;
   padding: 30px;
+  overflow: visible;
 }
 
 .modal-header {
@@ -200,12 +313,15 @@ td {
 }
 
 .contract-detail {
+  width: 100%;
+  max-width: 100%;
   border: 1px solid #ddd;
   padding: 30px;
   border-radius: 16px;
   background: #fff;
   line-height: 1.8;
   font-size: 17px;
+  overflow-x: hidden;
 }
 
 .contract-detail h1 {
@@ -222,24 +338,33 @@ td {
   color: #1f3d68;
 }
 
-.detail-table {
+.detail-table,
+.contract-detail table {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  table-layout: fixed;
   border-collapse: collapse;
   margin: 12px 0;
 }
 
 .detail-table th,
-.detail-table td {
+.detail-table td,
+.contract-detail th,
+.contract-detail td {
   border: 1px solid #333;
   padding: 10px;
   font-size: 14px;
+  white-space: normal;
+  word-break: keep-all;
 }
 
 .sign-admin-box {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  margin-top: 40px;
+  gap: 24px;
+  max-width: 100%;
+  margin-top: 24px;
 }
 
 .sign-admin-box > div {
@@ -270,13 +395,55 @@ td {
   flex: 1;
 }
 
-@media (max-width: 900px) {
-  body {
-    padding: 18px;
+/* 중간 크기 데스크톱 */
+@media (max-width: 1450px) {
+  .container {
+    width: 98vw;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   header h1 {
-    font-size: 34px;
+    font-size: 32px;
+  }
+
+  .table-wrap table {
+    min-width: 1240px;
+  }
+
+  .table-wrap th,
+  .table-wrap td {
+    padding: 9px 6px;
+    font-size: 11.5px;
+  }
+
+  .action-buttons button {
+    min-width: 58px;
+    font-size: 10.5px;
+    padding: 0 6px;
+  }
+}
+
+/* 노트북 */
+@media (max-width: 1100px) {
+  .search-box {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* 모바일 */
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    padding: 12px;
+  }
+
+  header h1 {
+    font-size: 30px;
   }
 
   .stats {
@@ -287,13 +454,22 @@ td {
     grid-template-columns: 1fr;
   }
 
+  .modal {
+    padding: 10px;
+  }
+
+  .modal-content {
+    width: 100%;
+    padding: 18px;
+  }
+
   .sign-admin-box {
     grid-template-columns: 1fr;
   }
 }
 
+/* 인쇄 / PDF */
 @media print {
-
   @page {
     size: A4 portrait;
     margin: 12mm;
@@ -411,363 +587,5 @@ td {
   .signature-img {
     max-width: 180px !important;
     max-height: 70px !important;
-  }
-}
-.contract-detail {
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-.contract-detail table {
-  width: 100%;
-  max-width: 100%;
-  table-layout: fixed;
-}
-
-.contract-detail th,
-.contract-detail td {
-  word-break: keep-all;
-  white-space: normal;
-  font-size: 14px;
-}
-
-.modal-content {
-  max-width: 1100px;
-  overflow-x: hidden;
-}
-
-.sign-admin-box {
-  max-width: 100%;
-}
-.contract-detail table {
-  width: 100%;
-  min-width: 0;
-  table-layout: fixed;
-}
-.modal {
-  overflow-y: auto;
-}
-
-.modal-content {
-  width: 90%;
-  max-width: 1200px;
-  max-height: none;
-  overflow: visible;
-}
-
-.contract-detail {
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-.contract-detail table {
-  width: 100%;
-  min-width: 0 !important;
-  table-layout: fixed;
-}
-
-.contract-detail th,
-.contract-detail td {
-  white-space: normal;
-  word-break: keep-all;
-}
-
-.sign-admin-box {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-top: 24px;
-}
-
-@media (max-width: 768px) {
-  .modal {
-    padding: 10px;
-  }
-
-  .modal-content {
-    width: 100%;
-  }
-
-  .sign-admin-box {
-    grid-template-columns: 1fr;
-  }
-}
-.header-buttons{
-    display:flex;
-    justify-content:flex-end;
-    margin-bottom:20px;
-}
-
-.ledger-btn{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    padding:12px 22px;
-    background:#1f3d68;
-    color:#fff;
-    border-radius:10px;
-    text-decoration:none;
-    font-weight:700;
-    font-size:15px;
-    transition:.2s;
-}
-
-.ledger-btn:hover{
-    background:#2d568d;
-}
-
-/* =========================================================
-   전자근로계약 통합관리 - 데스크톱 한 화면 최적화 패치
-   기존 contract-admin.css 맨 아래에 추가
-========================================================= */
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: #f4f7fb;
-  color: #17345f;
-}
-
-/* 전체 폭을 넓혀 우측 관리버튼까지 한 화면에 표시 */
-.container {
-  width: min(96vw, 1540px);
-  max-width: 1540px;
-  margin: 0 auto;
-  padding: 18px 18px 28px;
-}
-
-/* 상단 타이틀 공간 축소 */
-header {
-  margin: 0 0 14px;
-  padding: 8px 0 0;
-  text-align: center;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 38px;
-  line-height: 1.15;
-  letter-spacing: -1.5px;
-}
-
-header p {
-  margin: 6px 0 0;
-  font-size: 15px;
-  letter-spacing: 5px;
-}
-
-/* 관리대장 버튼도 위 공간 적게 사용 */
-.header-buttons {
-  display: flex;
-  justify-content: flex-end;
-  margin: 8px 0 12px;
-}
-
-.ledger-btn {
-  padding: 10px 16px;
-  border-radius: 9px;
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-/* 통계카드 높이 축소 */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin: 0 0 14px;
-}
-
-.stats > div {
-  min-height: 92px;
-  padding: 14px 10px;
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.stats strong {
-  font-size: 31px;
-  line-height: 1;
-  margin-bottom: 8px;
-}
-
-.stats span {
-  font-size: 14px;
-}
-
-/* 검색영역 한 줄 유지 */
-.search-box {
-  display: grid;
-  grid-template-columns:
-    minmax(180px, 1.15fr)
-    minmax(170px, .95fr)
-    minmax(150px, .78fr)
-    minmax(150px, .78fr)
-    150px
-    150px;
-  gap: 10px;
-  margin: 0 0 14px;
-  align-items: stretch;
-}
-
-.search-box input,
-.search-box select,
-.search-box button {
-  width: 100%;
-  min-width: 0;
-  height: 50px;
-  padding: 0 14px;
-  font-size: 14px;
-  border-radius: 10px;
-}
-
-.search-box button {
-  font-weight: 700;
-}
-
-/* 표 영역 */
-.table-wrap {
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: visible;
-  border-radius: 16px;
-  background: #fff;
-}
-
-/* 1540px 화면 안에서 최대한 모두 보이도록 압축 */
-.table-wrap table {
-  width: 100%;
-  min-width: 1320px;
-  table-layout: fixed;
-  border-collapse: collapse;
-}
-
-.table-wrap th,
-.table-wrap td {
-  padding: 11px 8px;
-  font-size: 12.5px;
-  line-height: 1.35;
-  vertical-align: middle;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.table-wrap th {
-  font-size: 13px;
-}
-
-/* 각 열 폭 */
-.table-wrap th:nth-child(1),
-.table-wrap td:nth-child(1) { width: 205px; }
-
-.table-wrap th:nth-child(2),
-.table-wrap td:nth-child(2) { width: 215px; }
-
-.table-wrap th:nth-child(3),
-.table-wrap td:nth-child(3) { width: 205px; }
-
-.table-wrap th:nth-child(4),
-.table-wrap td:nth-child(4) { width: 90px; text-align: center; }
-
-.table-wrap th:nth-child(5),
-.table-wrap td:nth-child(5) { width: 90px; text-align: center; }
-
-.table-wrap th:nth-child(6),
-.table-wrap td:nth-child(6) { width: 115px; text-align: center; }
-
-.table-wrap th:nth-child(7),
-.table-wrap td:nth-child(7) { width: 100px; text-align: center; }
-
-.table-wrap th:nth-child(8),
-.table-wrap td:nth-child(8) { width: 145px; text-align: center; }
-
-.table-wrap th:nth-child(9),
-.table-wrap td:nth-child(9) { width: 145px; text-align: center; }
-
-.table-wrap th:nth-child(10),
-.table-wrap td:nth-child(10) {
-  width: 150px;
-  text-align: center;
-}
-
-/* 관리 버튼 두 개가 잘리지 않도록 */
-.action-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-  flex-wrap: nowrap;
-}
-
-.action-buttons button {
-  min-width: 66px;
-  height: 32px;
-  padding: 0 8px;
-  font-size: 11px;
-  border-radius: 8px;
-  white-space: nowrap;
-}
-
-/* 상태 뱃지 */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 66px;
-  padding: 6px 8px;
-  font-size: 11px;
-  border-radius: 999px;
-}
-
-/* 표 헤더 고정 */
-.table-wrap thead th {
-  position: sticky;
-  top: 0;
-  z-index: 3;
-}
-
-/* 1366~1450 화면 대응 */
-@media (max-width: 1450px) {
-  .container {
-    width: 98vw;
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-
-  header h1 {
-    font-size: 32px;
-  }
-
-  .table-wrap table {
-    min-width: 1240px;
-  }
-
-  .table-wrap th,
-  .table-wrap td {
-    padding: 9px 6px;
-    font-size: 11.5px;
-  }
-
-  .action-buttons button {
-    min-width: 58px;
-    font-size: 10.5px;
-    padding: 0 6px;
-  }
-}
-
-/* 노트북에서는 검색영역 2줄 허용, 표는 가로스크롤 */
-@media (max-width: 1100px) {
-  .search-box {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .stats {
-    grid-template-columns: repeat(4, 1fr);
   }
 }
