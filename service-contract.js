@@ -1,6 +1,46 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycbwRGQcXgYhfkTUiklPrHs4uFe7oHpgn8D_jM2jJPpU74tXr3D_h6vGMq72CHXU0EnAb/exec";
 
+
+
+const WORKPLACES = {
+  hq: {
+    workplaceName: "더큰코리아 본사",
+    companyName: "주식회사 더큰코리아",
+    representative: "박병호",
+    address: "대전광역시 유성구 테크노4로 29 201호",
+    phone: "042-712-5035"
+  },
+  koreahouse_jamsil: {
+    workplaceName: "한국의집 롯데월드몰점",
+    companyName: "한국의집 롯데월드몰점",
+    representative: "박병호",
+    address: "서울특별시 송파구 올림픽로 300, 롯데월드몰 5층",
+    phone: "042-712-5035"
+  },
+  gilchaejeong_apgujeong: {
+    workplaceName: "길채정 압구정",
+    companyName: "길채정 압구정",
+    representative: "박병호",
+    address: "서울특별시 강남구 압구정로 343, 갤러리아백화점",
+    phone: "042-712-5035"
+  },
+  sobagongbang_pyeongchon: {
+    workplaceName: "평촌 소바공방",
+    companyName: "소바공방 평촌점",
+    representative: "박병호",
+    address: "경기도 안양시 동안구 시민대로 180, 롯데백화점 평촌점",
+    phone: "042-712-5035"
+  },
+  koreahouse_hyojonggang_paju: {
+    workplaceName: "한국의집 효종갱 파주",
+    companyName: "한국의집 효종갱 파주",
+    representative: "박병호",
+    address: "경기도 파주시 필승로 200, 파주프리미엄아울렛",
+    phone: "042-712-5035"
+  }
+};
+
 let canvas;
 let ctx;
 let drawing = false;
@@ -65,24 +105,21 @@ function initMoneyInput() {
 }
 
 function collectData() {
-  const workplaceCode = value("workplaceCode");
-  const workplaceName = selectedText("workplaceCode") || value("workPlace");
+  const w = companyInfoForCurrentForm();
   const dutyRaw = value("jobDuty");
   const duty = dutyRaw === "기타" ? (value("jobDutyEtc") || "기타") : dutyRaw;
 
-  const totalPay =
-    value("totalPay") ||
-    value("servicePay");
-
-  const withholding =
-    value("withholding") ||
-    value("taxType");
+  const totalPay = value("totalPay") || value("servicePay");
+  const withholding = value("withholding") || value("taxType");
 
   return {
     contractType: value("contractType") || "사업소득자 용역계약서",
-    workplaceCode,
-    workplaceName,
-    companyName: "주식회사 더큰코리아",
+    workplaceCode: value("workplaceCode"),
+    workplaceName: w.workplaceName,
+    companyName: w.companyName,
+    companyRepresentative: w.representative,
+    companyAddress: w.address,
+    companyPhone: w.phone,
 
     empName: value("empName"),
     residentNo: value("residentNo"),
@@ -94,19 +131,21 @@ function collectData() {
     endDate: formatDate(value("endDate")),
     startDateRaw: value("startDate"),
     endDateRaw: value("endDate"),
-    workPlace: value("workPlace") || workplaceName,
+    workPlace: value("workPlace") || w.workplaceName,
     jobDuty: duty,
 
     payType: value("payType"),
     servicePay: totalPay,
-    totalPay,
+    totalPay: totalPay,
     taxType: withholding,
-    withholding,
+    withholding: withholding,
     payDate: value("payDate"),
     bankName: value("bankName"),
     bankAccount: value("bankAccount"),
+    bank: value("bankName"),
+    account: value("bankAccount"),
 
-    representative: "박병호"
+    representative: w.representative
   };
 }
 
@@ -579,6 +618,12 @@ function showLinkResult(contractId) {
 
   const box = document.getElementById("resultBox");
   if (box) {
+    // 링크 박스를 '계약 저장 및 직원 링크 생성' 버튼 바로 아래로 이동
+    const buttons = document.querySelector(".buttons");
+    if (buttons && box.parentNode) {
+      buttons.insertAdjacentElement("afterend", box);
+    }
+
     box.style.display = "block";
     box.innerHTML = `
       <strong>계약서가 저장되었습니다.</strong><br>
@@ -603,19 +648,103 @@ function saveContract() {
 }
 
 function renderCurrentPreview(d) {
-  showPreviewHtml(
-    d.contractType || "사업소득자 용역계약서",
-    [
-      ["계약기간", `${d.startDate} ~ ${d.endDate}`],
-      ["용역장소", d.workPlace],
-      ["용역내용", d.jobDuty],
-      ["지급기준", d.payType],
-      ["용역비", d.totalPay ? `${d.totalPay}원` : ""],
-      ["원천징수", d.withholding],
-      ["지급일", d.payDate],
-      ["지급계좌", `${d.bankName || ""} ${d.bankAccount || ""}`.trim()],
-      ["주소", d.address]
-    ],
-    d
+  const preview = document.getElementById("preview");
+  if (!preview) return;
+
+  const intro =
+    `<strong>${escHtml(d.companyName || "")}</strong>(이하 “사업자”라 함)과 용역제공자 ` +
+    `<strong>${escHtml(d.empName || "")}</strong>(이하 “제공자”라 함)은 다음과 같이 용역계약을 체결한다.`;
+
+  const clauses = [
+    ["계약기간", `${escHtml(d.startDate)}부터 ${escHtml(d.endDate)}까지`],
+    ["용역장소 및 용역내용",
+      `① 용역장소 : ${escHtml(d.workPlace)}<br>② 용역내용 : ${escHtml(d.jobDuty)}`],
+    ["용역비",
+      `<table style="width:100%;border-collapse:collapse;text-align:center;">
+        <tr><th style="border:1px solid #ccd6e3;padding:10px;">지급기준</th>
+            <th style="border:1px solid #ccd6e3;padding:10px;">용역비</th>
+            <th style="border:1px solid #ccd6e3;padding:10px;">원천징수</th>
+            <th style="border:1px solid #ccd6e3;padding:10px;">지급일</th></tr>
+        <tr><td style="border:1px solid #ccd6e3;padding:10px;">${escHtml(d.payType)}</td>
+            <td style="border:1px solid #ccd6e3;padding:10px;">${escHtml(d.totalPay)}원</td>
+            <td style="border:1px solid #ccd6e3;padding:10px;">${escHtml(d.withholding)}</td>
+            <td style="border:1px solid #ccd6e3;padding:10px;">${escHtml(d.payDate)}</td></tr>
+      </table>
+      <p>지급계좌 : ${escHtml((d.bankName + " " + d.bankAccount).trim())}</p>`],
+    ["세금 및 신고", "사업소득에 대한 원천징수 및 세무신고는 관계 법령과 계약 조건에 따라 처리한다."],
+    ["전자계약 및 전자서명", "본 계약은 전자문서 및 전자서명 방식으로 체결할 수 있으며 전자서명은 자필서명 또는 날인과 동일한 효력을 가진다."]
+  ];
+
+  preview.innerHTML = contractPaperHtml(
+    "사업소득자 용역계약서",
+    intro, clauses, d, "용역제공자"
   );
+}
+
+
+
+function companyInfoForCurrentForm() {
+  const code = value("workplaceCode") || "hq";
+  return WORKPLACES[code] || WORKPLACES.hq;
+}
+
+function contractPaperHtml(title, intro, clauses, d, workerLabel) {
+  const w = {
+    companyName: d.companyName || "주식회사 더큰코리아",
+    representative: d.companyRepresentative || d.representative || "박병호",
+    address: d.companyAddress || "",
+    phone: d.companyPhone || ""
+  };
+
+  const clauseHtml = clauses.map((item, idx) => `
+    <section style="margin:26px 0;">
+      <h3 style="margin:0 0 10px;padding-left:10px;border-left:5px solid #24497f;
+                 font-size:19px;color:#173b70;">${idx + 1}. ${escHtml(item[0])}</h3>
+      <div style="font-size:15px;line-height:1.85;white-space:normal;">${item[1]}</div>
+    </section>
+  `).join("");
+
+  return `
+    <div style="max-width:900px;margin:0 auto;background:#fff;padding:42px 38px;
+                color:#111;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;">
+      <h1 style="text-align:center;font-size:30px;letter-spacing:2px;margin:0 0 28px;">
+        ${escHtml(title)}
+      </h1>
+
+      <p style="font-size:15px;line-height:1.9;margin:0 0 30px;">${intro}</p>
+
+      ${clauseHtml}
+
+      <p style="margin:34px 0 18px;text-align:center;font-weight:700;">
+        당사자는 상기 계약의 내용을 명확히 숙지하고 계약 체결하였음을 확인한다.
+      </p>
+
+      <div style="text-align:center;font-weight:700;margin-bottom:28px;">
+        ${escHtml(getTodayKorean ? getTodayKorean() : "")}
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
+        <div style="border:1px solid #ccd6e3;border-radius:14px;padding:22px;min-height:230px;">
+          <h3 style="font-size:20px;color:#173b70;margin-top:0;">[사업주]</h3>
+          <p>상호 : ${escHtml(w.companyName)}</p>
+          <p>대표자 : ${escHtml(w.representative)}
+            <img src="stamp.png" alt="회사 직인"
+                 style="width:62px;vertical-align:middle;margin-left:8px;">
+          </p>
+          <p>주소 : ${escHtml(w.address)}</p>
+          <p>연락처 : ${escHtml(w.phone)}</p>
+        </div>
+
+        <div style="border:1px solid #ccd6e3;border-radius:14px;padding:22px;min-height:230px;">
+          <h3 style="font-size:20px;color:#173b70;margin-top:0;">[${escHtml(workerLabel)}]</h3>
+          <p>성명 : ${escHtml(d.empName || "")}</p>
+          <p>주민등록번호 : ${escHtml(d.residentNo || "")}</p>
+          <p>생년월일 : ${escHtml(d.birth || "")}</p>
+          <p>주소 : ${escHtml(d.address || "")}</p>
+          <p>연락처 : ${escHtml(d.phone || "")}</p>
+          <p>급여계좌 : ${escHtml(((d.bankName || d.bank || "") + " " + (d.bankAccount || d.account || "")).trim())}</p>
+        </div>
+      </div>
+    </div>
+  `;
 }
