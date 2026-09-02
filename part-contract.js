@@ -104,6 +104,10 @@ function collectData() {
     hourPay: value("hourPay"),
     insurance: value("insurance"),
 
+    weeklyHolidayPay: value("weeklyHolidayPay"),
+    bankName: value("bankName"),
+    bankAccount: value("bankAccount"),
+
     workPlace: "한국의집 롯데월드몰점",
     representative: "박병호"
   };
@@ -147,49 +151,70 @@ function createContract() {
 }
 
 async function saveContractAndCreateLink(event) {
-  const btn = event.target;
+  const btn = event?.target || document.getElementById("saveBtn");
   const d = collectData();
 
   if (!validateData(d)) return;
 
   fillContract(d);
 
-  btn.disabled = true;
-  btn.innerText = "처리중...";
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = "처리중...";
+  }
+
   setMessage("계약 저장 및 직원 링크 생성 중입니다...");
 
   try {
     const result = await postData({
       action: "saveContractDraft",
+      ...d,
+      data: d,
       contract: d
     });
 
-    console.log("저장결과:", result);
-
     if (!result || !result.success) {
-      alert((result && result.message) ? result.message : "계약 저장 실패");
-      setMessage((result && result.message) ? result.message : "계약 저장 실패");
+      alert(result?.message || "계약 저장 실패");
+      setMessage(result?.message || "계약 저장 실패");
       return;
     }
 
-    currentContractId = result.contractId;
+    const contractId = result.contractId || result.id || "";
+    if (!contractId) {
+      throw new Error("계약번호가 생성되지 않았습니다.");
+    }
+
+    currentContractId = contractId;
 
     const link =
-      `https://thebigkorea.github.io/hr-system/part-contract.html?id=${encodeURIComponent(result.contractId)}`;
+      "https://thebigkorea.github.io/hr-system/contract-view.html?id=" +
+      encodeURIComponent(contractId) +
+      "&v=" + Date.now();
 
-    document.getElementById("contractLinkBox").style.display = "block";
-    document.getElementById("contractLink").value = link;
+    const resultBox = document.getElementById("resultBox");
+    if (resultBox) {
+      resultBox.style.display = "block";
+      resultBox.innerHTML = `
+        <strong>계약서가 저장되었습니다.</strong><br>
+        계약번호 : ${contractId}<br>
+        직원에게 아래 링크를 보내 전자서명을 진행하세요.
+        <input id="contractLink" value="${link}" readonly />
+        <button type="button" onclick="copyContractLink()">직원 링크 복사</button>
+      `;
+    }
 
     setMessage("계약 저장 완료. 직원 링크가 생성되었습니다.");
-    alert("계약 저장 및 직원 링크 생성이 완료되었습니다.");
+    alert("계약직·아르바이트 근로계약서 저장 및 직원 링크 생성이 완료되었습니다.");
 
   } catch (e) {
     console.error(e);
-    alert("저장 중 오류가 발생했습니다. Apps Script 배포 또는 인터넷 연결을 확인해주세요.");
+    alert("저장 중 오류가 발생했습니다.\n" + (e.message || ""));
     setMessage("저장 중 오류가 발생했습니다.");
   } finally {
-    btn.disabled = false;
-    btn.innerText = "계약 저장 및 직원 링크 생성";
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = "계약 저장 및 직원 링크 생성";
+    }
   }
 }
 
@@ -378,6 +403,18 @@ async function completeElectronicContract(event) {
     btn.disabled = false;
     btn.innerText = "전자계약 완료";
   }
+}
+
+
+
+/* HTML 버튼 이름 호환 - 링크 생성 기능만 연결 */
+function makePreview() {
+  createContract();
+}
+
+function saveContract() {
+  const btn = document.getElementById("saveBtn");
+  saveContractAndCreateLink({ target: btn });
 }
 
 function copyContractLink() {
