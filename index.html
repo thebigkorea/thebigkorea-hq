@@ -1180,13 +1180,7 @@
   const KOREA_API_URL =
     "https://script.google.com/macros/s/AKfycbz_NFlMRhx_mP_0maccpd62iWNHGMVo-pAZCHg7s8-tM26QvKlIVrPL6TmElRgM6XIS/exec";
 
-  const SOBA_API_URL =
-    "https://script.google.com/macros/s/AKfycbwYnfRshHZs5kFl_3gvyYRlOgkfIPKx997vIjNg1hecxreYcetFFK_uS_ael9tuefP4/exec";
-
-  const GILCHAEJEONG_API_URL =
-    "https://script.google.com/macros/s/AKfycbzjJ4xzZl96Wi4AcYrfKrEzIl-gY5iEZCUEiZ_th51mD2Kq97G13z883QIMjFf99sQE3w/exec";
-
-
+  
   /* ================================
      매장점검 통합 대시보드 API
   ================================= */
@@ -1230,94 +1224,69 @@
      일용직 미지급 배지
   ================================= */
 
-  const unpaidCounts = {
-    korea: 0,
-    gilchaejeong: 0,
-    soba: 0
-  };
+  async function loadDailyUnpaidBadges() {
+  try {
+    const response = await fetch(
+      KOREA_API_URL +
+        "?action=getDailyWorkerList&t=" +
+        Date.now(),
+      {
+        cache: "no-store"
+      }
+    );
 
-  function updateTotalUnpaidBadge() {
-    const total =
-      unpaidCounts.korea +
-      unpaidCounts.gilchaejeong +
-      unpaidCounts.soba;
+    if (!response.ok) {
+      throw new Error(
+        "HTTP " + response.status
+      );
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(
+        data.message ||
+        "일용직 자료 조회 실패"
+      );
+    }
+
+    const allList =
+      Array.isArray(data.data)
+        ? data.data
+        : [];
+
+    const unpaidList =
+      allList.filter(function(item) {
+        const payStatus =
+          String(item.payStatus || "").trim();
+
+        const name =
+          String(item.name || "").trim();
+
+        return (
+          name !== "NO" &&
+          name !== "" &&
+          payStatus === "미지급"
+        );
+      });
 
     showBadge(
       "hqDailyUnpaidBadgeTop",
-      total
+      unpaidList.length
+    );
+
+  } catch (error) {
+    console.log(
+      "일용직 미지급 배지 조회 실패",
+      error
+    );
+
+    showBadge(
+      "hqDailyUnpaidBadgeTop",
+      0
     );
   }
-
-  async function loadUnpaidBadge(
-    apiUrl,
-    key,
-    label
-  ) {
-    try {
-      const response =
-        await fetch(
-          apiUrl +
-            "?action=getDailyUnpaidCount&t=" +
-            Date.now(),
-          {
-            cache: "no-store"
-          }
-        );
-
-      if (!response.ok) {
-        throw new Error(
-          "HTTP " + response.status
-        );
-      }
-
-      const data =
-        await response.json();
-
-      const count =
-        Number(
-          data.count ||
-          data.unpaidCount ||
-          0
-        );
-
-      unpaidCounts[key] =
-        Number.isFinite(count)
-          ? count
-          : 0;
-
-    } catch (error) {
-      console.log(
-        label +
-          " 미지급 배지 조회 실패",
-        error
-      );
-
-      unpaidCounts[key] = 0;
-
-    } finally {
-      updateTotalUnpaidBadge();
-    }
-  }
-
-  function loadDailyUnpaidBadges() {
-    loadUnpaidBadge(
-      KOREA_API_URL,
-      "korea",
-      "한국의집"
-    );
-
-    loadUnpaidBadge(
-      GILCHAEJEONG_API_URL,
-      "gilchaejeong",
-      "압구정 길채정"
-    );
-
-    loadUnpaidBadge(
-      SOBA_API_URL,
-      "soba",
-      "평촌 소바공방"
-    );
-  }
+}
 
 
   /* ================================
