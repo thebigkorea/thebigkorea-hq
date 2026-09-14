@@ -1,6 +1,108 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>출장 정산</title><link rel="stylesheet" href="trip-expense.css"></head><body>
-<header class="header"><div><h1>출장 정산</h1><p>THE BIG KOREA TRIP EXPENSE</p></div></header><main class="container">
-<section class="summary"><div class="summary-card"><strong id="totalFuelCost">0</strong><span>총 주유비</span></div><div class="summary-card"><strong id="totalDistance">0</strong><span>총 운행거리</span></div><div class="summary-card"><strong id="unsettledCount">0</strong><span>미정산 출장</span></div></section>
-<section class="panel"><div class="panel-head"><div><h2>출장 이동비 내역</h2><p>출장 후 주유비와 실제 운행거리만 정산합니다.</p></div></div><div class="table-wrap"><table><thead><tr><th>출장기간</th><th>출장자</th><th>동행자</th><th>부서</th><th>이동수단</th><th>차량번호</th><th>방문처</th><th>주유비</th><th>운행거리</th><th>정산상태</th><th>관리</th></tr></thead><tbody id="expenseTable"></tbody></table></div></section></main>
-<div id="settleModal" class="modal" hidden><div class="modal-card"><h3>출장 정산</h3><div id="settleInfo"></div><label>주유비<input type="number" id="settleFuel" min="0" value="0"></label><label>운행거리 km<input type="number" id="settleDistance" min="0" value="0"></label><div class="modal-actions"><button type="button" onclick="closeSettle()">취소</button><button type="button" onclick="saveSettlement()">정산 완료</button></div></div></div>
-<script src="trip-expense.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>출장 정산</title>
+  <link rel="stylesheet" href="trip-expense.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <h1>출장 정산</h1>
+      <p>THE BIG KOREA TRIP EXPENSE</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="summary">
+      <div class="summary-card">
+        <strong id="totalFuelCost">0 원</strong>
+        <span>총 주유비</span>
+      </div>
+      <div class="summary-card">
+        <strong id="totalDistance">0 km</strong>
+        <span>총 운행거리</span>
+      </div>
+      <div class="summary-card">
+        <strong id="unsettledCount">0 건</strong>
+        <span>미정산 출장</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>출장 이동비 내역</h2>
+          <p>출장 후 주유비와 실제 운행거리만 정산합니다.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>출장기간</th>
+              <th>출장자</th>
+              <th>동행자</th>
+              <th>부서</th>
+              <th>이동수단</th>
+              <th>차량번호</th>
+              <th>방문처</th>
+              <th class="num-col">주유비</th>
+              <th class="num-col">운행거리</th>
+              <th>정산상태</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="expenseTable">
+            <tr><td colspan="11" class="empty">출장 내역을 불러오는 중입니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="settleModal" class="modal" hidden>
+    <div class="modal-backdrop" onclick="closeSettle()"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settleTitle">
+      <div class="modal-head">
+        <div>
+          <span class="modal-kicker">TRIP EXPENSE</span>
+          <h3 id="settleTitle">출장 정산 입력</h3>
+        </div>
+        <button type="button" class="modal-close" onclick="closeSettle()" aria-label="닫기">×</button>
+      </div>
+
+      <div id="settleInfo" class="settle-info"></div>
+
+      <div class="settle-form">
+        <label>
+          <span>주유비</span>
+          <div class="input-unit">
+            <input type="number" id="settleFuel" min="0" step="1" value="0">
+            <em>원</em>
+          </div>
+        </label>
+
+        <label>
+          <span>실제 운행거리</span>
+          <div class="input-unit">
+            <input type="number" id="settleDistance" min="0" step="1" value="0">
+            <em>km</em>
+          </div>
+        </label>
+      </div>
+
+      <p class="settle-note">톨비와 주차비는 별도 사용내역으로 확인하므로 이 화면에서는 입력하지 않습니다.</p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeSettle()">취소</button>
+        <button type="button" id="saveSettlementBtn" class="btn-confirm" onclick="saveSettlement()">정산 완료</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="trip-expense.js"></script>
+</body>
+</html>
