@@ -1,136 +1,133 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>출장관리</title>
-  <link rel="stylesheet" href="trip.css">
-</head>
-<body>
-  <header class="header">
-    <div class="header-inner">
-      <div>
-        <h1>더큰코리아 출장관리</h1>
-        <p>BUSINESS TRIP MANAGEMENT</p>
-      </div>
-      <a class="home-btn" href="trip-management.html">출장 통합관리</a>
-    </div>
-  </header>
+<!DOCTYPE html> 
+<html lang="ko"> 
+<head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>출장관리</title> 
+  <link rel="stylesheet" href="trip.css"> 
+</head> 
+<body> 
+  <header class="header"> 
+    <div class="header-inner"> 
+      <div> 
+        <h1>더큰코리아 출장관리</h1> 
+        <p>BUSINESS TRIP MANAGEMENT</p> 
+      </div> 
+      <a class="home-btn" href="trip-management.html">출장 통합관리</a> 
+    </div> 
+  </header> 
 
-  <main class="container">
-    <section class="summary">
-      <div class="summary-card">
-        <strong id="tripCount">0</strong>
-        <span>출장 신청건수</span>
-      </div>
-      <div class="summary-card">
-        <strong id="todayTripCount">0</strong>
-        <span>오늘 출장</span>
-      </div>
-    </section>
+  <main class="container"> 
+    <section class="summary"> 
+      <div class="summary-card"> 
+        <strong id="tripCount">0</strong> 
+        <span>출장 신청건수</span> 
+      </div> 
+      <div class="summary-card"> 
+        <strong id="todayTripCount">0</strong> 
+        <span>오늘 출장</span> 
+      </div> 
+    </section> 
 
-    <section class="panel">
-      <h2>출장 등록</h2>
+    <section class="panel"> 
+      <h2>출장 등록</h2> 
 
-      <div class="form-grid">
-        <label>
-          <span>출장 시작일</span>
-          <input type="date" id="tripStartDate">
-        </label>
+      <div class="form-grid"> 
+        <label> 
+          <span>출장 시작일</span> 
+          <input type="date" id="tripStartDate"> 
+        </label> 
 
-        <label>
-          <span>출장 종료일</span>
-          <input type="date" id="tripEndDate">
-        </label>
+        <label> 
+          <span>출장 종료일</span> 
+          <input type="date" id="tripEndDate"> 
+        </label> 
 
-        <label>
-          <span>출장자</span>
-          <select id="userName">
-            <option value="">본사 직원 선택</option>
-          </select>
-        </label>
+        <label> 
+          <span>출장자</span> 
+          <select id="userName"> 
+            <option value="">본사 직원 선택</option> 
+          </select> 
+        </label> 
 
-        <label>
-          <span>부서</span>
-          <input type="text" id="department" placeholder="직원 선택 시 자동입력">
-        </label>
+        <label> 
+          <span>부서</span> 
+          <input type="text" id="department" placeholder="직원 선택 시 자동입력"> 
+        </label> 
 
-        <label>
-          <span>이동수단</span>
-          <select id="transportType">
-            <option value="개인차량" selected>개인차량</option>
-            <option value="대중교통">대중교통</option>
-            <option value="법인차량">법인차량</option>
-            <option value="기타">기타</option>
-          </select>
-        </label>
+        <label> 
+          <span>이동수단</span> 
+          <select id="transportType"> 
+            <option value="개인차량" selected>개인차량</option> 
+            <option value="대중교통">대중교통</option> 
+            <option value="법인차량">법인차량</option> 
+            <option value="기타">기타</option> 
+          </select> 
+        </label> 
 
-        <label>
-          <span>차량번호</span>
-          <select id="carNumber">
-            <option value="">차량 선택</option>
-          </select>
-        </label>
+        <label id="carNumberField" hidden> 
+          <span>차량번호</span> 
+          <select id="carNumber"> 
+            <option value="">차량 선택</option> 
+          </select> 
+        </label> 
 
-        <label>
-          <span>방문처</span>
-          <input type="text" id="destination" placeholder="예: 파주 효종갱">
-        </label>
+        <label> 
+          <span>방문처</span> 
+          <input type="text" id="destination" placeholder="예: 파주 효종갱"> 
+        </label> 
 
-        <label>
-          <span>출장목적</span>
-          <input type="text" id="purpose" placeholder="예: 매장 점검">
-        </label>
-      </div>
+        <label> 
+          <span>출장목적</span> 
+          <input type="text" id="purpose" placeholder="예: 매장 점검"> 
+        </label> 
+      </div> 
 
-      <div class="companion-box">
-        <div class="companion-head">
-          <div>
-            <strong>동행자</strong>
-            <span>본사 직원 선택 또는 직접 입력 · 여러 명 등록 가능</span>
-          </div>
-        </div>
+      <div class="companion-box"> 
+        <div class="companion-head"> 
+          <div> 
+            <strong>동행자</strong> 
+            <span>본사 직원 선택 또는 직접 입력 · 여러 명 등록 가능</span> 
+          </div> 
+        </div> 
 
-        <div class="companion-control">
-          <select id="companionEmployee">
-            <option value="">본사 직원 선택</option>
-          </select>
-          <button type="button" class="companion-add-btn" onclick="addSelectedCompanion()">
-            + 선택 직원 추가
-          </button>
-        </div>
+        <div class="companion-control"> 
+          <select id="companionEmployee"> 
+            <option value="">본사 직원 선택</option> 
+          </select> 
+          <button type="button" class="companion-add-btn" onclick="addSelectedCompanion()"> 
+            + 선택 직원 추가 
+          </button> 
+        </div> 
 
-        <div class="companion-control">
-          <input
-            type="text"
-            id="companionDirect"
+        <div class="companion-control"> 
+          <input type="text" id="companionDirect"
             placeholder="외부 동행자 이름 입력 · 여러 명은 쉼표로 구분"
-            onkeydown="if(event.key==='Enter'){event.preventDefault();addDirectCompanions();}"
-          >
-          <button type="button" class="companion-add-btn secondary" onclick="addDirectCompanions()">
-            + 직접입력 추가
-          </button>
-        </div>
+            onkeydown="if(event.key==='Enter'){event.preventDefault();addDirectCompanions();}">
+          <button type="button" class="companion-add-btn secondary" onclick="addDirectCompanions()"> 
+            + 직접입력 추가 
+          </button> 
+        </div> 
 
-        <div id="companionTags" class="companion-tags">
-          <span class="companion-empty">등록된 동행자가 없습니다.</span>
-        </div>
-      </div>
+        <div id="companionTags" class="companion-tags"> 
+          <span class="companion-empty">등록된 동행자가 없습니다.</span> 
+        </div> 
+      </div> 
 
-      <label class="full-label">
-        <span>비고</span>
-        <textarea id="memo" placeholder="필요한 내용을 입력하세요."></textarea>
-      </label>
+      <label class="full-label"> 
+        <span>비고</span> 
+        <textarea id="memo" placeholder="필요한 내용을 입력하세요."></textarea> 
+      </label> 
 
-      <button type="button" class="submit" onclick="saveTrip()">출장 신청</button>
-    </section>
+      <button type="button" class="submit" onclick="saveTrip()">출장 신청</button> 
+    </section> 
 
-    <section class="history">
-      <h2>최근 출장 신청내역</h2>
-      <div id="tripList" class="trip-list"></div>
-    </section>
-  </main>
+    <section class="history"> 
+      <h2>최근 출장 신청내역</h2> 
+      <div id="tripList" class="trip-list"></div> 
+    </section> 
+  </main> 
 
-  <script src="trip.js"></script>
-</body>
+  <script src="trip.js"></script> 
+</body> 
 </html>

@@ -15,6 +15,10 @@ button,input,select,textarea{font:inherit}
   max-width:1180px;
   margin:0 auto;
   padding:28px 18px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
 }
 .header h1{
   margin:0;
@@ -28,6 +32,23 @@ button,input,select,textarea{font:inherit}
   letter-spacing:4px;
   color:#876f5e;
 }
+.home-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:92px;
+  height:42px;
+  padding:0 16px;
+  border:1px solid #d8c6b6;
+  border-radius:11px;
+  background:#f2e7dc;
+  color:#55321f;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.home-btn:hover{background:#e9d9ca}
 .container{
   max-width:1180px;
   margin:0 auto;
@@ -80,6 +101,7 @@ button,input,select,textarea{font:inherit}
   font-size:13px;
   font-weight:700;
 }
+#carNumberField[hidden]{display:none!important}
 input,select,textarea{
   width:100%;
   border:1px solid #ded6ce;
@@ -108,13 +130,8 @@ input:focus,select:focus,textarea:focus{
   border-radius:14px;
   background:#fbf6ef;
 }
-.companion-head{
-  margin-bottom:12px;
-}
-.companion-head strong{
-  display:block;
-  font-size:14px;
-}
+.companion-head{margin-bottom:12px}
+.companion-head strong{display:block;font-size:14px}
 .companion-head span{
   display:block;
   margin-top:4px;
@@ -157,11 +174,7 @@ input:focus,select:focus,textarea:focus{
   gap:8px;
   padding-top:3px;
 }
-.companion-empty{
-  color:#9c8b7e;
-  font-size:12px;
-  font-weight:400;
-}
+.companion-empty{color:#9c8b7e;font-size:12px;font-weight:400}
 .companion-tag{
   display:inline-flex;
   align-items:center;
@@ -203,10 +216,7 @@ input:focus,select:focus,textarea:focus{
 }
 .submit:hover{opacity:.94}
 .history{margin-top:20px}
-.trip-list{
-  display:grid;
-  gap:12px;
-}
+.trip-list{display:grid;gap:12px}
 .trip-item{
   border:1px solid #e3d9cf;
   border-radius:13px;
@@ -230,11 +240,7 @@ input:focus,select:focus,textarea:focus{
   color:#665548;
   font-size:13px;
 }
-.empty{
-  padding:28px 10px;
-  text-align:center;
-  color:#978779;
-}
+.empty{padding:28px 10px;text-align:center;color:#978779}
 @media(max-width:760px){
   .container{padding-left:12px;padding-right:12px}
   .header-inner{padding-left:14px;padding-right:14px}
@@ -242,8 +248,7 @@ input:focus,select:focus,textarea:focus{
   .companion-control{grid-template-columns:1fr}
   .panel,.history{padding:17px}
 }
-
-.header-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}
-.home-btn{display:inline-flex;align-items:center;justify-content:center;min-width:92px;height:42px;padding:0 16px;border:1px solid #d8c6b6;border-radius:11px;background:#f2e7dc;color:#55321f;text-decoration:none;font-size:13px;font-weight:800;white-space:nowrap}
-.home-btn:hover{background:#e9d9ca}
-@media(max-width:600px){.header-inner{align-items:flex-start}.home-btn{min-width:80px;height:38px;padding:0 12px}}
+@media(max-width:600px){
+  .header-inner{align-items:flex-start}
+  .home-btn{min-width:80px;height:38px;padding:0 12px}
+}

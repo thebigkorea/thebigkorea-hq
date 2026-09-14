@@ -9,10 +9,33 @@ document.addEventListener("DOMContentLoaded",()=>{
   loadVehicles();
   loadHeadOfficeEmployees();
   loadTrips();
+  setupTransportType();
 
   document.getElementById("tripStartDate")?.addEventListener("change",syncEndDate);
   document.getElementById("userName")?.addEventListener("change",syncSelectedEmployee);
 });
+
+function setupTransportType(){
+  const transport=document.getElementById("transportType");
+  if(!transport)return;
+  transport.value="개인차량";
+  transport.addEventListener("change",updateCarNumberVisibility);
+  updateCarNumberVisibility();
+}
+
+function updateCarNumberVisibility(){
+  const transport=document.getElementById("transportType");
+  const field=document.getElementById("carNumberField");
+  const car=document.getElementById("carNumber");
+  if(!transport||!field||!car)return;
+
+  const show=transport.value==="법인차량";
+  field.hidden=!show;
+
+  if(!show){
+    car.value="";
+  }
+}
 
 function localToday(){
   const d=new Date();
@@ -192,7 +215,7 @@ async function saveTrip(){
     companions:COMPANIONS,
     department:value_("department"),
     transportType:value_("transportType"),
-    carNumber:value_("carNumber"),
+    carNumber:value_("transportType")==="법인차량"?value_("carNumber"):"",
     destination:value_("destination"),
     purpose:value_("purpose"),
     memo:value_("memo"),
@@ -295,6 +318,8 @@ function clearForm(){
   document.getElementById("transportType").value="개인차량";
   if(document.getElementById("carNumber"))document.getElementById("carNumber").value="";
   if(document.getElementById("companionEmployee"))document.getElementById("companionEmployee").value="";
+
+  updateCarNumberVisibility();
 
   COMPANIONS=[];
   renderCompanionTags();
