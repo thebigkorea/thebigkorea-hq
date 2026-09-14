@@ -1,0 +1,1356 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#3a2517">
+  <title>더큰코리아 본사 업무포털</title>
+
+  <style>
+    :root {
+      --brown:#49301f;
+      --brown2:#805529;
+      --gold:#c49a4a;
+      --cream:#f5efe6;
+      --paper:#fff;
+      --ink:#241812;
+      --muted:#75685d;
+      --line:#e5ddd2;
+      --shadow:0 12px 32px rgba(58,37,23,.09);
+    }
+
+    * {
+      box-sizing:border-box;
+    }
+
+    html {
+      scroll-behavior:smooth;
+    }
+
+    body {
+      margin:0;
+      font-family:Pretendard,"Noto Sans KR","Segoe UI",sans-serif;
+      color:var(--ink);
+      background:#f7f6f3;
+    }
+
+    a {
+      color:inherit;
+      text-decoration:none;
+    }
+
+    .top {
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(255,255,255,.95);
+      backdrop-filter:blur(13px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .top-inner {
+      max-width:1320px;
+      height:72px;
+      margin:auto;
+      padding:0 28px;
+      display:flex;
+      align-items:center;
+      gap:28px;
+    }
+
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-right:auto;
+    }
+
+    .mark {
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      background:var(--brown);
+      color:#f1d59e;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+    }
+
+    .brand strong {
+      display:block;
+      font-size:18px;
+    }
+
+    .brand small {
+      display:block;
+      color:var(--muted);
+    }
+
+    nav {
+      display:flex;
+      gap:4px;
+    }
+
+    nav a {
+      padding:10px 12px;
+      border-radius:10px;
+      color:#5e554e;
+      font-size:14px;
+      font-weight:750;
+    }
+
+    nav a:hover {
+      background:#f2ece5;
+      color:var(--brown);
+    }
+
+    .hero {
+      background:var(--brown);
+      color:white;
+    }
+
+    .hero-inner {
+      max-width:1320px;
+      margin:auto;
+      padding:48px 28px 38px;
+      display:grid;
+      grid-template-columns:1fr auto;
+      align-items:end;
+      gap:30px;
+    }
+
+    .eyebrow {
+      color:#e5c78f;
+      font-size:12px;
+      font-weight:850;
+      letter-spacing:.18em;
+    }
+
+    .hero h1 {
+      margin:11px 0 9px;
+      font-size:39px;
+      letter-spacing:-.05em;
+    }
+
+    .hero p {
+      margin:0;
+      color:#e0d9d2;
+    }
+
+    .date {
+      color:#f2ebe4;
+      font-weight:750;
+    }
+
+    main {
+      max-width:1320px;
+      margin:auto;
+      padding:28px;
+    }
+
+    .quick {
+      padding:22px;
+      background:white;
+      border:1px solid var(--line);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+    }
+
+    .section-title {
+      margin-bottom:16px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:18px;
+    }
+
+    .section-title h2 {
+      margin:0;
+      font-size:22px;
+    }
+
+    .section-title p {
+      margin:5px 0 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .quick-grid {
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      gap:10px;
+    }
+
+    .quick-btn {
+      position:relative;
+      min-height:102px;
+      padding:15px;
+      background:#fcfbf9;
+      border:1px solid var(--line);
+      border-radius:15px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      transition:.16s;
+    }
+
+    .quick-btn:hover {
+      transform:translateY(-2px);
+      border-color:#cbb293;
+      box-shadow:0 8px 20px rgba(73,48,31,.08);
+    }
+
+    .quick-btn .ico {
+      font-size:22px;
+    }
+
+    .quick-btn strong {
+      font-size:14px;
+    }
+
+    .quick-btn small {
+      color:var(--muted);
+    }
+
+    .all {
+      margin-top:38px;
+    }
+
+    .category-grid {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:18px;
+    }
+
+    .category {
+      padding:22px;
+      background:white;
+      border:1px solid var(--line);
+      border-radius:20px;
+    }
+
+    .cat-head {
+      padding-bottom:17px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      gap:13px;
+    }
+
+    .cat-icon {
+      width:43px;
+      height:43px;
+      border-radius:13px;
+      background:#f2eae0;
+      display:grid;
+      place-items:center;
+      font-size:21px;
+    }
+
+    .cat-head h3 {
+      margin:0;
+      font-size:18px;
+    }
+
+    .cat-head p {
+      margin:3px 0 0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .group {
+      margin-top:19px;
+    }
+
+    .group h4 {
+      margin:0 0 9px;
+      color:#7c7067;
+      font-size:13px;
+    }
+
+    .links {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:8px;
+    }
+
+    .task {
+      position:relative;
+      min-height:44px;
+      padding:11px 13px;
+      border-radius:11px;
+      background:#f5f3f0;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      font-size:13px;
+      font-weight:750;
+    }
+
+    .task:hover {
+      background:#eee6dc;
+    }
+
+    .task::after {
+      content:"↗";
+      color:#9a8b7f;
+    }
+
+    .task.primary {
+      background:var(--brown);
+      color:white;
+    }
+
+    .task.primary::after {
+      color:#e5d7c9;
+    }
+
+    .task.placeholder {
+      color:#9b938c;
+    }
+
+    .task.placeholder::after {
+      content:"준비 중";
+      font-size:10px;
+    }
+
+    .badge-new {
+      position:absolute;
+      top:-8px;
+      right:-7px;
+      z-index:3;
+      min-width:24px;
+      height:24px;
+      padding:0 7px;
+      border-radius:999px;
+      background:#df342f;
+      color:white;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      font-weight:900;
+      line-height:24px;
+      box-shadow:0 4px 10px rgba(0,0,0,.2);
+    }
+
+    .wide {
+      grid-column:1/-1;
+    }
+
+    .store-grid {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:13px;
+    }
+
+    .parttime-grid {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:13px;
+    }
+
+    .parttime-store {
+      padding:18px;
+      background:linear-gradient(145deg,#fffdf9,#f7f1e9);
+      border:1px solid #ddcfbd;
+      border-radius:16px;
+    }
+
+    .parttime-store .store-label {
+      display:block;
+      margin-bottom:7px;
+      color:var(--gold);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.08em;
+    }
+
+    .parttime-store h4 {
+      min-height:42px;
+      margin:0 0 14px;
+      color:var(--brown);
+      font-size:15px;
+      line-height:1.45;
+    }
+
+    .parttime-store .task {
+      justify-content:center;
+    }
+
+    .store {
+      padding:17px;
+      background:#fcfbf9;
+      border:1px solid var(--line);
+      border-radius:15px;
+    }
+
+    .store h4 {
+      margin:0 0 12px;
+      color:var(--brown);
+      font-size:15px;
+    }
+
+    .store .links {
+      grid-template-columns:1fr;
+    }
+
+    .footer {
+      max-width:1320px;
+      margin:auto;
+      padding:16px 28px 42px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    @media (max-width:1080px) {
+      nav {
+        display:none;
+      }
+
+      .quick-grid {
+        grid-template-columns:repeat(3,1fr);
+      }
+
+      .category-grid {
+        grid-template-columns:1fr;
+      }
+
+      .wide {
+        grid-column:auto;
+      }
+
+      .store-grid {
+        grid-template-columns:1fr;
+      }
+
+      .parttime-grid {
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+
+    @media (max-width:620px) {
+      .top-inner {
+        height:64px;
+        padding:0 16px;
+      }
+
+      .hero-inner {
+        padding:34px 18px;
+        grid-template-columns:1fr;
+      }
+
+      .hero h1 {
+        font-size:31px;
+      }
+
+      .date {
+        display:none;
+      }
+
+      main {
+        padding:18px;
+      }
+
+      .quick,
+      .category {
+        padding:17px;
+      }
+
+      .quick-grid {
+        grid-template-columns:repeat(2,1fr);
+      }
+
+      .links {
+        grid-template-columns:1fr;
+      }
+
+      .parttime-grid {
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="#home">
+        <span class="mark">大</span>
+
+        <span>
+          <strong>더큰코리아 본사 업무포털</strong>
+          <small>THE BIG KOREA · HEAD OFFICE</small>
+        </span>
+      </a>
+
+      <nav>
+        <a href="#home">홈</a>
+        <a href="#hr">근태·인사</a>
+        <a href="#finance">계약·정산</a>
+        <a href="#operation">운영지원</a>
+        <a href="#part-time">아르바이트</a>
+        <a href="#stores">지점관리</a>
+        <a href="#admin">원장·관리자</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero" id="home">
+    <div class="hero-inner">
+      <div>
+        <div class="eyebrow">THE BIG KOREA · HEAD OFFICE</div>
+        <h1>본사 업무를 빠르고 명확하게</h1>
+        <p>본사와 각 지점의 업무를 목적별로 정리했습니다. 자주 쓰는 메뉴는 위에서 바로 시작하세요.</p>
+      </div>
+
+      <div class="date" id="today"></div>
+    </div>
+  </section>
+
+  <main>
+    <section class="quick">
+      <div class="section-title">
+        <div>
+          <h2>자주 쓰는 업무</h2>
+          <p>본사에서 자주 사용하는 핵심 업무입니다.</p>
+        </div>
+      </div>
+
+      <div class="quick-grid">
+
+        <a class="quick-btn"
+           target="_blank"
+           href="https://script.google.com/macros/s/AKfycbzX4BEypYJv6h-5FZBTCFx1iJfHk-3DPBIHO9yRJfUmdXyy6xATo7vGnjG_T1swabh7XQ/exec">
+          <span class="ico">📊</span>
+          <strong>더큰코리아 영업실적 대시보드</strong>
+          <small>매출·전년비·월별 실적 조회</small>
+        </a>
+
+        <a class="quick-btn"
+           target="_blank"
+           href="https://thebigkorea.github.io/thebigkorea-attendance/admin.html">
+          <span class="ico">🕘</span>
+          <strong>관리자 출퇴근 조회 화면</strong>
+          <small>출퇴근·출장·연차·미휴무 등 직원 근무현황 조회</small>
+        </a>
+
+        <a class="quick-btn"
+           target="_blank"
+           href="notice.html">
+          <span class="ico">📢</span>
+          <strong>공지사항</strong>
+          <small>점포 운영지침·행사·교육·긴급사항 전달</small>
+        </a>
+
+        <a class="quick-btn"
+           target="_blank"
+           href="https://script.google.com/macros/s/AKfycbyfytW-OyP84u1yaa4FJIF0EDclm_w6CWpY1rIDszzax7SfVuxF9KsDw5yfd53k0fb6Nw/exec">
+          <span class="ico">💳</span>
+          <strong>영업점 매출 내역 입력</strong>
+          <small>본사 영업점 매출 일괄 입력</small>
+        </a>
+
+        <a class="quick-btn"
+           target="_blank"
+           href="https://thebigkorea.github.io/thebigkorea-leave-new/">
+          <span class="ico">🌿</span>
+          <strong>연월차 신청</strong>
+          <small>연월차 신청 및 내역 확인</small>
+        </a>
+
+        <a class="quick-btn"
+           target="_blank"
+           href="trip-management.html">
+          <span class="ico">🧳</span>
+          <strong>출장 통합관리</strong>
+          <small>출장 신청·승인·정산 및 전체 출장 현황을 통합 관리합니다.</small>
+        </a>
+
+        <a class="quick-btn"
+           target="_blank"
+           href="store-opening.html">
+          <span class="ico">🏢</span>
+          <strong>신규점포 개설</strong>
+          <small>행정·회계,진행현황과 투자비용을 기록·관리합니다.</small>
+        </a>
+<a class="quick-btn"
+           target="_blank"
+           href="https://thebigkorea.github.io/thebigkorea-hq/daily-worker.html">
+          <span class="ico">📝</span>
+          <strong>일용직 관리</strong>
+          <small>통합 근무내역</small>
+          <span id="hqDailyUnpaidBadgeTop" class="badge-new">0</span>
+        </a>
+
+        <a class="quick-btn" href="#part-time">
+          <span class="ico">🧑‍🍳</span>
+          <strong>아르바이트 매장별 관리</strong>
+          <small>직원·근로내역·급여명세서·급여대장</small>
+        </a>
+
+        <a class="quick-btn"
+           target="_blank"
+           href="store-dashboard.html">
+          <span class="ico">🏪</span>
+          <strong>매장점검대시보드</strong>
+          <small>본사 담당자가 피드백과 필요한 조치를 진행합니다.</small>
+          <span id="storeDashboardBadge" class="badge-new">0</span>
+        </a>
+
+        <a class="quick-btn"
+           target="_blank"
+           href="https://mail.worksmobile.com">
+          <span class="ico">📧</span>
+          <strong>네이버웍스 메일</strong>
+          <small>메일 확인</small>
+        </a>
+
+        <a class="quick-btn"
+           target="_blank"
+           href="https://drive.worksmobile.com">
+          <span class="ico">☁️</span>
+          <strong>웍스 드라이브</strong>
+          <small>공용 자료</small>
+        </a>
+
+      </div>
+    </section>
+
+    <section class="all">
+      <div class="section-title">
+        <div>
+          <h2>전체 업무</h2>
+          <p>업무별 세부 카테고리에서 필요한 메뉴를 찾으세요.</p>
+        </div>
+      </div>
+
+      <div class="category-grid">
+        <article class="category" id="hr">
+          <div class="cat-head">
+            <span class="cat-icon">👥</span>
+
+            <div>
+              <h3>근태 · 인사</h3>
+              <p>출퇴근, 연월차, 직원정보 및 퇴직</p>
+            </div>
+          </div>
+
+          <div class="group">
+            <h4>근태 · 연월차</h4>
+
+            <div class="links">
+              <a class="task primary"
+                 target="_blank"
+                 href="https://thebigkorea.github.io/thebigkorea-attendance/">
+                출퇴근 등록 앱
+              </a>
+
+              <a class="task"
+                 target="_blank"
+                 href="https://thebigkorea.github.io/thebigkorea-attendance/admin.html">
+                관리자 출퇴근 조회 화면
+              </a>
+
+              <a class="task"
+                 target="_blank"
+                 href="https://thebigkorea.github.io/thebigkorea-leave-new/">
+                연월차 신청
+              </a>
+
+              <a class="task"
+                 target="_blank"
+                 href="https://thebigkorea.github.io/thebigkorea-leave-new/admin.html">
+                연월차 관리자 승인
+              </a>
+            </div>
+          </div>
+
+          <div class="group">
+            <h4>직원정보</h4>
+
+            <div class="links">
+              <a class="task" target="_blank" href="employee-info.html">
+                기본입력
+              </a>
+
+              <a class="task" target="_blank" href="employee-admin.html">
+                인사관리대장
+              </a>
+            </div>
+          </div>
+
+          <div class="group">
+            <h4>증명서 발급</h4>
+
+            <div class="links">
+              <a class="task primary"
+                 target="_blank"
+                 href="certificate.html">
+                재직증명서
+              </a>
+
+              <a class="task"
+                 target="_blank"
+                 href="career.html">
+                경력증명서
+              </a>
+
+            </div>
+          </div>
+
+          <div class="group">
+  <h4>외국인 근로자 채용</h4>
+
+  <div class="links">
+
+    <a
+      class="task primary"
+      target="_blank"
+      href="foreign-worker-visa.html">
+      비자별 채용 가능 여부
+    </a>
+
+  </div>
+</div>
+
+          <div class="group">
+            <h4>퇴직 관리</h4>
+
+            <div class="links">
+              <a class="task"
+                 target="_blank"
+                 href="https://thebigkorea.github.io/hr-system/retirement-admin.html">
+                퇴직서 작성
+              </a>
+
+              <a class="task"
+                 target="_blank"
+                 href="https://thebigkorea.github.io/hr-system/retirement-list.html">
+                퇴직자 관리자
+              </a>
+
+              <a class="task"
+                 target="_blank"
+                 href="https://thebigkorea.github.io/hr-system/retirement-auth.html">
+                퇴직자 조회 원장
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <article class="category" id="finance">
+          <div class="cat-head">
+            <span class="cat-icon">🧾</span>
+
+            <div>
+              <h3>계약 · 정산</h3>
+              <p>근로계약과 점포별 월 정산</p>
+            </div>
+          </div>
+
+          <div class="group">
+            <h4>전자계약</h4>
+
+            <div class="links">
+              <a class="task" target="_blank" href="regular-contract.html">
+                정규직
+              </a>
+
+              <a class="task" target="_blank" href="part-contract.html">
+                계약직·알바
+              </a>
+
+              <a class="task" target="_blank" href="service-contract.html">
+                용역계약
+              </a>
+
+              <a class="task" target="_blank" href="contract-admin.html">
+                계약관리 / 대장
+              </a>
+            </div>
+          </div>
+
+          <div class="group">
+            <h4>급여관리</h4>
+
+            <div class="links">
+              <a class="task primary"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 href="https://script.google.com/macros/s/AKfycbyzLLU_vboJprliPHe_MELBe-M9crwK9xRSHB20BoRCMjC-DFwJG5MEE3D_EtBCjGp0gg/exec">
+                직영점 통합 급여관리
+              </a>
+            </div>
+          </div>
+
+          <div class="group">
+            <h4>점포별 월정산</h4>
+
+            <div class="links">
+              <a class="task primary"
+                 target="_blank"
+                 href="https://thebigkorea.github.io/thebigkorea-settlement/settlement.html">
+                정산 입력
+              </a>
+
+              <a class="task"
+                 target="_blank"
+                 href="https://thebigkorea.github.io/thebigkorea-settlement/settlement-admin.html">
+                정산 관리
+              </a>
+
+              <a class="task"
+                 target="_blank"
+                 href="https://thebigkorea.github.io/thebigkorea-settlement/settlement-summary.html">
+                월별합산조회
+              </a>
+
+              <a class="task"
+                 target="_blank"
+                 href="https://docs.google.com/spreadsheets/d/1YsskSeam5Um3WUcMqmBktG7X751u-lVDZva_mth4z9E/edit?gid=1056348194#gid=1056348194">
+                원장조회
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <article class="category" id="operation">
+          <div class="cat-head">
+            <span class="cat-icon">🏢</span>
+
+            <div>
+              <h3>운영 지원</h3>
+              <p>점포 운영, 신규점포, 디자인 및 공지</p>
+            </div>
+          </div>
+
+          <div class="group">
+            <h4>점포 운영관리</h4>
+
+            <div class="links">
+              <a class="task primary"
+   target="_blank"
+   href="store-dashboard.html">
+
+  매장점검대시보드
+
+  <span
+    id="storeDashboardBadge"
+    class="badge-new">
+    0
+  </span>
+
+</a>
+
+              <a class="task placeholder" href="#">주간보고</a>
+              <a class="task placeholder" href="#">운영자료</a>
+            </div>
+          </div>
+
+          <div class="group">
+            <h4>신규점포 · 디자인</h4>
+
+            <div class="links">
+              <a class="task" target="_blank" href="store-opening.html">
+                신규점포 관리 열기
+              </a>
+
+              <a class="task"
+                 target="_blank"
+                 href="https://docs.google.com/spreadsheets/d/1sEdpKlRjjPesAvdyG-q55Gw3pJAPZC4WyE4EsAuCaCQ/edit#gid=0">
+                신규점포 원장조회
+              </a>
+
+              <a class="task" target="_blank" href="design-task.html">
+                디자인 업무관리
+              </a>
+
+              <a class="task"
+                 target="_blank"
+                 href="https://docs.google.com/spreadsheets/d/179hMU4XcS71l30cY2DP0nkg5HLZS4Q3p15dm83S5a8U/edit?gid=0#gid=0">
+                디자인 원장조회
+              </a>
+            </div>
+          </div>
+
+          <div class="group">
+            <h4>공지사항</h4>
+
+            <div class="links">
+              <a class="task" target="_blank" href="notice.html">
+                공지사항 열기
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <article class="category">
+          <div class="cat-head">
+            <span class="cat-icon">🚙</span>
+
+            <div>
+              <h3>차량 · 출장</h3>
+              <p>법인차량 운행과 출장·이동비</p>
+            </div>
+          </div>
+
+          <div class="group">
+            <h4>법인차량</h4>
+
+            <div class="links">
+              <a class="task primary" target="_blank" href="vehicle.html">
+                차량관리
+              </a>
+              
+
+              <a class="task" target="_blank" href="vehicle-admin.html">
+                관리자 대시보드
+              </a>
+            </div>
+          </div>
+
+          <div class="group">
+            <h4>출장관리</h4>
+
+            <div class="links">
+              <a class="task primary" target="_blank" href="trip-management.html">
+                출장 통합관리
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <article class="category wide" id="part-time">
+          <div class="cat-head">
+            <span class="cat-icon">🧑‍🍳</span>
+
+            <div>
+              <h3>아르바이트 매장별 관리</h3>
+              <p>매장별 직원정보, 근로내역, 급여명세서 및 월별 급여대장을 관리합니다.</p>
+            </div>
+          </div>
+
+          <div class="group">
+            <div class="parttime-grid">
+              <div class="parttime-store">
+                <span class="store-label">LOTTE WORLD MALL</span>
+                <h4>한국의집 롯데월드몰점</h4>
+                <a class="task primary"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   href="https://script.google.com/macros/s/AKfycbxvr3itmxIu-yO8yzKkcN0EcBH9TY41f4-E_jVIrCeGn8BxSmuAbmARlV9cXKGAN-aPRA/exec">
+                  관리화면 열기
+                </a>
+              </div>
+
+              <div class="parttime-store">
+                <span class="store-label">GALLERIA APGUJEONG</span>
+                <h4>길채정 압구정점</h4>
+                <a class="task primary"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   href="https://script.google.com/macros/s/AKfycbzPPPkbG-BS0M1NFMGkU8aAplXY-ix3knA9OjsUpz9n2HD0BJOwXTHZTdG8wefHrpWC/exec">
+                  관리화면 열기
+                </a>
+              </div>
+
+              <div class="parttime-store">
+                <span class="store-label">SHINSEGAE PAJU</span>
+                <h4>한국의집 효종갱 신세계파주 프리미엄아울렛점</h4>
+                <a class="task primary"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   href="https://script.google.com/macros/s/AKfycbxrQIoPLOsYMbnkAMO4oeBjfWqwQCagCz7EJGGSBM7eLh2hPQGrth7tmTAeFJQzs9_PlQ/exec">
+                  관리화면 열기
+                </a>
+              </div>
+
+              <div class="parttime-store">
+                <span class="store-label">LOTTE PYEONGCHON</span>
+                <h4>소바공방 롯데백화점 평촌점</h4>
+                <a class="task primary"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   href="https://script.google.com/macros/s/AKfycbw18xcPkkzKQJ0VcNgQF-wfc4Utbb7YZCl4Yz3RKgearuU8nveasQSiSUoCLD5_AJHWsw/exec">
+                  관리화면 열기
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="category wide" id="stores">
+          <div class="cat-head">
+            <span class="cat-icon">🏬</span>
+
+            <div>
+              <h3>지점 관리</h3>
+              <p>지점별 인트라넷과 주요 관리업무</p>
+            </div>
+          </div>
+
+          <div class="group">
+            <div class="store-grid">
+              <div class="store">
+                <h4>한국의집 잠실</h4>
+
+                <div class="links">
+                  <a class="task primary"
+                     target="_blank"
+                     href="https://thebigkorea.github.io/koreahouse-intranet/">
+                    인트라넷
+                  </a>
+
+                  <a class="task"
+                     target="_blank"
+                     href="https://thebigkorea.github.io/koreahouse-attendance/admin.html">
+                    출퇴근 관리자 조회
+                  </a>
+
+                  <a class="task"
+                     target="_blank"
+                     href="https://docs.google.com/spreadsheets/d/1VXAFKtm7IaK6Ns_QbrRzpP8XnzBHau6e49GXhNe0uQg/edit?gid=949326317#gid=949326317">
+                    영업실적
+                  </a>
+                  
+                </div>
+              </div>
+
+              <div class="store">
+                <h4>압구정 길채정</h4>
+
+                <div class="links">
+                  <a class="task primary"
+                     target="_blank"
+                     href="https://thebigkorea.github.io/gilchaejeong-apgujeong-intranet/">
+                    인트라넷
+                  </a>
+
+                  <a class="task"
+                     target="_blank"
+                     href="https://thebigkorea.github.io/gilchaejeong-apgujeong/admin.html">
+                    출퇴근 관리자 조회
+                  </a>
+
+                  <a class="task"
+                     target="_blank"
+                     href="https://docs.google.com/spreadsheets/d/1mmesI8_0POeqRJwcdyugLauWL0ZH4boPQn4w9YbRiT8/edit?gid=949326317#gid=949326317">
+                    영업실적
+                  </a>
+                  
+                </div>
+              </div>
+
+              <div class="store">
+                <h4>평촌 소바공방</h4>
+
+                <div class="links">
+                  <a class="task primary"
+                     target="_blank"
+                     href="https://thebigkorea.github.io/sobagongbang-pyeongchon-intranet/">
+                    인트라넷
+                  </a>
+
+                  <a class="task"
+                     target="_blank"
+                     href="https://thebigkorea.github.io/sobagongbang-pyeongchon/admin.html">
+                    출퇴근 관리자 조회
+                  </a>
+
+                  <a class="task"
+                     target="_blank"
+                     href="https://docs.google.com/spreadsheets/d/1BN0FdwGuW5KCJ9_6_gkEPQHS46MX26S5zEeB9SbsnNI/edit?gid=949326317#gid=949326317">
+                    영업실적
+                  </a>
+                  
+                </div>
+              </div>
+
+              <div class="store">
+  <h4>파주 효종갱</h4>
+
+  <div class="links">
+    <a class="task primary"
+       target="_blank"
+       href="https://thebigkorea.github.io/hyojonggaeng-paju-intranet/">
+      인트라넷
+    </a>
+  </div>
+</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="category wide" id="admin">
+          <div class="cat-head">
+            <span class="cat-icon">⚙️</span>
+
+            <div>
+              <h3>원장 · 관리자</h3>
+              <p>본사 관리자 및 통합 현황 바로가기</p>
+            </div>
+          </div>
+
+          <div class="group">
+            <h4>관리자 바로가기</h4>
+
+            <div class="links">
+
+  <a class="task" target="_blank" href="hr-list.html">
+    인사관리대장
+  </a>
+
+  <a class="task"
+     target="_blank"
+     href="https://docs.google.com/spreadsheets/d/1HzUpTGgVmd74kz1DB4QWbe5t9SutlYunGCf2iLbVaE4/edit?gid=319299006#gid=319299006">
+    연월차 관리 시트 원장
+  </a>
+
+  <a class="task" target="_blank" href="trip-admin.html">
+    출장 승인관리
+  </a>
+
+  <a class="task" target="_blank" href="vehicle-admin.html">
+    차량 관리자
+  </a>
+
+  <a class="task"
+     target="_blank"
+     href="https://script.google.com/macros/s/AKfycbx5BwuumKLdSkx_EB_u0ocLgoRD4JPAGgIE8xiSDpypTCZO5IfmFgwj1tYeEF006t1ngA/exec">
+    통합 실적 원장
+  </a>
+
+  <a class="task"
+     target="_blank"
+     href="https://docs.google.com/spreadsheets/d/18Z9qf4_dQt3qpwk7K5hbIT1q4iRDVZCK1Z-tX6CnBi0/edit?gid=0#gid=0">
+    운행원장
+  </a>
+
+  <a class="task"
+     target="_blank"
+     href="https://docs.google.com/spreadsheets/d/1RT5y2BfSMy8QdlhQvuB3vNG9R581ce538b-f8uAOVo8/edit?usp=drivesdk">
+    통합 인사DB
+  </a>
+
+</div>
+          </div>
+
+          <div class="group">
+            <h4>통합 현황</h4>
+
+            <div class="links">
+              <a class="task placeholder" href="#">전체 직원현황</a>
+              <a class="task placeholder" href="#">전체 출퇴근현황</a>
+              <a class="task placeholder" href="#">전체 연월차현황</a>
+              <a class="task placeholder" href="#">전자계약 목록</a>
+              <a class="task placeholder" href="#">영업실적 대시보드</a>
+              <a class="task placeholder" href="#">보고서 취합현황</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    더큰코리아 본사 임직원 전용 업무포털 · THE BIG KOREA HEAD OFFICE SYSTEM
+  </footer>
+
+  <script>
+  document.getElementById("today").textContent =
+    new Intl.DateTimeFormat("ko-KR", {
+      dateStyle: "full"
+    }).format(new Date());
+
+
+  /* ================================
+     지점별 일용직 미지급 API
+  ================================= */
+
+  const KOREA_API_URL =
+    "https://script.google.com/macros/s/AKfycbz_NFlMRhx_mP_0maccpd62iWNHGMVo-pAZCHg7s8-tM26QvKlIVrPL6TmElRgM6XIS/exec";
+
+  
+  /* ================================
+     매장점검 통합 대시보드 API
+  ================================= */
+
+  const STORE_DASHBOARD_API_URL =
+    "https://script.google.com/macros/s/AKfycby1RoQvXt51KjoasIG-_MmD7SiMau10eRWAYiq4Vk1k2s9yRVsuEBrBVEFvmW7aX765/exec";
+
+
+  /* ================================
+     공통 배지 표시
+  ================================= */
+
+  function showBadge(id, count) {
+    const badge =
+      document.getElementById(id);
+
+    if (!badge) {
+      return;
+    }
+
+    const safeCount =
+      Number.isFinite(Number(count))
+        ? Number(count)
+        : 0;
+
+    if (safeCount > 0) {
+      badge.textContent =
+        safeCount > 99
+          ? "99+"
+          : String(safeCount);
+
+      badge.style.display = "flex";
+    } else {
+      badge.textContent = "0";
+      badge.style.display = "none";
+    }
+  }
+
+
+  /* ================================
+     일용직 미지급 배지
+  ================================= */
+
+  async function loadDailyUnpaidBadges() {
+  try {
+    const response = await fetch(
+      KOREA_API_URL +
+        "?action=getDailyWorkerList&t=" +
+        Date.now(),
+      {
+        cache: "no-store"
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "HTTP " + response.status
+      );
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(
+        data.message ||
+        "일용직 자료 조회 실패"
+      );
+    }
+
+    const allList =
+      Array.isArray(data.data)
+        ? data.data
+        : [];
+
+    const unpaidList =
+      allList.filter(function(item) {
+        const payStatus =
+          String(item.payStatus || "").trim();
+
+        const name =
+          String(item.name || "").trim();
+
+        return (
+          name !== "NO" &&
+          name !== "" &&
+          payStatus === "미지급"
+        );
+      });
+
+    showBadge(
+      "hqDailyUnpaidBadgeTop",
+      unpaidList.length
+    );
+
+  } catch (error) {
+    console.log(
+      "일용직 미지급 배지 조회 실패",
+      error
+    );
+
+    showBadge(
+      "hqDailyUnpaidBadgeTop",
+      0
+    );
+  }
+}
+
+
+  /* ================================
+     매장점검대시보드 미확인 배지
+  ================================= */
+
+  async function loadStoreDashboardBadge() {
+    try {
+      const response =
+        await fetch(
+          STORE_DASHBOARD_API_URL +
+            "?action=getDashboard&t=" +
+            Date.now(),
+          {
+            cache: "no-store"
+          }
+        );
+
+      if (!response.ok) {
+        throw new Error(
+          "HTTP " + response.status
+        );
+      }
+
+      const data =
+        await response.json();
+
+      if (data.ok === false) {
+        throw new Error(
+          data.message ||
+          "매장점검 현황 조회 실패"
+        );
+      }
+
+      showBadge(
+        "storeDashboardBadge",
+        Number(data.pendingCount || 0)
+      );
+
+    } catch (error) {
+      console.log(
+        "매장점검대시보드 배지 조회 실패",
+        error
+      );
+
+      showBadge(
+        "storeDashboardBadge",
+        0
+      );
+    }
+  }
+
+
+  /* ================================
+     최초 실행
+  ================================= */
+
+  function initializePortalBadges() {
+    loadDailyUnpaidBadges();
+    loadStoreDashboardBadge();
+  }
+
+  if (
+    document.readyState === "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializePortalBadges
+    );
+  } else {
+    initializePortalBadges();
+  }
+</script>
+</body>
+</html>
