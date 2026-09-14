@@ -51,7 +51,7 @@ async function loadHeadOfficeEmployees(){
       throw new Error(d.message||"본사 직원 조회 실패");
     }
 
-    HEAD_OFFICE_EMPLOYEES=Array.isArray(d.employees)?d.employees:[];
+    HEAD_OFFICE_EMPLOYEES=(Array.isArray(d.employees)?d.employees:[]).filter(emp=>String(emp.name||"").trim()!=="성다미");
 
     [user,companion].forEach(el=>{
       if(!el)return;
@@ -292,6 +292,7 @@ function clearForm(){
   });
 
   if(document.getElementById("userName"))document.getElementById("userName").value="";
+  document.getElementById("transportType").value="개인차량";
   if(document.getElementById("carNumber"))document.getElementById("carNumber").value="";
   if(document.getElementById("companionEmployee"))document.getElementById("companionEmployee").value="";
 
