@@ -1,7 +1,8 @@
 const API_URL="https://script.google.com/macros/s/AKfycbzD9fUFvLxl6-cZGm6IUslFQrZDJk3P6Ip8to2NEWiktC2HR9a9VPFK-fNlxdcc_yg/exec";
 let TRIPS=[],ACTIVE_FILTER="ALL",SETTLE_ID="";
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded",async()=>{
+  await initializeExistingSettlement();
   loadTrips();
   document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{
     document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
@@ -10,6 +11,23 @@ document.addEventListener("DOMContentLoaded",()=>{
   document.getElementById("searchInput").addEventListener("input",renderTable);
   document.getElementById("statusFilter").addEventListener("change",renderTable);
 });
+
+
+async function initializeExistingSettlement(){
+  try{
+    const d=await(await fetch(API_URL+"?action=initializeExistingTripsSettlement&_="+Date.now(),{
+      cache:"no-store"
+    })).json();
+
+    if(!d.success){
+      console.warn("기존 출장 정산상태 초기화:",d.message||"실패");
+    }else if(!d.alreadyDone && d.updatedCount>0){
+      console.log(`기존 출장 ${d.updatedCount}건을 정산완료로 전환했습니다.`);
+    }
+  }catch(e){
+    console.warn("기존 출장 정산상태 초기화 연결 실패:",e);
+  }
+}
 
 async function loadTrips(){
   try{
