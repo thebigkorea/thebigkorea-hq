@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>더큰코리아 통합 ERP</title>
   <meta name="description" content="더큰코리아 통합 ERP - 인사·급여·점포·경영관리 통합 시스템" />
-  <link rel="stylesheet" href="style.css?v=21" />
+  <link rel="stylesheet" href="style.css?v=22" />
 
   <style>
     /* ===== ERP 홈 상단/브랜드 정렬 개선 ===== */
@@ -353,7 +353,7 @@
                 </div>
                 <div class="panel-actions">
                   <span class="sales-linked-badge" id="salesDataStatus">매출 데이터 불러오는 중</span>
-                  <button class="text-btn" onclick="handleQuickSystem('sales')">영업실적 대시보드 열기</button>
+                  <button class="text-btn" onclick="handleQuickSystem('managementDashboard')">영업실적 대시보드 열기</button>
                 </div>
               </div>
 
@@ -379,7 +379,7 @@
                 <button class="alert-item" type="button" onclick="handleQuickSystem('payroll')"><span class="dot red"></span><div><strong>급여 미확정</strong><small>확정 전 직원 급여가 있습니다.</small></div><b>확인</b></button>
                 <button class="alert-item" type="button" onclick="handleQuickSystem('leave')"><span class="dot amber"></span><div><strong>연월차 승인 대기</strong><small>관리자 승인이 필요한 신청 건입니다.</small></div><b>확인</b></button>
                 <button class="alert-item" type="button" onclick="handleQuickSystem('contract')"><span class="dot blue"></span><div><strong>계약 갱신 예정</strong><small>재계약 대상자를 확인하세요.</small></div><b>확인</b></button>
-                <button class="alert-item" type="button" onclick="handleQuickSystem('sales')"><span class="dot green"></span><div><strong>영업실적 입력</strong><small>점포별 일일 실적 입력 상태를 확인합니다.</small></div><b>확인</b></button>
+                <button class="alert-item" type="button" onclick="handleQuickSystem('managementDashboard')"><span class="dot green"></span><div><strong>영업실적 입력</strong><small>점포별 일일 실적 입력 상태를 확인합니다.</small></div><b>확인</b></button>
               </div>
             </section>
           </div>
@@ -410,6 +410,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=21"></script>
+  <script src="script.js?v=22"></script>
 </body>
 </html>
