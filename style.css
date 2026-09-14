@@ -386,3 +386,83 @@ button{cursor:pointer}
 .company-status-row strong{font-size:10px;color:#657382}
 .company-status-row b{font-size:11px;color:var(--text);margin-left:3px}
 @media(max-width:700px){.company-status-row{gap:10px}.company-status-row>div{width:calc(50% - 8px)}}
+
+
+/* =========================================================
+   2026-09 Navigation detail visual differentiation
+   기능/링크/데이터 로직은 변경하지 않고 모듈별 색상만 차별화
+   ========================================================= */
+.module-view{--module-accent:#2f6fd6;--module-soft:#eef5ff;--module-soft2:#f8fbff;--module-border:#cfe0fb}
+.module-view[data-module="stores"]{--module-accent:#2575d8;--module-soft:#eaf4ff;--module-soft2:#f8fbff;--module-border:#bdd8fb}
+.module-view[data-module="schedule"]{--module-accent:#7858c7;--module-soft:#f1edff;--module-soft2:#fbf9ff;--module-border:#d9cef8}
+.module-view[data-module="sales"]{--module-accent:#16896b;--module-soft:#e8f8f2;--module-soft2:#f7fcfa;--module-border:#bfe8db}
+.module-view[data-module="opening"]{--module-accent:#d39124;--module-soft:#fff4df;--module-soft2:#fffaf1;--module-border:#f0d49e}
+.module-view[data-module="hq"]{--module-accent:#3568b8;--module-soft:#edf4ff;--module-soft2:#f9fbff;--module-border:#cadbf4}
+.module-view[data-module="support"]{--module-accent:#dc6c2d;--module-soft:#fff0e7;--module-soft2:#fffaf7;--module-border:#f3cfb8}
+.module-view[data-module="settlement"]{--module-accent:#15956f;--module-soft:#e8f8f1;--module-soft2:#f7fcfa;--module-border:#bfe9da}
+.module-view[data-module="vehicle"]{--module-accent:#287bc1;--module-soft:#eaf5fc;--module-soft2:#f7fbfe;--module-border:#c5e0f2}
+.module-view[data-module="tools"]{--module-accent:#8657c8;--module-soft:#f3edfb;--module-soft2:#fbf9fe;--module-border:#dfcff3}
+
+.module-view .module-hero{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--module-soft) 0%,#fff 58%,var(--module-soft2) 100%);
+  border-color:var(--module-border);
+  box-shadow:0 10px 28px rgba(31,45,61,.055);
+}
+.module-view .module-hero:before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--module-accent)
+}
+.module-view .module-hero:after{
+  content:"";position:absolute;right:-45px;top:-75px;width:190px;height:190px;border-radius:50%;
+  background:var(--module-soft);opacity:.72;pointer-events:none
+}
+.module-view .module-hero h2{position:relative;z-index:1;color:#16243a}
+.module-view .module-hero p{position:relative;z-index:1}
+.module-view .module-grid{align-items:stretch}
+.module-view .module-card{
+  position:relative;overflow:hidden;border-color:var(--module-border);
+  background:linear-gradient(145deg,#fff 0%,var(--module-soft2) 100%);
+  box-shadow:0 5px 16px rgba(31,45,61,.035);transition:.2s ease
+}
+.module-view .module-card:before{
+  content:"";position:absolute;left:0;top:0;width:100%;height:3px;background:var(--module-accent)
+}
+.module-view .module-card:hover{
+  transform:translateY(-2px);box-shadow:0 12px 26px rgba(31,45,61,.09)
+}
+.module-view .module-card button:not(.secondary){
+  background:var(--module-accent);box-shadow:0 5px 12px color-mix(in srgb,var(--module-accent) 20%,transparent)
+}
+.module-view .module-card button.secondary{
+  background:var(--module-soft);color:var(--module-accent);border:1px solid var(--module-border)
+}
+
+/* 지점관리: 4개 점포를 서로 다른 색으로 구분 */
+.store-management-view .store-link-card:nth-child(1),
+#view-stores .store-link-card:nth-child(1){--store-accent:#2476df;--store-soft:#edf5ff;--store-border:#bdd9fb}
+.store-management-view .store-link-card:nth-child(2),
+#view-stores .store-link-card:nth-child(2){--store-accent:#14966c;--store-soft:#eaf9f3;--store-border:#bfe8d9}
+.store-management-view .store-link-card:nth-child(3),
+#view-stores .store-link-card:nth-child(3){--store-accent:#8156c7;--store-soft:#f3eefc;--store-border:#ddcff4}
+.store-management-view .store-link-card:nth-child(4),
+#view-stores .store-link-card:nth-child(4){--store-accent:#dc711e;--store-soft:#fff1e5;--store-border:#f3cfb1}
+.store-link-card{
+  border-top:3px solid var(--store-accent,var(--module-accent,#2f6fd6))!important;
+  background:linear-gradient(145deg,#fff 0%,var(--store-soft,#f8fbff) 100%)!important
+}
+.store-link-card .store-status,
+.store-link-card .status-badge{background:var(--store-soft,#edf5ff)!important;color:var(--store-accent,#2f6fd6)!important}
+.store-link-card button,.store-link-card a.store-action{
+  background:var(--store-accent,#1b2638)!important;color:#fff!important
+}
+
+/* 신규점포 개설은 각 업무 성격별 카드 색상 차별화 */
+#view-opening .module-card:nth-child(1){--module-accent:#cf3e49;--module-soft:#fff0f2;--module-soft2:#fff8f8;--module-border:#f4cbd0}
+#view-opening .module-card:nth-child(2){--module-accent:#2478df;--module-soft:#edf5ff;--module-soft2:#f8fbff;--module-border:#c6dcfa}
+#view-opening .module-card:nth-child(3){--module-accent:#15966f;--module-soft:#eaf9f3;--module-soft2:#f7fcfa;--module-border:#c1e9db}
+#view-opening .module-card:nth-child(4){--module-accent:#d17b22;--module-soft:#fff3e7;--module-soft2:#fffaf5;--module-border:#f0d2b5}
+
+/* 좁은 화면에서도 색상/카드 구조 유지 */
+@media(max-width:900px){
+  .module-view .module-card{min-height:118px}
+}

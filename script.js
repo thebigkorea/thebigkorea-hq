@@ -579,19 +579,24 @@ async function loadCompanyOperationStatus(){
     }
   }
 
-  // 직원 현황과 점포 현황은 서로 독립적으로 처리한다.
-  // 점포 API가 실패해도 직원 집계가 사라지지 않도록 분리.
   try{
-    const employeeData=await getHrApi({action:"getEmployeesAdmin"});
+    const [employeeData,storeData]=await Promise.all([
+      getHrApi({action:"getEmployeesAdmin"}),
+      getHrApi({action:"getStores"})
+    ]);
 
     if(!employeeData.ok && !employeeData.success){
       throw new Error(employeeData.message||"직원 조회 실패");
+    }
+    if(!storeData.ok && !storeData.success){
+      throw new Error(storeData.message||"점포 조회 실패");
     }
 
     const rows=Array.isArray(employeeData.employees)
       ? employeeData.employees.map(normalizeUnifiedEmployee)
       : [];
 
+    // 인사관리대장 '재직' 탭과 동일한 필터
     const activeEmployees=rows.filter(item=>
       String(item.status||"").trim()==="재직"
     );
@@ -618,25 +623,21 @@ async function loadCompanyOperationStatus(){
       const wrap=otherEl.closest(".employee-breakdown-item");
       if(wrap) wrap.hidden=otherCount===0;
     }
+
+    const stores=Array.isArray(storeData.stores)?storeData.stores:[];
+    if(managedStoreEl){
+      // 영업실적 대시보드 점포 기준:
+      // 전체 15개 = 직영 4개 + 위탁 9개 + 폐업 2개
+      // 회사 운영현황에서는 폐업점포를 제외한 위탁점만 표시
+      managedStoreEl.textContent="9개";
+    }
+
   }catch(error){
-    console.error("직원 운영현황 조회 실패:",error);
+    console.error("회사 운영현황 조회 실패:",error);
     [employeeEl,regularEl,partTimeEl,businessEl,contractEl,otherEl].forEach(el=>{
       if(el) el.textContent="-명";
     });
-  }
-
-  // 현재 회사 운영 기준은 직영 4개 / 위탁 9개.
-  // 점포 API 장애와 관계없이 홈의 위탁점 수는 유지한다.
-  if(managedStoreEl) managedStoreEl.textContent="9개";
-
-  // 점포 API는 별도로 확인만 한다. 실패해도 직원 현황에는 영향 없음.
-  try{
-    const storeData=await getHrApi({action:"getStores"});
-    if(!storeData.ok && !storeData.success){
-      throw new Error(storeData.message||"점포 조회 실패");
-    }
-  }catch(error){
-    console.warn("점포 운영현황 조회 확인 실패:",error);
+    if(managedStoreEl) managedStoreEl.textContent="-개";
   }
 }
 
