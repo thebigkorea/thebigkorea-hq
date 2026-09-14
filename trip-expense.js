@@ -1,86 +1,9 @@
-const API_URL =
-"https://script.google.com/macros/s/AKfycbzD9fUFvLxl6-cZGm6IUslFQrZDJk3P6Ip8to2NEWiktC2HR9a9VPFK-fNlxdcc_yg/exec";
-
-let ALL_TRIPS = [];
-
-document.addEventListener("DOMContentLoaded", function () {
-  loadTrips();
-});
-
-async function loadTrips() {
-  try {
-    const res = await fetch(API_URL + "?action=getTrips");
-    const data = await res.json();
-
-    if (!data.success) return;
-
-    ALL_TRIPS = data.trips || [];
-
-    renderExpenses();
-    updateExpenseSummary();
-
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-function renderExpenses() {
-  const tbody = document.getElementById("expenseTable");
-  tbody.innerHTML = "";
-
-  if (!ALL_TRIPS.length) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="11" class="empty">
-          이동비 내역이 없습니다.
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  ALL_TRIPS.forEach(trip => {
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>${trip.tripDate || ""}</td>
-      <td>${trip.userName || ""}</td>
-      <td>${trip.department || ""}</td>
-      <td>${trip.transportType || ""}</td>
-      <td>${trip.carNumber || ""}</td>
-      <td>${trip.destination || ""}</td>
-      <td>${number_(trip.fuelCost)} 원</td>
-      <td>${number_(trip.tollCost)} 원</td>
-      <td>${number_(trip.parkingCost)} 원</td>
-      <td>${number_(trip.distance)} km</td>
-      <td>${trip.status || ""}</td>
-    `;
-
-    tbody.appendChild(tr);
-  });
-}
-
-function updateExpenseSummary() {
-  let fuel = 0;
-  let toll = 0;
-  let parking = 0;
-
-  ALL_TRIPS.forEach(trip => {
-    fuel += Number(trip.fuelCost || 0);
-    toll += Number(trip.tollCost || 0);
-    parking += Number(trip.parkingCost || 0);
-  });
-
-  document.getElementById("totalFuelCost").textContent =
-    number_(fuel) + " 원";
-
-  document.getElementById("totalTollCost").textContent =
-    number_(toll) + " 원";
-
-  document.getElementById("totalParkingCost").textContent =
-    number_(parking) + " 원";
-}
-
-function number_(num) {
-  return Number(num || 0).toLocaleString();
-}
+const API_URL="https://script.google.com/macros/s/AKfycbzD9fUFvLxl6-cZGm6IUslFQrZDJk3P6Ip8to2NEWiktC2HR9a9VPFK-fNlxdcc_yg/exec";let ALL_TRIPS=[],SETTLE_ID="";
+document.addEventListener("DOMContentLoaded",loadTrips);
+async function loadTrips(){try{const d=await(await fetch(API_URL+"?action=getTrips")).json();if(!d.success)return;ALL_TRIPS=d.trips||[];renderExpenses();updateExpenseSummary();}catch(e){console.log(e);}}
+function renderExpenses(){const b=document.getElementById("expenseTable");b.innerHTML="";if(!ALL_TRIPS.length){b.innerHTML='<tr><td colspan="11" class="empty">출장 내역이 없습니다.</td></tr>';return;}ALL_TRIPS.forEach(t=>{const tr=document.createElement("tr"),period=t.tripStartDate===t.tripEndDate?t.tripStartDate:`${t.tripStartDate} ~ ${t.tripEndDate}`,done=t.settlementStatus==="정산완료";tr.innerHTML=`<td>${period}</td><td>${esc(t.userName)}</td><td>${esc(t.companions||"-")}</td><td>${esc(t.department)}</td><td>${esc(t.transportType)}</td><td>${esc(t.carNumber||"-")}</td><td>${esc(t.destination)}</td><td>${done?number_(t.fuelCost)+" 원":"-"}</td><td>${done?number_(t.distance)+" km":"-"}</td><td>${esc(t.settlementStatus||"미정산")}</td><td>${done?"정산완료":`<button class="btn-settle" onclick='openSettle(${JSON.stringify(t.id)})'>정산하기</button>`}</td>`;b.appendChild(tr);});}
+function updateExpenseSummary(){const done=ALL_TRIPS.filter(t=>t.settlementStatus==="정산완료");document.getElementById("totalFuelCost").textContent=number_(done.reduce((a,t)=>a+Number(t.fuelCost||0),0))+" 원";document.getElementById("totalDistance").textContent=number_(done.reduce((a,t)=>a+Number(t.distance||0),0))+" km";document.getElementById("unsettledCount").textContent=number_(ALL_TRIPS.filter(t=>t.settlementStatus!=="정산완료").length)+" 건";}
+function openSettle(id){const t=ALL_TRIPS.find(x=>x.id===id);if(!t)return;SETTLE_ID=id;document.getElementById("settleInfo").textContent=`${t.userName} · ${t.tripStartDate}${t.tripEndDate!==t.tripStartDate?" ~ "+t.tripEndDate:""} · ${t.destination}`;document.getElementById("settleFuel").value=t.fuelCost||0;document.getElementById("settleDistance").value=t.distance||0;document.getElementById("settleModal").hidden=false;}
+function closeSettle(){document.getElementById("settleModal").hidden=true;SETTLE_ID="";}
+async function saveSettlement(){if(!SETTLE_ID)return;const body={action:"settleTrip",tripId:SETTLE_ID,fuelCost:document.getElementById("settleFuel").value,distance:document.getElementById("settleDistance").value};try{const d=await(await fetch(API_URL,{method:"POST",body:JSON.stringify(body)})).json();if(d.success){alert("출장 정산이 완료되었습니다.");closeSettle();loadTrips();}else alert(d.message||"정산 실패");}catch(e){alert("서버 연결 실패");}}
+function number_(n){return Number(n||0).toLocaleString();}function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}

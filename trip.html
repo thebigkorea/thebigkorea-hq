@@ -1,139 +1,23 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>출장관리</title>
-
-  <link rel="stylesheet" href="trip.css" />
-</head>
-
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>출장관리</title><link rel="stylesheet" href="trip.css"></head>
 <body>
-
-  <header class="header">
-    <div>
-      <h1>더큰코리아 출장관리</h1>
-      <p>BUSINESS TRIP MANAGEMENT</p>
-    </div>
-  </header>
-
-  <main class="container">
-
-    <section class="summary">
-
-      <div class="summary-card">
-        <strong id="tripCount">0</strong>
-        <span>출장 신청건수</span>
-      </div>
-
-      <div class="summary-card">
-        <strong id="todayTripCount">0</strong>
-        <span>오늘 출장</span>
-      </div>
-
-    </section>
-
-    <section class="panel">
-
-      <h2>출장 등록</h2>
-
-      <div class="form-grid">
-
-        <label>
-          출장일자
-          <input type="date" id="tripDate">
-        </label>
-
-        <label>
-          출장자
-          <input type="text" id="userName" placeholder="예: 홍길동">
-        </label>
-
-        <label>
-          부서
-          <input type="text" id="department" placeholder="예: 운영관리팀">
-        </label>
-
-        <label>
-          이동수단
-          <select id="transportType">
-            <option value="법인차량">법인차량</option>
-            <option value="개인차량">개인차량</option>
-            <option value="대중교통">대중교통</option>
-            <option value="기타">기타</option>
-          </select>
-        </label>
-
-        <label>
-          차량번호
-          <select id="carNumber"></select>
-        </label>
-
-        <label>
-          방문처
-          <input type="text" id="destination" placeholder="예: 잠실 롯데월드몰">
-        </label>
-
-        <label>
-          출장목적
-          <input type="text" id="purpose" placeholder="예: 매장 점검">
-        </label>
-
-        <label>
-          시작시간
-          <input type="time" id="startTime">
-        </label>
-
-        <label>
-          종료시간
-          <input type="time" id="endTime">
-        </label>
-
-        <label>
-          주유금액
-          <input type="number" id="fuelCost" value="0">
-        </label>
-
-        <label>
-          톨비
-          <input type="number" id="tollCost" value="0">
-        </label>
-
-        <label>
-          주차비
-          <input type="number" id="parkingCost" value="0">
-        </label>
-
-        <label>
-          운행거리 km
-          <input type="number" id="distance" placeholder="예: 120">
-        </label>
-
-      </div>
-
-      <label class="full-label">
-        비고
-        <textarea id="memo"></textarea>
-      </label>
-
-      <button class="submit" onclick="saveTrip()">
-        출장 등록 저장
-      </button>
-
-    </section>
-
-    <section class="history">
-
-      <h2>최근 출장 신청내역</h2>
-
-      <div id="tripList" class="trip-list"></div>
-
-    </section>
-
-  </main>
-
-  <script src="trip.js"></script>
-
-</body>
-</html>
+<header class="header"><div><h1>더큰코리아 출장관리</h1><p>BUSINESS TRIP MANAGEMENT</p></div></header>
+<main class="container">
+<section class="summary"><div class="summary-card"><strong id="tripCount">0</strong><span>출장 신청건수</span></div><div class="summary-card"><strong id="todayTripCount">0</strong><span>오늘 출장</span></div></section>
+<section class="panel"><h2>출장 등록</h2>
+<div class="form-grid">
+<label>출장 시작일<input type="date" id="tripStartDate"></label>
+<label>출장 종료일<input type="date" id="tripEndDate"></label>
+<label>출장자<select id="userName"><option value="">본사 직원 선택</option></select></label>
+<label>부서<input type="text" id="department" placeholder="예: 운영관리팀"></label>
+<label>이동수단<select id="transportType"><option value="법인차량">법인차량</option><option value="개인차량">개인차량</option><option value="대중교통">대중교통</option><option value="기타">기타</option></select></label>
+<label>차량번호<select id="carNumber"></select></label>
+<label>방문처<input type="text" id="destination" placeholder="예: 파주 효종갱"></label>
+<label>출장목적<input type="text" id="purpose" placeholder="예: 매장 점검"></label>
+</div>
+<div class="companion-box"><div class="companion-head"><strong>동행자</strong><span>본사 직원 선택 또는 직접입력 가능</span></div><div class="companion-controls"><select id="companionEmployee"><option value="">본사 직원 선택</option></select><button type="button" onclick="addSelectedCompanion()">직원 추가</button><input type="text" id="companionDirect" placeholder="직접입력: 김민수, 홍길동"><button type="button" onclick="addDirectCompanions()">직접입력 추가</button></div><div id="companionTags" class="companion-tags"></div></div>
+<label class="full-label">비고<textarea id="memo"></textarea></label>
+<button class="submit" onclick="saveTrip()">출장 신청</button></section>
+<section class="history"><h2>최근 출장 신청내역</h2><div id="tripList" class="trip-list"></div></section>
+</main><script src="trip.js"></script></body></html>
