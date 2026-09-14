@@ -24,3 +24,11 @@
   white-space:nowrap;
 }
 .main-home-btn:hover{background:#e9d9ca}
+
+[hidden]{display:none!important}
+.recent-panel{margin-top:18px}
+.recent-panel table{min-width:900px}
+.recent-panel .panel-head{align-items:center}
+.list-view{margin-top:18px}
+.dashboard-empty{grid-column:1/-1;min-height:70px;display:flex;align-items:center;justify-content:center}
+.tabs .tab.active{background:#fffaf4;color:#4c2c1a;box-shadow:0 2px 8px rgba(50,30,18,.08)}

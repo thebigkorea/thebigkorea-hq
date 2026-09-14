@@ -18,43 +18,61 @@
 <main class="wrap">
   <nav class="tabs">
     <button class="tab apply-tab" type="button" onclick="location.href='trip.html'">+ 출장 신청</button>
-    <button class="tab active" data-filter="ALL">전체 출장</button>
+    <button class="tab" data-filter="ALL">전체 출장</button>
     <button class="tab" data-filter="승인대기">승인대기 <b id="tabPending">0</b></button>
     <button class="tab" data-filter="승인">승인완료</button>
     <button class="tab" data-filter="SETTLE">정산대기 <b id="tabSettle">0</b></button>
     <button class="tab" data-filter="정산완료">정산완료</button>
   </nav>
 
-  <section class="cards">
-    <article><span>전체 출장</span><strong id="totalCount">0</strong><small>건</small></article>
-    <article class="warn"><span>승인대기</span><strong id="pendingCount">0</strong><small>건</small></article>
-    <article><span>승인완료</span><strong id="approvedCount">0</strong><small>건</small></article>
-    <article class="accent"><span>정산대기</span><strong id="settleCount">0</strong><small>건</small></article>
-    <article class="done"><span>정산완료</span><strong id="settledCount">0</strong><small>건</small></article>
-  </section>
+  <section id="dashboardView">
+    <section class="cards">
+      <article><span>전체 출장</span><strong id="totalCount">0</strong><small>건</small></article>
+      <article class="warn"><span>승인대기</span><strong id="pendingCount">0</strong><small>건</small></article>
+      <article><span>승인완료</span><strong id="approvedCount">0</strong><small>건</small></article>
+      <article class="accent"><span>정산대기</span><strong id="settleCount">0</strong><small>건</small></article>
+      <article class="done"><span>정산완료</span><strong id="settledCount">0</strong><small>건</small></article>
+    </section>
 
-  <section class="work">
-    <div class="section-title">
-      <div>
-        <h2>처리할 업무</h2>
-        <p>승인 또는 정산이 필요한 출장만 모아서 보여줍니다.</p>
+    <section class="work">
+      <div class="section-title">
+        <div>
+          <h2>처리할 업무</h2>
+          <p>승인 또는 정산이 필요한 출장만 모아서 보여줍니다.</p>
+        </div>
       </div>
-    </div>
-    <div id="todoList" class="todo-list"></div>
+      <div id="todoList" class="todo-list"></div>
+    </section>
+
+    <section class="panel recent-panel">
+      <div class="panel-head">
+        <div>
+          <h2>최근 출장</h2>
+          <p>최근 등록된 출장 5건을 보여줍니다. 전체 자료는 상단의 ‘전체 출장’에서 확인하세요.</p>
+        </div>
+        <button class="soft" type="button" onclick="openList('ALL')">전체 출장 보기</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>출장기간</th><th>출장자</th><th>동행자</th><th>부서</th><th>방문처</th><th>승인상태</th><th>정산상태</th></tr>
+          </thead>
+          <tbody id="recentTable">
+            <tr><td colspan="7" class="empty">최근 출장내역을 불러오는 중입니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </section>
 
-  <section class="panel">
+  <section id="listView" class="panel list-view" hidden>
     <div class="panel-head">
       <div>
-        <h2>출장 전체내역</h2>
-        <p>출장자·기간·부서·상태를 한 화면에서 조회합니다.</p>
+        <h2 id="listTitle">출장 전체내역</h2>
+        <p id="listDescription">출장자·기간·부서·상태를 조회합니다.</p>
       </div>
-      <div class="actions">
-        <button class="soft" onclick="location.href='trip-admin.html'">승인 화면</button>
-        <button class="soft" onclick="location.href='trip-expense.html'">정산 화면</button>
-      </div>
+      <button class="soft" type="button" onclick="showDashboard()">대시보드로</button>
     </div>
-
     <div class="filters">
       <input id="searchInput" type="search" placeholder="출장자, 동행자, 방문처, 부서 검색">
       <select id="statusFilter">
@@ -66,7 +84,6 @@
       </select>
       <button class="soft" type="button" onclick="loadTrips()">새로고침</button>
     </div>
-
     <div class="table-wrap">
       <table>
         <thead>
