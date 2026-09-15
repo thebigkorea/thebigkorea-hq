@@ -1279,18 +1279,35 @@ function buildHqTaskView(){
   const el=document.getElementById("view-hqtasks"); if(!el)return;
   el.innerHTML=`
     <style>
-      .hq-repeat-help{margin-top:14px;border:1px solid #d9e3ee;border-radius:14px;background:#f8fbff;overflow:hidden}
-      .hq-repeat-help-head{padding:13px 15px;background:linear-gradient(90deg,#eef6ff,#fff8eb);border-bottom:1px solid #e4eaf1}
-      .hq-repeat-help-head strong{display:block;color:#17355c;font-size:13px}
-      .hq-repeat-help-head span{display:block;margin-top:3px;color:#718096;font-size:10px}
-      .hq-repeat-examples{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:10px}
-      .hq-example{border:1px solid #e2e8f0;background:#fff;border-radius:10px;padding:9px 10px;text-align:left;cursor:pointer}
-      .hq-example:hover{border-color:#8ab8ef;background:#f5f9ff}
-      .hq-example b{display:block;color:#17355c;font-size:11px}
-      .hq-example small{display:block;margin-top:3px;color:#718096;font-size:9px;line-height:1.35}
+      .hq-example-open-btn{width:100%;margin-top:14px;border:1px solid #d5e1ef;background:#f7fbff;color:#17355c;border-radius:10px;padding:11px 14px;font-weight:800;cursor:pointer}
+      .hq-example-open-btn:hover{background:#eef6ff;border-color:#9fc3ec}
+      .hq-example-modal{display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;padding:24px}
+      .hq-example-modal.open{display:flex}
+      .hq-example-backdrop{position:absolute;inset:0;background:rgba(12,25,43,.58);backdrop-filter:blur(3px)}
+      .hq-example-dialog{position:relative;z-index:1;width:min(980px,94vw);max-height:86vh;background:#fff;border-radius:18px;box-shadow:0 28px 80px rgba(0,0,0,.28);overflow:hidden;display:flex;flex-direction:column}
+      .hq-example-dialog-head{display:flex;justify-content:space-between;gap:20px;padding:22px 24px 16px;border-bottom:1px solid #e7edf4}
+      .hq-example-dialog-head h3{margin:3px 0 5px;font-size:20px;color:#132c4c}
+      .hq-example-dialog-head p{margin:0;color:#718096;font-size:11px}
+      .hq-example-close{width:38px;height:38px;border:0;border-radius:10px;background:#f1f5f9;color:#334155;font-size:25px;line-height:1;cursor:pointer}
+      .hq-example-tabs{display:flex;gap:7px;overflow-x:auto;padding:13px 20px;border-bottom:1px solid #edf1f5;background:#fbfcfe}
+      .hq-example-tab{white-space:nowrap;border:1px solid #dce5ef;background:#fff;color:#53657a;border-radius:999px;padding:7px 12px;font-size:10px;font-weight:800;cursor:pointer}
+      .hq-example-tab.active{background:#17355c;border-color:#17355c;color:#fff}
+      .hq-example-modal-list{overflow:auto;padding:18px 20px 24px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+      .hq-example-item{border:1px solid #e1e8f0;background:#fff;border-radius:12px;padding:12px 13px;text-align:left;cursor:pointer}
+      .hq-example-item:hover{border-color:#82b4ed;background:#f6faff}
+      .hq-example-item-top{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+      .hq-example-cycle{font-size:9px;font-weight:900;color:#0d65c2;background:#eaf4ff;border-radius:999px;padding:3px 7px}
+      .hq-example-category{font-size:9px;color:#8a6a34}
+      .hq-example-item b{display:block;color:#17355c;font-size:12px}
+      .hq-example-item small{display:block;margin-top:4px;color:#718096;font-size:9px;line-height:1.45}
       #hqRepeatDetail>label,#hqRepeatDetail .hq-form-row{margin:0}
       #hqRepeatDetail small{display:block;margin-top:4px;color:#8a6a34;font-size:9px}
-      @media(max-width:700px){.hq-repeat-examples{grid-template-columns:1fr}}
+      @media(max-width:700px){
+        .hq-example-modal{padding:10px}
+        .hq-example-dialog{width:100%;max-height:92vh}
+        .hq-example-modal-list{grid-template-columns:1fr;padding:12px}
+        .hq-example-dialog-head{padding:17px 16px 13px}
+      }
     </style>
     <section class="module-hero hq-task-hero">
       <div><span class="eyebrow">HEAD OFFICE WORK CALENDAR</span><h2>본사 업무일정 관리</h2>
@@ -1331,30 +1348,119 @@ function buildHqTaskView(){
           </div>
           <button class="hq-add-btn" onclick="addHqTask()">업무 등록</button>
 
-          <div class="hq-repeat-help">
-            <div class="hq-repeat-help-head">
-              <strong>💡 회사 반복업무 예시</strong>
-              <span>예시를 누르면 업무명·반복주기·구분이 자동 입력됩니다. 회사 상황에 맞게 수정해서 등록하세요.</span>
-            </div>
-            <div class="hq-repeat-examples">
-              <button class="hq-example" onclick="fillHqTaskExample('일일 매출·입금 확인','DAILY','정산')"><b>매일 · 매출/입금 확인</b><small>전일 매출, 카드·현금 입금, 미입금 내역 확인</small></button>
-              <button class="hq-example" onclick="fillHqTaskExample('주간 영업실적 보고','WEEKLY','점포')"><b>매주 · 주간 실적 보고</b><small>매출·원가·이슈·다음 주 계획 취합</small></button>
-              <button class="hq-example" onclick="fillHqTaskExample('급여 지급 및 급여대장 확인','MONTHLY','인사·급여')"><b>매월 · 급여 지급</b><small>급여 확정, 지급, 급여대장 및 공제내역 확인</small></button>
-              <button class="hq-example" onclick="fillHqTaskExample('거래처 및 백화점 정산','MONTHLY','정산')"><b>매월 · 거래처/백화점 정산</b><small>수수료, 거래처 대금, 세금계산서 확인</small></button>
-              <button class="hq-example" onclick="fillHqTaskExample('4대보험 및 원천세 납부 확인','MONTHLY','인사·급여')"><b>매월 · 세금/4대보험</b><small>원천세, 4대보험 납부금액 및 납부 여부 확인</small></button>
-              <button class="hq-example" onclick="fillHqTaskExample('부가가치세 신고 준비','QUARTERLY','세무')"><b>분기 · 부가세 업무</b><small>매출·매입자료, 증빙 누락, 신고 준비 확인</small></button>
-              <button class="hq-example" onclick="fillHqTaskExample('근로계약 및 인사정보 점검','MONTHLY','인사·급여')"><b>매월 · 인사자료 점검</b><small>입퇴사, 계약서, 보건증, 직원정보 변경사항 확인</small></button>
-              <button class="hq-example" onclick="fillHqTaskExample('보험 및 주요 계약 갱신 확인','YEARLY','계약')"><b>매년 · 계약/보험 갱신</b><small>보험, 임대차, 유지보수, 주요 계약 만료일 확인</small></button>
-            </div>
-          </div>
+          <button class="hq-example-open-btn" type="button" onclick="openHqTaskExamples()">💡 회사 반복업무 예시 보기</button>
         </div>
       </section>
     </div>
     <section class="panel hq-ledger-panel">
       <div class="panel-head"><div><h3>본사 업무 원장</h3><p>반복업무와 직접 등록한 업무를 함께 관리합니다.</p></div></div>
       <div class="hq-ledger-wrap"><table class="hq-ledger"><thead><tr><th>업무명</th><th>구분</th><th>주기</th><th>담당</th><th>다음 예정일</th><th>비고</th><th>관리</th></tr></thead><tbody id="hqLedgerBody"></tbody></table></div>
-    </section>`;
+    </section>
+    <div class="hq-example-modal" id="hqExampleModal" aria-hidden="true">
+      <div class="hq-example-backdrop" onclick="closeHqTaskExamples()"></div>
+      <section class="hq-example-dialog" role="dialog" aria-modal="true" aria-labelledby="hqExampleTitle">
+        <div class="hq-example-dialog-head">
+          <div><span class="eyebrow">REFERENCE LIBRARY</span><h3 id="hqExampleTitle">회사 반복업무 예시</h3><p>분야별 예시를 참고하고, 사용할 업무를 누르면 등록란에 자동 입력됩니다.</p></div>
+          <button type="button" class="hq-example-close" onclick="closeHqTaskExamples()" aria-label="닫기">×</button>
+        </div>
+        <div class="hq-example-tabs" id="hqExampleTabs"></div>
+        <div class="hq-example-modal-list" id="hqExampleList"></div>
+      </section>
+    </div>`;
   updateHqRepeatFields();
+}
+const HQ_TASK_EXAMPLES=[
+  {group:"매출·정산",title:"일일 매출·입금 확인",repeat:"DAILY",category:"정산",desc:"전일 매출, 카드·현금 입금, 미입금 내역 확인"},
+  {group:"매출·정산",title:"영업점 매출 입력 확인",repeat:"DAILY",category:"점포",desc:"점포별 일일 매출 입력 및 누락 여부 확인"},
+  {group:"매출·정산",title:"주간 영업실적 보고",repeat:"WEEKLY",category:"점포",desc:"매출·원가·주요 이슈 및 다음 주 계획 취합"},
+  {group:"매출·정산",title:"거래처 및 백화점 정산",repeat:"MONTHLY",category:"정산",desc:"수수료, 거래처 대금, 정산 차이 확인"},
+  {group:"매출·정산",title:"카드사 매출대금 대사",repeat:"MONTHLY",category:"정산",desc:"카드 매출과 실제 입금액 및 수수료 대사"},
+
+  {group:"회계·자금",title:"법인계좌 입출금 확인",repeat:"DAILY",category:"회계",desc:"법인계좌 주요 입출금 및 이상거래 확인"},
+  {group:"회계·자금",title:"지출결의 및 증빙 점검",repeat:"WEEKLY",category:"회계",desc:"영수증·세금계산서·지출결의 누락 확인"},
+  {group:"회계·자금",title:"미수금·미지급금 점검",repeat:"WEEKLY",category:"회계",desc:"회수 예정금액과 지급 예정금액 확인"},
+  {group:"회계·자금",title:"월말 자금계획 작성",repeat:"MONTHLY",category:"회계",desc:"다음 달 급여·거래처·세금 등 주요 자금소요 정리"},
+  {group:"회계·자금",title:"월 회계마감 자료 확인",repeat:"MONTHLY",category:"회계",desc:"매출·매입·경비·계좌 자료의 월 마감 상태 확인"},
+
+  {group:"세무",title:"세금계산서 발행·수취 확인",repeat:"WEEKLY",category:"세무",desc:"매출·매입 세금계산서 발행 및 누락 여부 확인"},
+  {group:"세무",title:"원천세 신고·납부 확인",repeat:"MONTHLY",category:"세무",desc:"근로·사업·일용소득 원천세 신고 및 납부 확인"},
+  {group:"세무",title:"부가가치세 신고 준비",repeat:"QUARTERLY",category:"세무",desc:"매출·매입자료, 증빙 누락 및 신고자료 점검"},
+  {group:"세무",title:"법인세 결산자료 준비",repeat:"YEARLY",category:"세무",desc:"결산 및 법인세 신고에 필요한 자료 정리"},
+  {group:"세무",title:"지급명세서 제출 확인",repeat:"YEARLY",category:"세무",desc:"근로·사업·기타소득 지급명세서 제출 일정 확인"},
+
+  {group:"인사·급여",title:"출퇴근 이상내역 확인",repeat:"DAILY",category:"인사·급여",desc:"미출근·지각·퇴근 누락 등 근태 이상사항 확인"},
+  {group:"인사·급여",title:"연월차·미휴무 승인 확인",repeat:"DAILY",category:"인사·급여",desc:"승인대기 신청과 잔여일수 이상 여부 확인"},
+  {group:"인사·급여",title:"입퇴사 및 인사변동 점검",repeat:"WEEKLY",category:"인사·급여",desc:"신규입사·퇴사·휴직·직책 변경사항 확인"},
+  {group:"인사·급여",title:"급여 지급 및 급여대장 확인",repeat:"MONTHLY",category:"인사·급여",desc:"급여 확정, 지급, 공제 및 급여대장 확인"},
+  {group:"인사·급여",title:"4대보험 취득·상실 점검",repeat:"MONTHLY",category:"인사·급여",desc:"입퇴사자 4대보험 신고 및 처리상태 확인"},
+  {group:"인사·급여",title:"4대보험료 납부 확인",repeat:"MONTHLY",category:"인사·급여",desc:"국민연금·건강·고용·산재보험 납부 확인"},
+  {group:"인사·급여",title:"근로계약 및 인사정보 점검",repeat:"MONTHLY",category:"인사·급여",desc:"계약서, 보건증, 직원정보 변경 및 누락 확인"},
+  {group:"인사·급여",title:"퇴직금 지급대상 점검",repeat:"MONTHLY",category:"인사·급여",desc:"퇴직자 정산 및 퇴직급여 지급대상 확인"},
+
+  {group:"점포운영",title:"점포 주요 운영이슈 확인",repeat:"DAILY",category:"점포",desc:"시설·고객·인력·영업 관련 긴급 이슈 확인"},
+  {group:"점포운영",title:"매장점검 미처리 업무 확인",repeat:"DAILY",category:"점포",desc:"본사 점검 후 미조치·보완요청 건 확인"},
+  {group:"점포운영",title:"점포 주간보고 취합",repeat:"WEEKLY",category:"점포",desc:"매출·인력·시설·민원·행사 이슈 취합"},
+  {group:"점포운영",title:"위생·안전 점검 확인",repeat:"WEEKLY",category:"점포",desc:"위생관리, 안전사고 위험 및 개선사항 확인"},
+  {group:"점포운영",title:"점포별 손익 및 원가율 점검",repeat:"MONTHLY",category:"점포",desc:"매출·식재료비·인건비·수수료·손익 확인"},
+
+  {group:"계약·총무",title:"계약 만료 예정건 확인",repeat:"MONTHLY",category:"계약",desc:"임대차·용역·유지보수·상표 등 만료 예정 계약 확인"},
+  {group:"계약·총무",title:"보험 만료 및 갱신 확인",repeat:"MONTHLY",category:"계약",desc:"영업배상·화재·자동차 등 보험 만료일 점검"},
+  {group:"계약·총무",title:"법인차량 운행·정비 점검",repeat:"MONTHLY",category:"총무",desc:"운행기록, 보험, 정비 및 소모품 교체 일정 확인"},
+  {group:"계약·총무",title:"비품·소모품 재고 점검",repeat:"MONTHLY",category:"총무",desc:"본사 및 점포 공용 비품과 소모품 부족 여부 확인"},
+  {group:"계약·총무",title:"각종 인허가 갱신 확인",repeat:"YEARLY",category:"총무",desc:"영업신고·교육·검사 등 갱신 및 유효기간 확인"},
+
+  {group:"경영관리",title:"주간 경영현황 점검",repeat:"WEEKLY",category:"기타",desc:"매출·자금·인사·점포 핵심 현황과 주요 이슈 확인"},
+  {group:"경영관리",title:"월간 경영실적 분석",repeat:"MONTHLY",category:"기타",desc:"전월·전년 대비 매출, 원가, 인건비, 손익 분석"},
+  {group:"경영관리",title:"예산 대비 실적 점검",repeat:"MONTHLY",category:"기타",desc:"매출·비용·투자비의 예산 대비 실적 확인"},
+  {group:"경영관리",title:"분기 경영계획 점검",repeat:"QUARTERLY",category:"기타",desc:"분기 목표·실적·신규점포·투자계획 점검"},
+  {group:"경영관리",title:"연간 사업계획 수립",repeat:"YEARLY",category:"기타",desc:"차년도 매출목표·예산·인력·출점계획 수립"}
+];
+
+let hqExampleGroup="전체";
+
+function hqExampleCycleLabel(rule){
+  return ({DAILY:"매일",WEEKLY:"매주",MONTHLY:"매월",QUARTERLY:"분기",YEARLY:"매년",DATE:"1회성"})[rule]||rule;
+}
+function openHqTaskExamples(){
+  const modal=document.getElementById("hqExampleModal");
+  if(!modal)return;
+  hqExampleGroup="전체";
+  renderHqTaskExampleModal();
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden","false");
+  document.body.style.overflow="hidden";
+}
+function closeHqTaskExamples(){
+  const modal=document.getElementById("hqExampleModal");
+  if(!modal)return;
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden","true");
+  document.body.style.overflow="";
+}
+function renderHqTaskExampleModal(){
+  const tabs=document.getElementById("hqExampleTabs");
+  const list=document.getElementById("hqExampleList");
+  if(!tabs||!list)return;
+  const groups=["전체",...new Set(HQ_TASK_EXAMPLES.map(x=>x.group))];
+  tabs.innerHTML=groups.map(g=>`<button type="button" class="hq-example-tab ${g===hqExampleGroup?"active":""}" onclick="setHqExampleGroup('${g}')">${g}</button>`).join("");
+  const rows=hqExampleGroup==="전체"?HQ_TASK_EXAMPLES:HQ_TASK_EXAMPLES.filter(x=>x.group===hqExampleGroup);
+  list.innerHTML=rows.map((x,i)=>{
+    const realIndex=HQ_TASK_EXAMPLES.indexOf(x);
+    return `<button type="button" class="hq-example-item" onclick="selectHqTaskExample(${realIndex})">
+      <span class="hq-example-item-top"><span class="hq-example-cycle">${hqExampleCycleLabel(x.repeat)}</span><span class="hq-example-category">${escapeHtml(x.group)} · ${escapeHtml(x.category)}</span></span>
+      <b>${escapeHtml(x.title)}</b><small>${escapeHtml(x.desc)}</small>
+    </button>`;
+  }).join("");
+}
+function setHqExampleGroup(group){
+  hqExampleGroup=group;
+  renderHqTaskExampleModal();
+}
+function selectHqTaskExample(index){
+  const x=HQ_TASK_EXAMPLES[index];
+  if(!x)return;
+  fillHqTaskExample(x.title,x.repeat,x.category);
+  closeHqTaskExamples();
 }
 function fillHqTaskExample(title,repeat,category){
   const titleEl=document.getElementById("hqTaskTitle");
