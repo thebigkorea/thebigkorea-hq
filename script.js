@@ -170,7 +170,7 @@ async function loadAllStoreAttendance(){
   const groups=document.getElementById("attendanceStoreGroups");
   if(!summary||!groups)return;
 
-  summary.textContent="지정된 4개 점포 출퇴근 현황을 불러오는 중입니다.";
+  summary.textContent=`지정된 ${ATTENDANCE_STORES.length}개 사업장 출퇴근 현황을 불러오는 중입니다.`;
   groups.innerHTML='<div class="attendance-roster-empty">출퇴근 명단을 불러오는 중입니다.</div>';
   try{
     attendanceStoreData=await Promise.all(ATTENDANCE_STORES.map(async store=>{
@@ -189,7 +189,7 @@ async function loadAllStoreAttendance(){
     }));
     const total=attendanceStoreData.reduce((sum,store)=>sum+(store.employees||[]).length,0);
     const working=attendanceStoreData.reduce((sum,store)=>sum+(store.workingCount||0),0);
-    summary.textContent=`4개 점포 오늘 출근 ${total}명 · 근무 중 ${working}명`;
+    summary.textContent=`${ATTENDANCE_STORES.length}개 사업장 오늘 출근 ${total}명 · 근무 중 ${working}명`;
     buildAttendanceStoreTabs();
     renderAttendanceStores("all");
   }catch(error){
@@ -1157,7 +1157,6 @@ function showFundTab(tab,button){
 const HQ_TASK_STORAGE_KEY="thebigkorea_erp_hq_tasks_v1";
 
 const HQ_TASK_DEFAULTS=[
-  {id:"daily-worker",title:"일용직 근무·지급내역 확인",category:"인사·급여",cycle:"매일",rule:"DAILY",day:null,months:null,owner:"본사",memo:"일용직 근무내역·지급 및 신고자료 확인"},
   {id:"payroll-10",title:"급여 지급",category:"인사·급여",cycle:"매월 10일",rule:"MONTHLY",day:10,months:null,owner:"본사",memo:"급여 확정 및 지급 처리"},
   {id:"shinsegae-10",title:"신세계 계열 정산",category:"정산",cycle:"매월 10일",rule:"MONTHLY",day:10,months:null,owner:"본사",memo:"신세계 계열 점포 월 정산"},
   {id:"lotte-20",title:"롯데백화점 정산",category:"정산",cycle:"매월 20일",rule:"MONTHLY",day:20,months:null,owner:"본사",memo:"롯데백화점 계열 점포 월 정산"},
