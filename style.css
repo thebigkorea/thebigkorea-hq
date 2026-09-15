@@ -62,10 +62,6 @@ button{cursor:pointer}
 .text-btn{border:0;background:transparent;color:var(--blue);font-weight:800;font-size:11px}
 .quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .quick-card{border:1px solid var(--line);background:#fff;border-radius:13px;padding:14px;text-align:left;min-height:104px;transition:.18s}
-.quick-card{position:relative}
-.workflow-badge{position:absolute;top:9px;right:9px;min-width:23px;height:23px;padding:0 6px;border-radius:999px;background:#d73535;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;line-height:1;box-shadow:0 4px 10px rgba(199,48,48,.28)}
-.workflow-badge[hidden]{display:none!important}
-.quick-card.has-pending{border-color:#efb5b5;background:linear-gradient(145deg,#fff 0%,#fff8f8 100%)}
 .quick-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(31,45,61,.09);border-color:#cad4df}
 .quick-icon{font-size:22px;display:block;margin-bottom:10px}.quick-card strong{font-size:12px;display:block}.quick-card small{display:block;color:var(--muted);font-size:10px;margin-top:5px}
 .alert-list{display:grid;gap:7px}.alert-item{width:100%;display:grid;grid-template-columns:10px 1fr auto;align-items:center;gap:10px;border:1px solid var(--line);border-radius:11px;padding:11px;background:#fff;text-align:left;color:var(--text)}
@@ -369,7 +365,6 @@ button{cursor:pointer}
 .hq-task-layout{display:grid;grid-template-columns:1.45fr .75fr;gap:14px;margin-bottom:14px}
 .hq-today-list{display:grid;gap:8px}.hq-today-item{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:11px;border:1px solid var(--line);border-radius:12px;padding:11px 12px}.hq-today-item.done{background:#f7fbf9}
 .hq-check{width:30px;height:30px;border-radius:9px;border:1px solid #ccd5dd;background:#fff;font-weight:900;color:var(--green)}.hq-today-item.done .hq-check{background:var(--green);border-color:var(--green);color:#fff}
-.hq-check.synced{color:var(--blue);cursor:default}.hq-today-item.done .hq-check.synced{color:#fff}
 .hq-today-item strong,.hq-today-item small{display:block}.hq-today-item strong{font-size:12px}.hq-today-item small{font-size:10px;color:var(--muted);margin-top:4px}
 .hq-state{padding:5px 8px;border-radius:999px;font-size:9px;font-weight:900}.hq-state.pending{background:#fff1dd;color:#9a6518}.hq-state.done{background:#e7f5ee;color:#16734a}
 .hq-task-form{display:grid;gap:11px}.hq-task-form label{font-size:10px;color:#657382;font-weight:900}.hq-task-form input,.hq-task-form select{width:100%;height:38px;margin-top:6px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:0 10px}.hq-form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.hq-add-btn{height:40px;border:0;border-radius:9px;background:var(--navy);color:#fff;font-weight:900}
@@ -535,147 +530,194 @@ button{cursor:pointer}
 
 
 /* =========================================================
-   V24 모바일 전면 개선
-   - 상단 겹침 제거
-   - 운영현황/업무카드/매출카드 모바일 재배치
+   V24 COLORFUL ERP HOME
+   현재 화면 순서/기능/API/ID는 그대로 유지하고 디자인만 변경
    ========================================================= */
-@media (max-width:700px){
-  html{-webkit-text-size-adjust:100%;overflow-x:hidden}
-  body{overflow-x:hidden;background:#f3f6f9}
-  button,a{-webkit-tap-highlight-color:transparent}
+.colorful-home{
+  --c-blue:#1473e6;
+  --c-sky:#4aa8ff;
+  --c-green:#13a873;
+  --c-mint:#16bfa0;
+  --c-purple:#8057d9;
+  --c-orange:#f28a1a;
+  --c-red:#e94d5d;
+  --c-pink:#e85c9b;
+  --c-navy:#112b52;
+}
+.colorful-home .hero-card{
+  min-height:210px;
+  border:0;
+  color:#fff;
+  background:
+    radial-gradient(circle at 82% 28%,rgba(255,183,77,.38),transparent 18%),
+    radial-gradient(circle at 66% 72%,rgba(65,142,255,.30),transparent 28%),
+    linear-gradient(115deg,#0d2b5c 0%,#1258b6 46%,#0d3c7c 72%,#10284e 100%);
+  box-shadow:0 18px 38px rgba(16,55,105,.20);
+  position:relative;
+  overflow:hidden;
+}
+.colorful-home .hero-card:before{
+  content:"";
+  position:absolute;right:4%;bottom:-58px;width:430px;height:190px;
+  border-radius:120px 120px 0 0;
+  border:2px solid rgba(255,255,255,.11);
+  box-shadow:
+    -75px -24px 0 -72px rgba(255,255,255,.28),
+    -145px -4px 0 -142px rgba(255,255,255,.20);
+  transform:skewX(-8deg);
+}
+.colorful-home .hero-card:after{
+  content:"THE BIG KOREA";
+  position:absolute;right:36px;top:26px;
+  color:rgba(255,255,255,.18);font-weight:900;letter-spacing:.22em;font-size:13px
+}
+.colorful-home .hero-card>div{position:relative;z-index:1}
+.colorful-home .hero-card .eyebrow{color:#ffd86f;letter-spacing:.18em;font-weight:900}
+.colorful-home .hero-card h2{font-size:32px;line-height:1.28;color:#fff;margin-top:10px}
+.colorful-home .hero-card p{color:#e7f1ff;font-size:14px}
+.colorful-home .hero-badge{
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);
+  backdrop-filter:blur(8px);box-shadow:none
+}
+.colorful-home .hero-badge strong,.colorful-home .hero-badge span{color:#fff}
 
-  .main-area{min-width:0;overflow-x:hidden}
-  .content{padding:12px 12px 42px}
-
-  /* 모바일 상단: 첫 줄 메뉴/제목, 둘째 줄 기준월/새로고침 */
-  .topbar{
-    height:auto!important;
-    min-height:0!important;
-    padding:10px 12px 11px!important;
-    display:grid!important;
-    grid-template-columns:1fr!important;
-    gap:9px!important;
-    align-items:stretch!important;
-    box-shadow:0 5px 18px rgba(23,34,49,.07);
-  }
-  .topbar-left{
-    width:100%;min-width:0;display:grid!important;
-    grid-template-columns:42px minmax(0,1fr);gap:10px!important;align-items:center!important;
-  }
-  .menu-toggle{display:grid;width:42px;height:42px;place-items:center;border-radius:12px;font-size:21px;color:#172231}
-  .topbar-left>div{min-width:0}
-  .topbar h1{margin:0!important;font-size:20px;line-height:1.2;letter-spacing:-.5px;white-space:nowrap}
-  .topbar p{display:none!important}
-  .topbar-actions{
-    width:100%;margin:0!important;display:grid!important;
-    grid-template-columns:minmax(0,1fr) auto;gap:8px!important;align-items:end!important;
-  }
-  .month-box{
-    display:grid!important;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px;
-    min-height:44px!important;margin:0!important;padding-left:4px;
-    font-size:11px!important;white-space:nowrap;
-  }
-  .month-box input{
-    width:100%;min-width:0;height:44px!important;margin:0!important;padding:0 10px;
-    border-radius:12px!important;background:#f6f8fa;font-size:14px;font-weight:800;
-  }
-  #refreshBtn.icon-btn{
-    align-self:auto!important;height:44px!important;min-height:44px!important;margin:0!important;
-    padding:0 13px;border-radius:12px;font-size:13px;
-  }
-
-  /* 홈 소개 영역 */
-  .hero-card{padding:19px 18px;border-radius:17px;display:block}
-  .hero-card h2{font-size:20px;line-height:1.38;margin:7px 0 8px;letter-spacing:-.5px}
-  .hero-card h2 br{display:none}
-  .hero-card p{font-size:12px;line-height:1.55}
-  .hero-badge{display:none}
-  .eyebrow{font-size:9px;letter-spacing:.09em}
-
-  .section-title-row{margin:20px 2px 10px;gap:10px;align-items:flex-end}
-  .section-title-row>div{min-width:0}
-  .section-title-row h3,.panel-head h3{font-size:17px;letter-spacing:-.35px}
-  .section-title-row p{display:none}
-  .home-task-link{flex:0 0 auto;padding:7px 10px}
-
-  /* 본사 업무 KPI는 짧은 2열 카드 */
-  .home-task-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}
-  .home-task-kpis .kpi-card{min-height:92px;padding:13px 14px;border-radius:14px}
-  .home-task-kpis .kpi-card span{font-size:11px}
-  .home-task-kpis .kpi-card strong{font-size:21px;margin:9px 0 4px}
-  .home-task-kpis .kpi-card small{font-size:9px}
-
-  /* 회사 운영현황: 첫 행 직원현황 + 아래 3개 지표 */
-  .company-status-row{
-    margin-top:10px;padding:14px;display:grid!important;
-    grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 6px!important;border-radius:15px;
-  }
-  .company-status-row>div{width:auto!important;min-width:0;text-align:center}
-  .company-status-row>div:first-child{
-    grid-column:1/-1;display:block!important;text-align:left;padding-bottom:12px;
-    border-bottom:1px solid var(--line);
-  }
-  .company-status-row>div:first-child>span{display:block;margin-bottom:9px;font-size:12px}
-  .company-status-row strong{display:block;font-size:11px;line-height:1.45;word-break:keep-all}
-  .company-status-row b{font-size:14px;margin-left:2px;white-space:nowrap}
-  .employee-breakdown{
-    display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px;margin-top:10px;
-  }
-  .employee-breakdown-item{display:flex!important;justify-content:space-between;align-items:center;padding:7px 9px;border-radius:9px;background:#f5f7fa;font-size:10px}
-  .employee-breakdown-item b{font-size:12px}
-
-  /* 패널과 자주 쓰는 업무 */
-  .dashboard-grid,.dashboard-grid.lower{display:grid;grid-template-columns:minmax(0,1fr)!important;gap:12px;margin-top:12px}
-  .panel{min-width:0;padding:15px;border-radius:17px}
-  .panel-head{gap:10px;margin-bottom:12px}
-  .panel-head>div{min-width:0}
-  .panel-head p{font-size:10px;line-height:1.45}
-  .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}
-  .quick-card{min-width:0;min-height:118px;padding:13px 12px;border-radius:14px}
-  .quick-icon{font-size:23px;margin-bottom:9px}
-  .quick-card strong{font-size:12px;line-height:1.35;word-break:keep-all}
-  .quick-card small{font-size:9.5px;line-height:1.45;word-break:keep-all}
-
-  /* 출퇴근 명부: 높이 고정 제거, 점포 탭 자연스러운 좌우 스크롤 */
-  .attendance-roster-panel{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible}
-  .attendance-store-tabs{margin:0 -2px 4px;padding:1px 2px 9px;scrollbar-width:none;overscroll-behavior-x:contain}
-  .attendance-store-tabs::-webkit-scrollbar{display:none}
-  .attendance-store-tab{padding:9px 13px;font-size:11px}
-  .attendance-store-groups{max-height:none;overflow:visible;padding-right:0;gap:8px}
-  .attendance-summary-row{padding:13px 12px}
-
-  /* 매출 요약 숫자와 카드를 모바일 폭에 맞춤 */
-  .sales-company-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}
-  .sales-company-card{padding:12px;overflow:hidden}
-  .sales-company-card span{font-size:9.5px;line-height:1.35;word-break:keep-all}
-  .sales-company-card strong{font-size:clamp(15px,4.6vw,19px);letter-spacing:-.6px;white-space:nowrap}
-  .sales-company-card small{font-size:9px;line-height:1.4}
-  .sales-store-summary-grid{grid-template-columns:1fr!important;gap:9px}
-  .sales-store-card{min-height:0;padding:14px}
-  .sales-store-card>strong{font-size:20px;white-space:nowrap}
-  .panel-actions{align-items:flex-end;gap:5px}
-  .panel-actions .text-btn{white-space:nowrap}
-
-  /* 공통 상세 화면 */
-  .module-hero{padding:18px;border-radius:15px}
-  .module-hero h2{font-size:19px}
-  .module-grid{grid-template-columns:1fr!important;gap:10px}
-  .module-card{min-height:0!important;padding:15px}
-  .fund-kpi-grid,.hq-task-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}
-  .fund-kpi-card,.hq-task-kpis article{min-width:0;padding:13px}
-  .fund-kpi-card strong,.hq-task-kpis strong{font-size:18px;white-space:nowrap}
-  .fund-filter-grid{grid-template-columns:1fr!important}
-
-  /* 사이드 메뉴 */
-  .sidebar{width:min(86vw,320px);box-shadow:18px 0 45px rgba(10,18,28,.28)}
-  .brand.brand-premium{min-height:84px;padding:12px 16px}
+/* section title */
+.colorful-home .section-title-row{margin-top:22px}
+.colorful-home .section-title-row h3:before{
+  content:"★";display:inline-grid;place-items:center;width:30px;height:30px;margin-right:9px;
+  border-radius:10px;background:#eaf4ff;color:var(--c-blue);font-size:14px;vertical-align:middle
 }
 
-@media (max-width:380px){
-  .content{padding-left:9px;padding-right:9px}
-  .topbar{padding-left:9px!important;padding-right:9px!important}
-  #refreshBtn.icon-btn{padding:0 10px;font-size:12px}
-  .home-task-kpis,.quick-grid,.sales-company-summary{gap:7px}
-  .quick-card{padding:12px 10px}
-  .sales-company-card strong{font-size:14px}
+/* 오늘의 업무 KPI */
+.colorful-home .home-task-kpis{gap:12px}
+.colorful-home .home-task-kpis .kpi-card{
+  border:1px solid transparent;box-shadow:0 7px 20px rgba(37,71,117,.06);
+  min-height:108px;position:relative;overflow:hidden
+}
+.colorful-home .home-task-kpis .kpi-card:after{
+  content:"";position:absolute;right:-18px;top:-18px;width:68px;height:68px;border-radius:50%;opacity:.55
+}
+.colorful-home .home-task-kpis .kpi-card:nth-child(1){background:linear-gradient(135deg,#edf7ff,#f8fcff);border-color:#cfe8ff}
+.colorful-home .home-task-kpis .kpi-card:nth-child(1):after{background:#b9dcff}
+.colorful-home .home-task-kpis .kpi-card:nth-child(2){background:linear-gradient(135deg,#eafaf5,#f8fffc);border-color:#c9eddf}
+.colorful-home .home-task-kpis .kpi-card:nth-child(2):after{background:#b7ead9}
+.colorful-home .home-task-kpis .kpi-card:nth-child(3){background:linear-gradient(135deg,#fff7e8,#fffdf8);border-color:#f6dfb8}
+.colorful-home .home-task-kpis .kpi-card:nth-child(3):after{background:#f9d89e}
+.colorful-home .home-task-kpis .kpi-card:nth-child(4){background:linear-gradient(135deg,#f4efff,#fcfaff);border-color:#dfd2fa}
+.colorful-home .home-task-kpis .kpi-card:nth-child(4):after{background:#d7c2fa}
+.colorful-home .home-task-kpis .kpi-card:nth-child(5){background:linear-gradient(135deg,#fff0f3,#fff9fa);border-color:#f7ccd4}
+.colorful-home .home-task-kpis .kpi-card:nth-child(5):after{background:#f6bdc8}
+.colorful-home .home-task-kpis .kpi-card:nth-child(6){background:linear-gradient(135deg,#edf6ff,#fafcff);border-color:#d3e5f8}
+.colorful-home .home-task-kpis .kpi-card:nth-child(6):after{background:#c6dff8}
+.colorful-home .home-task-kpis .kpi-card strong{font-size:26px;color:#10284d}
+
+/* 회사 운영현황 */
+.colorful-home .company-status-row{
+  margin-top:12px;padding:10px 16px;border:1px solid #d9e6f5;
+  background:linear-gradient(90deg,#fff,#f7fbff,#fff);
+  box-shadow:0 5px 16px rgba(34,74,119,.045);border-radius:14px
+}
+.colorful-home .company-status-row>div:first-child>span{color:#1d5fae;font-weight:900}
+.colorful-home .company-status-row b{color:#0d376f}
+
+/* 패널 */
+.colorful-home .panel{
+  border:1px solid #dce6f2;box-shadow:0 8px 24px rgba(33,70,112,.055);
+  border-radius:18px;background:#fff
+}
+.colorful-home .panel-head h3{font-size:18px;color:#10294d}
+
+/* 자주 쓰는 업무 - 카드별 컬러 */
+.colorful-home .quick-panel{background:linear-gradient(180deg,#fff,#fbfdff)}
+.colorful-home .quick-grid{gap:10px}
+.colorful-home .quick-card{
+  min-height:92px;border:1px solid transparent!important;border-radius:14px!important;
+  box-shadow:none!important;transition:.18s ease!important;position:relative;overflow:hidden
+}
+.colorful-home .quick-card:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(30,72,120,.10)!important}
+.colorful-home .quick-card:nth-child(8n+1){background:#eaf9f4!important;border-color:#c9eee1!important;color:#087b5a}
+.colorful-home .quick-card:nth-child(8n+2){background:#eaf4ff!important;border-color:#cce3fb!important;color:#1466c2}
+.colorful-home .quick-card:nth-child(8n+3){background:#fff1e9!important;border-color:#f8d8c4!important;color:#d95f18}
+.colorful-home .quick-card:nth-child(8n+4){background:#f3edff!important;border-color:#dfd1fa!important;color:#7542ca}
+.colorful-home .quick-card:nth-child(8n+5){background:#fff0f3!important;border-color:#f6ccd5!important;color:#d83d55}
+.colorful-home .quick-card:nth-child(8n+6){background:#e9faf6!important;border-color:#c6ecdf!important;color:#07886a}
+.colorful-home .quick-card:nth-child(8n+7){background:#fff6e7!important;border-color:#f6dfb6!important;color:#d9820d}
+.colorful-home .quick-card:nth-child(8n+8){background:#edf6ff!important;border-color:#cfe5fb!important;color:#1473d6}
+.colorful-home .quick-card .quick-icon{
+  width:42px;height:42px;display:grid;place-items:center;border-radius:12px;
+  background:rgba(255,255,255,.72);font-size:22px;margin-bottom:8px
+}
+.colorful-home .quick-card strong{color:inherit!important;font-weight:900}
+.colorful-home .quick-card small{color:#6b7b90!important}
+
+/* 출퇴근자 명부 */
+.colorful-home .attendance-roster-panel{
+  background:linear-gradient(180deg,#ffffff,#f9fcff);border-top:4px solid #2478df
+}
+.colorful-home .attendance-store-tab.active{background:#173e75!important;color:#fff!important}
+.colorful-home .attendance-summary-row{
+  border-left:4px solid #3b82f6!important;background:#fff!important;
+  box-shadow:0 4px 12px rgba(40,85,130,.05)
+}
+.colorful-home .attendance-summary-row:nth-child(2){border-left-color:#14a673!important}
+.colorful-home .attendance-summary-row:nth-child(3){border-left-color:#7d55d5!important}
+.colorful-home .attendance-summary-row:nth-child(4){border-left-color:#ed8a18!important}
+
+/* 영업실적 */
+.colorful-home .sales-panel{
+  border-top:4px solid #16a277;background:linear-gradient(180deg,#fff,#fbfffd)
+}
+.colorful-home .sales-company-summary{gap:10px}
+.colorful-home .sales-company-card{
+  border:1px solid transparent!important;border-radius:14px!important;box-shadow:none!important
+}
+.colorful-home .sales-company-card:nth-child(1){background:#f1edff!important;border-color:#ded2fb!important}
+.colorful-home .sales-company-card:nth-child(2){background:#eafaf5!important;border-color:#c7ecdf!important}
+.colorful-home .sales-company-card:nth-child(3){background:#fff5e7!important;border-color:#f4ddb9!important}
+.colorful-home .sales-company-card:nth-child(4){background:#fff0f4!important;border-color:#f5ced8!important}
+.colorful-home .sales-company-card strong{color:#10294d}
+.colorful-home .sales-store-card{
+  overflow:hidden;border-radius:15px!important;border:1px solid #dbe6f2!important;
+  box-shadow:0 6px 16px rgba(35,73,116,.05)
+}
+.colorful-home .sales-store-card:nth-child(1){border-top:4px solid #2478df!important}
+.colorful-home .sales-store-card:nth-child(2){border-top:4px solid #7d55d5!important}
+.colorful-home .sales-store-card:nth-child(3){border-top:4px solid #16a277!important}
+.colorful-home .sales-store-card:nth-child(4){border-top:4px solid #e88118!important}
+
+/* 관리 알림 */
+.colorful-home .dashboard-grid.lower>.alert-panel{
+  border-top:4px solid #f0a11d;background:linear-gradient(180deg,#fff,#fffdf9)
+}
+.colorful-home .alert-item{border-radius:12px!important;margin-bottom:7px!important}
+.colorful-home .alert-item:hover{background:#f7fbff!important}
+
+/* 상단 버튼 */
+.colorful-home .text-btn,.colorful-home .home-task-link{
+  border-radius:999px!important;font-weight:800!important
+}
+
+/* 전체 모듈 상세화면도 메뉴별 색상 유지 */
+#view-stores{--module-accent:#2478df}
+#view-schedule{--module-accent:#8057d9}
+#view-sales{--module-accent:#16a277}
+#view-opening{--module-accent:#e29418}
+#view-hqtasks{--module-accent:#2478df}
+#view-support{--module-accent:#ef7c22}
+#view-settlement{--module-accent:#11a77d}
+#view-vehicle{--module-accent:#287bc1}
+#view-tools{--module-accent:#8756cf}
+[id^="view-"]:not(#view-home) .module-hero{
+  border-top:5px solid var(--module-accent,#2478df)!important
+}
+
+/* responsive */
+@media(max-width:1100px){
+  .colorful-home .hero-card h2{font-size:27px}
+  .colorful-home .quick-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:760px){
+  .colorful-home .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .colorful-home .hero-card{min-height:180px}
+  .colorful-home .hero-card h2{font-size:23px}
 }
