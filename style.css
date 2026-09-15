@@ -722,54 +722,157 @@ button{cursor:pointer}
   .colorful-home .hero-card h2{font-size:23px}
 }
 
-/* ================= V27 모바일/카드 안정화 ================= */
+.colorful-home .quick-card:nth-child(1){--quick-photo:url("assets/quick-sales.jpg")}
+.colorful-home .quick-card:nth-child(2){--quick-photo:url("assets/quick-attendance.jpg")}
+.colorful-home .quick-card:nth-child(3){--quick-photo:url("assets/quick-notice.jpg")}
+.colorful-home .quick-card:nth-child(4){--quick-photo:url("assets/quick-salesinput.jpg")}
+.colorful-home .quick-card:nth-child(5){--quick-photo:url("assets/quick-leave.jpg")}
+.colorful-home .quick-card:nth-child(6){--quick-photo:url("assets/quick-trip.jpg")}
+.colorful-home .quick-card:nth-child(7){--quick-photo:url("assets/quick-opening.jpg")}
+.colorful-home .quick-card:nth-child(8){--quick-photo:url("assets/quick-daily.jpg")}
+.colorful-home .quick-card:nth-child(9){--quick-photo:url("assets/quick-parttime.jpg")}
+.colorful-home .quick-card:nth-child(10){--quick-photo:url("assets/quick-inspection.jpg")}
+.colorful-home .quick-card:nth-child(11){--quick-photo:url("assets/quick-mail.jpg")}
+.colorful-home .quick-card:nth-child(12){--quick-photo:url("assets/quick-drive.jpg")}
+
+/* =========================================================
+   V28 - 실제 업로드 파일 기준 최종 홈 보정
+   ========================================================= */
 .colorful-home .quick-grid{
   display:grid!important;
   grid-template-columns:repeat(4,minmax(0,1fr))!important;
-  gap:10px!important;
+  gap:11px!important;
 }
 .colorful-home .quick-card{
-  min-width:0!important; min-height:100px!important;
-  padding:14px!important; overflow:hidden!important;
-  border-radius:14px!important; background-image:none!important;
+  position:relative!important;
+  min-width:0!important;
+  min-height:154px!important;
+  padding:82px 13px 12px!important;
+  overflow:hidden!important;
+  border:1px solid #dbe4ee!important;
+  border-radius:15px!important;
+  background:#fff!important;
+  color:#10243f!important;
+  box-shadow:0 5px 15px rgba(24,55,91,.07)!important;
+  isolation:isolate;
 }
-.colorful-home .quick-card:nth-child(8n+1){background:linear-gradient(135deg,#eaf9f4,#f9fffd)!important}
-.colorful-home .quick-card:nth-child(8n+2){background:linear-gradient(135deg,#eaf4ff,#fafcff)!important}
-.colorful-home .quick-card:nth-child(8n+3){background:linear-gradient(135deg,#fff1e8,#fffaf6)!important}
-.colorful-home .quick-card:nth-child(8n+4){background:linear-gradient(135deg,#f4edff,#fcfaff)!important}
-.colorful-home .quick-card:nth-child(8n+5){background:linear-gradient(135deg,#fff0f4,#fff9fb)!important}
-.colorful-home .quick-card:nth-child(8n+6){background:linear-gradient(135deg,#e9faf6,#f8fffc)!important}
-.colorful-home .quick-card:nth-child(8n+7){background:linear-gradient(135deg,#fff6e7,#fffdf8)!important}
-.colorful-home .quick-card:nth-child(8n+8){background:linear-gradient(135deg,#edf6ff,#fbfdff)!important}
-.colorful-home .quick-card strong{color:#102a4c!important;text-shadow:none!important}
-.colorful-home .quick-card small{color:#6b7c90!important;text-shadow:none!important}
-.colorful-home .quick-card .quick-icon{background:#fff!important}
+.colorful-home .quick-card::before{
+  content:"";
+  position:absolute;
+  z-index:-2;
+  left:0;right:0;top:0;height:72px;
+  background-image:var(--quick-photo);
+  background-size:cover;
+  background-position:center;
+}
+.colorful-home .quick-card::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:0;right:0;top:42px;height:32px;
+  background:linear-gradient(180deg,rgba(255,255,255,0),#fff);
+}
+.colorful-home .quick-card:hover{
+  transform:translateY(-3px)!important;
+  box-shadow:0 10px 24px rgba(24,55,91,.13)!important;
+  border-color:#b9cadb!important;
+}
+.colorful-home .quick-card .quick-icon{
+  position:absolute!important;
+  top:48px!important;left:12px!important;
+  width:38px!important;height:38px!important;
+  display:grid!important;place-items:center!important;
+  margin:0!important;border-radius:11px!important;
+  background:#fff!important;
+  box-shadow:0 4px 12px rgba(14,42,74,.15)!important;
+  font-size:20px!important;
+}
+.colorful-home .quick-card strong{
+  display:block!important;
+  color:#10243f!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+  font-weight:900!important;
+  text-shadow:none!important;
+}
+.colorful-home .quick-card small{
+  display:block!important;
+  margin-top:5px!important;
+  color:#6b7b8e!important;
+  font-size:10px!important;
+  line-height:1.4!important;
+  text-shadow:none!important;
+}
 
-@media(max-width:760px){
-  html,body{max-width:100%!important;overflow-x:hidden!important}
-  .main-content,.content,.content-wrap,main{max-width:100%!important;min-width:0!important}
-  .colorful-home .hero-card{min-height:170px!important;padding:18px!important}
-  .colorful-home .hero-card h2{font-size:22px!important}
+/* 모바일: 기존 900px 사이드바 접힘을 유지하면서 홈을 별도 정리 */
+@media(max-width:900px){
+  html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+  .app-shell{display:block!important;width:100%!important;max-width:100%!important}
+  .main-area{margin-left:0!important;width:100%!important;max-width:100%!important}
+  .topbar{height:auto!important;min-height:76px!important;padding:10px 12px!important}
+  .topbar-left{min-width:0!important}
+  .topbar h1{font-size:18px!important}
+  .topbar p{font-size:10px!important;white-space:normal!important}
+  .topbar-actions{gap:6px!important}
+  #refreshBtn.icon-btn{height:38px!important;min-height:38px!important;padding:0 9px!important;font-size:11px!important}
+  .content{padding:12px!important;width:100%!important;max-width:100%!important;overflow:hidden!important}
+  .colorful-home .hero-card{
+    min-height:170px!important;padding:18px!important;border-radius:16px!important
+  }
+  .colorful-home .hero-card h2{font-size:22px!important;line-height:1.3!important}
+  .colorful-home .hero-card p{font-size:11px!important;line-height:1.5!important}
   .colorful-home .hero-badge{display:none!important}
+  .section-title-row{margin:16px 0 9px!important;gap:8px!important}
   .colorful-home .home-task-kpis{
-    display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important
   }
+  .colorful-home .home-task-kpis .kpi-card{
+    min-width:0!important;min-height:94px!important;padding:12px!important
+  }
+  .company-status-row{
+    width:100%!important;max-width:100%!important;
+    overflow-x:auto!important;flex-wrap:nowrap!important;
+    -webkit-overflow-scrolling:touch!important
+  }
+  .company-status-row>div{flex:0 0 auto!important;width:auto!important}
   .dashboard-grid,.dashboard-grid.lower{
-    display:grid!important;grid-template-columns:1fr!important;gap:10px!important
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+    gap:10px!important;width:100%!important
   }
+  .panel{min-width:0!important;width:100%!important;max-width:100%!important;padding:13px!important}
   .colorful-home .quick-grid{
-    grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important
   }
-  .colorful-home .quick-card{min-height:96px!important;padding:11px!important}
-  .attendance-store-tabs{display:flex!important;overflow-x:auto!important;white-space:nowrap!important}
+  .colorful-home .quick-card{
+    min-height:145px!important;padding:76px 10px 10px!important
+  }
+  .colorful-home .quick-card::before{height:67px!important}
+  .colorful-home .quick-card::after{top:38px!important;height:30px!important}
+  .colorful-home .quick-card .quick-icon{top:43px!important;left:9px!important;width:34px!important;height:34px!important}
+  .attendance-roster-panel{
+    height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important
+  }
+  .attendance-store-tabs{
+    display:flex!important;max-width:100%!important;overflow-x:auto!important;
+    white-space:nowrap!important;-webkit-overflow-scrolling:touch!important
+  }
   .attendance-store-tab{flex:0 0 auto!important}
-  .attendance-summary-row,.panel{min-width:0!important;max-width:100%!important}
-  .sales-company-summary,.sales-store-grid,.module-grid{
-    display:grid!important;grid-template-columns:1fr!important;gap:9px!important
+  .attendance-store-groups{overflow:visible!important;max-height:none!important;padding-right:0!important}
+  .attendance-summary-row{width:100%!important;min-width:0!important}
+  .attendance-summary-row small{word-break:break-word!important}
+  .sales-company-summary{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important
   }
-  table{display:block!important;max-width:100%!important;overflow-x:auto!important}
+  .sales-store-summary-grid,.module-grid{grid-template-columns:1fr!important}
+  .store-table-wrap,.hq-ledger-wrap{max-width:100%!important;overflow-x:auto!important}
 }
-@media(max-width:430px){
-  .colorful-home .quick-card strong{font-size:12px!important}
-  .colorful-home .quick-card small{font-size:10px!important}
+@media(max-width:560px){
+  .month-box{display:none!important}
+  .colorful-home .home-task-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .colorful-home .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .colorful-home .quick-card strong{font-size:11px!important}
+  .colorful-home .quick-card small{font-size:9px!important}
+  .sales-company-summary{grid-template-columns:1fr!important}
 }
