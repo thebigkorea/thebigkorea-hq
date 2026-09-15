@@ -1174,10 +1174,13 @@ function loadHqTaskState(){
 function saveHqTaskState(state){localStorage.setItem(HQ_TASK_STORAGE_KEY,JSON.stringify(state));}
 function getHqTasks(){const s=loadHqTaskState();return [...HQ_TASK_DEFAULTS,...(s.custom||[])];}
 function isHqTaskDue(task,d){
-  const m=d.getMonth()+1, day=d.getDate();
+  const m=d.getMonth()+1, day=d.getDate(), weekday=d.getDay();
   if(task.rule==="DAILY") return true;
+  if(task.rule==="WEEKLY") return weekday===Number(task.weekday);
   if(task.rule==="MONTHLY") return day===Number(task.day);
+  if(task.rule==="QUARTERLY") return [1,4,7,10].includes(m) && day===Number(task.day);
   if(task.rule==="MONTHS") return (task.months||[]).includes(m) && day===Number(task.day||25);
+  if(task.rule==="YEARLY") return m===Number(task.month) && day===Number(task.day);
   if(task.rule==="DATE") return task.date===hqTaskDateKey(d);
   return false;
 }
@@ -1201,14 +1204,65 @@ function toggleHqTaskDone(id,dateKey){
   renderHqTaskView();
   updateHomeHqTaskSummary();
 }
+function updateHqRepeatFields(){
+  const type=document.getElementById("hqTaskRepeat")?.value||"DATE";
+  const box=document.getElementById("hqRepeatDetail");
+  if(!box)return;
+  const days=Array.from({length:31},(_,i)=>`<option value="${i+1}">${i+1}일</option>`).join("");
+  const weekdays=["일요일","월요일","화요일","수요일","목요일","금요일","토요일"]
+    .map((x,i)=>`<option value="${i}">${x}</option>`).join("");
+
+  if(type==="DATE"){
+    box.innerHTML=`<label>처리일<input type="date" id="hqTaskDate"></label>`;
+  }else if(type==="DAILY"){
+    box.innerHTML=`<label>반복일<input value="매일" disabled></label>`;
+  }else if(type==="WEEKLY"){
+    box.innerHTML=`<label>요일<select id="hqTaskWeekday">${weekdays}</select></label>`;
+  }else if(type==="MONTHLY"){
+    box.innerHTML=`<label>처리일<select id="hqTaskDay">${days}</select></label>`;
+  }else if(type==="QUARTERLY"){
+    box.innerHTML=`<label>처리일<select id="hqTaskDay">${days}</select><small>1·4·7·10월에 자동 반복</small></label>`;
+  }else if(type==="YEARLY"){
+    box.innerHTML=`<div class="hq-form-row">
+      <label>월<select id="hqTaskMonth">${Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}월</option>`).join("")}</select></label>
+      <label>일<select id="hqTaskDay">${days}</select></label>
+    </div>`;
+  }
+}
 function addHqTask(){
   const title=document.getElementById("hqTaskTitle")?.value.trim();
-  const date=document.getElementById("hqTaskDate")?.value;
+  const repeat=document.getElementById("hqTaskRepeat")?.value||"DATE";
   const category=document.getElementById("hqTaskCategory")?.value||"기타";
   const owner=document.getElementById("hqTaskOwner")?.value.trim()||"본사";
-  if(!title||!date){alert("업무명과 처리일을 입력해 주세요.");return;}
-  const state=loadHqTaskState();state.custom=state.custom||[];
-  state.custom.push({id:"custom-"+Date.now(),title,category,cycle:"직접 지정",rule:"DATE",date,owner,memo:""});
+  if(!title){alert("업무명을 입력해 주세요.");return;}
+
+  const task={id:"custom-"+Date.now(),title,category,owner,memo:""};
+  const weekdays=["일","월","화","수","목","금","토"];
+
+  if(repeat==="DATE"){
+    const date=document.getElementById("hqTaskDate")?.value;
+    if(!date){alert("처리일을 선택해 주세요.");return;}
+    Object.assign(task,{cycle:"1회성 · "+date,rule:"DATE",date});
+  }else if(repeat==="DAILY"){
+    Object.assign(task,{cycle:"매일",rule:"DAILY"});
+  }else if(repeat==="WEEKLY"){
+    const weekday=Number(document.getElementById("hqTaskWeekday")?.value||1);
+    Object.assign(task,{cycle:`매주 ${weekdays[weekday]}요일`,rule:"WEEKLY",weekday});
+  }else if(repeat==="MONTHLY"){
+    const day=Number(document.getElementById("hqTaskDay")?.value||1);
+    Object.assign(task,{cycle:`매월 ${day}일`,rule:"MONTHLY",day});
+  }else if(repeat==="QUARTERLY"){
+    const day=Number(document.getElementById("hqTaskDay")?.value||1);
+    Object.assign(task,{cycle:`분기별 ${day}일`,rule:"QUARTERLY",day});
+  }else if(repeat==="YEARLY"){
+    const month=Number(document.getElementById("hqTaskMonth")?.value||1);
+    const day=Number(document.getElementById("hqTaskDay")?.value||1);
+    Object.assign(task,{cycle:`매년 ${month}월 ${day}일`,rule:"YEARLY",month,day});
+  }
+
+  const state=loadHqTaskState();
+  state.custom=state.custom||[];
+  state.custom.push(task);
   saveHqTaskState(state);
   document.getElementById("hqTaskTitle").value="";
   renderHqTaskView();
@@ -1224,9 +1278,23 @@ function deleteHqTask(id){
 function buildHqTaskView(){
   const el=document.getElementById("view-hqtasks"); if(!el)return;
   el.innerHTML=`
+    <style>
+      .hq-repeat-help{margin-top:14px;border:1px solid #d9e3ee;border-radius:14px;background:#f8fbff;overflow:hidden}
+      .hq-repeat-help-head{padding:13px 15px;background:linear-gradient(90deg,#eef6ff,#fff8eb);border-bottom:1px solid #e4eaf1}
+      .hq-repeat-help-head strong{display:block;color:#17355c;font-size:13px}
+      .hq-repeat-help-head span{display:block;margin-top:3px;color:#718096;font-size:10px}
+      .hq-repeat-examples{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:10px}
+      .hq-example{border:1px solid #e2e8f0;background:#fff;border-radius:10px;padding:9px 10px;text-align:left;cursor:pointer}
+      .hq-example:hover{border-color:#8ab8ef;background:#f5f9ff}
+      .hq-example b{display:block;color:#17355c;font-size:11px}
+      .hq-example small{display:block;margin-top:3px;color:#718096;font-size:9px;line-height:1.35}
+      #hqRepeatDetail>label,#hqRepeatDetail .hq-form-row{margin:0}
+      #hqRepeatDetail small{display:block;margin-top:4px;color:#8a6a34;font-size:9px}
+      @media(max-width:700px){.hq-repeat-examples{grid-template-columns:1fr}}
+    </style>
     <section class="module-hero hq-task-hero">
       <div><span class="eyebrow">HEAD OFFICE WORK CALENDAR</span><h2>본사 업무일정 관리</h2>
-      <p>매일·매월·분기별 반복업무와 회사 자체 마감업무를 한 원장에 축적합니다.</p></div>
+      <p>매일·매주·매월·분기·매년 반복업무와 1회성 업무를 한 원장에 관리합니다.</p></div>
       <div class="legacy-count"><strong id="hqTaskCount">0</strong><span>오늘 처리 업무</span></div>
     </section>
     <div class="hq-task-kpis">
@@ -1241,15 +1309,44 @@ function buildHqTaskView(){
         <div id="hqTodayList" class="hq-today-list"></div>
       </section>
       <section class="panel">
-        <div class="panel-head"><div><h3>업무 추가</h3><p>회사 자체 마감업무를 계속 등록해 데이터베이스로 축적합니다.</p></div></div>
+        <div class="panel-head"><div><h3>업무 추가</h3><p>반복주기를 선택하면 해당 일정에 자동으로 오늘 업무에 나타납니다.</p></div></div>
         <div class="hq-task-form">
           <label>업무명<input id="hqTaskTitle" placeholder="예: 카드매출 정산 확인"></label>
           <div class="hq-form-row">
-            <label>처리일<input type="date" id="hqTaskDate"></label>
-            <label>구분<select id="hqTaskCategory"><option>정산</option><option>인사·급여</option><option>세무</option><option>점포</option><option>계약</option><option>기타</option></select></label>
+            <label>반복주기
+              <select id="hqTaskRepeat" onchange="updateHqRepeatFields()">
+                <option value="DATE">1회성</option>
+                <option value="DAILY">매일</option>
+                <option value="WEEKLY">매주</option>
+                <option value="MONTHLY">매월</option>
+                <option value="QUARTERLY">분기</option>
+                <option value="YEARLY">매년</option>
+              </select>
+            </label>
+            <div id="hqRepeatDetail"></div>
           </div>
-          <label>담당<input id="hqTaskOwner" placeholder="본사 / 담당자명"></label>
+          <div class="hq-form-row">
+            <label>구분<select id="hqTaskCategory"><option>정산</option><option>인사·급여</option><option>세무</option><option>점포</option><option>계약</option><option>회계</option><option>총무</option><option>기타</option></select></label>
+            <label>담당<input id="hqTaskOwner" placeholder="본사 / 담당자명"></label>
+          </div>
           <button class="hq-add-btn" onclick="addHqTask()">업무 등록</button>
+
+          <div class="hq-repeat-help">
+            <div class="hq-repeat-help-head">
+              <strong>💡 회사 반복업무 예시</strong>
+              <span>예시를 누르면 업무명·반복주기·구분이 자동 입력됩니다. 회사 상황에 맞게 수정해서 등록하세요.</span>
+            </div>
+            <div class="hq-repeat-examples">
+              <button class="hq-example" onclick="fillHqTaskExample('일일 매출·입금 확인','DAILY','정산')"><b>매일 · 매출/입금 확인</b><small>전일 매출, 카드·현금 입금, 미입금 내역 확인</small></button>
+              <button class="hq-example" onclick="fillHqTaskExample('주간 영업실적 보고','WEEKLY','점포')"><b>매주 · 주간 실적 보고</b><small>매출·원가·이슈·다음 주 계획 취합</small></button>
+              <button class="hq-example" onclick="fillHqTaskExample('급여 지급 및 급여대장 확인','MONTHLY','인사·급여')"><b>매월 · 급여 지급</b><small>급여 확정, 지급, 급여대장 및 공제내역 확인</small></button>
+              <button class="hq-example" onclick="fillHqTaskExample('거래처 및 백화점 정산','MONTHLY','정산')"><b>매월 · 거래처/백화점 정산</b><small>수수료, 거래처 대금, 세금계산서 확인</small></button>
+              <button class="hq-example" onclick="fillHqTaskExample('4대보험 및 원천세 납부 확인','MONTHLY','인사·급여')"><b>매월 · 세금/4대보험</b><small>원천세, 4대보험 납부금액 및 납부 여부 확인</small></button>
+              <button class="hq-example" onclick="fillHqTaskExample('부가가치세 신고 준비','QUARTERLY','세무')"><b>분기 · 부가세 업무</b><small>매출·매입자료, 증빙 누락, 신고 준비 확인</small></button>
+              <button class="hq-example" onclick="fillHqTaskExample('근로계약 및 인사정보 점검','MONTHLY','인사·급여')"><b>매월 · 인사자료 점검</b><small>입퇴사, 계약서, 보건증, 직원정보 변경사항 확인</small></button>
+              <button class="hq-example" onclick="fillHqTaskExample('보험 및 주요 계약 갱신 확인','YEARLY','계약')"><b>매년 · 계약/보험 갱신</b><small>보험, 임대차, 유지보수, 주요 계약 만료일 확인</small></button>
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -1257,6 +1354,17 @@ function buildHqTaskView(){
       <div class="panel-head"><div><h3>본사 업무 원장</h3><p>반복업무와 직접 등록한 업무를 함께 관리합니다.</p></div></div>
       <div class="hq-ledger-wrap"><table class="hq-ledger"><thead><tr><th>업무명</th><th>구분</th><th>주기</th><th>담당</th><th>다음 예정일</th><th>비고</th><th>관리</th></tr></thead><tbody id="hqLedgerBody"></tbody></table></div>
     </section>`;
+  updateHqRepeatFields();
+}
+function fillHqTaskExample(title,repeat,category){
+  const titleEl=document.getElementById("hqTaskTitle");
+  const repeatEl=document.getElementById("hqTaskRepeat");
+  const categoryEl=document.getElementById("hqTaskCategory");
+  if(titleEl)titleEl.value=title;
+  if(repeatEl)repeatEl.value=repeat;
+  if(categoryEl)categoryEl.value=category;
+  updateHqRepeatFields();
+  titleEl?.focus();
 }
 function renderHqTaskView(){
   const el=document.getElementById("view-hqtasks");if(!el)return;
