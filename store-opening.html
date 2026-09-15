@@ -8,36 +8,19 @@
 
 <link rel="stylesheet" href="store-opening.css">
 
-<style>
-.project-overview-header{display:flex;justify-content:space-between;align-items:end;margin:0 0 16px}
-.project-overview-header h2{margin:0 0 6px}
-.project-overview-header p{margin:0;color:#6b7280}
-.project-overview-list{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:32px}
-.project-card-clickable{cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
-.project-card-clickable:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.10)}
-.project-detail-card{max-width:900px;width:calc(100% - 32px)}
-.project-detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
-.project-detail-item{padding:14px 16px;border:1px solid #e5e7eb;border-radius:12px;background:#fafafa}
-.project-detail-item span{display:block;font-size:12px;color:#6b7280;margin-bottom:6px}
-.project-detail-item strong{font-size:15px;color:#111827;word-break:break-word}
-.project-detail-memo{margin-top:20px;border:1px solid #ead8cf;border-radius:14px;overflow:hidden}
-.project-detail-memo-title{padding:12px 16px;font-weight:700;background:#f8eee9;color:#7c2d12}
-.project-detail-memo-content{padding:18px;min-height:100px;line-height:1.7;white-space:normal;word-break:break-word;background:#fff}
-@media(max-width:760px){
-  .project-detail-grid{grid-template-columns:1fr 1fr}
-}
-@media(max-width:520px){
-  .project-detail-grid{grid-template-columns:1fr}
-}
-</style>
 
 </head>
 
 <body>
 
-<header class="header">
-  <h1>신규점포 개설관리</h1>
-  <p>STORE OPENING PROJECT MANAGEMENT</p>
+<header class="hero-header">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-brand">THE BIG KOREA · STORE DEVELOPMENT</div>
+    <h1>신규점포 개설관리</h1>
+    <p>STORE OPENING PROJECT MANAGEMENT</p>
+    <span>점포 등록부터 업무 처리와 출납까지 한 곳에서 관리합니다.</span>
+  </div>
 </header>
 
 <main class="wrap">
@@ -60,11 +43,11 @@
   </section>
 
   <section class="tabs">
-  <button class="tab active" onclick="showTab('project', this)">점포등록</button>
-  <button type="button" id="taskTabButton" class="tab" onclick="showTab('task', this)">업무등록</button>
-  <button class="tab" onclick="showTab('schedule', this)">업무처리현황</button>
-  <button class="tab" onclick="showTab('expenseSave', this)">출납내역 저장</button>
-  <button class="tab" onclick="showTab('expenseLookup', this)">출납내역 조회</button>
+  <button class="tab active" onclick="showTab('project', this)">⌂ &nbsp;점포등록</button>
+  <button type="button" id="taskTabButton" class="tab" onclick="showTab('task', this)">▣ &nbsp;업무등록</button>
+  <button class="tab" onclick="showTab('schedule', this)">▥ &nbsp;업무처리현황</button>
+  <button class="tab" onclick="showTab('expenseSave', this)">▰ &nbsp;출납내역 저장</button>
+  <button class="tab" onclick="showTab('expenseLookup', this)">⌕ &nbsp;출납내역 조회</button>
 </section>
 <div
   id="checklistModal"
@@ -129,7 +112,6 @@
         </select>
       </label>
 
-label>
 
       <label>
         표시순서
@@ -296,15 +278,16 @@ label>
     <div class="checklist-modal-actions">
       <button type="button" class="checklist-cancel-button" onclick="closeProjectDetailModal()">닫기</button>
       <button type="button" class="primary" onclick="editProjectFromDetail()">정보 수정</button>
-      <button type="button" class="primary" onclick="openProjectSchedule()">업무현황 보기</button>
+      <button type="button" class="primary" onclick="openProjectSchedule()">업무처리현황 보기</button>
     </div>
   </div>
 </div>
 
   <section id="task" class="panel">
 
+    <div class="section-kicker">STEP 1</div>
     <h2>업무 등록</h2>
-    <p>먼저 점포를 선택한 뒤 아래 개설 체크리스트에서 필요한 업무를 선택하면 업무구분과 업무명이 자동 입력됩니다.</p>
+    <p class="section-desc">점포를 선택하고 개설 체크리스트에서 필요한 업무를 고르면 등록창에 자동 입력됩니다.</p>
 
     <div class="form-grid" style="margin-bottom:24px;">
       <label>업무등록 대상 점포
@@ -315,7 +298,8 @@ label>
 <div class="checklist-header">
 
     <div>
-      <h2>신규점포 개설 업무 체크리스트</h2>
+      <div class="section-kicker">STEP 2</div>
+      <h2>개설 체크리스트</h2>
 
       <p>
   필요한 업무를 체크하면 업무등록 화면으로 이동하며
@@ -331,14 +315,14 @@ label>
   </div>
 
 
-  <div
-  id="openingChecklist"
-  class="opening-checklist">
-
-  <div class="checklist-loading">
-    체크리스트를 불러오는 중입니다...
+  <div id="openingChecklist" class="opening-checklist">
+    <div class="checklist-loading">체크리스트를 불러오는 중입니다...</div>
   </div>
-    <h2 style="margin-top:34px;">선택 업무 등록</h2>
+
+  <div id="taskRegistrationForm" class="task-registration-shell">
+    <div class="section-kicker">STEP 3</div>
+    <h2>선택 업무 등록</h2>
+    <p class="section-desc">체크리스트에서 선택한 업무가 자동 입력됩니다. 담당자와 일정을 확인한 뒤 저장하세요.</p>
 
     <div class="form-grid">
 
@@ -385,9 +369,10 @@ label>
       <textarea id="taskMemo"></textarea>
     </label>
 
-    <button class="primary" onclick="saveTask()">
-      업무 저장
+    <button class="primary task-save-button" onclick="saveTask()">
+      ✓ 업무 등록하기
     </button>
+  </div>
 
   </section>
 

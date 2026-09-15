@@ -1428,10 +1428,13 @@ function setupChecklistTaskLinks() {
        */
       checkbox.checked = false;
 
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
+      const form = document.getElementById("taskRegistrationForm");
+      if (form) {
+        form.classList.remove("task-form-flash");
+        void form.offsetWidth;
+        form.classList.add("task-form-flash");
+        form.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
 
     }
   );
@@ -2155,3 +2158,13 @@ document.addEventListener(
 
   }
 );
+
+document.addEventListener("click", (event) => {
+  const item = event.target.closest(".checklist-item");
+  if (!item || event.target.closest("button") || event.target.matches('input[type="checkbox"]')) return;
+  const checkbox = item.querySelector('input[type="checkbox"]');
+  if (checkbox) {
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+});
