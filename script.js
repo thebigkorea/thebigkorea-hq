@@ -166,7 +166,10 @@ const WORKFLOW_SOURCES={
   storeDashboard:{
     label:"매장점검 미조치",
     url:"https://script.google.com/macros/s/AKfycby1RoQvXt51KjoasIG-_MmD7SiMau10eRWAYiq4Vk1k2s9yRVsuEBrBVEFvmW7aX765/exec?action=getDashboard",
-    read:data=>Number(data.pendingCount||0)
+    /* 미확인뿐 아니라 확인사항·보완요청·조치필요 등 완료 전 상태 전체 */
+    read:data=>Array.isArray(data.logs)
+      ?data.logs.filter(log=>!["확인완료","조치완료"].includes(String(log.status||"미확인").trim())).length
+      :Number(data.pendingCount||0)
   },
   leave:{
     label:"연월차 승인대기",
@@ -180,8 +183,13 @@ const WORKFLOW_SOURCES={
   }
 };
 const workflowState={};
+let workflowLoading=false;
+let workflowLoadedAt=0;
 
-async function loadWorkflowStatus(){
+async function loadWorkflowStatus(force=false){
+  if(workflowLoading)return;
+  if(!force&&Date.now()-workflowLoadedAt<3000)return;
+  workflowLoading=true;
   await Promise.all(Object.entries(WORKFLOW_SOURCES).map(async([key,source])=>{
     try{
       const joiner=source.url.includes("?")?"&":"?";
@@ -199,6 +207,8 @@ async function loadWorkflowStatus(){
   renderWorkflowBadges();
   renderHqTaskView();
   updateHomeHqTaskSummary();
+  workflowLoadedAt=Date.now();
+  workflowLoading=false;
 }
 
 function renderWorkflowBadges(){
@@ -744,6 +754,11 @@ function init(){
   loadAllStoreAttendance();
   loadErpStoreSales();
   loadWorkflowStatus();
+  /* 연결 화면을 새 탭에서 처리하고 돌아오면 배지와 완료상태를 즉시 갱신 */
+  window.addEventListener("focus",()=>loadWorkflowStatus(true));
+  document.addEventListener("visibilitychange",()=>{
+    if(document.visibilityState==="visible")loadWorkflowStatus(true);
+  });
 }
 
 function openView(view){
@@ -1246,7 +1261,6 @@ function getHqTasks(){
   const s=loadHqTaskState(),dateKey=hqTaskDateKey(new Date()),seen=s.workflowSeen?.[dateKey]||{};
   const external=[
     {id:"leave-approval",workflowKey:"leave",title:"연월차·미휴무 승인 처리",category:"인사·급여",cycle:"발생 시",rule:"DAILY",owner:"본사",memo:"승인대기 신청 확인"},
-    {id:"trip-approval",workflowKey:"trip",title:"출장 승인·정산 처리",category:"차량·출장",cycle:"발생 시",rule:"DAILY",owner:"본사",memo:"출장 승인대기 및 정산대기 확인"},
     {id:"store-inspection",workflowKey:"storeDashboard",title:"매장점검 미조치 확인",category:"점포",cycle:"발생 시",rule:"DAILY",owner:"본사",memo:"미확인·미조치 점검 확인"}
   ].filter(task=>workflowState[task.workflowKey]?.count>0||seen[task.workflowKey]);
   return [...HQ_TASK_DEFAULTS,...external,...(s.custom||[])];
