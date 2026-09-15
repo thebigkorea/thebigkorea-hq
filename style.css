@@ -930,3 +930,64 @@ button{cursor:pointer}
       url("assets/hero-thebigkorea.jpg") center/cover no-repeat!important;
   }
 }
+
+/* =========================================================
+   회사 반복업무 예시 - 상단 분류 버튼 글자 잘림 수정
+   2026-09-15
+   ========================================================= */
+.recurring-reference-modal .reference-category-tabs,
+.reference-library-modal .reference-category-tabs,
+.reference-category-tabs,
+.recurring-reference-modal .reference-tabs,
+.reference-library-modal .reference-tabs,
+.reference-tabs {
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  min-height:48px !important;
+  height:auto !important;
+  padding:8px 0 9px !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+}
+
+.recurring-reference-modal .reference-category-tabs button,
+.reference-library-modal .reference-category-tabs button,
+.reference-category-tabs button,
+.recurring-reference-modal .reference-tabs button,
+.reference-library-modal .reference-tabs button,
+.reference-tabs button {
+  flex:0 0 auto !important;
+  min-width:72px !important;
+  height:36px !important;
+  min-height:36px !important;
+  padding:0 15px !important;
+  margin:0 !important;
+  border-radius:999px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+  box-sizing:border-box !important;
+  font-size:11px !important;
+  font-weight:900 !important;
+  vertical-align:middle !important;
+}
+
+/* 실제 팝업에서 category 관련 다른 클래스명을 쓰더라도 동일 적용 */
+[class*="reference"] [class*="category"][class*="tab"] button,
+[class*="recurring"] [class*="category"][class*="tab"] button {
+  height:36px !important;
+  min-height:36px !important;
+  padding:0 15px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+  box-sizing:border-box !important;
+}
+
