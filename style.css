@@ -527,3 +527,150 @@ button{cursor:pointer}
 #view-opening .module-card:nth-child(2) button{background:#2478df!important}
 #view-opening .module-card:nth-child(3) button{background:#15966f!important}
 #view-opening .module-card:nth-child(4) button{background:#d17b22!important}
+
+
+/* =========================================================
+   V24 모바일 전면 개선
+   - 상단 겹침 제거
+   - 운영현황/업무카드/매출카드 모바일 재배치
+   ========================================================= */
+@media (max-width:700px){
+  html{-webkit-text-size-adjust:100%;overflow-x:hidden}
+  body{overflow-x:hidden;background:#f3f6f9}
+  button,a{-webkit-tap-highlight-color:transparent}
+
+  .main-area{min-width:0;overflow-x:hidden}
+  .content{padding:12px 12px 42px}
+
+  /* 모바일 상단: 첫 줄 메뉴/제목, 둘째 줄 기준월/새로고침 */
+  .topbar{
+    height:auto!important;
+    min-height:0!important;
+    padding:10px 12px 11px!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:9px!important;
+    align-items:stretch!important;
+    box-shadow:0 5px 18px rgba(23,34,49,.07);
+  }
+  .topbar-left{
+    width:100%;min-width:0;display:grid!important;
+    grid-template-columns:42px minmax(0,1fr);gap:10px!important;align-items:center!important;
+  }
+  .menu-toggle{display:grid;width:42px;height:42px;place-items:center;border-radius:12px;font-size:21px;color:#172231}
+  .topbar-left>div{min-width:0}
+  .topbar h1{margin:0!important;font-size:20px;line-height:1.2;letter-spacing:-.5px;white-space:nowrap}
+  .topbar p{display:none!important}
+  .topbar-actions{
+    width:100%;margin:0!important;display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto;gap:8px!important;align-items:end!important;
+  }
+  .month-box{
+    display:grid!important;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px;
+    min-height:44px!important;margin:0!important;padding-left:4px;
+    font-size:11px!important;white-space:nowrap;
+  }
+  .month-box input{
+    width:100%;min-width:0;height:44px!important;margin:0!important;padding:0 10px;
+    border-radius:12px!important;background:#f6f8fa;font-size:14px;font-weight:800;
+  }
+  #refreshBtn.icon-btn{
+    align-self:auto!important;height:44px!important;min-height:44px!important;margin:0!important;
+    padding:0 13px;border-radius:12px;font-size:13px;
+  }
+
+  /* 홈 소개 영역 */
+  .hero-card{padding:19px 18px;border-radius:17px;display:block}
+  .hero-card h2{font-size:20px;line-height:1.38;margin:7px 0 8px;letter-spacing:-.5px}
+  .hero-card h2 br{display:none}
+  .hero-card p{font-size:12px;line-height:1.55}
+  .hero-badge{display:none}
+  .eyebrow{font-size:9px;letter-spacing:.09em}
+
+  .section-title-row{margin:20px 2px 10px;gap:10px;align-items:flex-end}
+  .section-title-row>div{min-width:0}
+  .section-title-row h3,.panel-head h3{font-size:17px;letter-spacing:-.35px}
+  .section-title-row p{display:none}
+  .home-task-link{flex:0 0 auto;padding:7px 10px}
+
+  /* 본사 업무 KPI는 짧은 2열 카드 */
+  .home-task-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}
+  .home-task-kpis .kpi-card{min-height:92px;padding:13px 14px;border-radius:14px}
+  .home-task-kpis .kpi-card span{font-size:11px}
+  .home-task-kpis .kpi-card strong{font-size:21px;margin:9px 0 4px}
+  .home-task-kpis .kpi-card small{font-size:9px}
+
+  /* 회사 운영현황: 첫 행 직원현황 + 아래 3개 지표 */
+  .company-status-row{
+    margin-top:10px;padding:14px;display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 6px!important;border-radius:15px;
+  }
+  .company-status-row>div{width:auto!important;min-width:0;text-align:center}
+  .company-status-row>div:first-child{
+    grid-column:1/-1;display:block!important;text-align:left;padding-bottom:12px;
+    border-bottom:1px solid var(--line);
+  }
+  .company-status-row>div:first-child>span{display:block;margin-bottom:9px;font-size:12px}
+  .company-status-row strong{display:block;font-size:11px;line-height:1.45;word-break:keep-all}
+  .company-status-row b{font-size:14px;margin-left:2px;white-space:nowrap}
+  .employee-breakdown{
+    display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px;margin-top:10px;
+  }
+  .employee-breakdown-item{display:flex!important;justify-content:space-between;align-items:center;padding:7px 9px;border-radius:9px;background:#f5f7fa;font-size:10px}
+  .employee-breakdown-item b{font-size:12px}
+
+  /* 패널과 자주 쓰는 업무 */
+  .dashboard-grid,.dashboard-grid.lower{display:grid;grid-template-columns:minmax(0,1fr)!important;gap:12px;margin-top:12px}
+  .panel{min-width:0;padding:15px;border-radius:17px}
+  .panel-head{gap:10px;margin-bottom:12px}
+  .panel-head>div{min-width:0}
+  .panel-head p{font-size:10px;line-height:1.45}
+  .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}
+  .quick-card{min-width:0;min-height:118px;padding:13px 12px;border-radius:14px}
+  .quick-icon{font-size:23px;margin-bottom:9px}
+  .quick-card strong{font-size:12px;line-height:1.35;word-break:keep-all}
+  .quick-card small{font-size:9.5px;line-height:1.45;word-break:keep-all}
+
+  /* 출퇴근 명부: 높이 고정 제거, 점포 탭 자연스러운 좌우 스크롤 */
+  .attendance-roster-panel{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible}
+  .attendance-store-tabs{margin:0 -2px 4px;padding:1px 2px 9px;scrollbar-width:none;overscroll-behavior-x:contain}
+  .attendance-store-tabs::-webkit-scrollbar{display:none}
+  .attendance-store-tab{padding:9px 13px;font-size:11px}
+  .attendance-store-groups{max-height:none;overflow:visible;padding-right:0;gap:8px}
+  .attendance-summary-row{padding:13px 12px}
+
+  /* 매출 요약 숫자와 카드를 모바일 폭에 맞춤 */
+  .sales-company-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}
+  .sales-company-card{padding:12px;overflow:hidden}
+  .sales-company-card span{font-size:9.5px;line-height:1.35;word-break:keep-all}
+  .sales-company-card strong{font-size:clamp(15px,4.6vw,19px);letter-spacing:-.6px;white-space:nowrap}
+  .sales-company-card small{font-size:9px;line-height:1.4}
+  .sales-store-summary-grid{grid-template-columns:1fr!important;gap:9px}
+  .sales-store-card{min-height:0;padding:14px}
+  .sales-store-card>strong{font-size:20px;white-space:nowrap}
+  .panel-actions{align-items:flex-end;gap:5px}
+  .panel-actions .text-btn{white-space:nowrap}
+
+  /* 공통 상세 화면 */
+  .module-hero{padding:18px;border-radius:15px}
+  .module-hero h2{font-size:19px}
+  .module-grid{grid-template-columns:1fr!important;gap:10px}
+  .module-card{min-height:0!important;padding:15px}
+  .fund-kpi-grid,.hq-task-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}
+  .fund-kpi-card,.hq-task-kpis article{min-width:0;padding:13px}
+  .fund-kpi-card strong,.hq-task-kpis strong{font-size:18px;white-space:nowrap}
+  .fund-filter-grid{grid-template-columns:1fr!important}
+
+  /* 사이드 메뉴 */
+  .sidebar{width:min(86vw,320px);box-shadow:18px 0 45px rgba(10,18,28,.28)}
+  .brand.brand-premium{min-height:84px;padding:12px 16px}
+}
+
+@media (max-width:380px){
+  .content{padding-left:9px;padding-right:9px}
+  .topbar{padding-left:9px!important;padding-right:9px!important}
+  #refreshBtn.icon-btn{padding:0 10px;font-size:12px}
+  .home-task-kpis,.quick-grid,.sales-company-summary{gap:7px}
+  .quick-card{padding:12px 10px}
+  .sales-company-card strong{font-size:14px}
+}
