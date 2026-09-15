@@ -115,7 +115,11 @@ function renderProjects() {
     }
 
     cards.push(`
-      <div class="project-card">
+      <div class="project-card project-card-clickable"
+           role="button"
+           tabindex="0"
+           onclick="openProjectDetail('${safeText(p.projectId)}')"
+           onkeydown="if(event.key==='Enter'){openProjectDetail('${safeText(p.projectId)}')}">
         <div class="project-title">${safeText(p.storeName || "")}</div>
         <div class="project-meta">
           브랜드 : ${safeText(p.brand || "")}<br>
@@ -217,6 +221,116 @@ async function loadProjects(force = false) {
   projectsLoadedAt = Date.now();
   renderProjects();
   return projects;
+}
+
+
+function openProjectDetail(projectId) {
+  const p = projects.find(row => String(row.projectId) === String(projectId));
+  if (!p) {
+    alert("점포 정보를 찾지 못했습니다.");
+    return;
+  }
+
+  document.getElementById("detailProjectId").value = p.projectId || "";
+  document.getElementById("projectDetailTitle").textContent =
+    (p.storeName || "점포") + " 상세정보";
+
+  const memo = safeText(p.memo || "등록된 메모·주의사항이 없습니다.").replace(/\n/g, "<br>");
+
+  document.getElementById("projectDetailBody").innerHTML = `
+    <div class="project-detail-grid">
+      ${detailItem("브랜드", p.brand)}
+      ${detailItem("점포명", p.storeName)}
+      ${detailItem("유통사", p.retailer)}
+      ${detailItem("위치", p.location)}
+      ${detailItem("MD 담당자", p.mdName)}
+      ${detailItem("내부 담당자", p.owner)}
+      ${detailItem("계약예정일", p.contractDate)}
+      ${detailItem("공사시작일", p.constructionStart)}
+      ${detailItem("가오픈일", p.preOpenDate)}
+      ${detailItem("정식오픈일", p.openDate)}
+      ${detailItem("현재상태", p.status)}
+      ${detailItem("진행률", (p.progress || 0) + "%")}
+    </div>
+
+    <div class="project-detail-memo">
+      <div class="project-detail-memo-title">메모 · 주의사항</div>
+      <div class="project-detail-memo-content">${memo}</div>
+    </div>
+  `;
+
+  const modal = document.getElementById("projectDetailModal");
+  modal.classList.remove("hidden");
+  document.body.classList.add("modal-open");
+}
+
+function detailItem(label, value) {
+  return `
+    <div class="project-detail-item">
+      <span>${safeText(label)}</span>
+      <strong>${safeText(value || "-")}</strong>
+    </div>
+  `;
+}
+
+function closeProjectDetailModal() {
+  const modal = document.getElementById("projectDetailModal");
+  if (modal) modal.classList.add("hidden");
+  document.body.classList.remove("modal-open");
+}
+
+function editProjectFromDetail() {
+  const projectId = val("detailProjectId");
+  const p = projects.find(row => String(row.projectId) === String(projectId));
+  if (!p) return;
+
+  const projectTab = Array.from(document.querySelectorAll(".tab"))
+    .find(btn => btn.textContent.includes("점포등록"));
+
+  closeProjectDetailModal();
+  if (projectTab) showTab("project", projectTab);
+
+  const values = {
+    brand: p.brand,
+    storeName: p.storeName,
+    retailer: p.retailer,
+    location: p.location,
+    mdName: p.mdName,
+    owner: p.owner,
+    contractDate: p.contractDate,
+    constructionStart: p.constructionStart,
+    preOpenDate: p.preOpenDate,
+    openDate: p.openDate,
+    status: p.status,
+    progress: p.progress,
+    projectMemo: p.memo
+  };
+
+  Object.entries(values).forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = value || "";
+  });
+
+  // 현재 서버 저장 방식은 신규등록 중심이므로 수정 화면임을 사용자에게 표시합니다.
+  const title = document.querySelector("#project h2");
+  if (title) title.textContent = "신규점포 정보 확인 · 수정";
+}
+
+function openProjectSchedule() {
+  const projectId = val("detailProjectId");
+  if (!projectId) return;
+
+  const scheduleTab = Array.from(document.querySelectorAll(".tab"))
+    .find(btn => btn.textContent.includes("업무현황"));
+
+  closeProjectDetailModal();
+  if (scheduleTab) showTab("schedule", scheduleTab);
+
+  const select = document.getElementById("scheduleProjectId");
+  if (select) {
+    select.value = projectId;
+    loadSchedule();
+  }
 }
 
 function fillProjectSelects() {

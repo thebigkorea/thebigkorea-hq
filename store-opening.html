@@ -7,6 +7,30 @@
 <title>신규점포 개설관리</title>
 
 <link rel="stylesheet" href="store-opening.css">
+
+<style>
+.project-overview-header{display:flex;justify-content:space-between;align-items:end;margin:0 0 16px}
+.project-overview-header h2{margin:0 0 6px}
+.project-overview-header p{margin:0;color:#6b7280}
+.project-overview-list{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:32px}
+.project-card-clickable{cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+.project-card-clickable:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.10)}
+.project-detail-card{max-width:900px;width:calc(100% - 32px)}
+.project-detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
+.project-detail-item{padding:14px 16px;border:1px solid #e5e7eb;border-radius:12px;background:#fafafa}
+.project-detail-item span{display:block;font-size:12px;color:#6b7280;margin-bottom:6px}
+.project-detail-item strong{font-size:15px;color:#111827;word-break:break-word}
+.project-detail-memo{margin-top:20px;border:1px solid #ead8cf;border-radius:14px;overflow:hidden}
+.project-detail-memo-title{padding:12px 16px;font-weight:700;background:#f8eee9;color:#7c2d12}
+.project-detail-memo-content{padding:18px;min-height:100px;line-height:1.7;white-space:normal;word-break:break-word;background:#fff}
+@media(max-width:760px){
+  .project-detail-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:520px){
+  .project-detail-grid{grid-template-columns:1fr}
+}
+</style>
+
 </head>
 
 <body>
@@ -67,6 +91,15 @@
 
   <section id="list" class="panel active">
 
+  <div class="project-overview-header">
+    <div>
+      <h2>등록 점포 현황</h2>
+      <p>점포 카드를 클릭하면 등록한 개설정보와 메모·주의사항을 상세 조회할 수 있습니다.</p>
+    </div>
+  </div>
+
+  <div id="projectList" class="project-list project-overview-list"></div>
+
   <div class="checklist-header">
 
     <div>
@@ -95,14 +128,6 @@
   </div>
 
 </div>
-
-  <!-- 기존 프로젝트 데이터 처리를 위해 유지 -->
-  <div
-    id="projectList"
-    class="project-list"
-    style="display:none;">
-  </div>
-
 </section>
 
 <div
@@ -307,6 +332,30 @@ label>
     </button>
 
   </section>
+
+
+<div id="projectDetailModal" class="checklist-modal hidden">
+  <div class="checklist-modal-backdrop" onclick="closeProjectDetailModal()"></div>
+  <div class="checklist-modal-card project-detail-card">
+    <div class="checklist-modal-header">
+      <div>
+        <h2 id="projectDetailTitle">점포 상세정보</h2>
+        <p>등록한 신규점포 개설정보와 메모·주의사항입니다.</p>
+      </div>
+      <button type="button" class="checklist-modal-close" onclick="closeProjectDetailModal()">×</button>
+    </div>
+
+    <input type="hidden" id="detailProjectId">
+
+    <div id="projectDetailBody"></div>
+
+    <div class="checklist-modal-actions">
+      <button type="button" class="checklist-cancel-button" onclick="closeProjectDetailModal()">닫기</button>
+      <button type="button" class="primary" onclick="editProjectFromDetail()">정보 수정</button>
+      <button type="button" class="primary" onclick="openProjectSchedule()">업무현황 보기</button>
+    </div>
+  </div>
+</div>
 
   <section id="task" class="panel">
 
