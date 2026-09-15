@@ -7,7 +7,7 @@ let checklistItems = [];
 let taskProcessHistories = [];
 
 const OPENING_CACHE_KEY = "thebigkorea_store_opening_bootstrap_v2";
-const OPENING_CACHE_MAX_AGE = 24 * 60 * 60 * 1000;
+const OPENING_CACHE_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30일: 화면은 캐시를 즉시 표시하고 서버에서 뒤에서 갱신
 
 function saveOpeningCache_() {
   try {
@@ -25,7 +25,8 @@ function restoreOpeningCache_() {
     if (!raw) return false;
     const cached = JSON.parse(raw);
     if (!cached || !Array.isArray(cached.projects) || !Array.isArray(cached.checklistItems)) return false;
-    if (Date.now() - Number(cached.savedAt || 0) > OPENING_CACHE_MAX_AGE) return false;
+    // 오래된 캐시라도 먼저 화면에 표시합니다.
+    // 서버 최신 데이터는 loadInitialData()가 백그라운드에서 다시 받아 덮어씁니다.
     projects = cached.projects;
     checklistItems = cached.checklistItems;
     const now = Date.now();
@@ -92,39 +93,50 @@ let projectsLoadedAt = 0;
 let checklistLoadedAt = 0;
 
 async function loadInitialData() {
+  // 1) 이전에 받아둔 데이터를 즉시 그립니다.
+  // Apps Script가 콜드 스타트 중이어도 등록점포/체크리스트 화면은 바로 보입니다.
   const restored = restoreOpeningCache_();
   const checklistBox = document.getElementById("openingChecklist");
 
   if (!restored && checklistBox) {
     checklistBox.innerHTML = `
       <div class="checklist-loading">
-        신규점포 데이터를 불러오는 중입니다...
+        최초 데이터를 불러오는 중입니다...
       </div>
     `;
   }
 
+  // 2) 서버 최신 데이터는 뒤에서 한 번만 갱신합니다.
+  // 화면 표시를 이 요청이 끝날 때까지 기다리지 않습니다.
   try {
-    const data = await api({ action: "getOpeningBootstrapFast", t: Date.now() }, 12000);
+    const data = await api({ action: "getOpeningBootstrapFast" }, 15000);
 
     if (!data || data.success === false) {
       throw new Error(data && data.message ? data.message : "초기 데이터 조회 실패");
     }
 
-    projects = Array.isArray(data.projects) ? data.projects : [];
-    checklistItems = Array.isArray(data.checklistItems) ? data.checklistItems : [];
+    const nextProjects = Array.isArray(data.projects) ? data.projects : [];
+    const nextChecklistItems = Array.isArray(data.checklistItems) ? data.checklistItems : [];
+
+    // 서버에서 정상 배열이 왔을 때만 현재 화면 데이터를 교체합니다.
+    projects = nextProjects;
+    checklistItems = nextChecklistItems;
 
     const now = Date.now();
     projectsLoadedAt = now;
     checklistLoadedAt = now;
+
     renderProjects();
     renderChecklistItems();
     saveOpeningCache_();
   } catch (err) {
     console.error("초기 데이터 갱신 실패:", err);
+
+    // 캐시 화면이 이미 있으면 그대로 유지합니다.
     if (!restored && checklistBox) {
       checklistBox.innerHTML = `
         <div class="checklist-loading">
-          서버 응답이 지연되고 있습니다. 새로고침해 주세요.
+          서버 응답이 지연되고 있습니다. 잠시 후 새로고침해 주세요.
         </div>
       `;
     }
