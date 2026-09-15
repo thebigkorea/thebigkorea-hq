@@ -6,13 +6,8 @@ let tasks = [];
 let checklistItems = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-
-  loadProjects();
-
-  loadChecklistItems();
-
   setupChecklistTaskLinks();
-
+  loadInitialData();
 });
 
 function showTab(id, btn) {
@@ -25,11 +20,7 @@ function showTab(id, btn) {
   document.getElementById(id).classList.add("active");
   btn.classList.add("active");
 
-  
 
-  if (id === "list") {
-    loadProjects();
-  }
 }
 
 function val(id) {
@@ -56,6 +47,102 @@ async function api(params) {
 }
 
 
+
+const CACHE_TTL = 5 * 60 * 1000;
+let projectsLoadedAt = 0;
+let checklistLoadedAt = 0;
+
+async function loadInitialData() {
+  const checklistBox = document.getElementById("openingChecklist");
+  if (checklistBox) {
+    checklistBox.innerHTML = `
+      <div class="checklist-loading">
+        신규점포 데이터를 불러오는 중입니다...
+      </div>
+    `;
+  }
+
+  try {
+    const data = await api({ action: "getOpeningBootstrap" });
+
+    if (!data || data.success === false) {
+      throw new Error(data && data.message ? data.message : "초기 데이터 조회 실패");
+    }
+
+    projects = Array.isArray(data.projects) ? data.projects : [];
+    checklistItems = Array.isArray(data.checklistItems) ? data.checklistItems : [];
+
+    const now = Date.now();
+    projectsLoadedAt = now;
+    checklistLoadedAt = now;
+
+    renderProjects();
+    renderChecklistItems();
+  } catch (err) {
+    console.error(err);
+    // 구버전 Apps Script가 잠시 남아 있어도 화면은 동작하도록 fallback
+    await Promise.all([
+      loadProjects(true),
+      loadChecklistItems(true)
+    ]);
+  }
+}
+
+function renderProjects() {
+  document.getElementById("totalProjects").textContent = projects.length;
+
+  let activeProjectCount = 0;
+  let openSoonCount = 0;
+  const list = document.getElementById("projectList");
+  if (list) list.innerHTML = "";
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const cards = [];
+
+  projects.forEach(p => {
+    const progress = Number(p.progress || 0);
+
+    if (p.status !== "오픈완료" && progress < 100) {
+      activeProjectCount++;
+    }
+
+    if (p.openDate) {
+      const openDate = new Date(p.openDate + "T00:00:00");
+      const diffDays = Math.ceil((openDate - today) / 86400000);
+      if (diffDays >= 0 && diffDays <= 30) openSoonCount++;
+    }
+
+    cards.push(`
+      <div class="project-card">
+        <div class="project-title">${safeText(p.storeName || "")}</div>
+        <div class="project-meta">
+          브랜드 : ${safeText(p.brand || "")}<br>
+          유통사 : ${safeText(p.retailer || "")}<br>
+          담당 : ${safeText(p.owner || "")}<br>
+          오픈예정 : ${safeText(p.openDate || "")}<br>
+          상태 : ${safeText(p.status || "")}<br>
+          진행률 : ${progress}%
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar" style="width:${Math.max(0, Math.min(100, progress))}%"></div>
+        </div>
+      </div>
+    `);
+  });
+
+  if (list) list.innerHTML = cards.join("");
+
+  const activeEl = document.getElementById("avgProgress");
+  if (activeEl) activeEl.textContent = activeProjectCount;
+
+  const openSoonEl = document.getElementById("openSoon");
+  if (openSoonEl) openSoonEl.textContent = openSoonCount;
+
+  fillProjectSelects();
+}
+
 async function saveProject() {
   if (!val("storeName")) {
     alert("점포명을 입력하세요.");
@@ -80,7 +167,7 @@ async function saveProject() {
   });
 
   alert(data.message || "저장 완료");
-  loadProjects();
+  loadProjects(true);
 }
 
 async function saveTask() {
@@ -110,56 +197,26 @@ async function saveTask() {
   document.getElementById("taskDueDate").value = "";
   document.getElementById("taskMemo").value = "";
 
-  loadProjects();
-  loadSchedule();
+  await loadProjects(true);
+  if (val("scheduleProjectId")) {
+    await loadSchedule();
+  }
 }
 
-async function loadProjects() {
+async function loadProjects(force = false) {
+  if (!force && projects.length && (Date.now() - projectsLoadedAt) < CACHE_TTL) {
+    renderProjects();
+    return projects;
+  }
+
   const data = await api({
     action: "getStoreOpenings"
   });
 
-  projects = data.projects || [];
-
-  document.getElementById("totalProjects").textContent = projects.length;
-
-  let activeProjectCount = 0;
-  const list = document.getElementById("projectList");
-  list.innerHTML = "";
-
-  projects.forEach(p => {
-    const progress = Number(p.progress || 0);
-    if (
-  p.status !== "오픈완료" &&
-  progress < 100
-) {
-  activeProjectCount++;
-}
-
-    list.innerHTML += `
-      <div class="project-card">
-        <div class="project-title">${p.storeName || ""}</div>
-
-        <div class="project-meta">
-          브랜드 : ${p.brand || ""}<br>
-          유통사 : ${p.retailer || ""}<br>
-          담당 : ${p.owner || ""}<br>
-          오픈예정 : ${p.openDate || ""}<br>
-          상태 : ${p.status || ""}<br>
-          진행률 : ${progress}%
-        </div>
-
-        <div class="progress-wrap">
-          <div class="progress-bar" style="width:${progress}%"></div>
-        </div>
-      </div>
-    `;
-  });
-
-  document.getElementById("avgProgress").textContent =
-  activeProjectCount; 
-
-  fillProjectSelects();
+  projects = Array.isArray(data.projects) ? data.projects : [];
+  projectsLoadedAt = Date.now();
+  renderProjects();
+  return projects;
 }
 
 function fillProjectSelects() {
@@ -720,8 +777,10 @@ async function updateTaskProgress(taskId) {
   });
 
   alert(data.message || "진행상태가 수정되었습니다.");
-  loadProjects();
-  loadSchedule();
+  await Promise.all([
+    loadProjects(true),
+    loadSchedule()
+  ]);
 }
 
 async function delayTask(taskId) {
@@ -751,8 +810,10 @@ async function delayTask(taskId) {
   });
 
   alert(data.message || "지연상태가 등록되었습니다.");
-  loadProjects();
-  loadSchedule();
+  await Promise.all([
+    loadProjects(true),
+    loadSchedule()
+  ]);
 }
 
 async function completeTask(taskId) {
@@ -776,8 +837,10 @@ async function completeTask(taskId) {
   });
 
   alert(data.message || "완료 처리되었습니다.");
-  loadProjects();
-  loadSchedule();
+  await Promise.all([
+    loadProjects(true),
+    loadSchedule()
+  ]);
 }
 
 async function saveExpense() {
@@ -1381,7 +1444,7 @@ const CHECKLIST_GROUPS = [
 ];
 
 
-async function loadChecklistItems() {
+async function loadChecklistItems(force = false) {
 
   const box =
     document.getElementById(
@@ -1389,6 +1452,11 @@ async function loadChecklistItems() {
     );
 
   if (!box) return;
+
+  if (!force && checklistItems.length && (Date.now() - checklistLoadedAt) < CACHE_TTL) {
+    renderChecklistItems();
+    return checklistItems;
+  }
 
   box.innerHTML = `
     <div class="checklist-loading">
@@ -1425,7 +1493,9 @@ async function loadChecklistItems() {
         ? data.items
         : [];
 
+    checklistLoadedAt = Date.now();
     renderChecklistItems();
+    return checklistItems;
 
   } catch (err) {
 
@@ -1815,7 +1885,7 @@ async function saveChecklistItemFromModal() {
 
     closeChecklistModal();
 
-    await loadChecklistItems();
+    await loadChecklistItems(true);
 
   } catch (err) {
 
@@ -1901,7 +1971,7 @@ async function disableChecklistItem() {
 
     closeChecklistModal();
 
-    await loadChecklistItems();
+    await loadChecklistItems(true);
 
   } catch (err) {
 
