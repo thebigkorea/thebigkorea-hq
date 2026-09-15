@@ -1586,7 +1586,7 @@ function handleQuickSystem(key){
     notice:HQ_BASE+"notice.html",
     salesInput:"https://script.google.com/macros/s/AKfycbyfytW-OyP84u1yaa4FJIF0EDclm_w6CWpY1rIDszzax7SfVuxF9KsDw5yfd53k0fb6Nw/exec",
     leave:SYSTEM_LINKS.leave,
-    trip:HQ_BASE+"trip.html",
+    trip:SYSTEM_LINKS.trip,
     opening:HQ_BASE+"store-opening.html",
     daily:SYSTEM_LINKS.daily,
     storeDashboard:SYSTEM_LINKS.storeDashboard,
