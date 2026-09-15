@@ -876,3 +876,19 @@ button{cursor:pointer}
   .colorful-home .quick-card small{font-size:9px!important}
   .sales-company-summary{grid-template-columns:1fr!important}
 }
+
+
+/* =========================================================
+   V30 - 자주 쓰는 업무: 중복 아이콘 제거 / 실사 이미지 유지
+   ========================================================= */
+.colorful-home .quick-card{
+  padding:82px 13px 12px!important;
+}
+.colorful-home .quick-card .quick-icon{
+  display:none!important;
+}
+@media(max-width:900px){
+  .colorful-home .quick-card{
+    padding:76px 10px 10px!important;
+  }
+}
