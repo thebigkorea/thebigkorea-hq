@@ -229,6 +229,7 @@ function renderWorkflowBadges(){
 /* 네 출퇴근 Apps Script의 최신 /exec 배포 주소 */
 const ATTENDANCE_STORES = [
   {name:"더큰코리아 본사",url:"https://script.google.com/macros/s/AKfycbzRL0MceE5NfdEro8Og1VnjLhTc-pcCXKl0d3hXV8u8A3mNoRBBrTEfGdMtp2ohotWx/exec"},
+  {name:"한국의집",url:"https://script.google.com/macros/s/AKfycbz6rYVTUixqPOhHhethQcRI4ziwNukl8EcZx9nVvFLw0rV5o4kLD_BExlONS7WPGE54sQ/exec"},
   {name:"평촌 소바공방",url:"https://script.google.com/macros/s/AKfycbwqe8v-KtP_xn3eJ3keFMJ8a4G0zyfk6Rj5lBFZ8oSoVHm370qQ9xjUpi0bzEPbBxed/exec"},
   {name:"압구정 길채정",url:"https://script.google.com/macros/s/AKfycbyJuwQdfCgVrlCu6gH6JepEXu8u4pXrWueGimopd7s5U8Jwm4XqQWSfir-mnixu1mywYg/exec"},
   {name:"효종갱 파주점",url:"https://script.google.com/macros/s/AKfycbwepn9ybkMA6BPSqobW1009eCdxxdbfRv_1yuesYqormK3F1Rr74Rp6m_fN7CKiCud5/exec"}
@@ -240,7 +241,7 @@ async function loadAllStoreAttendance(){
   const groups=document.getElementById("attendanceStoreGroups");
   if(!summary||!groups)return;
 
-  summary.textContent="지정된 4개 점포 출퇴근 현황을 불러오는 중입니다.";
+  summary.textContent="지정된 5개 사업장 출퇴근 현황을 불러오는 중입니다.";
   groups.innerHTML='<div class="attendance-roster-empty">출퇴근 명단을 불러오는 중입니다.</div>';
   try{
     attendanceStoreData=await Promise.all(ATTENDANCE_STORES.map(async store=>{
@@ -259,7 +260,7 @@ async function loadAllStoreAttendance(){
     }));
     const total=attendanceStoreData.reduce((sum,store)=>sum+(store.employees||[]).length,0);
     const working=attendanceStoreData.reduce((sum,store)=>sum+(store.workingCount||0),0);
-    summary.textContent=`4개 점포 오늘 출근 ${total}명 · 근무 중 ${working}명`;
+    summary.textContent=`5개 사업장 오늘 출근 ${total}명 · 근무 중 ${working}명`;
     buildAttendanceStoreTabs();
     renderAttendanceStores("all");
   }catch(error){
