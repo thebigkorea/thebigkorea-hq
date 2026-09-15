@@ -156,6 +156,66 @@ const FUND_API_URL = "https://script.google.com/macros/s/AKfycbwr2mdmWMCUbQmHbCV
 
 const HR_API_URL = "https://script.google.com/macros/s/AKfycbwRGQcXgYhfkTUiklPrHs4uFe7oHpgn8D_jM2jJPpU74tXr3D_h6vGMq72CHXU0EnAb/exec";
 
+/* 관리자 처리대기 통합현황 */
+const WORKFLOW_SOURCES={
+  daily:{
+    label:"일용직 미지급",
+    url:"https://script.google.com/macros/s/AKfycbz_NFlMRhx_mP_0maccpd62iWNHGMVo-pAZCHg7s8-tM26QvKlIVrPL6TmElRgM6XIS/exec?action=getDailyUnpaidCount",
+    read:data=>Number(data.count||0)
+  },
+  storeDashboard:{
+    label:"매장점검 미조치",
+    url:"https://script.google.com/macros/s/AKfycby1RoQvXt51KjoasIG-_MmD7SiMau10eRWAYiq4Vk1k2s9yRVsuEBrBVEFvmW7aX765/exec?action=getDashboard",
+    read:data=>Number(data.pendingCount||0)
+  },
+  leave:{
+    label:"연월차 승인대기",
+    url:"https://script.google.com/macros/s/AKfycbx7Y5zaVU7kYTdFwdwhUgoKwqOGx55-8a0McZOmA42PpbU4WWJqYTFPeSH2oD4mOzd7/exec?action=workflowCounts",
+    read:data=>Number(data.pending||0)+Number(data.compPending||0)
+  },
+  trip:{
+    label:"출장 승인·정산대기",
+    url:"https://script.google.com/macros/s/AKfycbzD9fUFvLxl6-cZGm6IUslFQrZDJk3P6Ip8to2NEWiktC2HR9a9VPFK-fNlxdcc_yg/exec?action=getTrips",
+    read:data=>(data.trips||[]).filter(t=>t.status==="승인대기"||((t.status==="승인"||t.status==="승인완료")&&t.settlementStatus!=="정산완료")).length
+  }
+};
+const workflowState={};
+
+async function loadWorkflowStatus(){
+  await Promise.all(Object.entries(WORKFLOW_SOURCES).map(async([key,source])=>{
+    try{
+      const joiner=source.url.includes("?")?"&":"?";
+      const response=await fetch(source.url+joiner+"_="+Date.now(),{cache:"no-store"});
+      if(!response.ok)throw new Error("HTTP "+response.status);
+      const data=await response.json();
+      if(data.success===false||data.ok===false)throw new Error(data.message||"조회 실패");
+      workflowState[key]={loaded:true,count:Math.max(0,source.read(data)),label:source.label};
+      rememberWorkflowSeen(key,workflowState[key].count);
+    }catch(error){
+      workflowState[key]={loaded:false,count:0,label:source.label,error:String(error?.message||error)};
+      console.warn(source.label+" 조회 실패",error);
+    }
+  }));
+  renderWorkflowBadges();
+  renderHqTaskView();
+  updateHomeHqTaskSummary();
+}
+
+function renderWorkflowBadges(){
+  Object.keys(WORKFLOW_SOURCES).forEach(key=>{
+    const card=document.querySelector(`.quick-card[data-system="${key}"]`);
+    if(!card)return;
+    let badge=card.querySelector(".workflow-badge");
+    if(!badge){badge=document.createElement("span");badge.className="workflow-badge";card.appendChild(badge);}
+    const state=workflowState[key];
+    const count=state?.loaded?state.count:0;
+    badge.textContent=count>99?"99+":String(count);
+    badge.hidden=count<1;
+    card.classList.toggle("has-pending",count>0);
+    card.title=count>0?`${state.label} ${count}건`:"";
+  });
+}
+
 /* 네 출퇴근 Apps Script의 최신 /exec 배포 주소 */
 const ATTENDANCE_STORES = [
   {name:"더큰코리아 본사",url:"https://script.google.com/macros/s/AKfycbzRL0MceE5NfdEro8Og1VnjLhTc-pcCXKl0d3hXV8u8A3mNoRBBrTEfGdMtp2ohotWx/exec"},
@@ -683,6 +743,7 @@ function init(){
   loadFundData();
   loadAllStoreAttendance();
   loadErpStoreSales();
+  loadWorkflowStatus();
 }
 
 function openView(view){
@@ -1155,9 +1216,10 @@ function showFundTab(tab,button){
    - 추후 Google Sheet 원장/API로 교체 가능
 ========================================= */
 const HQ_TASK_STORAGE_KEY="thebigkorea_erp_hq_tasks_v1";
+let HQ_TASK_ACTIVE_FILTER="pending";
 
 const HQ_TASK_DEFAULTS=[
-  {id:"daily-worker",title:"일용직 근무·지급내역 확인",category:"인사·급여",cycle:"매일",rule:"DAILY",day:null,months:null,owner:"본사",memo:"일용직 근무내역·지급 및 신고자료 확인"},
+  {id:"daily-worker",workflowKey:"daily",title:"일용직 근무·지급내역 확인",category:"인사·급여",cycle:"매일",rule:"DAILY",day:null,months:null,owner:"본사",memo:"일용직 근무내역·지급 및 신고자료 확인"},
   {id:"payroll-10",title:"급여 지급",category:"인사·급여",cycle:"매월 10일",rule:"MONTHLY",day:10,months:null,owner:"본사",memo:"급여 확정 및 지급 처리"},
   {id:"shinsegae-10",title:"신세계 계열 정산",category:"정산",cycle:"매월 10일",rule:"MONTHLY",day:10,months:null,owner:"본사",memo:"신세계 계열 점포 월 정산"},
   {id:"lotte-20",title:"롯데백화점 정산",category:"정산",cycle:"매월 20일",rule:"MONTHLY",day:20,months:null,owner:"본사",memo:"롯데백화점 계열 점포 월 정산"},
@@ -1172,7 +1234,23 @@ function loadHqTaskState(){
   catch(e){return {custom:[],done:{}};}
 }
 function saveHqTaskState(state){localStorage.setItem(HQ_TASK_STORAGE_KEY,JSON.stringify(state));}
-function getHqTasks(){const s=loadHqTaskState();return [...HQ_TASK_DEFAULTS,...(s.custom||[])];}
+function rememberWorkflowSeen(key,count){
+  if(count<1)return;
+  const state=loadHqTaskState(),dateKey=hqTaskDateKey(new Date());
+  state.workflowSeen=state.workflowSeen||{};
+  state.workflowSeen[dateKey]=state.workflowSeen[dateKey]||{};
+  state.workflowSeen[dateKey][key]=true;
+  saveHqTaskState(state);
+}
+function getHqTasks(){
+  const s=loadHqTaskState(),dateKey=hqTaskDateKey(new Date()),seen=s.workflowSeen?.[dateKey]||{};
+  const external=[
+    {id:"leave-approval",workflowKey:"leave",title:"연월차·미휴무 승인 처리",category:"인사·급여",cycle:"발생 시",rule:"DAILY",owner:"본사",memo:"승인대기 신청 확인"},
+    {id:"trip-approval",workflowKey:"trip",title:"출장 승인·정산 처리",category:"차량·출장",cycle:"발생 시",rule:"DAILY",owner:"본사",memo:"출장 승인대기 및 정산대기 확인"},
+    {id:"store-inspection",workflowKey:"storeDashboard",title:"매장점검 미조치 확인",category:"점포",cycle:"발생 시",rule:"DAILY",owner:"본사",memo:"미확인·미조치 점검 확인"}
+  ].filter(task=>workflowState[task.workflowKey]?.count>0||seen[task.workflowKey]);
+  return [...HQ_TASK_DEFAULTS,...external,...(s.custom||[])];
+}
 function isHqTaskDue(task,d){
   const m=d.getMonth()+1, day=d.getDate();
   if(task.rule==="DAILY") return true;
@@ -1190,10 +1268,53 @@ function hqTaskNextDate(task,from=new Date()){
   return null;
 }
 function hqTaskStatus(task,d){
+  const external=task.workflowKey?workflowState[task.workflowKey]:null;
+  if(external?.loaded)return external.count===0;
   const state=loadHqTaskState(), key=`${task.id}|${hqTaskDateKey(d)}`;
   return !!state.done?.[key];
 }
+function hqTaskStartOfDay(value=new Date()){
+  return new Date(value.getFullYear(),value.getMonth(),value.getDate());
+}
+function getHqTaskBuckets(){
+  const today=hqTaskStartOfDay(),tasks=getHqTasks(),state=loadHqTaskState();
+  const dueToday=tasks.filter(t=>isHqTaskDue(t,today));
+  const doneToday=dueToday.filter(t=>hqTaskStatus(t,today));
+  const pendingToday=dueToday.filter(t=>!hqTaskStatus(t,today));
+  const soonEnd=new Date(today);soonEnd.setDate(soonEnd.getDate()+7);
+
+  /* 매일 반복업무는 이미 '오늘 업무'에 잡히므로 내일 일정까지 기한임박에 중복 표시하지 않는다. */
+  const soon=tasks.filter(t=>t.rule!=="DAILY").map(task=>{
+    const date=hqTaskNextDate(task,new Date(today.getFullYear(),today.getMonth(),today.getDate()+1));
+    return {task,date};
+  }).filter(item=>item.date&&item.date<=soonEnd&&!hqTaskStatus(item.task,item.date));
+
+  const overdue=tasks.filter(t=>{
+    if(t.rule!=="DATE"||!t.date)return false;
+    const date=new Date(t.date+"T00:00:00");
+    return date<today&&!state.done?.[`${t.id}|${t.date}`];
+  }).map(task=>({task,date:new Date(task.date+"T00:00:00")}));
+
+  const monthStart=new Date(today.getFullYear(),today.getMonth(),1);
+  const monthEnd=new Date(today.getFullYear(),today.getMonth()+1,0);
+  const month=tasks.filter(task=>{
+    for(let d=new Date(monthStart);d<=monthEnd;d.setDate(d.getDate()+1)){
+      if(isHqTaskDue(task,d))return true;
+    }
+    return false;
+  });
+  return {today,tasks,dueToday,doneToday,pendingToday,soon,overdue,month};
+}
+function openHqTaskFilter(filter="pending"){
+  HQ_TASK_ACTIVE_FILTER=filter;
+  openView("hqtasks");
+}
 function toggleHqTaskDone(id,dateKey){
+  const task=getHqTasks().find(item=>item.id===id);
+  if(task?.workflowKey&&workflowState[task.workflowKey]?.loaded){
+    alert("이 업무는 연결된 원장에서 처리하면 자동으로 완료됩니다.");
+    return;
+  }
   const state=loadHqTaskState(); state.done=state.done||{};
   const key=`${id}|${dateKey}`;
   state.done[key]=!state.done[key];
@@ -1237,7 +1358,7 @@ function buildHqTaskView(){
     </div>
     <div class="hq-task-layout">
       <section class="panel">
-        <div class="panel-head"><div><h3>오늘 해야 할 업무</h3><p id="hqTodayLabel"></p></div></div>
+        <div class="panel-head"><div><h3 id="hqListTitle">오늘 해야 할 업무</h3><p id="hqTodayLabel"></p></div></div>
         <div id="hqTodayList" class="hq-today-list"></div>
       </section>
       <section class="panel">
@@ -1260,66 +1381,39 @@ function buildHqTaskView(){
 }
 function renderHqTaskView(){
   const el=document.getElementById("view-hqtasks");if(!el)return;
-  const today=new Date(), key=hqTaskDateKey(today), tasks=getHqTasks();
-  const due=tasks.filter(t=>isHqTaskDue(t,today));
-  const done=due.filter(t=>hqTaskStatus(t,today));
-  document.getElementById("hqTaskCount").textContent=due.length;
-  document.getElementById("hqTodayCount").textContent=due.length+"건";
-  document.getElementById("hqDoneCount").textContent=done.length+"건";
-  document.getElementById("hqPendingCount").textContent=(due.length-done.length)+"건";
+  const buckets=getHqTaskBuckets();
+  const {today,tasks,dueToday,doneToday,pendingToday,soon,overdue,month}=buckets;
+  const key=hqTaskDateKey(today);
+  document.getElementById("hqTaskCount").textContent=dueToday.length;
+  document.getElementById("hqTodayCount").textContent=dueToday.length+"건";
+  document.getElementById("hqDoneCount").textContent=doneToday.length+"건";
+  document.getElementById("hqPendingCount").textContent=pendingToday.length+"건";
   document.getElementById("hqTotalCount").textContent=tasks.length+"개";
+  const filter=HQ_TASK_ACTIVE_FILTER;
+  const labels={today:"오늘 해야 할 업무",pending:"오늘 미처리 업무",done:"오늘 완료된 업무",soon:"7일 이내 기한 임박 업무",overdue:"기한이 지난 업무",month:"이번 달 주요업무"};
+  document.getElementById("hqListTitle").textContent=labels[filter]||labels.pending;
   document.getElementById("hqTodayLabel").textContent=`${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일 기준`;
-  document.getElementById("hqTodayList").innerHTML=due.length?due.map(t=>{
-    const completed=hqTaskStatus(t,today);
+  let displayItems=[];
+  if(filter==="done")displayItems=doneToday.map(task=>({task,date:today}));
+  else if(filter==="soon")displayItems=soon;
+  else if(filter==="overdue")displayItems=overdue;
+  else if(filter==="month")displayItems=month.map(task=>({task,date:hqTaskNextDate(task,today)||today}));
+  else displayItems=pendingToday.map(task=>({task,date:today}));
+  document.getElementById("hqTodayList").innerHTML=displayItems.length?displayItems.map(({task:t,date})=>{
+    const completed=hqTaskStatus(t,date);
+    const dateKey=hqTaskDateKey(date);
     return `<div class="hq-today-item ${completed?"done":""}">
-      <button class="hq-check" onclick="toggleHqTaskDone('${escapeJs(t.id)}','${key}')">${completed?"✓":""}</button>
-      <div><strong>${escapeHtml(t.title)}</strong><small>${escapeHtml(t.category)} · ${escapeHtml(t.owner||"본사")} · ${escapeHtml(t.cycle||"")}</small></div>
+      <button class="hq-check ${t.workflowKey?"synced":""}" onclick="toggleHqTaskDone('${escapeJs(t.id)}','${dateKey}')" title="${t.workflowKey?"연결 원장에서 자동 처리":"클릭하여 완료 처리"}">${completed?"✓":t.workflowKey?"↻":""}</button>
+      <div><strong>${escapeHtml(t.title)}</strong><small>${escapeHtml(t.category)} · ${escapeHtml(t.owner||"본사")} · ${escapeHtml(t.cycle||"")} · ${dateKey}</small></div>
       <span class="hq-state ${completed?"done":"pending"}">${completed?"완료":"처리대기"}</span>
-    </div>`}).join(""):`<div class="fund-empty"><strong>오늘 예정된 업무가 없습니다.</strong><span>직접 업무를 등록하거나 반복업무를 추가할 수 있습니다.</span></div>`;
+    </div>`}).join(""):`<div class="fund-empty"><strong>해당 업무가 없습니다.</strong><span>완료된 업무는 미처리·기한임박·기한경과 목록에 다시 표시되지 않습니다.</span></div>`;
   document.getElementById("hqLedgerBody").innerHTML=tasks.map(t=>{
     const next=hqTaskNextDate(t,today);
     return `<tr><td><strong>${escapeHtml(t.title)}</strong></td><td>${escapeHtml(t.category)}</td><td>${escapeHtml(t.cycle||"-")}</td><td>${escapeHtml(t.owner||"-")}</td><td>${next?hqTaskDateKey(next):"-"}</td><td>${escapeHtml(t.memo||"")}</td><td>${String(t.id).startsWith("custom-")?`<button class="hq-delete-btn" onclick="deleteHqTask('${escapeJs(t.id)}')">삭제</button>`:"기본업무"}</td></tr>`;
   }).join("");
 }
 function updateHomeHqTaskSummary(){
-  const today=new Date();
-  const todayKey=hqTaskDateKey(today);
-  const tasks=getHqTasks();
-  const state=loadHqTaskState();
-
-  const dueToday=tasks.filter(t=>isHqTaskDue(t,today));
-  const doneToday=dueToday.filter(t=>hqTaskStatus(t,today));
-  const pendingToday=dueToday.filter(t=>!hqTaskStatus(t,today));
-
-  const inDays=(base,days)=>{
-    const d=new Date(base.getFullYear(),base.getMonth(),base.getDate());
-    d.setDate(d.getDate()+days);
-    return d;
-  };
-
-  const soonEnd=inDays(today,7);
-  const soon=tasks.filter(t=>{
-    const n=hqTaskNextDate(t,today);
-    return n && n>today && n<=soonEnd;
-  });
-
-  // 직접 지정 업무 중 기한이 지났는데 완료되지 않은 항목
-  const overdue=tasks.filter(t=>{
-    if(t.rule!=="DATE" || !t.date) return false;
-    const d=new Date(t.date+"T00:00:00");
-    if(d>=today) return false;
-    return !state.done?.[`${t.id}|${t.date}`];
-  });
-
-  // 이번 달에 한 번 이상 발생하는 업무
-  const y=today.getFullYear(), m=today.getMonth();
-  const monthStart=new Date(y,m,1), monthEnd=new Date(y,m+1,0);
-  const monthTasks=tasks.filter(t=>{
-    for(let d=new Date(monthStart); d<=monthEnd; d.setDate(d.getDate()+1)){
-      if(isHqTaskDue(t,d)) return true;
-    }
-    return false;
-  });
+  const {dueToday,doneToday,pendingToday,soon,overdue,month}=getHqTaskBuckets();
 
   const setText=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
   setText("homeTaskToday",dueToday.length+"건");
@@ -1327,12 +1421,12 @@ function updateHomeHqTaskSummary(){
   setText("homeTaskPending",pendingToday.length+"건");
   setText("homeTaskSoon",soon.length+"건");
   setText("homeTaskOverdue",overdue.length+"건");
-  setText("homeTaskMonth",monthTasks.length+"건");
+  setText("homeTaskMonth",month.length+"건");
 
   const alertList=document.querySelector("#view-home .alert-list");if(!alertList)return;
   const old=document.getElementById("homeHqTaskAlert");if(old)old.remove();
   const item=document.createElement("div");item.id="homeHqTaskAlert";item.className="alert-item";
-  item.innerHTML=`<span class="dot ${overdue.length?"red":pendingToday.length?"amber":"green"}"></span><div><strong>${overdue.length?`기한 경과 ${overdue.length}건`:pendingToday.length?`오늘 본사 업무 ${pendingToday.length}건 미처리`:"오늘 본사 업무 처리 완료"}</strong><small>${overdue.length?overdue.slice(0,2).map(x=>escapeHtml(x.title)).join(" · "):pendingToday.length?pendingToday.slice(0,2).map(x=>escapeHtml(x.title)).join(" · "):"오늘 예정 업무를 모두 완료했습니다."}</small></div><b>확인</b>`;
+  item.innerHTML=`<span class="dot ${overdue.length?"red":pendingToday.length?"amber":"green"}"></span><div><strong>${overdue.length?`기한 경과 ${overdue.length}건`:pendingToday.length?`오늘 본사 업무 ${pendingToday.length}건 미처리`:"오늘 본사 업무 처리 완료"}</strong><small>${overdue.length?overdue.slice(0,2).map(x=>escapeHtml(x.task.title)).join(" · "):pendingToday.length?pendingToday.slice(0,2).map(x=>escapeHtml(x.title)).join(" · "):"오늘 예정 업무를 모두 완료했습니다."}</small></div><b>확인</b>`;
   item.onclick=()=>openView("hqtasks");alertList.prepend(item);
 }
 
