@@ -6,6 +6,39 @@ let tasks = [];
 let checklistItems = [];
 let taskProcessHistories = [];
 
+const OPENING_CACHE_KEY = "thebigkorea_store_opening_bootstrap_v2";
+const OPENING_CACHE_MAX_AGE = 24 * 60 * 60 * 1000;
+
+function saveOpeningCache_() {
+  try {
+    localStorage.setItem(OPENING_CACHE_KEY, JSON.stringify({
+      savedAt: Date.now(),
+      projects,
+      checklistItems
+    }));
+  } catch (e) {}
+}
+
+function restoreOpeningCache_() {
+  try {
+    const raw = localStorage.getItem(OPENING_CACHE_KEY);
+    if (!raw) return false;
+    const cached = JSON.parse(raw);
+    if (!cached || !Array.isArray(cached.projects) || !Array.isArray(cached.checklistItems)) return false;
+    if (Date.now() - Number(cached.savedAt || 0) > OPENING_CACHE_MAX_AGE) return false;
+    projects = cached.projects;
+    checklistItems = cached.checklistItems;
+    const now = Date.now();
+    projectsLoadedAt = now;
+    checklistLoadedAt = now;
+    renderProjects();
+    renderChecklistItems();
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   setupChecklistTaskLinks();
   loadInitialData();
@@ -29,24 +62,29 @@ function val(id) {
   return el ? el.value.trim() : "";
 }
 
-async function api(params) {
+async function api(params, timeoutMs = 12000) {
   const query = new URLSearchParams(params);
-
-  const res = await fetch(API_URL + "?" + query.toString(), {
-    method: "GET",
-    redirect: "follow"
-  });
-
-  const text = await res.text();
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    return JSON.parse(text);
-  } catch (e) {
-    console.log("서버 응답 원문:", text);
-    return {};
+    const res = await fetch(API_URL + "?" + query.toString(), {
+      method: "GET",
+      redirect: "follow",
+      cache: "no-store",
+      signal: controller.signal
+    });
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      console.log("서버 응답 원문:", text);
+      return {};
+    }
+  } finally {
+    clearTimeout(timer);
   }
 }
-
 
 
 const CACHE_TTL = 5 * 60 * 1000;
@@ -54,8 +92,10 @@ let projectsLoadedAt = 0;
 let checklistLoadedAt = 0;
 
 async function loadInitialData() {
+  const restored = restoreOpeningCache_();
   const checklistBox = document.getElementById("openingChecklist");
-  if (checklistBox) {
+
+  if (!restored && checklistBox) {
     checklistBox.innerHTML = `
       <div class="checklist-loading">
         신규점포 데이터를 불러오는 중입니다...
@@ -64,7 +104,7 @@ async function loadInitialData() {
   }
 
   try {
-    const data = await api({ action: "getOpeningBootstrap" });
+    const data = await api({ action: "getOpeningBootstrapFast", t: Date.now() }, 12000);
 
     if (!data || data.success === false) {
       throw new Error(data && data.message ? data.message : "초기 데이터 조회 실패");
@@ -76,16 +116,18 @@ async function loadInitialData() {
     const now = Date.now();
     projectsLoadedAt = now;
     checklistLoadedAt = now;
-
     renderProjects();
     renderChecklistItems();
+    saveOpeningCache_();
   } catch (err) {
-    console.error(err);
-    // 구버전 Apps Script가 잠시 남아 있어도 화면은 동작하도록 fallback
-    await Promise.all([
-      loadProjects(true),
-      loadChecklistItems(true)
-    ]);
+    console.error("초기 데이터 갱신 실패:", err);
+    if (!restored && checklistBox) {
+      checklistBox.innerHTML = `
+        <div class="checklist-loading">
+          서버 응답이 지연되고 있습니다. 새로고침해 주세요.
+        </div>
+      `;
+    }
   }
 }
 
@@ -221,6 +263,7 @@ async function loadProjects(force = false) {
   projects = Array.isArray(data.projects) ? data.projects : [];
   projectsLoadedAt = Date.now();
   renderProjects();
+  saveOpeningCache_();
   return projects;
 }
 
@@ -1635,6 +1678,7 @@ async function loadChecklistItems(force = false) {
 
     checklistLoadedAt = Date.now();
     renderChecklistItems();
+    saveOpeningCache_();
     return checklistItems;
 
   } catch (err) {
