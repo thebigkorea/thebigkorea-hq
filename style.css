@@ -721,3 +721,107 @@ button{cursor:pointer}
   .colorful-home .hero-card{min-height:180px}
   .colorful-home .hero-card h2{font-size:23px}
 }
+
+
+/* =========================================================
+   V25 IMAGE EDITION — 실제 이미지 자산을 포함한 ERP 디자인
+   ========================================================= */
+
+/* ERP 홈 메인 이미지 */
+.colorful-home .hero-card{
+  background:
+    linear-gradient(90deg,rgba(5,27,64,.92) 0%,rgba(8,53,111,.70) 48%,rgba(4,25,55,.28) 100%),
+    url("assets/erp-hero.svg") center 56%/cover no-repeat!important;
+  min-height:235px!important;
+}
+.colorful-home .hero-card:before{display:none!important}
+.colorful-home .hero-card:after{
+  content:"Good Food, Better People";
+  right:34px;top:28px;font-size:15px;font-style:italic;letter-spacing:.04em;
+  color:rgba(255,255,255,.72)
+}
+
+/* 점포관리 상단 */
+#view-stores .module-hero{
+  background:
+    linear-gradient(90deg,rgba(234,245,255,.96),rgba(255,255,255,.82)),
+    url("assets/erp-hero.svg") 82% 50%/520px auto no-repeat!important;
+}
+
+/* 점포 4개 카드 — 각 점포별 이미지 */
+#view-stores .module-card{
+  min-height:245px!important;
+  padding:22px!important;
+  display:flex!important;flex-direction:column!important;justify-content:flex-end!important;
+  color:#fff!important;border:0!important;box-shadow:0 12px 28px rgba(18,39,68,.15)!important
+}
+#view-stores .module-card:nth-child(1){
+  background:linear-gradient(180deg,rgba(10,42,89,.18),rgba(6,31,68,.88)),url("assets/store-koreahouse.svg") center/cover no-repeat!important
+}
+#view-stores .module-card:nth-child(2){
+  background:linear-gradient(180deg,rgba(5,80,64,.12),rgba(4,68,55,.88)),url("assets/store-gilchaejeong.svg") center/cover no-repeat!important
+}
+#view-stores .module-card:nth-child(3){
+  background:linear-gradient(180deg,rgba(75,42,125,.12),rgba(54,30,94,.88)),url("assets/store-soba.svg") center/cover no-repeat!important
+}
+#view-stores .module-card:nth-child(4){
+  background:linear-gradient(180deg,rgba(151,58,12,.12),rgba(105,40,7,.88)),url("assets/store-hyojong.svg") center/cover no-repeat!important
+}
+#view-stores .module-card h3,#view-stores .module-card h4,
+#view-stores .module-card p,#view-stores .module-card small{color:#fff!important}
+#view-stores .module-card p,#view-stores .module-card small{opacity:.82}
+#view-stores .module-card .status-badge,
+#view-stores .module-card .module-status{
+  background:rgba(255,255,255,.88)!important;color:#087d58!important;border:0!important
+}
+#view-stores .module-card button{
+  background:rgba(255,255,255,.94)!important;color:#17385f!important;
+  border:1px solid rgba(255,255,255,.65)!important;backdrop-filter:blur(5px)
+}
+#view-stores .module-card:nth-child(2) button{color:#08785d!important}
+#view-stores .module-card:nth-child(3) button{color:#6840ad!important}
+#view-stores .module-card:nth-child(4) button{color:#bd5717!important}
+
+/* 신규점포 개설 이미지 헤더 */
+#view-opening .module-hero{
+  background:
+    linear-gradient(90deg,rgba(255,247,227,.97),rgba(255,255,255,.72)),
+    url("assets/opening.svg") 85% 55%/540px auto no-repeat!important;
+  min-height:150px
+}
+#view-opening .module-hero:after{
+  content:"NEW STORY, BIGGER TOGETHER";
+  position:absolute;right:42px;bottom:24px;color:#d99b2c;opacity:.55;
+  font-size:12px;letter-spacing:.16em;font-weight:800
+}
+
+/* 상세 메뉴 공통 이미지 분위기 */
+#view-schedule .module-hero,
+#view-sales .module-hero,
+#view-hq .module-hero,
+#view-support .module-hero,
+#view-settlement .module-hero,
+#view-vehicle .module-hero,
+#view-tools .module-hero{
+  background-image:
+    linear-gradient(90deg,var(--module-soft,#eef5ff) 0%,rgba(255,255,255,.90) 64%),
+    url("assets/erp-hero.svg")!important;
+  background-position:0 0,100% 52%!important;
+  background-size:auto,430px auto!important;
+  background-repeat:no-repeat!important
+}
+
+/* 홈 영업실적 점포 카드에도 이미지 띠 */
+.colorful-home .sales-store-card{position:relative;padding-top:64px!important;overflow:hidden}
+.colorful-home .sales-store-card:before{
+  content:"";position:absolute;left:0;right:0;top:0;height:58px;background-size:cover;background-position:center
+}
+.colorful-home .sales-store-card:nth-child(1):before{background-image:linear-gradient(90deg,rgba(20,80,160,.15),rgba(20,80,160,.15)),url("assets/store-koreahouse.svg")}
+.colorful-home .sales-store-card:nth-child(2):before{background-image:linear-gradient(90deg,rgba(70,40,120,.12),rgba(70,40,120,.12)),url("assets/store-soba.svg")}
+.colorful-home .sales-store-card:nth-child(3):before{background-image:linear-gradient(90deg,rgba(10,110,80,.12),rgba(10,110,80,.12)),url("assets/store-gilchaejeong.svg")}
+.colorful-home .sales-store-card:nth-child(4):before{background-image:linear-gradient(90deg,rgba(180,70,10,.12),rgba(180,70,10,.12)),url("assets/store-hyojong.svg")}
+
+@media(max-width:900px){
+  #view-stores .module-card{min-height:210px!important}
+  .colorful-home .hero-card{min-height:205px!important}
+}
