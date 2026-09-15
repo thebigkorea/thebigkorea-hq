@@ -60,76 +60,12 @@
   </section>
 
   <section class="tabs">
-  <button class="tab active" onclick="showTab('list', this)">
-    개설 체크리스트
-  </button>
-
-  <button class="tab" onclick="showTab('project', this)">
-    점포등록
-  </button>
-
-  <button
-  type="button"
-  id="taskTabButton"
-  class="tab"
-  onclick="showTab('task', this)">
-  업무등록
-</button>
-
- <button class="tab" onclick="showTab('schedule', this)">
-  업무현황
-</button>
-
-  <button class="tab" onclick="showTab('expenseSave', this)">
-    출납내역 저장
-  </button>
-
-  <button class="tab" onclick="showTab('expenseLookup', this)">
-    출납내역 조회
-  </button>
+  <button class="tab active" onclick="showTab('project', this)">점포등록</button>
+  <button type="button" id="taskTabButton" class="tab" onclick="showTab('task', this)">업무등록</button>
+  <button class="tab" onclick="showTab('schedule', this)">업무처리현황</button>
+  <button class="tab" onclick="showTab('expenseSave', this)">출납내역 저장</button>
+  <button class="tab" onclick="showTab('expenseLookup', this)">출납내역 조회</button>
 </section>
-
-  <section id="list" class="panel active">
-
-  <div class="project-overview-header">
-    <div>
-      <h2>등록 점포 현황</h2>
-      <p>점포 카드를 클릭하면 등록한 개설정보와 메모·주의사항을 상세 조회할 수 있습니다.</p>
-    </div>
-  </div>
-
-  <div id="projectList" class="project-list project-overview-list"></div>
-
-  <div class="checklist-header">
-
-    <div>
-      <h2>신규점포 개설 업무 체크리스트</h2>
-
-      <p>
-  필요한 업무를 체크하면 업무등록 화면으로 이동하며
-  업무구분과 업무명이 자동으로 입력됩니다.
-</p>
-    </div>
-
-    <div class="checklist-total">
-  <strong id="checklistTotalCount">0</strong>
-  <span>전체 업무</span>
-</div>
-
-  </div>
-
-
-  <div
-  id="openingChecklist"
-  class="opening-checklist">
-
-  <div class="checklist-loading">
-    체크리스트를 불러오는 중입니다...
-  </div>
-
-</div>
-</section>
-
 <div
   id="checklistModal"
   class="checklist-modal hidden">
@@ -254,7 +190,7 @@ label>
 
 </div>
 
-  <section id="project" class="panel">
+  <section id="project" class="panel active">
 
     <h2>신규점포 등록</h2>
 
@@ -331,6 +267,14 @@ label>
       점포 프로젝트 저장
     </button>
 
+    <div class="project-overview-header" style="margin-top:34px;">
+      <div>
+        <h2>등록 점포 현황</h2>
+        <p>점포 카드를 클릭하면 등록한 개설정보와 메모·주의사항을 상세 조회할 수 있습니다.</p>
+      </div>
+    </div>
+    <div id="projectList" class="project-list project-overview-list"></div>
+
   </section>
 
 
@@ -360,12 +304,43 @@ label>
   <section id="task" class="panel">
 
     <h2>업무 등록</h2>
+    <p>먼저 점포를 선택한 뒤 아래 개설 체크리스트에서 필요한 업무를 선택하면 업무구분과 업무명이 자동 입력됩니다.</p>
 
-    <div class="form-grid">
-
-      <label>점포 선택
+    <div class="form-grid" style="margin-bottom:24px;">
+      <label>업무등록 대상 점포
         <select id="taskProjectId"></select>
       </label>
+    </div>
+
+<div class="checklist-header">
+
+    <div>
+      <h2>신규점포 개설 업무 체크리스트</h2>
+
+      <p>
+  필요한 업무를 체크하면 업무등록 화면으로 이동하며
+  업무구분과 업무명이 자동으로 입력됩니다.
+</p>
+    </div>
+
+    <div class="checklist-total">
+  <strong id="checklistTotalCount">0</strong>
+  <span>전체 업무</span>
+</div>
+
+  </div>
+
+
+  <div
+  id="openingChecklist"
+  class="opening-checklist">
+
+  <div class="checklist-loading">
+    체크리스트를 불러오는 중입니다...
+  </div>
+    <h2 style="margin-top:34px;">선택 업무 등록</h2>
+
+    <div class="form-grid">
 
       <label>업무구분
         <select id="taskCategory">
@@ -418,7 +393,7 @@ label>
 
   <section id="schedule" class="panel">
 
-  <h2>점포별 업무 진행현황</h2>
+  <h2>점포별 업무처리현황</h2>
 
   <div class="schedule-project-filter">
 
@@ -428,8 +403,7 @@ label>
   </label>
 
   <p>
-    점포를 선택한 후 조회 버튼을 누르면
-    미시작·진행중·지연·완료 업무 전체가 표시됩니다.
+    점포를 선택한 후 조회하면 담당자가 처리할 업무와 완료된 처리이력을 확인할 수 있습니다.
   </p>
 
   <button
@@ -454,7 +428,7 @@ label>
   class="print-schedule-header">
 
   <h1 id="printScheduleStoreName">
-    신규점포 업무 진행현황
+    신규점포 업무처리현황
   </h1>
 
   <p id="printScheduleDate"></p>

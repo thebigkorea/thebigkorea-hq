@@ -4,6 +4,7 @@ const API_URL =
 let projects = [];
 let tasks = [];
 let checklistItems = [];
+let taskProcessHistories = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   setupChecklistTaskLinks();
@@ -390,7 +391,7 @@ async function loadSchedule() {
 
   box.innerHTML = `
     <div class="schedule-empty">
-      업무현황을 불러오는 중입니다...
+      업무처리현황을 불러오는 중입니다...
     </div>
   `;
 
@@ -417,7 +418,7 @@ async function loadSchedule() {
         <div class="schedule-empty">
           ${data && data.message
             ? data.message
-            : "업무현황을 불러오지 못했습니다."}
+            : "업무처리현황을 불러오지 못했습니다."}
         </div>
       `;
 
@@ -429,6 +430,11 @@ async function loadSchedule() {
         ? data.schedules
         : [];
 
+    taskProcessHistories =
+      Array.isArray(data.histories)
+        ? data.histories
+        : [];
+
     renderSchedule(schedules);
 
   } catch (err) {
@@ -437,7 +443,7 @@ async function loadSchedule() {
 
     box.innerHTML = `
       <div class="schedule-empty">
-        업무현황을 불러오지 못했습니다.
+        업무처리현황을 불러오지 못했습니다.
       </div>
     `;
   }
@@ -718,6 +724,29 @@ function getTaskStatusClass(status) {
 }
 
 
+
+function renderTaskProcessHistory(taskId) {
+  const rows = taskProcessHistories
+    .filter(row => String(row.taskId) === String(taskId))
+    .sort((a,b) => String(b.processedAt || "").localeCompare(String(a.processedAt || "")));
+
+  if (!rows.length) return "";
+
+  return `
+    <div class="task-process-history">
+      <strong>업무 처리이력</strong>
+      ${rows.map(row => `
+        <div class="task-process-history-item">
+          <span>${safeText(row.processedAt || "")} · ${safeText(row.status || "")}</span>
+          <p>${safeText(row.processContent || "-")}</p>
+          ${row.followUp ? `<small>후속조치: ${safeText(row.followUp)}</small>` : ""}
+          ${row.issue ? `<small>특이사항/문제점: ${safeText(row.issue)}</small>` : ""}
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
 function renderActiveTaskCard(task) {
 
   const statusClass =
@@ -796,6 +825,8 @@ function renderActiveTaskCard(task) {
 
         </div>
 
+        ${renderTaskProcessHistory(task.taskId)}
+
       </div>
 
       <div class="task-actions">
@@ -860,103 +891,89 @@ function renderCompletedTaskCard(task) {
         <strong>100%</strong>
       </div>
 
+      ${renderTaskProcessHistory(task.taskId)}
+
     </article>
   `;
 }
 
 
 async function updateTaskProgress(taskId) {
-  if (!taskId) {
-    alert("업무 ID가 없습니다.");
-    return;
-  }
+  if (!taskId) return alert("업무 ID가 없습니다.");
 
-  let progress = prompt("현재 진행률을 숫자로 입력하세요. 예: 30, 50, 80");
+  let progress = prompt("현재 진행률을 입력하세요. 예: 30, 50, 80");
   if (progress === null) return;
+  progress = Math.max(0, Math.min(100, Number(String(progress).replace(/[^0-9]/g, "") || 0)));
 
-  progress = progress.replace(/[^0-9]/g, "");
-  progress = Math.max(0, Math.min(100, Number(progress || 0)));
-
-  const adminMemo = prompt("관리자 메모를 입력하세요.", "") || "";
-
+  const processContent = prompt("이번에 처리한 업무 내용을 구체적으로 입력하세요.", "");
+  if (processContent === null || !processContent.trim()) {
+    return alert("업무 처리내용을 입력하세요.");
+  }
+  const followUp = prompt("후속조치 또는 다음 할 일을 입력하세요.", "") || "";
   const status = progress >= 100 ? "완료" : "진행중";
 
   const data = await api({
-    action: "updateOpeningTask",
-    taskId: taskId,
-    status: status,
-    progress: progress,
-    delayReason: "",
-    adminMemo: adminMemo
+    action: "processOpeningTask",
+    taskId,
+    status,
+    progress,
+    processContent,
+    followUp,
+    issue: ""
   });
 
-  alert(data.message || "진행상태가 수정되었습니다.");
-  await Promise.all([
-    loadProjects(true),
-    loadSchedule()
-  ]);
+  alert(data.message || "업무 처리내용이 등록되었습니다.");
+  await Promise.all([loadProjects(true), loadSchedule()]);
 }
-
 async function delayTask(taskId) {
-  if (!taskId) {
-    alert("업무 ID가 없습니다.");
-    return;
-  }
+  if (!taskId) return alert("업무 ID가 없습니다.");
 
-  const delayReason = prompt("지연 사유를 입력하세요.", "");
-  if (delayReason === null) return;
+  const issue = prompt("지연 사유 또는 문제점을 입력하세요.", "");
+  if (issue === null || !issue.trim()) return;
 
-  let progress = prompt("현재 진행률을 입력하세요. 예: 20, 40, 60", "0");
+  let progress = prompt("현재 진행률을 입력하세요.", "0");
   if (progress === null) return;
+  progress = Math.max(0, Math.min(100, Number(String(progress).replace(/[^0-9]/g, "") || 0)));
 
-  progress = progress.replace(/[^0-9]/g, "");
-  progress = Math.max(0, Math.min(100, Number(progress || 0)));
-
-  const adminMemo = prompt("관리자 메모를 입력하세요.", "") || "";
+  const processContent = prompt("현재까지 처리한 내용을 입력하세요.", "") || "";
+  const followUp = prompt("후속조치 또는 해결계획을 입력하세요.", "") || "";
 
   const data = await api({
-    action: "updateOpeningTask",
-    taskId: taskId,
+    action: "processOpeningTask",
+    taskId,
     status: "지연",
-    progress: progress,
-    delayReason: delayReason,
-    adminMemo: adminMemo
+    progress,
+    processContent,
+    followUp,
+    issue
   });
 
-  alert(data.message || "지연상태가 등록되었습니다.");
-  await Promise.all([
-    loadProjects(true),
-    loadSchedule()
-  ]);
+  alert(data.message || "지연 처리내용이 등록되었습니다.");
+  await Promise.all([loadProjects(true), loadSchedule()]);
 }
-
 async function completeTask(taskId) {
-  if (!taskId) {
-    alert("업무 ID가 없습니다.");
-    return;
+  if (!taskId) return alert("업무 ID가 없습니다.");
+  if (!confirm("이 업무를 완료 처리하시겠습니까?")) return;
+
+  const processContent = prompt("최종 업무 처리내용을 입력하세요.", "");
+  if (processContent === null || !processContent.trim()) {
+    return alert("완료 처리내용을 입력하세요.");
   }
-
-  const ok = confirm("이 업무를 완료 처리하시겠습니까?");
-  if (!ok) return;
-
-  const adminMemo = prompt("완료 메모를 입력하세요.", "완료 처리") || "";
+  const followUp = prompt("후속조치가 있으면 입력하세요.", "") || "";
 
   const data = await api({
-    action: "updateOpeningTask",
-    taskId: taskId,
+    action: "processOpeningTask",
+    taskId,
     status: "완료",
     progress: "100",
-    delayReason: "",
-    adminMemo: adminMemo
+    processContent,
+    followUp,
+    issue: ""
   });
 
-  alert(data.message || "완료 처리되었습니다.");
-  await Promise.all([
-    loadProjects(true),
-    loadSchedule()
-  ]);
+  alert(data.message || "업무가 완료 처리되었습니다.");
+  await Promise.all([loadProjects(true), loadSchedule()]);
 }
-
 async function saveExpense() {
   const projectId = val("expenseProjectId");
   const expenseDate = val("expenseDate");
@@ -1314,6 +1331,12 @@ function setupChecklistTaskLinks() {
         return;
       }
 
+      if (!val("taskProjectId")) {
+        alert("먼저 업무등록 대상 점포를 선택하세요.");
+        checkbox.checked = false;
+        return;
+      }
+
       const item =
         checkbox.closest(
           ".checklist-item"
@@ -1466,7 +1489,7 @@ function printScheduleReport() {
   document.getElementById(
     "printScheduleStoreName"
   ).textContent =
-    storeName + " 개설 업무 진행현황";
+    storeName + " 개설 업무처리현황";
 
   document.getElementById(
     "printScheduleDate"
@@ -1481,7 +1504,7 @@ function printScheduleReport() {
     document.title;
 
   document.title =
-    storeName + " 개설 업무 진행현황";
+    storeName + " 개설 업무처리현황";
 
   const finishPrint = function() {
 
