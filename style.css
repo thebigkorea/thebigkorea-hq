@@ -892,3 +892,41 @@ button{cursor:pointer}
     padding:76px 10px 10px!important;
   }
 }
+
+
+/* =========================================================
+   V32 - 상단 ERP 배너 이미지만 교체
+   다른 화면/카드/기능은 변경하지 않음
+   ========================================================= */
+.colorful-home .hero-card{
+  position:relative!important;
+  overflow:hidden!important;
+  background:
+    linear-gradient(90deg,
+      rgba(7,45,101,.98) 0%,
+      rgba(10,72,157,.91) 30%,
+      rgba(7,51,112,.34) 58%,
+      rgba(4,31,73,.78) 100%),
+    url("assets/hero-thebigkorea.jpg") center right/cover no-repeat!important;
+}
+.colorful-home .hero-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.01),rgba(0,0,0,.10));
+}
+.colorful-home .hero-card > *{
+  position:relative;
+  z-index:1;
+}
+@media(max-width:900px){
+  .colorful-home .hero-card{
+    background:
+      linear-gradient(90deg,
+        rgba(7,45,101,.98) 0%,
+        rgba(9,64,137,.90) 52%,
+        rgba(4,31,73,.72) 100%),
+      url("assets/hero-thebigkorea.jpg") center/cover no-repeat!important;
+  }
+}
