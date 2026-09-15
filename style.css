@@ -991,3 +991,98 @@ button{cursor:pointer}
   box-sizing:border-box !important;
 }
 
+
+
+/* =========================================================
+   운영지원 > 더큰코리아 MasterData 통합조회
+========================================================= */
+.operations-hero{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  background:linear-gradient(135deg,#fff 0%,#f7f9fc 100%);
+  border-top:4px solid #3573d4;
+}
+.operations-hero-actions{display:flex;gap:8px;flex-wrap:wrap}
+.operations-hero-actions button{
+  border:0;background:var(--navy);color:#fff;border-radius:9px;
+  min-height:38px;padding:0 14px;font-size:11px;font-weight:900;
+}
+.master-panel{
+  background:#fff;border:1px solid var(--line);border-radius:18px;
+  padding:20px;box-shadow:var(--shadow);
+}
+.master-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}
+.master-head h3{margin:0;font-size:18px}
+.master-head p{margin:6px 0 0;color:var(--muted);font-size:11px}
+.master-source-badge{
+  flex:0 0 auto;background:#eef4ff;color:#2f66bd;border:1px solid #d7e5fb;
+  border-radius:999px;padding:7px 10px;font-size:10px;font-weight:900;
+}
+.master-search-row{margin-top:16px}
+.master-search-box{
+  min-height:48px;border:1px solid #cfd8e3;border-radius:13px;background:#f9fbfd;
+  display:flex;align-items:center;gap:9px;padding:0 10px 0 14px;
+}
+.master-search-box>span{font-size:17px}
+.master-search-box input{
+  flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--text);
+  font-size:12px;font-weight:700;
+}
+.master-search-box button{
+  border:0;background:#e9eef4;color:#536170;border-radius:8px;
+  height:32px;padding:0 10px;font-size:10px;font-weight:900;
+}
+.master-category-tabs{
+  display:flex;gap:7px;overflow-x:auto;padding:14px 0 8px;scrollbar-width:thin;
+}
+.master-tab{
+  flex:0 0 auto;border:1px solid var(--line);background:#fff;color:#5d6b79;
+  border-radius:999px;padding:8px 11px;font-size:10px;font-weight:900;
+}
+.master-tab:hover{border-color:#9fb7d8;background:#f8fbff}
+.master-tab.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.master-summary{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0 14px;
+}
+.master-summary>div{
+  border:1px solid var(--line);background:#f8fafc;border-radius:12px;padding:12px 14px;
+}
+.master-summary span,.master-summary strong{display:block}
+.master-summary span{font-size:9px;color:var(--muted);font-weight:900}
+.master-summary strong{font-size:14px;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.master-results{display:grid;gap:13px}
+.master-sheet-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.master-sheet-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:12px 14px;background:#f6f8fb;border-bottom:1px solid var(--line);
+}
+.master-sheet-head h4{margin:0;font-size:13px}
+.master-sheet-head span{font-size:9px;color:var(--muted);font-weight:900}
+.master-table-wrap{overflow:auto;max-height:470px}
+.master-table{border-collapse:collapse;width:max-content;min-width:100%;font-size:10px}
+.master-table th{
+  position:sticky;left:0;z-index:2;min-width:42px;background:#f7f9fb;color:#8995a2;
+  border-right:1px solid var(--line);border-bottom:1px solid #edf0f3;padding:9px;text-align:center;
+}
+.master-table td{
+  min-width:125px;max-width:260px;padding:9px 10px;border-bottom:1px solid #edf0f3;
+  border-right:1px solid #f0f2f5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.master-table tr:first-child td{background:#eef3f8;color:#3d4c5c;font-weight:900}
+.master-table tr:hover td{background:#fffaf2}
+.master-empty{color:#c1c8d0}
+.master-no-result{
+  border:1px dashed #cfd8e3;border-radius:14px;padding:38px 20px;text-align:center;color:var(--muted)
+}
+.master-no-result strong,.master-no-result span{display:block}
+.master-no-result strong{color:var(--text);font-size:14px;margin-bottom:7px}
+.master-security-note{
+  margin-top:14px;border:1px solid #ead7b6;background:#fff9ed;border-radius:12px;
+  padding:12px 14px;display:flex;align-items:flex-start;gap:9px;font-size:10px;line-height:1.55;color:#765d38;
+}
+.master-security-note strong{white-space:nowrap}
+@media(max-width:900px){
+  .operations-hero{align-items:flex-start;flex-direction:column}
+  .master-panel{padding:14px}
+  .master-summary{grid-template-columns:1fr}
+  .master-head{flex-direction:column}
+}
