@@ -190,9 +190,23 @@ function buildOperationsView(){
         <h2>더큰코리아 운영정보센터</h2>
         <p>매장점검·공지사항과 회사 MasterData를 한 화면에서 빠르게 조회합니다.</p>
       </div>
-      <div class="operations-hero-actions">
-        <button onclick="openModule('operations','매장점검대시보드')">매장점검 ↗</button>
-        <button onclick="openModule('operations','공지사항')">공지사항 ↗</button>
+      <div class="operations-hero-actions operations-card-actions">
+        <button class="operations-link-card" onclick="openModule('operations','매장점검대시보드')">
+          <span class="operations-link-icon">🏬</span>
+          <span class="operations-link-copy">
+            <strong>매장점검 대시보드</strong>
+            <small>점포 피드백 · 보완요청 · 조치현황</small>
+          </span>
+          <b>→</b>
+        </button>
+        <button class="operations-link-card" onclick="openModule('operations','공지사항')">
+          <span class="operations-link-icon">📢</span>
+          <span class="operations-link-copy">
+            <strong>공지사항</strong>
+            <small>운영지침 · 행사 · 교육 · 긴급사항</small>
+          </span>
+          <b>→</b>
+        </button>
       </div>
     </section>
 
