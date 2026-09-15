@@ -5,9 +5,10 @@ let projects = [];
 let tasks = [];
 let checklistItems = [];
 let taskProcessHistories = [];
+let currentProjectFilter = "all";
 
 const OPENING_CACHE_KEY = "thebigkorea_store_opening_bootstrap_v2";
-const OPENING_CACHE_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30일: 화면은 캐시를 즉시 표시하고 서버에서 뒤에서 갱신
+const OPENING_CACHE_MAX_AGE = 24 * 60 * 60 * 1000;
 
 function saveOpeningCache_() {
   try {
@@ -25,8 +26,7 @@ function restoreOpeningCache_() {
     if (!raw) return false;
     const cached = JSON.parse(raw);
     if (!cached || !Array.isArray(cached.projects) || !Array.isArray(cached.checklistItems)) return false;
-    // 오래된 캐시라도 먼저 화면에 표시합니다.
-    // 서버 최신 데이터는 loadInitialData()가 백그라운드에서 다시 받아 덮어씁니다.
+    if (Date.now() - Number(cached.savedAt || 0) > OPENING_CACHE_MAX_AGE) return false;
     projects = cached.projects;
     checklistItems = cached.checklistItems;
     const now = Date.now();
@@ -93,88 +93,151 @@ let projectsLoadedAt = 0;
 let checklistLoadedAt = 0;
 
 async function loadInitialData() {
-  // 1) 이전에 받아둔 데이터를 즉시 그립니다.
-  // Apps Script가 콜드 스타트 중이어도 등록점포/체크리스트 화면은 바로 보입니다.
   const restored = restoreOpeningCache_();
   const checklistBox = document.getElementById("openingChecklist");
 
   if (!restored && checklistBox) {
     checklistBox.innerHTML = `
       <div class="checklist-loading">
-        최초 데이터를 불러오는 중입니다...
+        신규점포 데이터를 불러오는 중입니다...
       </div>
     `;
   }
 
-  // 2) 서버 최신 데이터는 뒤에서 한 번만 갱신합니다.
-  // 화면 표시를 이 요청이 끝날 때까지 기다리지 않습니다.
   try {
-    const data = await api({ action: "getOpeningBootstrapFast" }, 15000);
+    const data = await api({ action: "getOpeningBootstrapFast", t: Date.now() }, 12000);
 
     if (!data || data.success === false) {
       throw new Error(data && data.message ? data.message : "초기 데이터 조회 실패");
     }
 
-    const nextProjects = Array.isArray(data.projects) ? data.projects : [];
-    const nextChecklistItems = Array.isArray(data.checklistItems) ? data.checklistItems : [];
-
-    // 서버에서 정상 배열이 왔을 때만 현재 화면 데이터를 교체합니다.
-    projects = nextProjects;
-    checklistItems = nextChecklistItems;
+    projects = Array.isArray(data.projects) ? data.projects : [];
+    checklistItems = Array.isArray(data.checklistItems) ? data.checklistItems : [];
 
     const now = Date.now();
     projectsLoadedAt = now;
     checklistLoadedAt = now;
-
     renderProjects();
     renderChecklistItems();
     saveOpeningCache_();
   } catch (err) {
     console.error("초기 데이터 갱신 실패:", err);
-
-    // 캐시 화면이 이미 있으면 그대로 유지합니다.
     if (!restored && checklistBox) {
       checklistBox.innerHTML = `
         <div class="checklist-loading">
-          서버 응답이 지연되고 있습니다. 잠시 후 새로고침해 주세요.
+          서버 응답이 지연되고 있습니다. 새로고침해 주세요.
         </div>
       `;
     }
   }
 }
 
+function projectIsCompleted_(p) {
+  return String((p && p.status) || "").trim() === "오픈완료" ||
+         Number((p && p.progress) || 0) >= 100;
+}
+
+function projectCreatedSortValue_(p) {
+  const created = String((p && p.createdAt) || "").trim();
+  if (created) {
+    const parsed = Date.parse(created);
+    if (!Number.isNaN(parsed)) return parsed;
+  }
+
+  const id = String((p && p.projectId) || "");
+  const m = id.match(/SO-(\d+)/);
+  return m ? Number(m[1]) : 0;
+}
+
+function setProjectFilter(filter, button) {
+  currentProjectFilter = filter || "all";
+
+  document.querySelectorAll(".project-filter").forEach(function(btn) {
+    btn.classList.toggle("active", btn.dataset.filter === currentProjectFilter);
+  });
+
+  if (button) button.classList.add("active");
+  renderProjects();
+}
+
 function renderProjects() {
-  document.getElementById("totalProjects").textContent = projects.length;
+  const totalEl = document.getElementById("totalProjects");
+  if (totalEl) totalEl.textContent = projects.length;
 
   let activeProjectCount = 0;
   let openSoonCount = 0;
-  const list = document.getElementById("projectList");
-  if (list) list.innerHTML = "";
+  let completedCount = 0;
 
+  const list = document.getElementById("projectList");
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const cards = [];
+  projects.forEach(function(p) {
+    const completed = projectIsCompleted_(p);
 
-  projects.forEach(p => {
-    const progress = Number(p.progress || 0);
-
-    if (p.status !== "오픈완료" && progress < 100) {
+    if (completed) {
+      completedCount++;
+    } else {
       activeProjectCount++;
     }
 
-    if (p.openDate) {
+    if (!completed && p.openDate) {
       const openDate = new Date(p.openDate + "T00:00:00");
       const diffDays = Math.ceil((openDate - today) / 86400000);
       if (diffDays >= 0 && diffDays <= 30) openSoonCount++;
     }
+  });
 
-    cards.push(`
-      <div class="project-card project-card-clickable"
-           role="button"
-           tabindex="0"
-           onclick="openProjectDetail('${safeText(p.projectId)}')"
-           onkeydown="if(event.key==='Enter'){openProjectDetail('${safeText(p.projectId)}')}">
+  const allCountEl = document.getElementById("filterAllCount");
+  const preparingCountEl = document.getElementById("filterPreparingCount");
+  const completedCountEl = document.getElementById("filterCompletedCount");
+
+  if (allCountEl) allCountEl.textContent = projects.length;
+  if (preparingCountEl) preparingCountEl.textContent = activeProjectCount;
+  if (completedCountEl) completedCountEl.textContent = completedCount;
+
+  const activeEl = document.getElementById("avgProgress");
+  if (activeEl) activeEl.textContent = activeProjectCount;
+
+  const openSoonEl = document.getElementById("openSoon");
+  if (openSoonEl) openSoonEl.textContent = openSoonCount;
+
+  if (!list) {
+    fillProjectSelects();
+    return;
+  }
+
+  const sorted = [...projects].sort(function(a, b) {
+    return projectCreatedSortValue_(b) - projectCreatedSortValue_(a);
+  });
+
+  const filtered = sorted.filter(function(p) {
+    const completed = projectIsCompleted_(p);
+    if (currentProjectFilter === "completed") return completed;
+    if (currentProjectFilter === "preparing") return !completed;
+    return true;
+  });
+
+  if (!filtered.length) {
+    const message =
+      currentProjectFilter === "completed" ? "개설완료된 점포가 없습니다." :
+      currentProjectFilter === "preparing" ? "개설준비중인 점포가 없습니다." :
+      "등록된 점포가 없습니다.";
+
+    list.innerHTML = '<div class="project-list-empty">' + message + '</div>';
+    fillProjectSelects();
+    return;
+  }
+
+  list.innerHTML = filtered.map(function(p) {
+    const progress = Math.max(0, Math.min(100, Number(p.progress || 0)));
+    const completed = projectIsCompleted_(p);
+    const actionLabel = completed ? "준비중으로 복원" : "개설완료 처리";
+    const actionClass = completed ? "restore" : "complete";
+    const nextStatus = completed ? "preparing" : "completed";
+
+    return `
+      <div class="project-card">
         <div class="project-title">${safeText(p.storeName || "")}</div>
         <div class="project-meta">
           브랜드 : ${safeText(p.brand || "")}<br>
@@ -184,22 +247,74 @@ function renderProjects() {
           상태 : ${safeText(p.status || "")}<br>
           진행률 : ${progress}%
         </div>
+
+        ${completed ? '<span class="project-complete-badge">✓ 개설완료</span>' : ''}
+
         <div class="progress-wrap">
-          <div class="progress-bar" style="width:${Math.max(0, Math.min(100, progress))}%"></div>
+          <div class="progress-bar" style="width:${completed ? 100 : progress}%"></div>
+        </div>
+
+        <div class="project-card-actions">
+          <button
+            type="button"
+            class="project-card-action detail"
+            onclick="openProjectDetail('${safeText(p.projectId)}')">
+            상세조회
+          </button>
+
+          <button
+            type="button"
+            class="project-card-action ${actionClass}"
+            onclick="setProjectCompletion('${safeText(p.projectId)}','${nextStatus}')">
+            ${actionLabel}
+          </button>
         </div>
       </div>
-    `);
-  });
-
-  if (list) list.innerHTML = cards.join("");
-
-  const activeEl = document.getElementById("avgProgress");
-  if (activeEl) activeEl.textContent = activeProjectCount;
-
-  const openSoonEl = document.getElementById("openSoon");
-  if (openSoonEl) openSoonEl.textContent = openSoonCount;
+    `;
+  }).join("");
 
   fillProjectSelects();
+}
+
+async function setProjectCompletion(projectId, mode) {
+  const p = projects.find(function(row) {
+    return String(row.projectId) === String(projectId);
+  });
+
+  if (!p) {
+    alert("점포 정보를 찾지 못했습니다.");
+    return;
+  }
+
+  const completing = mode === "completed";
+  const message = completing
+    ? `"${p.storeName}"을(를) 개설완료 처리하시겠습니까?\n\n직원의 미완료 업무가 있어도 점포는 오픈완료·100%로 처리됩니다.\n기존 업무처리 이력은 삭제되지 않습니다.`
+    : `"${p.storeName}"을(를) 개설준비중으로 복원하시겠습니까?\n\n세부 업무 이력은 그대로 유지됩니다.`;
+
+  if (!confirm(message)) return;
+
+  try {
+    const data = await api({
+      action: "setOpeningProjectCompletion",
+      projectId: projectId,
+      mode: completing ? "completed" : "preparing",
+      t: Date.now()
+    });
+
+    if (!data || data.success === false) {
+      throw new Error((data && data.message) || "처리에 실패했습니다.");
+    }
+
+    alert(data.message || (completing ? "개설완료 처리되었습니다." : "개설준비중으로 복원되었습니다."));
+
+    // 로컬 캐시를 즉시 무효화하고 서버 최신값 조회
+    try { localStorage.removeItem(OPENING_CACHE_KEY); } catch (e) {}
+    projectsLoadedAt = 0;
+    await loadProjects(true);
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "점포 상태 변경 중 오류가 발생했습니다.");
+  }
 }
 
 async function saveProject() {
@@ -226,7 +341,8 @@ async function saveProject() {
   });
 
   alert(data.message || "저장 완료");
-  loadProjects(true);
+  currentProjectFilter = "all";
+  await loadProjects(true);
 }
 
 async function saveTask() {

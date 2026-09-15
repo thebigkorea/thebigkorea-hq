@@ -9,6 +9,30 @@
 <link rel="stylesheet" href="store-opening.css">
 
 
+
+<style>
+.project-overview-top{margin:0 0 12px!important}
+.project-filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}
+.project-filter{border:1px solid #e3d7cf;background:#fff;color:#59483e;border-radius:999px;padding:10px 15px;font-weight:800;cursor:pointer}
+.project-filter strong{margin-left:5px;color:#9a431d}
+.project-filter.active{background:#91401d;color:#fff;border-color:#91401d;box-shadow:0 5px 14px rgba(145,64,29,.18)}
+.project-filter.active strong{color:#fff}
+.project-registration-divider{display:flex;align-items:center;gap:12px;margin:30px 0 18px;color:#7c2d12;font-weight:900;font-size:20px}
+.project-registration-divider:before,.project-registration-divider:after{content:"";height:1px;background:#eaded7;flex:1}
+.project-card-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.project-card-action{border:0;border-radius:10px;padding:9px 12px;font-size:13px;font-weight:800;cursor:pointer}
+.project-card-action.detail{background:#f2ebe7;color:#713315}
+.project-card-action.complete{background:#7c2d12;color:#fff}
+.project-card-action.restore{background:#eef2f7;color:#344054}
+.project-complete-badge{display:inline-flex;align-items:center;margin-top:8px;padding:5px 9px;border-radius:999px;background:#ecfdf3;color:#027a48;font-size:12px;font-weight:900}
+.project-list-empty{grid-column:1/-1;padding:28px;text-align:center;border:1px dashed #dccdc5;border-radius:14px;color:#777;background:#fcfaf9}
+@media(max-width:640px){
+  .project-filter-bar{display:grid;grid-template-columns:1fr 1fr 1fr}
+  .project-filter{padding:9px 5px;font-size:12px}
+  .project-card-actions{display:grid;grid-template-columns:1fr 1fr}
+}
+</style>
+
 </head>
 
 <body>
@@ -179,6 +203,31 @@
 
   <section id="project" class="panel active">
 
+    <div class="project-overview-header project-overview-top">
+      <div>
+        <h2>등록 점포 현황</h2>
+        <p>최근 등록한 점포부터 표시합니다. 상세조회와 개설완료 처리를 카드에서 바로 할 수 있습니다.</p>
+      </div>
+    </div>
+
+    <div class="project-filter-bar" aria-label="등록 점포 필터">
+      <button type="button" class="project-filter active" data-filter="all" onclick="setProjectFilter('all', this)">
+        전체점포 <strong id="filterAllCount">0</strong>
+      </button>
+      <button type="button" class="project-filter" data-filter="preparing" onclick="setProjectFilter('preparing', this)">
+        개설준비중 <strong id="filterPreparingCount">0</strong>
+      </button>
+      <button type="button" class="project-filter" data-filter="completed" onclick="setProjectFilter('completed', this)">
+        개설완료 <strong id="filterCompletedCount">0</strong>
+      </button>
+    </div>
+
+    <div id="projectList" class="project-list project-overview-list"></div>
+
+    <div class="project-registration-divider">
+      <span>신규점포 등록</span>
+    </div>
+
     <h2>신규점포 등록</h2>
 
     <div class="form-grid">
@@ -254,13 +303,6 @@
       점포 프로젝트 저장
     </button>
 
-    <div class="project-overview-header" style="margin-top:34px;">
-      <div>
-        <h2>등록 점포 현황</h2>
-        <p>점포 카드를 클릭하면 등록한 개설정보와 메모·주의사항을 상세 조회할 수 있습니다.</p>
-      </div>
-    </div>
-    <div id="projectList" class="project-list project-overview-list"></div>
 
   </section>
 
