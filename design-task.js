@@ -1,0 +1,662 @@
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbwBT9t47oyGSXCahuJAfqx0LV08wmOQuACFyL_yHcJWCuXSTua2quhgDHPjqFdNV8JQ/exec";
+
+let tasks = [];
+let selectedTaskId = null;
+
+const STORE_OPTIONS = [
+  "한국의집 롯데백화점 동탄점",
+  "카페그랑떼 롯데아울렛 부여점",
+  "더큰식탁과 소바공방",
+  "한국의집효종갱 롯데의왕타임빌라스점",
+  "한국의집 롯데월드몰점",
+  "고호재 롯데월드몰점",
+  "소바공방롯데백화점평촌점",
+  "더큰코리아 본사",
+  "상궁전 롯데백화점 센텀시티점",
+  "고궁 롯데 아울렛 부여점",
+  "소바공방 시흥신세계프리미엄아울렛점",
+  "길채정",
+  "길채정 갤러리아타임월드점",
+  "길채정 AK 프라자 분당점",
+  "한국의집 효종갱 신세계프리미엄아울렛 파주점"
+];
+
+document.addEventListener("DOMContentLoaded", () => {
+  fillStoreSelects();
+  setToday();
+  loadTasks();
+});
+
+function fillStoreSelects(){
+  ["storeName","filterStore","doneStore"].forEach(id => {
+    const select = document.getElementById(id);
+    if(!select) return;
+
+    const firstText = id === "storeName" ? "점포를 선택하세요" : "전체점포";
+    select.innerHTML = `<option value="">${firstText}</option>`;
+
+    STORE_OPTIONS.forEach(name => {
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      select.appendChild(opt);
+    });
+  });
+}
+
+function showTab(id, btn){
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+
+  const panel = document.getElementById(id);
+  if(panel) panel.classList.add("active");
+  if(btn) btn.classList.add("active");
+
+  selectedTaskId = null;
+
+  if(id === "list") loadTasks();
+  if(id === "done") renderDoneTasks();
+}
+
+function setToday(){
+  const today = new Date().toISOString().slice(0,10);
+  const requestDate = document.getElementById("requestDate");
+  if(requestDate && !requestDate.value) requestDate.value = today;
+}
+
+async function saveTask(){
+  const data = {
+    action:"save",
+    storeName:getValue("storeName"),
+    category:getValue("category"),
+    title:getValue("title"),
+    requester:getValue("requester"),
+    owner:getValue("owner"),
+    requestDate:getValue("requestDate"),
+    dueDate:getValue("dueDate"),
+    revisedDueDate:getValue("revisedDueDate"),
+    priority:getValue("priority"),
+    status:"진행중",
+    progress:getValue("progress") || "0",
+    detail:getValue("detail"),
+    delayReason:getValue("delayReason"),
+    feedback:getValue("feedback")
+  };
+
+  if(!data.storeName){ alert("관련 점포를 선택하세요."); return; }
+  if(!data.title){ alert("업무명을 입력하세요."); return; }
+  if(!data.dueDate){ alert("목표일을 입력하세요."); return; }
+
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body:JSON.stringify(data)
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      alert("디자인 업무가 저장되었습니다.");
+      clearForm();
+      await loadTasks();
+      showTab("list", document.querySelectorAll(".tab")[1]);
+    }else{
+      alert(result.message || "저장에 실패했습니다.");
+    }
+  }catch(err){
+    console.error(err);
+    alert("저장 중 오류가 발생했습니다.");
+  }
+}
+
+async function loadTasks(){
+  try{
+    const res = await fetch(API_URL + "?action=list&t=" + Date.now());
+    tasks = await res.json();
+
+    if(!Array.isArray(tasks)) tasks = [];
+
+    renderSummary();
+    renderTasks();
+    renderDoneTasks();
+  }catch(err){
+    console.error(err);
+    alert("업무 목록을 불러오지 못했습니다.");
+  }
+}
+
+function renderSummary(){
+  const today = getTodayDate();
+
+  const active = tasks.filter(t => t.status !== "완료").length;
+  const urgent = tasks.filter(t => t.priority === "긴급" && t.status !== "완료").length;
+  const overdue = tasks.filter(t => {
+    if(!t.dueDate || t.status === "완료") return false;
+    return parseDate(t.dueDate) < today;
+  }).length;
+  const done = tasks.filter(t => t.status === "완료").length;
+
+  setText("activeCount", active);
+  setText("urgentCount", urgent);
+  setText("overdueCount", overdue);
+  setText("doneCount", done);
+}
+
+function renderTasks(){
+  const box = document.getElementById("taskList");
+  if(!box) return;
+
+  const statusFilter = getValue("filterStatus");
+  const priorityFilter = getValue("filterPriority");
+  const storeFilter = getValue("filterStore");
+
+  let list = tasks.filter(t => t.status !== "완료");
+
+  if(selectedTaskId){
+    list = list.filter(t => String(t.id) === String(selectedTaskId));
+  }
+
+  if(statusFilter) list = list.filter(t => t.status === statusFilter);
+  if(priorityFilter) list = list.filter(t => t.priority === priorityFilter);
+  if(storeFilter) list = list.filter(t => t.storeName === storeFilter);
+
+  list.sort((a,b) => {
+    const da = a.dueDate || "9999-12-31";
+    const db = b.dueDate || "9999-12-31";
+    return da.localeCompare(db);
+  });
+
+  if(list.length === 0){
+    box.innerHTML = "<p>진행중인 디자인 업무가 없습니다.</p>";
+    return;
+  }
+
+  const today = getTodayDate();
+
+  let html = "";
+
+  if(selectedTaskId){
+    html += `
+      <button class="small-btn" onclick="backToTaskList()" style="margin-bottom:12px;">
+        전체 목록으로
+      </button>
+    `;
+  }
+
+  html += list.map(t => taskCardHtml(t, today)).join("");
+
+  box.innerHTML = html;
+}
+
+function taskCardHtml(t, today){
+  const overdue =
+    t.dueDate &&
+    t.status !== "완료" &&
+    parseDate(t.dueDate) < today;
+
+  const progress = Number(t.progress || 0);
+
+  let badge = "";
+
+  if(t.status === "지연" || overdue){
+    badge = `<span class="badge danger">지연</span>`;
+  }else if(t.priority === "긴급"){
+    badge = `<span class="badge danger">긴급</span>`;
+  }else if(t.priority === "중요"){
+    badge = `<span class="badge warning">중요</span>`;
+  }else{
+    badge = `<span class="badge">진행</span>`;
+  }
+
+  const isOpen = String(selectedTaskId) === String(t.id);
+
+  return `
+    <div class="task-card compact-card">
+
+      <div class="task-summary-line" onclick="toggleTaskDetail('${escapeAttr(t.id)}')">
+        <div>
+          <h3>${badge}${escapeHtml(t.title || "")}</h3>
+          <p>
+            ${escapeHtml(t.storeName || "-")}
+            · 목표일 ${escapeHtml(t.dueDate || "-")}
+            · 진행률 ${progress}%
+          </p>
+        </div>
+        <strong class="open-label">상세보기</strong>
+      </div>
+
+      <div id="detail_${escapeAttr(t.id)}" class="task-detail" style="display:${isOpen ? "block" : "none"};">
+
+        <p><b>관련 점포:</b> ${escapeHtml(t.storeName || "-")}</p>
+        <p><b>업무유형:</b> ${escapeHtml(t.category || "-")}</p>
+        <p><b>요청자:</b> ${escapeHtml(t.requester || "-")}</p>
+        <p><b>디자인 담당자:</b> ${escapeHtml(t.owner || "-")}</p>
+        <p><b>요청일:</b> ${escapeHtml(t.requestDate || "-")}</p>
+        <p><b>목표일:</b> ${escapeHtml(t.dueDate || "-")}</p>
+        <p><b>수정 목표일:</b> ${escapeHtml(t.revisedDueDate || "-")}</p>
+        <p><b>중요도:</b> ${escapeHtml(t.priority || "-")}</p>
+        <p><b>현재 상태:</b> ${escapeHtml(t.status || "-")}</p>
+
+        <label>진행률(%)
+          <select id="progress_${escapeAttr(t.id)}">
+            ${progressOptions(progress)}
+          </select>
+        </label>
+
+        <button class="small-btn" style="margin-top:8px;" onclick="updateProgress('${escapeAttr(t.id)}')">
+          진행률 등록
+        </button>
+
+        <div class="progress-wrap">
+          <div class="progress-bar" style="width:${progress}%"></div>
+        </div>
+
+        <p><b>관리자 상세 요청사항</b></p>
+        <div class="memo-box">${escapeHtml(t.detail || "-")}</div>
+
+        <p><b>지연사유</b></p>
+        <textarea id="delay_${escapeAttr(t.id)}">${escapeHtml(t.delayReason || "")}</textarea>
+
+        <p><b>수정 목표일</b></p>
+        <input type="date" id="revised_${escapeAttr(t.id)}" value="${escapeHtml(t.revisedDueDate || "")}">
+
+        <p><b>작업요청자 피드백</b></p>
+        <textarea id="feedback_${escapeAttr(t.id)}">${escapeHtml(t.feedback || "")}</textarea>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+          <button class="small-btn" onclick="updateProgress('${escapeAttr(t.id)}')">진행수정</button>
+          <button class="small-btn" onclick="editTask('${escapeAttr(t.id)}')">내용수정</button>
+          <button class="small-btn warning-btn" onclick="delayTask('${escapeAttr(t.id)}')">지연등록</button>
+          <button class="small-btn" onclick="updateFeedback('${escapeAttr(t.id)}')">피드백 저장</button>
+          <button class="small-btn done-btn" onclick="completeTask('${escapeAttr(t.id)}')">완료처리</button>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
+
+async function updateProgress(id){
+  const progress = document.getElementById("progress_" + id)?.value || "0";
+  const feedback = document.getElementById("feedback_" + id)?.value || "";
+
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body:JSON.stringify({
+        action:"updateProgress",
+        id,
+        progress,
+        feedback,
+        status:Number(progress) >= 100 ? "완료" : "진행중"
+      })
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      alert("진행률이 수정되었습니다.");
+
+      selectedTaskId = Number(progress) >= 100 ? null : id;
+
+      await loadTasks();
+
+      if(Number(progress) >= 100){
+        showTab("done", document.querySelectorAll(".tab")[2]);
+      }else{
+        openTaskOnly(id);
+      }
+
+    }else{
+      alert(result.message || "진행률 수정 실패");
+    }
+  }catch(err){
+    console.error(err);
+    alert("진행률 수정 중 오류가 발생했습니다.");
+  }
+}
+
+async function delayTask(id){
+  const progress = document.getElementById("progress_" + id)?.value || "0";
+  const delayReason = document.getElementById("delay_" + id)?.value || "";
+  const revisedDueDate = document.getElementById("revised_" + id)?.value || "";
+
+  if(!delayReason){
+    alert("지연사유를 입력하세요.");
+    return;
+  }
+
+  if(!revisedDueDate){
+    alert("수정 목표일을 입력하세요.");
+    return;
+  }
+
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body:JSON.stringify({
+        action:"delayTask",
+        id,
+        status:"지연",
+        progress,
+        delayReason,
+        revisedDueDate
+      })
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      alert("지연으로 등록되었습니다.");
+      selectedTaskId = id;
+      await loadTasks();
+      openTaskOnly(id);
+    }else{
+      alert(result.message || "지연 등록 실패");
+    }
+  }catch(err){
+    console.error(err);
+    alert("지연 등록 중 오류가 발생했습니다.");
+  }
+}
+
+async function completeTask(id){
+  const ok = confirm("이 디자인 업무를 완료 처리하시겠습니까?");
+  if(!ok) return;
+
+  const feedback = document.getElementById("feedback_" + id)?.value || "";
+
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body:JSON.stringify({
+        action:"completeTask",
+        id,
+        status:"완료",
+        progress:"100",
+        feedback,
+        completedAt:getTodayString()
+      })
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      alert("업무가 완료 처리되었습니다.");
+      selectedTaskId = null;
+      await loadTasks();
+      showTab("done", document.querySelectorAll(".tab")[2]);
+    }else{
+      alert(result.message || "완료 처리 실패");
+    }
+  }catch(err){
+    console.error(err);
+    alert("완료 처리 중 오류가 발생했습니다.");
+  }
+}
+
+async function updateFeedback(id){
+  const feedback = document.getElementById("feedback_" + id)?.value || "";
+
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body:JSON.stringify({
+        action:"updateFeedback",
+        id,
+        feedback
+      })
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      alert("피드백이 저장되었습니다.");
+      selectedTaskId = id;
+      await loadTasks();
+      openTaskOnly(id);
+    }else{
+      alert(result.message || "피드백 저장 실패");
+    }
+  }catch(err){
+    console.error(err);
+    alert("피드백 저장 중 오류가 발생했습니다.");
+  }
+}
+
+function editTask(id){
+  const t = tasks.find(x => String(x.id) === String(id));
+
+  if(!t){
+    alert("수정할 업무를 찾을 수 없습니다.");
+    return;
+  }
+
+  const title = prompt("업무명", t.title || "");
+  if(!title){
+    alert("업무명을 입력하세요.");
+    return;
+  }
+
+  const storeName = prompt("관련 점포", t.storeName || "") || t.storeName || "";
+  const category = prompt("업무유형", t.category || "") || t.category || "";
+  const requester = prompt("요청자", t.requester || "") || t.requester || "";
+  const owner = prompt("디자인 담당자", t.owner || "") || t.owner || "";
+  const dueDate = prompt("목표일 예: 2026-06-10", t.dueDate || "") || t.dueDate || "";
+  const priority = prompt("중요도: 보통 / 중요 / 긴급", t.priority || "보통") || t.priority || "보통";
+  const detail = prompt("관리자 상세 요청사항", t.detail || "") || t.detail || "";
+
+  updateTask({
+    id,
+    storeName,
+    category,
+    title,
+    requester,
+    owner,
+    requestDate:t.requestDate || "",
+    dueDate,
+    priority,
+    detail
+  });
+}
+
+async function updateTask(data){
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body:JSON.stringify({
+        action:"updateTask",
+        ...data
+      })
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      alert("업무 내용이 수정되었습니다.");
+      selectedTaskId = data.id;
+      await loadTasks();
+      openTaskOnly(data.id);
+    }else{
+      alert(result.message || "수정 실패");
+    }
+  }catch(err){
+    console.error(err);
+    alert("내용 수정 중 오류가 발생했습니다.");
+  }
+}
+
+function renderDoneTasks(){
+  const box = document.getElementById("doneTaskList");
+  if(!box) return;
+
+  const store = getValue("doneStore");
+  const start = getValue("doneStartDate");
+  const end = getValue("doneEndDate");
+
+  let list = tasks.filter(t => t.status === "완료");
+
+  if(store) list = list.filter(t => t.storeName === store);
+  if(start) list = list.filter(t => (t.completedAt || t.dueDate || "") >= start);
+  if(end) list = list.filter(t => (t.completedAt || t.dueDate || "") <= end);
+
+  list.sort((a,b) => {
+    const da = a.completedAt || a.dueDate || "1900-01-01";
+    const db = b.completedAt || b.dueDate || "1900-01-01";
+    return db.localeCompare(da);
+  });
+
+  if(list.length === 0){
+    box.innerHTML = "<p>조회된 완료 업무가 없습니다.</p>";
+    return;
+  }
+
+  box.innerHTML = list.map(t => `
+    <div class="task-card compact-card">
+
+      <div class="task-summary-line" onclick="toggleTaskDetail('done_${escapeAttr(t.id)}')">
+        <div>
+          <h3>
+            <span class="badge done">완료</span>
+            ${escapeHtml(t.title || "")}
+          </h3>
+          <p>
+            ${escapeHtml(t.storeName || "-")}
+            · 완료일 ${escapeHtml(t.completedAt || "-")}
+            · 진행률 ${escapeHtml(t.progress || "100")}%
+          </p>
+        </div>
+        <strong class="open-label">상세보기</strong>
+      </div>
+
+      <div id="detail_done_${escapeAttr(t.id)}" class="task-detail" style="display:none;">
+        <p><b>관련 점포:</b> ${escapeHtml(t.storeName || "-")}</p>
+        <p><b>업무유형:</b> ${escapeHtml(t.category || "-")}</p>
+        <p><b>요청자:</b> ${escapeHtml(t.requester || "-")}</p>
+        <p><b>디자인 담당자:</b> ${escapeHtml(t.owner || "-")}</p>
+        <p><b>요청일:</b> ${escapeHtml(t.requestDate || "-")}</p>
+        <p><b>목표일:</b> ${escapeHtml(t.dueDate || "-")}</p>
+        <p><b>수정 목표일:</b> ${escapeHtml(t.revisedDueDate || "-")}</p>
+        <p><b>완료일:</b> ${escapeHtml(t.completedAt || "-")}</p>
+        <p><b>진행률:</b> ${escapeHtml(t.progress || "100")}%</p>
+
+        <p><b>요청사항:</b></p>
+        <div class="memo-box">${escapeHtml(t.detail || "-")}</div>
+
+        <p><b>피드백:</b></p>
+        <div class="memo-box">${escapeHtml(t.feedback || "-")}</div>
+      </div>
+
+    </div>
+  `).join("");
+}
+
+function progressOptions(current){
+  const now = Number(current || 0);
+  let html = "";
+
+  for(let i = 0; i <= 100; i += 10){
+    html += `
+      <option value="${i}" ${now === i ? "selected" : ""}>
+        ${i}${i === 100 ? "% 완료" : "%"}
+      </option>
+    `;
+  }
+
+  return html;
+}
+
+function toggleTaskDetail(id){
+  const detail = document.getElementById("detail_" + id);
+  if(!detail) return;
+
+  detail.style.display =
+    detail.style.display === "none" ? "block" : "none";
+}
+
+function openTaskOnly(id){
+  selectedTaskId = id;
+  renderTasks();
+
+  setTimeout(() => {
+    const detail = document.getElementById("detail_" + id);
+    if(detail) detail.style.display = "block";
+  }, 50);
+}
+
+function backToTaskList(){
+  selectedTaskId = null;
+  renderTasks();
+}
+
+function clearForm(){
+  [
+    "title",
+    "requester",
+    "dueDate",
+    "revisedDueDate",
+    "detail",
+    "delayReason",
+    "feedback"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = "";
+  });
+
+  setValue("storeName", "");
+  setValue("category", "간판");
+  setValue("priority", "보통");
+  setValue("status", "진행중");
+  setValue("progress", "0");
+  setValue("owner", "김병식");
+
+  setToday();
+}
+
+function getValue(id){
+  const el = document.getElementById(id);
+  return el ? String(el.value || "").trim() : "";
+}
+
+function setValue(id, value){
+  const el = document.getElementById(id);
+  if(el) el.value = value;
+}
+
+function setText(id, value){
+  const el = document.getElementById(id);
+  if(el) el.innerText = value;
+}
+
+function getTodayDate(){
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  return today;
+}
+
+function getTodayString(){
+  return new Date().toISOString().slice(0,10);
+}
+
+function parseDate(value){
+  const d = new Date(value);
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+function escapeHtml(value){
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function escapeAttr(value){
+  return String(value || "")
+    .replaceAll("\\", "\\\\")
+    .replaceAll("'", "\\'")
+    .replaceAll('"', "&quot;");
+}

@@ -1,0 +1,579 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #f3f5f9;
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  color: #111;
+}
+
+/* =========================================================
+   전체 화면
+========================================================= */
+
+.container {
+  width: 100%;
+  max-width: 980px;
+  margin: 40px auto;
+  padding: 50px;
+
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+
+/* =========================================================
+   상단 로고
+========================================================= */
+
+.certificate-logo {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.certificate-logo img {
+  width: 220px;
+  height: auto;
+  display: block;
+  margin: 0;
+}
+
+
+/* =========================================================
+   상단 제목
+========================================================= */
+
+/* 조회 화면 상단 로고 */
+
+.top-logo {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.top-logo img {
+  width: 220px;
+  height: auto;
+  display: block;
+  margin: 0;
+}
+
+.top-area {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.top-area h1 {
+  font-size: 54px;
+  color: #173b72;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.top-area p {
+  font-size: 20px;
+  color: #6b7280;
+}
+
+
+/* =========================================================
+   입력 폼
+========================================================= */
+
+.form-box {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 36px;
+  box-shadow: none;
+}
+
+.input-group {
+  margin-bottom: 22px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  height: 78px;
+
+  border-radius: 18px;
+  border: 2px solid #d1d5db;
+
+  padding: 0 24px;
+
+  font-size: 26px;
+  background: #fff;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: #173b72;
+}
+
+
+/* =========================================================
+   버튼
+========================================================= */
+
+button {
+  width: 100%;
+  border: none;
+  border-radius: 20px;
+
+  background: #173b72;
+  color: #fff;
+
+  font-size: 30px;
+  font-weight: 800;
+
+  padding: 22px 20px;
+
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+  opacity: 0.75;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   메시지
+========================================================= */
+
+#message {
+  margin-top: 16px;
+  text-align: center;
+  color: red;
+  font-size: 18px;
+}
+
+
+/* =========================================================
+   증명서 미리보기
+========================================================= */
+
+.preview-box {
+  width: 100%;
+}
+
+
+/* =========================================================
+   실제 A4 경력증명서
+========================================================= */
+
+.paper {
+  width: 794px;
+  min-height: 1123px;
+
+  margin: 40px auto 0;
+
+  background: #fff;
+
+  padding: 72px 70px 62px;
+
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+}
+
+
+/* =========================================================
+   증명서 내부 로고
+========================================================= */
+
+.paper .certificate-logo {
+  text-align: left;
+  margin-bottom: 38px;
+}
+
+.paper .certificate-logo img {
+  width: 220px;
+  height: auto;
+  display: block;
+  margin: 0;
+}
+
+
+/* =========================================================
+   발급번호
+========================================================= */
+
+.issue-no {
+  font-size: 13px;
+  margin-bottom: 42px;
+}
+
+
+/* =========================================================
+   증명서 제목
+========================================================= */
+
+h2 {
+  text-align: center;
+
+  font-size: 34px;
+  font-weight: 800;
+
+  letter-spacing: 16px;
+
+  margin-bottom: 44px;
+}
+
+
+/* =========================================================
+   증명서 표
+========================================================= */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto 38px;
+}
+
+th,
+td {
+  border: 1px solid #222;
+
+  padding: 14px 18px;
+
+  height: 54px;
+
+  font-size: 18px;
+}
+
+th {
+  width: 28%;
+
+  background: #f3f4f6;
+
+  text-align: center;
+
+  font-weight: 800;
+}
+
+td {
+  width: 72%;
+  text-align: left;
+}
+
+
+/* =========================================================
+   하단 증명 문구
+========================================================= */
+
+.bottom-text {
+  text-align: center;
+
+  font-size: 18px;
+
+  line-height: 1.7;
+
+  margin-top: 34px;
+}
+
+#certToday {
+  display: inline-block;
+  margin-top: 20px;
+}
+
+
+/* =========================================================
+   회사 / 대표이사
+========================================================= */
+
+.sign-area {
+  margin-top: 46px;
+
+  text-align: center;
+
+  font-size: 17px;
+
+  line-height: 1.7;
+}
+
+.ceo-line {
+  margin-top: 20px;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  gap: 14px;
+}
+
+.ceo-name {
+  font-size: 21px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   법인 인감
+========================================================= */
+
+.stamp-img {
+  width: 64px;
+  height: 64px;
+
+  object-fit: contain;
+}
+
+
+/* =========================================================
+   인쇄 버튼
+========================================================= */
+
+.print-btn-area {
+  width: 794px;
+
+  margin: 24px auto 0;
+}
+
+.print-btn {
+  width: 100%;
+
+  display: block;
+
+  padding: 22px 20px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  background: #1f4678;
+
+  color: #fff;
+
+  font-size: 24px;
+
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   모바일
+========================================================= */
+
+@media (max-width: 768px) {
+
+  body {
+    background: #fff;
+  }
+
+  .container {
+    width: 100%;
+    margin: 0;
+    padding: 26px 20px;
+
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .certificate-logo img {
+    width: 180px;
+  }
+
+  .top-area {
+    margin-bottom: 30px;
+  }
+
+  .top-area h1 {
+    font-size: 38px;
+  }
+
+  .top-area p {
+    font-size: 17px;
+  }
+
+  .input-group label {
+    font-size: 18px;
+  }
+
+  .input-group input,
+  .input-group select {
+    height: 64px;
+
+    font-size: 20px;
+
+    padding: 0 18px;
+  }
+
+  button {
+    font-size: 22px;
+    padding: 18px;
+  }
+
+  .preview-box {
+    overflow-x: auto;
+  }
+
+  .paper {
+    transform-origin: top left;
+  }
+}
+
+
+/* =========================================================
+   A4 인쇄
+========================================================= */
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+
+@media print {
+
+  html,
+  body {
+    width: 210mm;
+    height: 297mm;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: #fff !important;
+
+    overflow: hidden !important;
+  }
+
+
+  /* 입력 화면 숨김 */
+
+  .no-print,
+  .print-btn-area,
+  .form-box,
+  .top-area {
+    display: none !important;
+  }
+
+
+  /* 전체 영역 */
+
+  .container,
+  .preview-box {
+    width: 210mm !important;
+    height: 297mm !important;
+
+    max-width: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: #fff !important;
+
+    border-radius: 0 !important;
+
+    box-shadow: none !important;
+  }
+
+
+  /* 실제 증명서 */
+
+  .paper {
+    width: 210mm !important;
+    height: 297mm !important;
+
+    min-height: 297mm !important;
+
+    margin: 0 !important;
+
+    padding: 18mm 20mm 12mm !important;
+
+    background: #fff !important;
+
+    box-shadow: none !important;
+  }
+
+
+  /* PDF / 인쇄용 회사 로고 */
+
+  .paper .certificate-logo {
+    display: block !important;
+
+    text-align: left !important;
+
+    margin-bottom: 10mm !important;
+  }
+
+  .paper .certificate-logo img {
+    display: block !important;
+
+    width: 45mm !important;
+
+    height: auto !important;
+
+    margin: 0 !important;
+  }
+
+
+  /* 발급번호 */
+
+  .issue-no {
+    font-size: 12px !important;
+
+    margin-bottom: 10mm !important;
+  }
+
+
+  /* 제목 */
+
+  h2 {
+    font-size: 30px !important;
+
+    margin-bottom: 28px !important;
+  }
+
+
+  /* 표 */
+
+  th,
+  td {
+    font-size: 15px !important;
+
+    padding: 9px 13px !important;
+
+    height: 40px !important;
+  }
+
+
+  /* 하단 */
+
+  .bottom-text {
+    font-size: 15px !important;
+  }
+
+  .sign-area {
+    font-size: 15px !important;
+  }
+
+  .ceo-name {
+    font-size: 18px !important;
+  }
+
+
+  /* 인감 */
+
+  .stamp-img {
+    width: 58px !important;
+    height: 58px !important;
+  }
+}

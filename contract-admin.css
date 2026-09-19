@@ -1,0 +1,591 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #f4f7fb;
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
+  color: #1e293b;
+}
+
+.container {
+  width: min(96vw, 1540px);
+  max-width: 1540px;
+  margin: 0 auto;
+  padding: 18px 18px 28px;
+}
+
+header {
+  text-align: center;
+  margin: 0 0 14px;
+  padding: 8px 0 0;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 38px;
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  color: #1f3d68;
+  font-weight: 900;
+}
+
+header p {
+  margin: 6px 0 0;
+  font-size: 15px;
+  color: #64748b;
+  letter-spacing: 5px;
+}
+
+.header-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px 0 12px;
+}
+
+.ledger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  background: #1f3d68;
+  color: #fff;
+  border-radius: 9px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: .2s;
+}
+
+.ledger-btn:hover {
+  background: #2d568d;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 14px;
+}
+
+.stats div {
+  min-height: 92px;
+  padding: 14px 10px;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.stats strong {
+  display: block;
+  font-size: 31px;
+  line-height: 1;
+  margin-bottom: 8px;
+  color: #1f3d68;
+  font-weight: 900;
+}
+
+.stats span {
+  display: block;
+  margin-top: 0;
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 800;
+}
+
+.search-box {
+  display: grid;
+  grid-template-columns:
+    minmax(180px, 1.15fr)
+    minmax(170px, .95fr)
+    minmax(150px, .78fr)
+    minmax(150px, .78fr)
+    150px
+    150px;
+  gap: 10px;
+  margin: 0 0 14px;
+  align-items: stretch;
+}
+
+.search-box input,
+.search-box select {
+  width: 100%;
+  min-width: 0;
+  height: 50px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 14px;
+  background: white;
+}
+
+button {
+  height: 50px;
+  border: none;
+  border-radius: 10px;
+  background: #1f3d68;
+  color: white;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+button.gray {
+  background: #64748b;
+}
+
+button.green {
+  background: #0f766e;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.search-box button {
+  width: 100%;
+  min-width: 0;
+  height: 50px;
+  padding: 0 14px;
+  font-size: 14px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.table-wrap {
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.table-wrap table {
+  width: 100%;
+  min-width: 1320px;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.table-wrap th,
+.table-wrap td {
+  padding: 11px 8px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  vertical-align: middle;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-wrap th {
+  background: #1f3d68;
+  color: white;
+  font-size: 13px;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.table-wrap td {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table-wrap th:nth-child(1),
+.table-wrap td:nth-child(1) { width: 205px; }
+
+.table-wrap th:nth-child(2),
+.table-wrap td:nth-child(2) { width: 215px; }
+
+.table-wrap th:nth-child(3),
+.table-wrap td:nth-child(3) { width: 205px; }
+
+.table-wrap th:nth-child(4),
+.table-wrap td:nth-child(4) { width: 90px; }
+
+.table-wrap th:nth-child(5),
+.table-wrap td:nth-child(5) { width: 90px; }
+
+.table-wrap th:nth-child(6),
+.table-wrap td:nth-child(6) { width: 115px; }
+
+.table-wrap th:nth-child(7),
+.table-wrap td:nth-child(7) { width: 100px; }
+
+.table-wrap th:nth-child(8),
+.table-wrap td:nth-child(8) { width: 145px; }
+
+.table-wrap th:nth-child(9),
+.table-wrap td:nth-child(9) { width: 145px; }
+
+.table-wrap th:nth-child(10),
+.table-wrap td:nth-child(10) { width: 150px; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 66px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.badge.wait {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge.done {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+}
+
+.action-buttons button {
+  min-width: 66px;
+  height: 32px;
+  padding: 0 8px;
+  font-size: 11px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+/* 계약서 원본 보기 모달 */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 999;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 36px;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 1200px;
+  max-height: none;
+  margin: 0 auto;
+  background: white;
+  border-radius: 24px;
+  padding: 30px;
+  overflow: visible;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 30px;
+  color: #1f3d68;
+}
+
+.modal-header button {
+  width: 110px;
+  height: 50px;
+  font-size: 17px;
+  background: #64748b;
+}
+
+.contract-detail {
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid #ddd;
+  padding: 30px;
+  border-radius: 16px;
+  background: #fff;
+  line-height: 1.8;
+  font-size: 17px;
+  overflow-x: hidden;
+}
+
+.contract-detail h1 {
+  text-align: center;
+  font-size: 34px;
+  letter-spacing: 8px;
+  margin-bottom: 30px;
+}
+
+.contract-detail h3 {
+  margin-top: 26px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 6px;
+  color: #1f3d68;
+}
+
+.detail-table,
+.contract-detail table {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin: 12px 0;
+}
+
+.detail-table th,
+.detail-table td,
+.contract-detail th,
+.contract-detail td {
+  border: 1px solid #333;
+  padding: 10px;
+  font-size: 14px;
+  white-space: normal;
+  word-break: keep-all;
+}
+
+.sign-admin-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 100%;
+  margin-top: 24px;
+}
+
+.sign-admin-box > div {
+  border: 1px solid #cbd5e1;
+  border-radius: 18px;
+  padding: 22px;
+}
+
+.signature-img {
+  max-width: 220px;
+  max-height: 90px;
+  border-bottom: 1px solid #333;
+  margin-top: 10px;
+}
+
+.company-stamp {
+  width: 130px;
+  margin-top: 12px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.modal-buttons button {
+  flex: 1;
+}
+
+/* 중간 크기 데스크톱 */
+@media (max-width: 1450px) {
+  .container {
+    width: 98vw;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  header h1 {
+    font-size: 32px;
+  }
+
+  .table-wrap table {
+    min-width: 1240px;
+  }
+
+  .table-wrap th,
+  .table-wrap td {
+    padding: 9px 6px;
+    font-size: 11.5px;
+  }
+
+  .action-buttons button {
+    min-width: 58px;
+    font-size: 10.5px;
+    padding: 0 6px;
+  }
+}
+
+/* 노트북 */
+@media (max-width: 1100px) {
+  .search-box {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* 모바일 */
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    padding: 12px;
+  }
+
+  header h1 {
+    font-size: 30px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .search-box {
+    grid-template-columns: 1fr;
+  }
+
+  .modal {
+    padding: 10px;
+  }
+
+  .modal-content {
+    width: 100%;
+    padding: 18px;
+  }
+
+  .sign-admin-box {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 인쇄 / PDF */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  #modal,
+  #modal *,
+  #contractDetail,
+  #contractDetail * {
+    visibility: visible !important;
+  }
+
+  #modal {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    background: #fff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .modal-content {
+    position: static !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .modal-header,
+  .modal-buttons,
+  .container {
+    display: none !important;
+  }
+
+  #contractDetail,
+  .contract-detail {
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    font-size: 14px !important;
+    line-height: 1.65 !important;
+  }
+
+  .contract-detail h1 {
+    font-size: 26px !important;
+    margin: 0 0 22px !important;
+  }
+
+  .contract-detail h3 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .detail-table,
+  .contract-detail table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+  }
+
+  .contract-detail th,
+  .contract-detail td {
+    font-size: 12px !important;
+    padding: 7px !important;
+    white-space: normal !important;
+    word-break: keep-all !important;
+  }
+
+  .sign-admin-box {
+    display: block !important;
+    margin-top: 24px !important;
+  }
+
+  .sign-admin-box > div {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 16px !important;
+  }
+
+  .company-stamp {
+    width: 100px !important;
+  }
+
+  .signature-img {
+    max-width: 180px !important;
+    max-height: 70px !important;
+  }
+}

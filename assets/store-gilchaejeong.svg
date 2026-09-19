@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="720" viewBox="0 0 1600 720">
+<defs>
+ <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#063d36"/><stop offset="1" stop-color="#0d7d66"/></linearGradient>
+ <linearGradient id="roof" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#15233a"/><stop offset="1" stop-color="#07111f"/></linearGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="16"/></filter>
+</defs>
+<rect width="1600" height="720" fill="url(#g)"/>
+<circle cx="1250" cy="160" r="170" fill="#37d0a2" opacity=".18" filter="url(#glow)"/>
+<circle cx="260" cy="590" r="220" fill="#37d0a2" opacity=".12" filter="url(#glow)"/>
+<!-- mountains -->
+<path d="M0 420 L220 260 390 390 570 230 770 410 980 255 1190 390 1380 250 1600 405 1600 720 0 720Z" fill="#08182c" opacity=".55"/>
+<!-- stylized hanok -->
+<g transform="translate(530 250)">
+ <path d="M-130 165 Q270 15 690 165 Q270 95 -130 165Z" fill="url(#roof)"/>
+ <path d="M-70 158 L640 158 L590 205 L-20 205Z" fill="#172a43"/>
+ <rect x="0" y="200" width="570" height="250" rx="8" fill="#8d552c"/>
+ <rect x="30" y="225" width="510" height="190" fill="#f2a847" opacity=".92"/>
+ <g stroke="#5a341d" stroke-width="13">
+  <line x1="85" y1="205" x2="85" y2="450"/><line x1="200" y1="205" x2="200" y2="450"/>
+  <line x1="315" y1="205" x2="315" y2="450"/><line x1="430" y1="205" x2="430" y2="450"/>
+  <line x1="0" y1="300" x2="570" y2="300"/>
+ </g>
+ <g fill="#fff0bf" opacity=".88">
+  <rect x="105" y="325" width="75" height="70"/><rect x="220" y="325" width="75" height="70"/>
+  <rect x="335" y="325" width="75" height="70"/><rect x="450" y="325" width="70" height="70"/>
+ </g>
+</g>
+<!-- food/table motif -->
+<g transform="translate(110 440)">
+ <ellipse cx="210" cy="150" rx="245" ry="90" fill="#25180f" opacity=".75"/>
+ <ellipse cx="210" cy="125" rx="215" ry="72" fill="#6c4526"/>
+ <circle cx="110" cy="112" r="45" fill="#f7efe1"/><circle cx="210" cy="100" r="52" fill="#efe2c9"/><circle cx="315" cy="120" r="43" fill="#fff3dc"/>
+ <path d="M80 112 q30-40 60 0 q-30 30-60 0" fill="#37d0a2"/>
+ <path d="M175 100 q35-55 70 0 q-35 40-70 0" fill="#5fa65b"/>
+ <path d="M286 120 q28-42 58 0 q-29 30-58 0" fill="#c85a38"/>
+</g>
+<text x="75" y="105" fill="#fff" font-family="Arial,sans-serif" font-size="38" font-weight="700">GILCHAEJEONG</text>
+<text x="78" y="148" fill="#fff" opacity=".78" font-family="Arial,sans-serif" font-size="20">압구정 길채정</text>
+<text x="1450" y="660" fill="#fff" opacity=".35" text-anchor="end" font-family="Arial,sans-serif" font-size="18" letter-spacing="4">GILCHAEJEONG</text>
+</svg>

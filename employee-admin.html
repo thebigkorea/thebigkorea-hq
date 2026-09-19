@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인사관리대장</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;
+  background:#f4f6f9;
+  color:#111;
+}
+.header{
+  background:linear-gradient(120deg,#102c56 0%,#173f76 58%,#24568f 100%);
+  color:#fff;
+  padding:22px 28px;
+  border-bottom:1px solid rgba(255,255,255,.16);
+  box-shadow:0 8px 24px rgba(15,35,68,.18);
+}
+.header-inner{display:flex;align-items:center;gap:14px}
+.header-icon{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.14);font-size:23px}
+.header h1{margin:0;font-size:25px;letter-spacing:-.6px}
+.header p{margin:4px 0 0;color:rgba(255,255,255,.78);font-size:14px}
+.wrap{
+  width:calc(100% - 32px);
+  max-width:1680px;
+  margin:0 auto;
+  padding:16px 0;
+}
+.card{
+  background:#fff;
+  border:1px solid #e4e9f0;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:16px;
+  box-shadow:0 5px 18px rgba(15,35,68,.06);
+}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.card-head h2{margin:0;font-size:20px;letter-spacing:-.4px}
+.card-head p{margin:4px 0 0;color:#64748b;font-size:13px}
+.search-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr auto;
+  gap:12px;
+}
+label{
+  font-weight:900;
+  font-size:14px;
+}
+input,select{
+  width:100%;
+  margin-top:7px;
+  height:46px;
+  border:1px solid #d7dce5;
+  border-radius:13px;
+  padding:0 14px;
+  font-size:15px;
+}
+button{
+  height:46px;
+  border:0;
+  border-radius:13px;
+  padding:0 22px;
+  background:#173b72;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+  margin-top:23px;
+  transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
+}
+button:hover{transform:translateY(-1px);box-shadow:0 5px 12px rgba(23,59,114,.18)}
+button.gray{background:#64748b}
+button.green{background:#197857}
+table button{
+  height:38px;
+  min-width:64px;
+  margin-top:0;
+  padding:0 14px;
+  border-radius:10px;
+  font-size:13px;
+}
+.table-wrap{
+  width:100%;
+  overflow-x:auto;
+  overflow-y:auto;
+  max-height:62vh;
+  border:1px solid #e2e8f0;
+  border-radius:13px;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-gutter:stable;
+  padding-bottom:8px;
+}
+
+table{
+  width:100%;
+  min-width:1040px;
+  border-collapse:collapse;
+  table-layout:auto;
+}
+
+th,
+td{
+  border-bottom:1px solid #e5e7eb;
+  padding:10px 8px;
+  text-align:left;
+  font-size:13px;
+  vertical-align:middle;
+  white-space:nowrap;
+}
+th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#edf3f9;
+  color:#253b58;
+  font-weight:900;
+}
+tbody tr:nth-child(even){background:#fbfcfe}
+td.employee-name{font-weight:900;color:#163c73}
+.employee-status{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;background:#e9f7f0;color:#14734f;font-size:11px;font-weight:900}
+th:nth-child(1),
+td:nth-child(1){
+  min-width:170px;
+}
+
+th:nth-child(2),
+td:nth-child(2){
+  min-width:72px;
+}
+
+th:nth-child(3),
+td:nth-child(3){
+  min-width:110px;
+}
+
+th:nth-child(4),
+td:nth-child(4){
+  min-width:110px;
+}
+
+th:nth-child(5),
+td:nth-child(5){
+  min-width:72px;
+}
+
+th:nth-child(6),
+td:nth-child(6){
+  min-width:92px;
+}
+
+th:nth-child(7),
+td:nth-child(7),
+th:nth-child(8),
+td:nth-child(8){
+  min-width:92px;
+}
+
+th:nth-child(9),
+td:nth-child(9){
+  width:70px;
+  min-width:70px;
+  text-align:center;
+}
+tr:hover{background:#fafafa}
+
+.status-filter{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+.search-tools{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:13px;padding-top:13px;border-top:1px solid #edf1f5}
+.search-tools .status-filter,.search-tools .store-review-actions{margin-top:0!important}
+.search-tools .store-review-actions button{margin-top:0;height:40px;padding:0 15px;font-size:13px}
+
+.status-filter button{
+  margin-top:0;
+  height:40px;
+  padding:0 18px;
+  border-radius:10px;
+  background:#e2e8f0;
+  color:#334155;
+  font-size:13px;
+}
+
+.status-filter button.active{
+  background:#173b72;
+  color:#fff;
+}
+
+.status{
+  margin-top:14px;
+  padding:13px;
+  border-radius:12px;
+  background:#f1f5f9;
+  color:#334155;
+  font-size:14px;
+}
+.status.compact{margin-top:12px;padding:10px 13px;border-left:4px solid #2f629d}
+.result-count{display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border-radius:999px;background:#edf3f9;color:#173b72;font-size:13px;font-weight:900}
+.empty{
+  text-align:center;
+  color:#777;
+  padding:30px;
+}
+.detail-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+.full{grid-column:1/-1}
+textarea{
+  width:100%;
+  min-height:90px;
+  border:1px solid #d7dce5;
+  border-radius:13px;
+  padding:13px;
+  font-size:15px;
+  resize:vertical;
+}
+
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.55);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:9999;
+}
+
+.modal-backdrop.hidden{
+  display:none;
+}
+
+.modal-card{
+  width:min(760px, 96vw);
+  max-height:90vh;
+  overflow-y:auto;
+  background:#fff;
+  border-radius:20px;
+  box-shadow:0 24px 70px rgba(0,0,0,.28);
+  padding:22px;
+}
+
+.modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.modal-header h2{
+  margin:0;
+}
+
+.modal-close{
+  margin-top:0;
+  width:42px;
+  min-width:42px;
+  height:42px;
+  padding:0;
+  border-radius:10px;
+  background:#64748b;
+  font-size:20px;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+}
+
+.modal-actions button{
+  margin-top:0;
+}
+
+body.modal-open{
+  overflow:hidden;
+}
+
+.hidden{display:none}
+@media(max-width:1400px){
+  .header{
+    padding:22px 16px;
+  }
+
+  .header h1{
+    font-size:24px;
+  }
+
+  .card{
+    padding:14px;
+    border-radius:16px;
+  }
+
+  table{
+    min-width:980px;
+  }
+
+  th,
+  td{
+    padding:9px 7px;
+    font-size:12px;
+  }
+
+  table button{
+    min-width:54px;
+    height:34px;
+    padding:0 10px;
+    font-size:12px;
+  }
+}
+
+@media(max-width:760px){
+  .header{padding:18px 16px}
+  .header-icon{width:40px;height:40px}
+  .header h1{font-size:21px}
+  .header p{font-size:12px}
+  .wrap{
+    width:calc(100% - 20px);
+    padding:14px 0;
+  }
+
+  .search-grid,
+  .detail-grid{
+    grid-template-columns:1fr;
+  }
+
+  .search-grid > button,
+  #detailCard > button{
+    width:100%;
+  }
+
+  table button{
+    width:auto;
+  }
+  .search-tools{align-items:stretch}
+  .search-tools .status-filter,.search-tools .store-review-actions{width:100%}
+  .search-tools .store-review-actions button{flex:1}
+}
+
+.store-dashboard{
+  display:none;
+  margin-bottom:16px;
+}
+.store-dashboard.show{display:block}
+.store-dashboard-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:12px;
+  margin-bottom:12px;
+}
+.store-dashboard-head h2{margin:0}
+.store-dashboard-head p{margin:0;color:#64748b;font-size:13px}
+.dashboard-back-btn{
+  display:none;
+  margin:0;
+  height:40px;
+  padding:0 16px;
+  background:#fff;
+  color:#173b72;
+  border:1px solid #b9cce2;
+  box-shadow:none;
+  white-space:nowrap;
+}
+.dashboard-back-btn.show{display:inline-flex;align-items:center}
+.store-dashboard-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:12px;
+}
+.store-summary-card{
+  border:1px solid #dbe3ec;
+  border-radius:16px;
+  padding:15px;
+  background:#fff;
+  cursor:pointer;
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+.store-summary-card:hover{
+  transform:translateY(-2px);
+  border-color:#7da2cc;
+  box-shadow:0 8px 20px rgba(23,59,114,.11);
+}
+.store-summary-card:focus-visible{
+  outline:3px solid rgba(47,98,157,.3);
+  outline-offset:2px;
+}
+.store-summary-title{
+  font-weight:900;
+  font-size:16px;
+  margin-bottom:12px;
+  padding-bottom:10px;
+  border-bottom:1px solid #edf1f5;
+}
+.store-summary-total{
+  font-size:13px;
+  color:#475569;
+  margin-left:6px;
+}
+.store-summary-types{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.store-type-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 10px;
+  border-radius:999px;
+  background:#f1f5f9;
+  font-size:12px;
+  font-weight:800;
+}
+.store-type-chip strong{font-size:14px}
+.store-dashboard-total{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid #e5e7eb;
+}
+
+.company-summary-card{
+  border:2px solid #173b72;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:14px;
+  background:linear-gradient(135deg,#f8fbff,#eef4fb);
+}
+.company-summary-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+.company-summary-title{
+  font-size:19px;
+  font-weight:900;
+  color:#173b72;
+}
+.company-summary-total{
+  font-size:26px;
+  font-weight:900;
+  color:#0f2344;
+}
+.company-summary-sub{
+  margin-top:4px;
+  font-size:12px;
+  color:#64748b;
+}
+.company-summary-types{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+}
+.company-summary-types .store-type-chip{
+  background:#fff;
+  border:1px solid #d7e2ef;
+  padding:9px 12px;
+  font-size:13px;
+}
+.company-summary-types .store-type-chip strong{
+  font-size:16px;
+}
+
+</style>
+
+<script>
+const ADMIN_PASSWORD = "1234";
+
+const pw = prompt("관리자 비밀번호를 입력하세요.");
+
+if (pw !== ADMIN_PASSWORD) {
+  alert("비밀번호가 올바르지 않습니다.");
+  location.replace("index.html");
+}
+</script>
+
+</head>
+
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="header-icon" aria-hidden="true">👥</div>
+    <div>
+      <h1>인사관리대장</h1>
+      <p>전 점포 직원 현황을 한눈에 확인하고 인사정보를 관리합니다.</p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <h2>직원 검색</h2>
+        <p>이름·연락처 또는 소속으로 빠르게 찾아보세요.</p>
+      </div>
+    </div>
+
+    <div class="search-grid">
+      <label>
+        직원명 / 연락처
+        <input id="keyword" type="text" placeholder="예: 홍길동 또는 01012345678">
+      </label>
+
+      <label>
+        소속
+        <select id="workplace">
+          <option value="">전체</option>
+        </select>
+      </label>
+
+      <button onclick="searchEmployees()">🔍 조회</button>
+    </div>
+
+    <div class="search-tools">
+    <div class="status-filter" id="statusFilter">
+      <button type="button" class="active" data-status="재직" onclick="setStatusFilter('재직', this)">재직</button>
+      <button type="button" data-status="휴직" onclick="setStatusFilter('휴직', this)">휴직</button>
+      <button type="button" data-status="퇴직" onclick="setStatusFilter('퇴직', this)">퇴직</button>
+      <button type="button" data-status="" onclick="setStatusFilter('', this)">전체</button>
+    </div>
+    <div class="store-review-actions" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button type="button" onclick="openStoreEmployeeReview()" style="background:#198754;">
+        📱 점포 확인 요청
+      </button>
+      <button type="button" onclick="copyStoreEmployeeReviewLink()" style="background:#475569;">
+        🔗 카톡 링크 복사
+      </button>
+    </div>
+    </div>
+
+    <div id="status" class="status compact">검색 조건을 입력하고 조회하세요.</div>
+  </section>
+
+
+  <section id="storeDashboard" class="card store-dashboard">
+    <div class="store-dashboard-head">
+      <div>
+        <h2>점포별 재직인원 현황</h2>
+        <p>전체 소속 조회 시 점포별 고용형태 인원을 보여줍니다.</p>
+      </div>
+      <button id="dashboardBackBtn" class="dashboard-back-btn" type="button" onclick="showAllStores()">
+        ← 전체 점포 보기
+      </button>
+    </div>
+    <div id="companyDashboardSummary" class="company-summary-card"></div>
+    <div id="storeDashboardGrid" class="store-dashboard-grid"></div>
+    <div id="storeDashboardTotal" class="store-dashboard-total"></div>
+  </section>
+
+  <section id="resultSection" class="card">
+    <div class="card-head">
+      <div>
+        <h2>직원 목록</h2>
+        <p>직원을 선택하면 상세 인사정보를 확인하고 수정할 수 있습니다.</p>
+      </div>
+      <span id="resultCount" class="result-count">0명</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>소속</th>
+            <th>이름</th>
+            <th>연락처</th>
+            <th>주민번호</th>
+            <th>직위</th>
+            <th>고용형태</th>
+            <th>입사일</th>
+            <th>퇴사일</th>
+            <th>보기</th>
+          </tr>
+        </thead>
+        <tbody id="resultBody">
+          <tr>
+            <td colspan="9" class="empty">조회 결과가 없습니다.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div id="detailModal" class="modal-backdrop hidden" onclick="handleModalBackdrop(event)">
+    <section id="detailCard" class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="modal-header">
+        <h2 id="detailTitle">직원 상세정보 수정</h2>
+        <button type="button" class="modal-close" onclick="closeDetail()" aria-label="닫기">×</button>
+      </div>
+
+      <div class="detail-grid">
+        <label>
+          소속
+          <input id="d_workplace" type="text">
+        </label>
+
+        <label>
+          이름
+          <input id="d_name" type="text">
+        </label>
+
+        <label>
+          연락처
+          <input id="d_phone" type="text">
+        </label>
+
+        <label>
+          주민번호
+          <input id="d_residentNo" type="text">
+        </label>
+
+        <label>
+          직위
+          <input id="d_position" type="text">
+        </label>
+
+        <label>
+          고용형태
+          <input id="d_contractType" type="text">
+        </label>
+
+        <label>
+          재직상태
+          <select id="d_status" onchange="toggleHrStatusFields()">
+            <option value="재직">재직</option>
+            <option value="휴직">휴직</option>
+            <option value="퇴직">퇴직</option>
+          </select>
+        </label>
+
+        <div id="leaveFields" class="full hidden">
+          <div class="detail-grid">
+            <label>
+              휴직 시작일
+              <input id="d_leaveStartDate" type="date">
+            </label>
+            <label>
+              휴직 종료예정일
+              <input id="d_leaveEndDate" type="date">
+            </label>
+          </div>
+        </div>
+
+        <div id="returnFields" class="full hidden">
+          <div class="detail-grid">
+            <label>
+              복직일
+              <input id="d_returnDate" type="date">
+            </label>
+          </div>
+        </div>
+
+        <label class="full">
+          상태변경 사유
+          <input id="d_statusReason" type="text" placeholder="예: 개인사정 휴직, 휴직 종료 복직, 퇴직 등">
+        </label>
+
+        <label>
+          처리자
+          <input id="d_statusEditor" type="text" placeholder="처리자 이름">
+        </label>
+
+        <label>
+          입사일
+          <input id="d_joinDate" type="date">
+        </label>
+
+        <label>
+          퇴사일
+          <input id="d_leaveDate" type="date">
+        </label>
+
+        <label class="full">
+          주소
+          <input id="d_address" type="text">
+        </label>
+
+        <label class="full">
+          비고
+          <textarea id="d_memo"></textarea>
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button class="green" type="button" onclick="updateEmployee()">수정 저장</button>
+        <button class="gray" type="button" onclick="closeDetail()">닫기</button>
+      </div>
+
+      <div id="detailStatus" class="status"></div>
+    </section>
+  </div>
+
+</main>
+
+<script>
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbwRGQcXgYhfkTUiklPrHs4uFe7oHpgn8D_jM2jJPpU74tXr3D_h6vGMq72CHXU0EnAb/exec";
+
+let selectedRowId = "";
+let selectedStatus = "재직";
+let STORE_MAP = {};
+let STORE_ID_MAP = {};
+
+function val(id){
+  return document.getElementById(id).value.trim();
+}
+
+function setStatus(msg){
+  document.getElementById("status").innerText = msg;
+}
+
+async function postApi(data){
+  const res = await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify(data)
+  });
+
+  return await res.json();
+}
+
+async function getApi(params){
+  const query = new URLSearchParams();
+
+  Object.keys(params || {}).forEach(function(key){
+    const value = params[key];
+
+    if(
+      value !== undefined &&
+      value !== null &&
+      String(value) !== ""
+    ){
+      query.set(key, String(value));
+    }
+  });
+
+  query.set("t", String(Date.now()));
+
+  const controller = new AbortController();
+  const timer = setTimeout(function(){
+    controller.abort();
+  }, 15000);
+
+  try{
+    const res = await fetch(
+      API_URL + "?" + query.toString(),
+      {
+        cache:"no-store",
+        signal:controller.signal
+      }
+    );
+
+    if(!res.ok){
+      throw new Error(
+        "API 응답 오류: HTTP " + res.status
+      );
+    }
+
+    return await res.json();
+
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
+function normalizeUnifiedEmployee(item){
+  item = item || {};
+
+  return {
+    employeeId: item.employeeId || "",
+    rowId: item.employeeId || "",
+    storeId: item.storeId || "",
+    workplace: item.storeName || item.workplace || "",
+    storeName: item.storeName || item.workplace || "",
+    name: item.name || "",
+    phone: item.phone || "",
+    residentNo: item.residentNo || "",
+    rrn: item.residentNo || item.rrn || "",
+    position: item.position || "",
+    employmentType: item.employmentType || "",
+    contractType: item.employmentType || item.contractType || "",
+    status: item.status || "",
+    joinDate: item.hireDate || item.joinDate || "",
+    hireDate: item.hireDate || item.joinDate || "",
+    leaveDate: item.retireDate || item.leaveDate || "",
+    retireDate: item.retireDate || item.leaveDate || "",
+    address: item.address || "",
+    memo: item.note || item.memo || "",
+    note: item.note || item.memo || "",
+    department: item.department || "",
+    payType: item.payType || "",
+
+    // 기존 관리자 UI 호환용.
+    // 현재 통합 직원원장에 별도 컬럼이 없는 값은 빈값으로 유지합니다.
+    leaveStartDate: item.leaveStartDate || "",
+    leaveEndDate: item.leaveEndDate || "",
+    returnDate: item.returnDate || "",
+    statusReason: item.statusReason || "",
+    statusEditor: item.statusEditor || ""
+  };
+}
+
+async function loadWorkplaces(){
+  const select = document.getElementById("workplace");
+  if(!select) return;
+
+  try{
+    const result = await getApi({
+      action:"getStores"
+    });
+
+    if(!result.success && !result.ok){
+      throw new Error(
+        result.message || "점포 목록 조회 실패"
+      );
+    }
+
+    const stores = Array.isArray(result.stores)
+      ? result.stores
+      : [];
+
+    STORE_MAP = {};
+    STORE_ID_MAP = {};
+
+    stores.forEach(function(store){
+      const storeId = String(store.storeId || "").trim();
+      const storeName = String(store.storeName || "").trim();
+
+      if(!storeId || !storeName) return;
+
+      STORE_MAP[storeName] = storeId;
+      STORE_ID_MAP[storeId] = storeName;
+    });
+
+    select.innerHTML =
+      '<option value="">전체</option>' +
+      stores.map(function(store){
+        const storeId = String(store.storeId || "").trim();
+        const storeName = String(store.storeName || "").trim();
+
+        const safeName = storeName
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+
+        return (
+          '<option value="' + safeName +
+          '" data-store-id="' + storeId + '">' +
+          safeName +
+          '</option>'
+        );
+      }).join("");
+
+  }catch(e){
+    console.error("소속 목록 조회 실패:", e);
+
+    select.innerHTML =
+      '<option value="">점포 목록 조회 실패</option>';
+
+    setStatus(
+      "통합 인사DB에서 점포 목록을 불러오지 못했습니다."
+    );
+  }
+}
+
+function getStoreEmployeeReviewUrl(){
+  const storeSelect = document.getElementById("workplace");
+  const store = storeSelect ? String(storeSelect.value || "").trim() : "";
+
+  if(!store){
+    alert("먼저 소속 점포를 선택해주세요.");
+    return "";
+  }
+
+  return "https://thebigkorea.github.io/thebigkorea-hq/employee-store-review.html?store=" +
+    encodeURIComponent(store);
+}
+
+function openStoreEmployeeReview(){
+  const url = getStoreEmployeeReviewUrl();
+  if(!url) return;
+  window.open(url, "_blank", "noopener");
+}
+
+async function copyStoreEmployeeReviewLink(){
+  const url = getStoreEmployeeReviewUrl();
+  if(!url) return;
+
+  const store = String(document.getElementById("workplace").value || "").trim();
+  const message =
+    "[" + store + " 직원정보 확인 요청]\n\n" +
+    "현재 근무 중인 직원정보를 확인해주세요.\n" +
+    "변경사항이 있으면 수정하고, 신규직원이 있으면 신규직원 입력을 해주세요.\n" +
+    "확인이 끝나면 '점포 직원정보 확인 완료' 버튼을 눌러주세요.\n\n" +
+    "직원정보 확인 링크\n" +
+    url;
+
+  try{
+    await navigator.clipboard.writeText(message);
+    alert("카톡용 안내문과 링크를 복사했습니다.\n카카오톡에 붙여넣기 하시면 됩니다.");
+  }catch(e){
+    const textarea = document.createElement("textarea");
+    textarea.value = message;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+    alert("카톡용 안내문과 링크를 복사했습니다.\n카카오톡에 붙여넣기 하시면 됩니다.");
+  }
+}
+
+function setStatusFilter(status, button){
+  selectedStatus = status;
+
+  document
+    .querySelectorAll("#statusFilter button")
+    .forEach(function(btn){
+      btn.classList.remove("active");
+    });
+
+  if(button){
+    button.classList.add("active");
+  }
+
+  searchEmployees();
+}
+
+async function selectStoreFromDashboard(card){
+  const workplace = document.getElementById("workplace");
+  const encodedStore = card ? card.getAttribute("data-store") : "";
+  const store = decodeURIComponent(encodedStore || "");
+
+  if(!workplace || !store) return;
+
+  workplace.value = store;
+  await searchEmployees();
+
+  const resultSection = document.getElementById("resultSection");
+  if(resultSection){
+    resultSection.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+}
+
+async function showAllStores(){
+  const workplace = document.getElementById("workplace");
+  if(!workplace) return;
+
+  workplace.value = "";
+  await searchEmployees();
+
+  const dashboard = document.getElementById("storeDashboard");
+  if(dashboard){
+    dashboard.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+}
+
+function handleStoreCardKey(event, card){
+  if(event.key === "Enter" || event.key === " "){
+    event.preventDefault();
+    selectStoreFromDashboard(card);
+  }
+}
+
+async function searchEmployees(){
+  const keyword = val("keyword");
+  const workplace = val("workplace");
+  const storeId = workplace
+    ? String(STORE_MAP[workplace] || "")
+    : "";
+
+  setStatus("조회 중입니다...");
+
+  try{
+    const result = await getApi({
+      action:"getEmployeesAdmin",
+      keyword:keyword,
+      storeId:storeId
+    });
+
+    if(!result.ok && !result.success){
+      setStatus(result.message || "조회 실패");
+      renderResults([]);
+      renderStoreDashboard([], workplace);
+      return;
+    }
+
+    const rows = Array.isArray(result.employees)
+      ? result.employees.map(normalizeUnifiedEmployee)
+      : [];
+
+    const filteredRows = rows.filter(function(item){
+
+  const itemStatus =
+    String(item.status || "").trim();
+
+  const itemWorkplace =
+    String(item.workplace || "").trim();
+
+  /*
+   * 소속을 선택한 경우
+   * 해당 점포 직원만 화면에 표시
+   */
+  if(workplace && itemWorkplace !== workplace){
+    return false;
+  }
+
+  /*
+   * 상태 = 전체
+   */
+  if(!selectedStatus){
+    return true;
+  }
+
+  /*
+   * 퇴직/퇴사 통합
+   */
+  if(selectedStatus === "퇴직"){
+    return (
+      itemStatus === "퇴직" ||
+      itemStatus === "퇴사"
+    );
+  }
+
+  return itemStatus === selectedStatus;
+});
+
+    /* 직원 정렬
+   1. 점포
+   2. 고용형태 : 정규직 → 아르바이트 → 사업소득자 → 용역 → 기타
+   3. 같은 고용형태에서는 이름 가나다순
+*/
+
+const employmentOrder = {
+  "정규직": 1,
+  "아르바이트": 2,
+  "사업소득자": 3,
+  "용역": 4
+};
+
+const list = filteredRows.sort(function(a, b){
+
+  /* 1. 점포 순서 */
+  const aStore = String(a.workplace || "").trim();
+  const bStore = String(b.workplace || "").trim();
+
+  const storeCompare = aStore.localeCompare(
+    bStore,
+    "ko"
+  );
+
+  if(storeCompare !== 0){
+    return storeCompare;
+  }
+
+
+  /* 2. 고용형태 순서 */
+  const groupA = normalizeEmploymentGroup(a);
+  const groupB = normalizeEmploymentGroup(b);
+
+  const orderA = employmentOrder[groupA] || 99;
+  const orderB = employmentOrder[groupB] || 99;
+
+  if(orderA !== orderB){
+    return orderA - orderB;
+  }
+
+
+  /* 3. 같은 고용형태에서는 이름 가나다순 */
+  return String(a.name || "").localeCompare(
+    String(b.name || ""),
+    "ko"
+  );
+});
+
+    renderResults(list);
+    renderStoreDashboard(list, workplace);
+
+    const statusLabel =
+      selectedStatus
+        ? " · " + selectedStatus
+        : "";
+
+    setStatus(
+      list.length +
+      "건 조회되었습니다." +
+      statusLabel
+    );
+
+  }catch(e){
+    console.error(e);
+    setStatus(
+      e && e.name === "AbortError"
+        ? "직원 조회가 15초를 초과했습니다. 통합 인사DB 배포 상태를 확인해주세요."
+        : "조회 중 오류가 발생했습니다: " + (e.message || e)
+    );
+    renderResults([]);
+    renderStoreDashboard([], workplace);
+  }
+}
+
+function maskRrn(v){
+  const s = String(v || "");
+  return s.replace(/^(\d{6})-(\d).*/, "$1-$2******");
+}
+
+
+function normalizeEmploymentGroup(item){
+  const raw = String(
+    item.employmentType ||
+    item.contractType ||
+    ""
+  ).replace(/\s+/g,"").trim();
+
+  if(!raw) return "미분류";
+
+  if(
+    raw.includes("정규") ||
+    raw.includes("정직")
+  ) return "정규직";
+
+  if(
+    raw.includes("아르바이트") ||
+    raw.includes("알바") ||
+    raw.includes("시급")
+  ) return "아르바이트";
+
+  if(
+    raw.includes("사업소득")
+  ) return "사업소득자";
+
+  if(
+    raw.includes("용역")
+  ) return "용역";
+
+  if(
+    raw.includes("일용")
+  ) return "일용직";
+
+  if(
+    raw.includes("계약")
+  ) return "계약직";
+
+  if(
+    raw.includes("파견")
+  ) return "파견";
+
+  return raw;
+}
+
+function renderStoreDashboard(list, workplace){
+
+  const dashboard =
+    document.getElementById("storeDashboard");
+
+  const grid =
+    document.getElementById("storeDashboardGrid");
+
+  const totalBox =
+    document.getElementById("storeDashboardTotal");
+
+  const companyBox =
+    document.getElementById("companyDashboardSummary");
+
+  if(
+    !dashboard ||
+    !grid ||
+    !totalBox ||
+    !companyBox
+  ){
+    return;
+  }
+
+  dashboard.classList.add("show");
+
+
+  const byStore = {};
+  const grand = {};
+
+  let grandTotal = 0;
+
+
+  (list || []).forEach(function(item){
+
+    const store =
+      String(
+        item.workplace || "소속 미지정"
+      ).trim() || "소속 미지정";
+
+    const group =
+      normalizeEmploymentGroup(item);
+
+
+    if(!byStore[store]){
+      byStore[store] = {
+        total: 0,
+        groups: {}
+      };
+    }
+
+
+    byStore[store].total++;
+
+
+    byStore[store].groups[group] =
+      Number(
+        byStore[store].groups[group] || 0
+      ) + 1;
+
+
+    grand[group] =
+      Number(
+        grand[group] || 0
+      ) + 1;
+
+
+    grandTotal++;
+  });
+
+
+  /* 고용형태 표시 순서 */
+  const preferredGroups = [
+    "정규직",
+    "아르바이트",
+    "사업소득자",
+    "용역",
+    "일용직",
+    "계약직",
+    "파견",
+    "미분류"
+  ];
+
+
+  function groupOrder(a, b){
+
+    const ai =
+      preferredGroups.indexOf(a);
+
+    const bi =
+      preferredGroups.indexOf(b);
+
+
+    if(ai === -1 && bi === -1){
+      return a.localeCompare(b, "ko");
+    }
+
+    if(ai === -1){
+      return 1;
+    }
+
+    if(bi === -1){
+      return -1;
+    }
+
+    return ai - bi;
+  }
+
+
+  const stores =
+    Object.keys(byStore)
+      .sort(function(a, b){
+        return a.localeCompare(b, "ko");
+      });
+
+  const selectedWorkplace =
+    String(workplace || "").trim();
+
+  const backButton =
+    document.getElementById("dashboardBackBtn");
+
+  if(backButton){
+    backButton.classList.toggle("show", Boolean(selectedWorkplace));
+  }
+
+
+  /* 직원이 없는 경우 */
+  if(!stores.length){
+
+    companyBox.innerHTML =
+      '<div class="empty">표시할 직원이 없습니다.</div>';
+
+    grid.innerHTML = "";
+    totalBox.innerHTML = "";
+
+    return;
+  }
+
+  /* =====================================================
+     상단 직원 구성 요약
+  ====================================================== */
+
+  const companyChips =
+    Object.keys(grand)
+      .sort(groupOrder)
+      .map(function(group){
+
+        return (
+          '<span class="store-type-chip">' +
+            group +
+            ' <strong>' +
+            grand[group] +
+            '명</strong>' +
+          '</span>'
+        );
+
+      })
+      .join("");
+
+
+  const summaryTitle =
+    selectedWorkplace
+      ? selectedWorkplace + " 직원 구성"
+      : "더큰코리아 전체 직원 구성";
+
+
+  const summarySub =
+    selectedWorkplace
+      ? "선택한 점포의 현재 재직 인원 기준"
+      : "전 점포 현재 재직 인원 기준";
+
+
+  companyBox.innerHTML =
+    '<div class="company-summary-head">' +
+
+      '<div>' +
+
+        '<div class="company-summary-title">' +
+          summaryTitle +
+        '</div>' +
+
+        '<div class="company-summary-sub">' +
+          summarySub +
+        '</div>' +
+
+      '</div>' +
+
+      '<div class="company-summary-total">' +
+        '총 ' + grandTotal + '명' +
+      '</div>' +
+
+    '</div>' +
+
+    '<div class="company-summary-types">' +
+      companyChips +
+    '</div>';
+
+
+  /* =====================================================
+     점포별 카드
+
+     전체 조회 → 점포별 카드 표시
+     개별 점포 → 위 요약과 중복되므로 숨김
+  ====================================================== */
+
+  if(selectedWorkplace){
+
+    grid.innerHTML = "";
+
+  }else{
+
+    grid.innerHTML =
+      stores.map(function(store){
+
+        const data =
+          byStore[store];
+
+        const encodedStore =
+          encodeURIComponent(store).replace(/'/g, "%27");
+
+
+        const chips =
+          Object.keys(data.groups)
+            .sort(groupOrder)
+            .map(function(group){
+
+              return (
+                '<span class="store-type-chip">' +
+                  group +
+                  ' <strong>' +
+                  data.groups[group] +
+                  '명</strong>' +
+                '</span>'
+              );
+
+            })
+            .join("");
+
+
+        return (
+          '<div class="store-summary-card" role="button" tabindex="0" ' +
+            'data-store="' + encodedStore + '" ' +
+            'title="' + store + ' 직원 목록 보기" ' +
+            'onclick="selectStoreFromDashboard(this)" ' +
+            'onkeydown="handleStoreCardKey(event,this)">' +
+
+            '<div class="store-summary-title">' +
+
+              store +
+
+              '<span class="store-summary-total">' +
+                '총 ' + data.total + '명' +
+              '</span>' +
+
+            '</div>' +
+
+            '<div class="store-summary-types">' +
+              chips +
+            '</div>' +
+
+          '</div>'
+        );
+
+      })
+      .join("");
+  }
+
+
+  /* =====================================================
+     하단 합계
+  ====================================================== */
+
+  if(selectedWorkplace){
+
+    totalBox.innerHTML = "";
+
+  }else{
+
+    totalBox.innerHTML =
+      '<span class="store-type-chip">' +
+        '전체 점포 <strong>' +
+        stores.length +
+        '개</strong>' +
+      '</span>' +
+
+      '<span class="store-type-chip">' +
+        '전체 재직인원 <strong>' +
+        grandTotal +
+        '명</strong>' +
+      '</span>';
+  }
+}
+
+
+ 
+
+function renderResults(list){
+  const body = document.getElementById("resultBody");
+  const count = document.getElementById("resultCount");
+
+  if(count){
+    count.textContent = (list || []).length + "명";
+  }
+
+  if(!list.length){
+    body.innerHTML = `<tr><td colspan="9" class="empty">조회 결과가 없습니다.</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = list.map(item => `
+    <tr>
+      <td>${item.workplace || ""}</td>
+      <td class="employee-name">${item.name || ""}</td>
+      <td>${item.phone || ""}</td>
+      <td>${maskRrn(item.rrn || item.residentNo || "")}</td>
+      <td>${item.position || ""}</td>
+      <td><span class="employee-status">${item.employmentType || item.contractType || "미분류"}</span></td>
+      <td>${item.joinDate || ""}</td>
+      <td>${item.leaveDate || ""}</td>
+      <td><button onclick='openDetail(${JSON.stringify(item)})'>수정</button></td>
+    </tr>
+  `).join("");
+}
+
+function toggleHrStatusFields(){
+  const status = val("d_status");
+  const leaveFields = document.getElementById("leaveFields");
+  const returnFields = document.getElementById("returnFields");
+
+  leaveFields.classList.toggle("hidden", status !== "휴직");
+
+  // 기존 휴직자가 재직으로 변경될 때 복직일을 입력할 수 있게 표시
+  const originalStatus = String(
+    document.getElementById("d_status").dataset.originalStatus || ""
+  ).trim();
+
+  returnFields.classList.toggle(
+    "hidden",
+    !(status === "재직" && (originalStatus === "휴직"))
+  );
+}
+
+function openDetail(item){
+  selectedRowId = item.employeeId || item.rowId || "";
+
+  document.getElementById("d_workplace").value = item.workplace || "";
+  document.getElementById("d_name").value = item.name || "";
+  document.getElementById("d_phone").value = item.phone || "";
+  document.getElementById("d_residentNo").value = item.rrn || item.residentNo || "";
+  document.getElementById("d_position").value = item.position || "";
+  document.getElementById("d_contractType").value = item.employmentType || item.contractType || "";
+
+  const statusValue = String(item.status || "재직").trim();
+  document.getElementById("d_status").value =
+    statusValue === "퇴사" ? "퇴직" :
+    (["재직","휴직","퇴직"].includes(statusValue) ? statusValue : "재직");
+
+  document.getElementById("d_status").dataset.originalStatus =
+    statusValue === "퇴사" ? "퇴직" : statusValue;
+
+  document.getElementById("d_leaveStartDate").value = item.leaveStartDate || "";
+  document.getElementById("d_leaveEndDate").value = item.leaveEndDate || "";
+  document.getElementById("d_returnDate").value = item.returnDate || "";
+  document.getElementById("d_statusReason").value = item.statusReason || "";
+  document.getElementById("d_statusEditor").value = item.statusEditor || "";
+
+  document.getElementById("d_joinDate").value = item.joinDate || "";
+  document.getElementById("d_leaveDate").value = item.leaveDate || "";
+  document.getElementById("d_address").value = item.address || "";
+  document.getElementById("d_memo").value = item.memo || "";
+
+  document.getElementById("detailStatus").innerText = "";
+  toggleHrStatusFields();
+
+  const modal = document.getElementById("detailModal");
+  modal.classList.remove("hidden");
+  document.body.classList.add("modal-open");
+}
+
+function closeDetail(){
+  document.getElementById("detailModal").classList.add("hidden");
+  document.body.classList.remove("modal-open");
+}
+
+function handleModalBackdrop(event){
+  if(event.target.id === "detailModal"){
+    closeDetail();
+  }
+}
+
+document.addEventListener("keydown", function(event){
+  if(event.key === "Escape"){
+    const modal = document.getElementById("detailModal");
+    if(modal && !modal.classList.contains("hidden")){
+      closeDetail();
+    }
+  }
+});
+
+async function updateEmployee(){
+  const workplace = val("d_workplace");
+  const storeId =
+    String(STORE_MAP[workplace] || "").trim();
+
+  const status = val("d_status");
+  const retireDate =
+    status === "퇴직"
+      ? val("d_leaveDate")
+      : "";
+
+  const data = {
+    action:"saveEmployee",
+    employeeId:selectedRowId,
+
+    storeId:storeId,
+    storeName:workplace,
+
+    name:val("d_name"),
+    phone:val("d_phone"),
+    residentNo:val("d_residentNo"),
+
+    position:val("d_position"),
+    employmentType:val("d_contractType"),
+    status:status,
+
+    hireDate:val("d_joinDate"),
+    retireDate:retireDate,
+
+    address:val("d_address"),
+    note:val("d_memo"),
+
+    source:"직원정보 관리자 수정"
+  };
+
+  document.getElementById("detailStatus").innerText =
+    "저장 중입니다...";
+
+  try{
+    const result = await postApi(data);
+
+    if(result.ok || result.success){
+      document.getElementById("detailStatus").innerText =
+        "통합 인사DB에 수정 저장되었습니다.";
+
+      await searchEmployees();
+      closeDetail();
+
+    }else{
+      document.getElementById("detailStatus").innerText =
+        result.message || "저장 실패";
+    }
+
+  }catch(e){
+    console.error(e);
+    document.getElementById("detailStatus").innerText =
+      "저장 중 오류가 발생했습니다.";
+  }
+}
+
+window.addEventListener("DOMContentLoaded", async function(){
+  document.getElementById("keyword").addEventListener("keydown", function(event){
+    if(event.key === "Enter"){
+      searchEmployees();
+    }
+  });
+
+  await loadWorkplaces();
+  searchEmployees();
+});
+</script>
+
+</body>
+</html>

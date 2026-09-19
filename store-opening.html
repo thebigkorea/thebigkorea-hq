@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>신규점포 개설관리</title>
+
+<link rel="stylesheet" href="store-opening.css">
+
+
+
+<style>
+.project-overview-top{margin:0 0 12px!important}
+.project-filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}
+.project-filter{border:1px solid #e3d7cf;background:#fff;color:#59483e;border-radius:999px;padding:10px 15px;font-weight:800;cursor:pointer}
+.project-filter strong{margin-left:5px;color:#9a431d}
+.project-filter.active{background:#91401d;color:#fff;border-color:#91401d;box-shadow:0 5px 14px rgba(145,64,29,.18)}
+.project-filter.active strong{color:#fff}
+.project-registration-divider{display:flex;align-items:center;gap:12px;margin:30px 0 18px;color:#7c2d12;font-weight:900;font-size:20px}
+.project-registration-divider:before,.project-registration-divider:after{content:"";height:1px;background:#eaded7;flex:1}
+.project-card-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.project-card-action{border:0;border-radius:10px;padding:9px 12px;font-size:13px;font-weight:800;cursor:pointer}
+.project-card-action.detail{background:#f2ebe7;color:#713315}
+.project-card-action.complete{background:#7c2d12;color:#fff}
+.project-card-action.restore{background:#eef2f7;color:#344054}
+.project-complete-badge{display:inline-flex;align-items:center;margin-top:8px;padding:5px 9px;border-radius:999px;background:#ecfdf3;color:#027a48;font-size:12px;font-weight:900}
+.project-list-empty{grid-column:1/-1;padding:28px;text-align:center;border:1px dashed #dccdc5;border-radius:14px;color:#777;background:#fcfaf9}
+.opening-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 22px;flex-wrap:wrap}
+.opening-toolbar-copy h2{margin:0 0 6px}
+.opening-toolbar-copy p{margin:0;color:#7a6a61}
+.secondary-action{border:1px solid #d7c8bf;background:#fff;color:#713315;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer}
+.task-action-button.exclude{background:#fff1f0;color:#b42318;border:1px solid #fecdca}
+.project-filter-bar .completed-history{margin-left:auto}
+
+/* 업무처리현황 V2 */
+.tabs{grid-template-columns:repeat(4,1fr)}
+#schedule{padding:30px;background:#f8fafc;border-color:#e5e7eb}
+#schedule .opening-toolbar{padding:22px 24px;border-radius:20px;background:linear-gradient(135deg,#1d2939,#344054);color:#fff;box-shadow:0 14px 30px rgba(16,24,40,.13)}
+#schedule .opening-toolbar h2{font-size:25px;letter-spacing:-.04em}
+#schedule .opening-toolbar p{color:#d0d5dd}
+#schedule .secondary-action{background:#fff;color:#344054;border:0;box-shadow:0 4px 12px rgba(0,0,0,.14)}
+.schedule-project-filter{display:grid!important;grid-template-columns:minmax(260px,360px) 1fr auto;align-items:end!important;gap:18px!important;padding:18px 20px;margin-bottom:22px;border:1px solid #e4e7ec;border-radius:18px;background:#fff;box-shadow:0 6px 18px rgba(16,24,40,.05)}
+.schedule-project-filter label{font-size:13px;color:#344054}.schedule-project-filter select{height:48px;border:2px solid #e4e7ec;border-radius:12px;font-size:15px;font-weight:800;background:#fff}
+.schedule-project-filter p{margin:0 0 13px;color:#667085;font-size:13px;line-height:1.6}.schedule-search-button{height:48px;background:#344054!important;white-space:nowrap}
+.task-dashboard{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 0 24px}
+.task-stat{position:relative;overflow:hidden;min-height:105px;padding:18px;border:1px solid #eaecf0;border-radius:16px;background:#fff;box-shadow:0 5px 15px rgba(16,24,40,.045)}
+.task-stat:after{content:"";position:absolute;width:66px;height:66px;border-radius:50%;right:-20px;top:-22px;background:#f2f4f7}
+.task-stat span{display:block;position:relative;z-index:1;color:#667085;font-size:12px;font-weight:800}.task-stat strong{display:block;position:relative;z-index:1;margin-top:10px;color:#101828;font-size:29px;line-height:1}
+.task-stat-delayed{border-color:#fecdca;background:#fffbfa}.task-stat-delayed strong{color:#d92d20}.task-stat-working{border-color:#b2ddff;background:#f5fbff}.task-stat-working strong{color:#1570ef}.task-stat-done{border-color:#abefc6;background:#f6fef9}.task-stat-done strong{color:#079455}.task-stat-progress{border-color:#fedf89;background:#fffcf5}.task-stat-progress strong{color:#b54708}
+.task-section{margin-top:20px;padding:22px;border:1px solid #e4e7ec;border-radius:20px;background:#fff;box-shadow:0 7px 20px rgba(16,24,40,.05)}
+.task-section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #eaecf0}.task-section-title h3{margin:0 0 4px;font-size:20px}.task-section-title p{margin:0;color:#667085;font-size:12px}.task-count{display:inline-flex;align-items:center;justify-content:center;min-width:54px;padding:7px 11px;border-radius:999px;background:#f2f4f7;color:#344054;font-size:12px;font-weight:900}.task-count-active{background:#fff4ed;color:#b93815}.task-count-done{background:#ecfdf3;color:#027a48}
+.active-task-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.active-task-card{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;padding:18px;border:1px solid #e4e7ec;border-left:5px solid #98a2b3;border-radius:16px;background:#fff;box-shadow:0 4px 12px rgba(16,24,40,.04);transition:.18s ease}.active-task-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(16,24,40,.09)}.active-task-card.working{border-left-color:#2e90fa}.active-task-card.delayed{border-left-color:#f04438;background:#fffbfa}.active-task-card.waiting{border-left-color:#f79009}
+.task-top-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.task-status-badge,.task-category,.task-date{display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900}.task-status-badge{background:#f2f4f7;color:#475467}.task-status-badge.working{background:#eff8ff;color:#175cd3}.task-status-badge.delayed{background:#fef3f2;color:#b42318}.task-status-badge.done{background:#ecfdf3;color:#027a48}.task-category{background:#f9f5ff;color:#6941c6}.task-date{margin-left:auto;background:#f9fafb;color:#667085}.active-task-card h4,.completed-task-card h4{margin:14px 0 12px;font-size:17px;letter-spacing:-.025em;color:#101828}
+.task-detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.task-detail-grid>span{padding:9px 10px;border-radius:10px;background:#f9fafb;color:#667085;font-size:10px}.task-detail-grid strong{display:block;margin-top:3px;color:#344054;font-size:12px}.task-progress-line{margin-top:14px}.task-progress-label{display:flex;justify-content:space-between;color:#667085;font-size:11px}.task-progress-label strong{color:#344054}.active-task-card .progress-wrap{margin-top:6px;height:6px}
+.active-task-card .task-actions{display:flex;flex-direction:column;min-width:92px;justify-content:center}.task-action-button{border:0!important;border-radius:9px!important;padding:9px 11px!important;font-size:11px;font-weight:900;cursor:pointer;white-space:nowrap}.task-action-button.edit{background:#eff8ff!important;color:#175cd3}.task-action-button.delay{background:#fffaeb!important;color:#b54708}.task-action-button.complete{background:#ecfdf3!important;color:#027a48}.task-action-button.exclude{background:#fff1f0!important;color:#b42318!important}
+.completed-task-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.completed-task-card{margin:0!important;padding:16px!important;border:1px solid #d1fadf!important;background:#f6fef9!important}.completed-task-meta{color:#667085;font-size:11px;line-height:1.7}.completed-progress{display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid #d1fadf;color:#027a48;font-size:12px}.schedule-empty{padding:42px 20px;border:1px dashed #d0d5dd;border-radius:14px;background:#f9fafb;text-align:center;color:#667085}
+
+/* 업무 제목형 아코디언 목록 */
+.active-task-list,.completed-task-list{display:flex;flex-direction:column;gap:8px}
+.task-accordion{overflow:hidden;border:1px solid #e4e7ec;border-left:4px solid #98a2b3;border-radius:13px;background:#fff;box-shadow:0 2px 8px rgba(16,24,40,.035)}
+.task-accordion.working{border-left-color:#2e90fa}.task-accordion.delayed{border-left-color:#f04438}.task-accordion.waiting{border-left-color:#f79009}.task-accordion.done{border-left-color:#12b76a;background:#fbfffd}
+.task-accordion summary{display:grid;grid-template-columns:90px 105px minmax(0,1fr) 125px 24px;align-items:center;gap:10px;min-height:58px;padding:0 16px;cursor:pointer;list-style:none;transition:.15s ease}
+.task-accordion summary::-webkit-details-marker{display:none}.task-accordion summary:hover{background:#f9fafb}.task-accordion[open] summary{background:#f8fafc;border-bottom:1px solid #eaecf0}
+.task-head-title{overflow:hidden;color:#101828;font-size:14px;font-weight:900;text-overflow:ellipsis;white-space:nowrap}.task-head-date{color:#667085;font-size:12px;text-align:right}.task-head-arrow{color:#98a2b3;font-size:15px;text-align:center;transition:transform .18s ease}.task-accordion[open] .task-head-arrow{transform:rotate(180deg)}
+.task-accordion-body{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:18px;padding:18px}.task-accordion-body .task-actions{display:flex;flex-direction:column;justify-content:center;gap:7px}.task-accordion-body .task-detail-grid{grid-template-columns:repeat(4,1fr)}
+.completed-task-body{grid-template-columns:1fr}.completed-task-body .completed-task-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.completed-task-body .completed-task-meta span{padding:10px;border-radius:10px;background:#f6fef9}
+
+/* 신규점포 등록 V2 */
+#project{background:#f8fafc;border-color:#e5e7eb}#project>.form-grid{grid-template-columns:repeat(4,1fr)}#project>.form-grid,#task .form-grid{padding:22px;border:1px solid #e4e7ec;border-radius:18px;background:#fff;box-shadow:0 6px 18px rgba(16,24,40,.05)}#project input,#project select,#project textarea,#task input,#task select,#task textarea{min-height:46px;border:1px solid #d0d5dd;background:#fff}#project .primary{min-width:250px}
+
+/* 한 화면 업무 처리 팝업 */
+.task-process-modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.task-process-modal-grid .wide{grid-column:1/-1}.task-process-modal-grid textarea{min-height:92px}.task-modal-mode{display:inline-flex;margin-bottom:10px;padding:6px 10px;border-radius:999px;background:#f2f4f7;color:#475467;font-size:11px;font-weight:900}.task-modal-title{margin:0 0 4px}.task-process-submit{background:#175cd3!important}
+@media(max-width:640px){
+  .project-filter-bar{display:grid;grid-template-columns:1fr 1fr}
+  .project-filter{padding:9px 5px;font-size:12px}
+  .project-card-actions{display:grid;grid-template-columns:1fr 1fr}
+  .tabs{grid-template-columns:1fr 1fr}#schedule{padding:15px}.schedule-project-filter{grid-template-columns:1fr}.schedule-project-filter p{display:none}.task-dashboard{grid-template-columns:repeat(2,1fr)}.task-accordion summary{grid-template-columns:70px minmax(0,1fr) 20px;min-height:60px;padding:0 12px}.task-accordion summary .task-category,.task-head-date{display:none}.task-accordion-body{grid-template-columns:1fr;padding:14px}.task-accordion-body .task-actions{display:grid;grid-template-columns:1fr 1fr}.task-accordion-body .task-detail-grid,.completed-task-body .completed-task-meta,.task-process-modal-grid,#project>.form-grid{grid-template-columns:1fr}.task-process-modal-grid .wide{grid-column:auto}.task-date{margin-left:0}
+}
+</style>
+
+</head>
+
+<body>
+
+<header class="hero-header">
+  <div class="hero-content">
+    <div class="hero-brand">THE BIG KOREA · STORE DEVELOPMENT</div>
+    <div class="hero-copy">
+      <h1>신규점포 개설관리</h1>
+      <p>STORE OPENING PROJECT MANAGEMENT</p>
+      <span>새로운 공간의 시작부터 오픈까지, 한눈에 관리합니다.</span>
+    </div>
+    <div class="hero-message">
+      <strong>새로운 시작,<br>더 큰 가능성</strong>
+      <small>A NEW BEGINNING · A BIGGER TOMORROW</small>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="summary">
+    <div class="summary-card">
+      <strong id="totalProjects">0</strong>
+      <span>개설 준비 프로젝트</span>
+    </div>
+
+    <div class="summary-card">
+      <strong id="openSoon">0</strong>
+      <span>30일 이내 오픈</span>
+    </div>
+
+    <div class="summary-card">
+  <strong id="avgProgress">0</strong>
+  <span>진행 중 점포</span>
+</div>
+  </section>
+
+  <section class="tabs">
+  <button class="tab active" onclick="showTab('schedule', this)">▥ &nbsp;업무처리현황</button>
+  <button class="tab" onclick="showTab('expenseSave', this)">▰ &nbsp;출납내역 저장</button>
+  <button class="tab" onclick="showTab('expenseLookup', this)">⌕ &nbsp;출납내역 조회</button>
+  <button class="tab" onclick="showTab('project', this)">⌂ &nbsp;신규점포 등록</button>
+</section>
+<div
+  id="checklistModal"
+  class="checklist-modal hidden">
+
+  <div
+    class="checklist-modal-backdrop"
+    onclick="closeChecklistModal()">
+  </div>
+
+  <div class="checklist-modal-card">
+
+    <div class="checklist-modal-header">
+
+      <div>
+        <h2 id="checklistModalTitle">
+          체크리스트 항목 추가
+        </h2>
+
+        <p>
+          신규점포 개설 시 필요한 표준 업무를 관리합니다.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="checklist-modal-close"
+        onclick="closeChecklistModal()">
+        ×
+      </button>
+
+    </div>
+
+    <input
+      type="hidden"
+      id="checklistId">
+
+    <div class="checklist-modal-grid">
+
+      <label>
+        체크리스트 항목
+        <select id="checklistGroupName">
+          <option value="계약·승인">계약·승인</option>
+          <option value="도면·시설">도면·시설</option>
+          <option value="공사">공사</option>
+          <option value="집기·장비·물품">집기·장비·물품</option>
+          <option value="인허가">인허가</option>
+          <option value="채용">채용</option>
+        </select>
+      </label>
+
+      <label>
+        업무구분
+        <select id="checklistTaskCategory">
+          <option value="계약">계약</option>
+          <option value="도면">도면</option>
+          <option value="공사">공사</option>
+          <option value="집기/장비">집기/장비</option>
+          <option value="인허가">인허가</option>
+          <option value="채용">채용</option>
+          <option value="교육">교육</option>
+        </select>
+      </label>
+
+
+      <label>
+        표시순서
+        <input
+          type="number"
+          id="checklistSortOrder"
+          min="1"
+          value="1">
+      </label>
+
+    </div>
+
+    <label class="full-label">
+      업무명
+
+      <input
+        type="text"
+        id="checklistTitle"
+        placeholder="예: 소방시설 완비증명서 발급">
+    </label>
+
+    <label class="full-label">
+      세부 설명
+
+      <textarea
+        id="checklistDescription"
+        placeholder="담당자가 확인할 업무내용을 입력하세요."></textarea>
+    </label>
+
+    <div class="checklist-modal-actions">
+
+      <button
+        type="button"
+        id="disableChecklistBtn"
+        class="checklist-disable-button hidden"
+        onclick="disableChecklistItem()">
+        사용중지
+      </button>
+
+      <button
+        type="button"
+        class="checklist-cancel-button"
+        onclick="closeChecklistModal()">
+        취소
+      </button>
+
+      <button
+        type="button"
+        id="saveChecklistBtn"
+        class="checklist-save-button"
+        onclick="saveChecklistItemFromModal()">
+        저장
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+  <section id="project" class="panel">
+
+    <div class="project-overview-header project-overview-top">
+      <div>
+        <h2>개설 준비 점포</h2>
+        <p>현재 개설을 준비 중인 점포만 표시합니다. 완료점포는 필요할 때 이력으로 확인할 수 있습니다.</p>
+      </div>
+    </div>
+
+    <div class="project-filter-bar" aria-label="등록 점포 필터">
+      <button type="button" class="project-filter active" data-filter="preparing" onclick="setProjectFilter('preparing', this)">
+        개설준비중 <strong id="filterPreparingCount">0</strong>
+      </button>
+      <button type="button" class="project-filter completed-history" data-filter="completed" onclick="setProjectFilter('completed', this)">
+        완료점포 보기 <strong id="filterCompletedCount">0</strong>
+      </button>
+    </div>
+
+    <div id="projectList" class="project-list project-overview-list"></div>
+
+    <div class="project-registration-divider">
+      <span>신규점포 등록</span>
+    </div>
+
+    <h2>신규점포 등록</h2>
+
+    <div class="form-grid">
+
+      <label>브랜드
+        <select id="brand">
+          <option>한국의집</option>
+          <option>고호재</option>
+          <option>효종갱</option>
+          <option>길채정</option>
+          <option>소바공방</option>
+        </select>
+      </label>
+
+      <label>점포명
+        <input type="text" id="storeName">
+      </label>
+
+      <label>유통사
+        <input type="text" id="retailer">
+      </label>
+
+      <label>위치
+        <input type="text" id="location">
+      </label>
+
+      <label>MD 담당자
+        <input type="text" id="mdName">
+      </label>
+
+      <label>내부 담당자
+        <input type="text" id="owner">
+      </label>
+
+      <label>계약예정일
+        <input type="date" id="contractDate">
+      </label>
+
+      <label>공사시작일
+        <input type="date" id="constructionStart">
+      </label>
+
+      <label>가오픈일
+        <input type="date" id="preOpenDate">
+      </label>
+
+      <label>정식오픈일
+        <input type="date" id="openDate">
+      </label>
+
+      <label>현재상태
+        <select id="status">
+          <option>검토중</option>
+          <option>계약진행</option>
+          <option>공사진행</option>
+          <option>오픈준비</option>
+          <option>오픈완료</option>
+        </select>
+      </label>
+
+      <label>진행률(%)
+        <input type="number" id="progress" value="0">
+      </label>
+
+    </div>
+
+    <label class="full-label">
+      메모
+      <textarea id="projectMemo"></textarea>
+    </label>
+
+    <button id="saveProjectBtn" class="primary" onclick="saveProject()">
+      신규점포 등록 및 기본업무 생성
+    </button>
+
+
+  </section>
+
+
+<div id="projectDetailModal" class="checklist-modal hidden">
+  <div class="checklist-modal-backdrop" onclick="closeProjectDetailModal()"></div>
+  <div class="checklist-modal-card project-detail-card">
+    <div class="checklist-modal-header">
+      <div>
+        <h2 id="projectDetailTitle">점포 상세정보</h2>
+        <p>등록한 신규점포 개설정보와 메모·주의사항입니다.</p>
+      </div>
+      <button type="button" class="checklist-modal-close" onclick="closeProjectDetailModal()">×</button>
+    </div>
+
+    <input type="hidden" id="detailProjectId">
+
+    <div id="projectDetailBody"></div>
+
+    <div class="checklist-modal-actions">
+      <button type="button" class="checklist-cancel-button" onclick="closeProjectDetailModal()">닫기</button>
+      <button type="button" class="primary" onclick="editProjectFromDetail()">정보 수정</button>
+      <button type="button" class="primary" onclick="openProjectSchedule()">업무처리현황 보기</button>
+    </div>
+  </div>
+</div>
+
+  <section id="task" class="panel">
+
+    <div class="section-kicker">STEP 1</div>
+    <h2>업무 등록</h2>
+    <p class="section-desc">점포를 선택하고 개설 체크리스트에서 필요한 업무를 고르면 등록창에 자동 입력됩니다.</p>
+
+    <div class="form-grid" style="margin-bottom:24px;">
+      <label>업무등록 대상 점포
+        <select id="taskProjectId"></select>
+      </label>
+    </div>
+
+<div class="checklist-header">
+
+    <div>
+      <div class="section-kicker">STEP 2</div>
+      <h2>개설 체크리스트</h2>
+
+      <p>
+  필요한 업무를 체크하면 업무등록 화면으로 이동하며
+  업무구분과 업무명이 자동으로 입력됩니다.
+</p>
+    </div>
+
+    <div class="checklist-total">
+  <strong id="checklistTotalCount">0</strong>
+  <span>전체 업무</span>
+</div>
+
+  </div>
+
+
+  <div id="openingChecklist" class="opening-checklist">
+    <div class="checklist-loading">체크리스트를 불러오는 중입니다...</div>
+  </div>
+
+  <div id="taskRegistrationForm" class="task-registration-shell">
+    <div class="section-kicker">STEP 3</div>
+    <h2>선택 업무 등록</h2>
+    <p class="section-desc">체크리스트에서 선택한 업무가 자동 입력됩니다. 담당자와 일정을 확인한 뒤 저장하세요.</p>
+
+    <div class="form-grid">
+
+      <label>업무구분
+        <select id="taskCategory">
+          <option>계약</option>
+          <option>도면</option>
+          <option>공사</option>
+          <option>집기/장비</option>
+          <option>인허가</option>
+          <option>채용</option>
+          <option>교육</option>
+        </select>
+      </label>
+
+      <label>업무명
+        <input type="text" id="taskTitle">
+      </label>
+
+      <label>담당자
+        <input type="text" id="taskOwner">
+      </label>
+
+      <label>시작일
+        <input type="date" id="taskStartDate">
+      </label>
+
+      <label>마감일
+        <input type="date" id="taskDueDate">
+      </label>
+
+      <label>상태
+        <select id="taskStatus">
+          <option>예정</option>
+          <option>진행중</option>
+          <option>완료</option>
+        </select>
+      </label>
+
+    </div>
+
+    <label class="full-label">
+      메모
+      <textarea id="taskMemo"></textarea>
+    </label>
+
+    <button class="primary task-save-button" onclick="saveTask()">
+      ✓ 업무 등록하기
+    </button>
+  </div>
+
+  </section>
+
+  <section id="schedule" class="panel active">
+
+  <div class="opening-toolbar">
+    <div class="opening-toolbar-copy">
+      <h2>점포별 업무처리현황</h2>
+      <p>개설 준비 중인 점포와 자동 생성된 기본업무를 관리합니다.</p>
+    </div>
+    <button type="button" class="secondary-action" onclick="openAdditionalTaskForm()">＋ 추가업무 등록</button>
+  </div>
+
+  <div class="schedule-project-filter">
+
+  <label>
+    점포 선택
+    <select id="scheduleProjectId" onchange="loadSchedule()"></select>
+  </label>
+
+  <p>
+    점포를 선택하면 담당자가 처리할 업무와 완료된 처리이력이 자동으로 표시됩니다.
+  </p>
+
+  <button
+    type="button"
+    id="scheduleSearchBtn"
+    class="primary schedule-search-button"
+    onclick="loadSchedule()">
+    다시 불러오기
+  </button>
+
+</div>
+
+<div id="scheduleList"></div>
+
+</section>
+
+  <section id="expenseSave" class="panel">
+
+  <h2>출납내역 저장</h2>
+
+  <div class="form-grid">
+
+    <label>
+      점포 선택
+      <select id="expenseProjectId"></select>
+    </label>
+
+    <label>
+      지출일자
+      <input type="date" id="expenseDate">
+    </label>
+
+    <label>
+      비용구분
+      <select id="expenseCategory">
+        <option>계약금</option>
+        <option>보증금</option>
+        <option>권리금</option>
+        <option>설계비</option>
+        <option>공사비</option>
+        <option>전기/가스/수도</option>
+        <option>집기/장비</option>
+        <option>POS/전산</option>
+        <option>초도물품</option>
+        <option>인허가/수수료</option>
+        <option>교육비</option>
+        <option>인건비</option>
+        <option>교통/출장비</option>
+        <option>기타</option>
+      </select>
+    </label>
+
+    <label>
+      거래처
+      <input
+        type="text"
+        id="expenseVendor"
+        placeholder="예: 인테리어 업체, 장비업체">
+    </label>
+
+    <label>
+      지출금액
+      <input
+        type="text"
+        id="expenseAmount"
+        placeholder="예: 1,000,000">
+    </label>
+
+    <label>
+      결제수단
+      <select id="expensePayMethod">
+        <option>계좌이체</option>
+        <option>법인카드</option>
+        <option>현금</option>
+        <option>개인카드</option>
+        <option>기타</option>
+      </select>
+    </label>
+
+    <label>
+      비용부담
+      <select id="expenseShareType">
+        <option>본사부담</option>
+        <option>점포부담</option>
+        <option>공동부담</option>
+        <option>추후정산</option>
+      </select>
+    </label>
+
+    <label>
+      증빙여부
+      <select id="expenseProof">
+        <option>세금계산서</option>
+        <option>카드영수증</option>
+        <option>현금영수증</option>
+        <option>간이영수증</option>
+        <option>증빙없음</option>
+      </select>
+    </label>
+
+  </div>
+
+  <label class="full-label">
+    메모
+    <textarea
+      id="expenseMemo"
+      placeholder="비용 배분 기준, 정산 예정일, 특이사항"></textarea>
+  </label>
+
+  <button
+    id="saveExpenseBtn"
+    class="primary"
+    onclick="saveExpense()">
+    출납 내역 저장
+  </button>
+
+</section>
+
+
+<section id="expenseLookup" class="panel">
+
+  <h2>출납내역 조회</h2>
+
+  <div class="expense-lookup-row">
+
+    <label>
+      점포 선택
+      <select id="expenseLookupProjectId"></select>
+    </label>
+
+    <button
+      id="loadExpenseBtn"
+      class="primary"
+      onclick="loadExpenses()">
+      출납 내역 조회
+    </button>
+
+  </div>
+
+  <div
+    id="expenseSummary"
+    class="summary"
+    style="margin-top:24px; margin-bottom:20px;">
+
+    <div class="summary-card">
+      <strong id="expenseTotal">0원</strong>
+      <span>총 지출액</span>
+    </div>
+
+    <div class="summary-card">
+      <strong id="expenseHeadOffice">0원</strong>
+      <span>본사부담</span>
+    </div>
+
+    <div class="summary-card">
+      <strong id="expenseStore">0원</strong>
+      <span>점포부담</span>
+    </div>
+
+  </div>
+
+  <h2 class="expense-list-title">항목별 출납 내역</h2>
+
+  <div id="expenseList" class="project-list"></div>
+
+</section>
+
+</main>
+
+<div id="taskProcessModal" class="checklist-modal hidden">
+  <div class="checklist-modal-backdrop" onclick="closeTaskProcessModal()"></div>
+  <div class="checklist-modal-card">
+    <div class="checklist-modal-header">
+      <div>
+        <span id="taskProcessModeLabel" class="task-modal-mode">업무 처리</span>
+        <h2 id="taskProcessTitle" class="task-modal-title">업무 처리</h2>
+        <p>진행상황과 처리내용을 한 번에 입력하세요.</p>
+      </div>
+      <button type="button" class="checklist-modal-close" onclick="closeTaskProcessModal()">×</button>
+    </div>
+
+    <input type="hidden" id="taskProcessTaskId">
+    <input type="hidden" id="taskProcessMode">
+
+    <div class="task-process-modal-grid">
+      <label>처리상태
+        <select id="taskProcessStatus">
+          <option value="진행중">진행중</option>
+          <option value="지연">지연</option>
+          <option value="완료">완료</option>
+        </select>
+      </label>
+      <label>진행률(%)
+        <input type="number" id="taskProcessProgress" min="0" max="100" step="10" value="0">
+      </label>
+      <label class="wide">업무 처리내용
+        <textarea id="taskProcessContent" placeholder="현재까지 처리한 내용을 입력하세요."></textarea>
+      </label>
+      <label class="wide">후속조치·다음 할 일
+        <textarea id="taskProcessFollowUp" placeholder="다음 조치가 있으면 입력하세요."></textarea>
+      </label>
+      <label id="taskProcessIssueWrap" class="wide">지연사유·문제점
+        <textarea id="taskProcessIssue" placeholder="지연 원인이나 해결이 필요한 문제를 입력하세요."></textarea>
+      </label>
+    </div>
+
+    <div class="checklist-modal-actions">
+      <button type="button" class="checklist-cancel-button" onclick="closeTaskProcessModal()">취소</button>
+      <button type="button" id="taskProcessSaveBtn" class="primary task-process-submit" onclick="submitTaskProcessModal()">처리내용 저장</button>
+    </div>
+  </div>
+</div>
+
+<script src="store-opening.js"></script>
+
+</body>
+</html>

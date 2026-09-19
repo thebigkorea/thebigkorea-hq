@@ -1,0 +1,1726 @@
+
+:root{
+  --navy:#172231;
+  --navy2:#223247;
+  --bg:#f4f6f8;
+  --panel:#ffffff;
+  --line:#e2e7ec;
+  --text:#1c2733;
+  --muted:#788596;
+  --accent:#b58a52;
+  --green:#1e8a5b;
+  --blue:#3573d4;
+  --amber:#c78b25;
+  --red:#c95050;
+  --shadow:0 10px 30px rgba(27,39,51,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,"Noto Sans KR",sans-serif;color:var(--text);background:var(--bg)}
+button,input{font:inherit}
+button{cursor:pointer}
+.app-shell{display:flex;min-height:100vh}
+.sidebar{
+  width:252px;background:linear-gradient(180deg,var(--navy),#101923);color:#fff;
+  position:fixed;left:0;top:0;bottom:0;display:flex;flex-direction:column;z-index:50;
+  box-shadow:8px 0 30px rgba(16,25,35,.14)
+}
+.brand{height:84px;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand-mark{width:42px;height:42px;border-radius:12px;background:var(--accent);display:grid;place-items:center;font-weight:900;color:#fff}
+.brand strong{display:block;font-size:17px}.brand span{display:block;font-size:12px;color:#aeb9c6;margin-top:3px}
+.nav{padding:14px 10px;overflow:auto;flex:1}
+.nav-group-title{font-size:10px;color:#758497;font-weight:900;letter-spacing:.1em;padding:18px 12px 8px}
+.nav-item{width:100%;height:42px;border:0;background:transparent;color:#c8d1da;border-radius:9px;display:flex;align-items:center;gap:10px;padding:0 12px;font-weight:800;text-align:left;margin-bottom:3px}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item.active{background:#fff;color:var(--navy);box-shadow:0 5px 16px rgba(0,0,0,.16)}
+.nav-item span{width:22px;text-align:center}
+.sidebar-footer{padding:16px 20px 20px;border-top:1px solid rgba(255,255,255,.08)}
+.sidebar-footer small{display:block;font-weight:900;color:#d5b27e}.sidebar-footer span{display:block;color:#7f8c9b;font-size:11px;margin-top:5px}
+.main-area{margin-left:252px;width:calc(100% - 252px)}
+.topbar{height:84px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:30}
+.topbar-left{display:flex;align-items:center;gap:14px}.topbar h1{font-size:22px;margin:0 0 5px}.topbar p{font-size:12px;color:var(--muted);margin:0}
+.menu-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);background:#fff;border-radius:9px}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.month-box{font-size:11px;color:var(--muted);font-weight:800}.month-box input{display:block;margin-top:4px;border:1px solid var(--line);border-radius:8px;height:34px;padding:0 8px}
+.icon-btn{height:40px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:0 12px;font-weight:800;color:#536170}
+.user-chip{display:flex;align-items:center;gap:9px;padding:6px 10px;border:1px solid var(--line);border-radius:11px;background:#fff}
+.user-avatar{width:32px;height:32px;border-radius:9px;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:900}
+.user-chip strong,.user-chip small{display:block}.user-chip strong{font-size:12px}.user-chip small{font-size:10px;color:var(--muted);margin-top:2px}
+.content{padding:24px 28px 50px}
+.view{display:none}.view.active{display:block}
+.hero-card{background:linear-gradient(120deg,#213047,#172231);border-radius:20px;padding:28px 30px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px;box-shadow:var(--shadow)}
+.eyebrow{font-size:11px;letter-spacing:.13em;font-weight:900;color:#d8b37c}.hero-card h2{font-size:26px;line-height:1.4;margin:8px 0 10px}.hero-card p{margin:0;color:#c8d1dc;font-size:13px}
+.hero-badge{min-width:210px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.07);border-radius:16px;padding:18px}.hero-badge strong,.hero-badge span{display:block}.hero-badge strong{font-size:18px}.hero-badge span{font-size:11px;color:#bac7d4;margin-top:7px}
+.section-title-row{display:flex;justify-content:space-between;align-items:center;margin:24px 0 12px}.section-title-row h3,.panel-head h3{margin:0;font-size:16px}.section-title-row p,.panel-head p{margin:5px 0 0;font-size:11px;color:var(--muted)}
+.status-pill{font-size:10px;font-weight:900;padding:6px 9px;border-radius:999px}.status-pill.draft{background:#eee6da;color:#856231}
+.kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.kpi-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px;min-height:112px;box-shadow:0 4px 16px rgba(31,45,61,.04)}
+.kpi-card span{display:block;font-size:11px;color:var(--muted);font-weight:800}.kpi-card strong{display:block;font-size:23px;margin:12px 0 8px}.kpi-card small{font-size:10px;color:#99a4b1}
+.kpi-card.accent{border-top:3px solid var(--accent)}.kpi-card.warning{border-top:3px solid var(--amber)}
+.dashboard-grid{display:grid;grid-template-columns:1.65fr .85fr;gap:14px;margin-top:14px}.dashboard-grid.lower{grid-template-columns:1.65fr .85fr}
+.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:0 4px 18px rgba(31,45,61,.04)}
+.panel-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.text-btn{border:0;background:transparent;color:var(--blue);font-weight:800;font-size:11px}
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.quick-card{border:1px solid var(--line);background:#fff;border-radius:13px;padding:14px;text-align:left;min-height:104px;transition:.18s}
+.quick-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(31,45,61,.09);border-color:#cad4df}
+.quick-icon{font-size:22px;display:block;margin-bottom:10px}.quick-card strong{font-size:12px;display:block}.quick-card small{display:block;color:var(--muted);font-size:10px;margin-top:5px}
+.alert-list{display:grid;gap:7px}.alert-item{width:100%;display:grid;grid-template-columns:10px 1fr auto;align-items:center;gap:10px;border:1px solid var(--line);border-radius:11px;padding:11px;background:#fff;text-align:left;color:var(--text)}
+.alert-item:hover{border-color:#c9d3de;background:#f9fbfd}
+.alert-item strong,.alert-item small{display:block}.alert-item strong{font-size:11px}.alert-item small{font-size:10px;color:var(--muted);margin-top:4px}.alert-item b{font-size:10px;color:var(--blue)}
+.dot{width:8px;height:8px;border-radius:50%}.dot.red{background:var(--red)}.dot.amber{background:var(--amber)}.dot.blue{background:var(--blue)}.dot.green{background:var(--green)}
+.attendance-roster-panel{height:100%;min-height:0;max-height:none;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden}
+.attendance-roster-panel .panel-head{flex:0 0 auto}
+.attendance-store-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;margin-bottom:2px}
+.attendance-store-tab{flex:0 0 auto;border:1px solid var(--line);background:#f7f9fb;color:#617083;border-radius:999px;padding:7px 11px;font-size:10px;font-weight:900}
+.attendance-store-tab.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.attendance-store-groups{display:grid;align-content:start;gap:10px;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding-right:6px;scrollbar-gutter:stable}
+.attendance-store-groups::-webkit-scrollbar{width:8px}.attendance-store-groups::-webkit-scrollbar-thumb{background:#bcc6d1;border-radius:999px}.attendance-store-groups::-webkit-scrollbar-track{background:#eef2f5;border-radius:999px}
+.attendance-store-group{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.attendance-store-title{display:flex;justify-content:space-between;align-items:center;padding:10px 11px;background:#f7f9fb;border-bottom:1px solid var(--line)}
+.attendance-store-title strong{font-size:12px}.attendance-store-title span{font-size:10px;color:var(--muted);font-weight:800}
+.attendance-person-list{display:grid}
+.attendance-person{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 11px;border-bottom:1px solid #edf0f3}
+.attendance-person:last-child{border-bottom:0}
+.attendance-person strong,.attendance-person small{display:block}.attendance-person strong{font-size:12px}.attendance-person small{font-size:10px;color:var(--muted);margin-top:4px}
+.attendance-state{font-size:9px;font-weight:900;border-radius:999px;padding:5px 8px;white-space:nowrap}
+.attendance-state.working{background:#e7f5ee;color:#16734a}.attendance-state.completed{background:#eef2f6;color:#5f6d7c}
+.attendance-roster-empty{padding:28px 12px;text-align:center;color:var(--muted);font-size:11px;border:1px dashed var(--line);border-radius:12px}
+.attendance-all-summary{display:grid;gap:8px}
+.attendance-summary-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:13px;text-align:left;color:var(--text)}
+.attendance-summary-row:hover{border-color:#b8c5d2;background:#f8fafc}
+.attendance-summary-row span,.attendance-summary-row strong,.attendance-summary-row small{display:block;min-width:0}
+.attendance-summary-row strong{font-size:12px}.attendance-summary-row small{margin-top:6px;color:var(--muted);font-size:10px;line-height:1.45;white-space:normal;word-break:keep-all}
+.attendance-summary-row b{font-size:11px;color:var(--blue);white-space:nowrap}
+.store-table-wrap{overflow:auto}.store-table{width:100%;border-collapse:collapse;min-width:760px}.store-table th{font-size:10px;color:#7a8795;background:#f7f9fb;text-align:left;padding:10px;border-bottom:1px solid var(--line)}.store-table td{padding:11px 10px;border-bottom:1px solid #edf0f3;font-size:11px}
+.type,.state{display:inline-block;padding:4px 7px;border-radius:999px;font-size:9px;font-weight:900}.type.direct{background:#e8f1ff;color:#2e61ad}.state.good{background:#e7f5ee;color:#16734a}
+.roadmap{display:grid;gap:10px}.roadmap-item{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:11px}.roadmap-item>span{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#e9edf2;color:#647180;font-weight:900;font-size:11px}.roadmap-item strong,.roadmap-item small{display:block}.roadmap-item strong{font-size:11px}.roadmap-item small{font-size:10px;color:var(--muted);margin-top:3px}.roadmap-item.done>span{background:#dff3e9;color:#11734a}.roadmap-item.current{border-color:#d7c4a5;background:#fffaf2}.roadmap-item.current>span{background:#b58a52;color:#fff}
+.roadmap-panel{margin-top:14px}.roadmap-horizontal{grid-template-columns:repeat(4,minmax(0,1fr))}
+.module-hero{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:14px}
+.module-hero h2{margin:0 0 8px;font-size:20px}.module-hero p{margin:0;color:var(--muted);font-size:12px}
+.module-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.module-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:17px;min-height:132px;display:flex;flex-direction:column}
+.module-card h3{font-size:14px;margin:0 0 7px}.module-card p{font-size:11px;color:var(--muted);line-height:1.55;margin:0 0 14px}.module-card button{margin-top:auto;align-self:flex-start;border:0;background:var(--navy);color:#fff;border-radius:8px;height:34px;padding:0 11px;font-size:10px;font-weight:900}
+.module-card button.secondary{background:#eef2f6;color:#44515f}
+.note-box{margin-top:14px;background:#fff9ed;border:1px solid #ead7b6;border-radius:12px;padding:13px;font-size:11px;color:#765d38}
+@media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.quick-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}
+  .main-area{margin-left:0;width:100%}.menu-toggle{display:block}.topbar{padding:0 14px}.content{padding:16px}
+  .dashboard-grid,.dashboard-grid.lower{grid-template-columns:1fr}.kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .roadmap-horizontal{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .attendance-roster-panel{height:420px;min-height:420px;max-height:420px}
+  .topbar-actions .user-chip{display:none}
+}
+@media(max-width:560px){.kpi-grid,.module-grid{grid-template-columns:1fr}.hero-card{flex-direction:column;align-items:flex-start}.quick-grid,.roadmap-horizontal{grid-template-columns:1fr}.month-box{display:none}}
+
+
+/* V2 전 점포 매출 현황 */
+.sales-summary-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin-top:14px;
+}
+.sales-summary-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:16px 18px;
+  min-height:104px;
+  box-shadow:0 4px 16px rgba(31,45,61,.04);
+}
+.sales-summary-card span{
+  display:block;
+  font-size:11px;
+  color:var(--muted);
+  font-weight:800;
+}
+.sales-summary-card strong{
+  display:block;
+  margin:10px 0 7px;
+  font-size:22px;
+}
+.sales-summary-card small{
+  display:block;
+  color:#99a4b1;
+  font-size:10px;
+  line-height:1.45;
+}
+.sales-panel{min-width:0}
+.panel-actions{display:flex;align-items:center;gap:10px}
+.sales-linked-badge{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:999px;
+  background:#eef2f6;
+  color:#6e7b88;
+  font-size:9px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.sales-linked-badge.live{
+  background:#e7f5ee;
+  color:#16734a;
+}
+.sales-table{min-width:980px}
+.sales-table th:nth-child(n+3),
+.sales-table td:nth-child(n+3){
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.sales-table tbody tr:hover{background:#fafbfc}
+.sales-table tfoot th{
+  padding:12px 10px;
+  border-top:2px solid #d9e0e7;
+  background:#f7f9fb;
+  font-size:11px;
+}
+.sales-loading-row td{
+  padding:28px 12px !important;
+  text-align:center !important;
+  color:#8b96a3;
+}
+.sales-footnote{
+  margin-top:10px;
+  color:#8793a0;
+  font-size:10px;
+  line-height:1.55;
+}
+.sales-change{
+  display:inline-flex;
+  align-items:center;
+  justify-content:flex-end;
+  min-width:68px;
+  font-weight:900;
+}
+.sales-change.up{color:#15734a}
+.sales-change.down{color:#c34a4a}
+.sales-change.same{color:#788596}
+.type.consignment{background:#fff1dd;color:#9a6518}
+.sales-company-summary{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin-top:14px;
+}
+.sales-company-card{
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#f8fafc;
+  padding:14px;
+  min-width:0;
+}
+.sales-company-card span,.sales-company-card small{display:block;color:var(--muted);font-size:10px;font-weight:800}
+.sales-company-card strong{display:block;margin:8px 0 5px;font-size:18px;line-height:1.25;word-break:keep-all}
+.sales-store-summary-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin-top:12px;
+}
+.sales-store-card{
+  appearance:none;text-align:left;font:inherit;color:inherit;background:#fff;
+  border:1px solid var(--line);border-radius:14px;padding:15px;min-height:150px;
+  cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s;
+}
+.sales-store-card:hover,.sales-store-card:focus-visible{transform:translateY(-2px);border-color:#b98a3d;box-shadow:0 8px 20px rgba(31,45,61,.09);outline:none}
+.sales-store-name{display:block;color:#44515f;font-size:11px;font-weight:900}
+.sales-store-card>strong{display:block;margin:10px 0 4px;font-size:20px}
+.sales-store-card>small{display:block;color:var(--muted);font-size:10px}
+.sales-store-yesterday,.sales-store-previous{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:7px 8px;border-radius:8px;background:#f5f8fb;color:#526170;font-size:10px}
+.sales-store-yesterday strong,.sales-store-previous strong{color:#17243a;font-size:12px;white-space:nowrap}
+.sales-company-card small b,.sales-company-card small em{font-style:normal}
+.sales-store-change{display:block;margin-top:10px;font-size:10px;color:var(--muted)}
+.sales-store-card>b{display:block;margin-top:11px;color:#2458a6;font-size:10px}
+.sales-store-card .sales-change{justify-content:flex-start;min-width:0;margin-left:3px}
+.sales-store-loading{grid-column:1/-1;padding:35px 14px;text-align:center;color:#8793a0;border:1px dashed var(--line);border-radius:14px}
+.sales-store-loading.error{color:#b54848;background:#fff8f8}
+@media(max-width:1200px){
+  .sales-summary-grid,.sales-company-summary,.sales-store-summary-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){
+  .sales-summary-grid,.sales-company-summary,.sales-store-summary-grid{grid-template-columns:1fr}
+  .panel-actions{align-items:flex-end;flex-direction:column;gap:5px}
+}
+
+
+/* =========================================
+   경비 · 자금 전용 화면 V3
+========================================= */
+.fund-hero{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.fund-hero .eyebrow{color:#9c7443}
+.fund-connection-box{display:flex;align-items:center;gap:10px;min-width:250px;border:1px solid var(--line);border-radius:13px;padding:12px 14px;background:#f9fbfc}
+.fund-connection-dot{width:10px;height:10px;border-radius:50%;background:#aab4bf;box-shadow:0 0 0 4px #edf1f4}
+.fund-connection-dot.ready{background:var(--green);box-shadow:0 0 0 4px #e5f4ec}
+.fund-connection-box strong,.fund-connection-box small{display:block}
+.fund-connection-box strong{font-size:12px}
+.fund-connection-box small{font-size:10px;color:var(--muted);margin-top:4px}
+
+.fund-kpi-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.fund-kpi-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:17px 18px;min-height:110px;box-shadow:0 4px 16px rgba(31,45,61,.04);border-top:3px solid #9aa6b2}
+.fund-kpi-card.income{border-top-color:var(--green)}
+.fund-kpi-card.expense{border-top-color:var(--red)}
+.fund-kpi-card.warning{border-top-color:var(--amber)}
+.fund-kpi-card.posted{border-top-color:var(--blue)}
+.fund-kpi-card span{display:block;font-size:11px;color:var(--muted);font-weight:800}
+.fund-kpi-card strong{display:block;font-size:22px;margin:12px 0 7px;font-variant-numeric:tabular-nums}
+.fund-kpi-card small{font-size:10px;color:#98a3ae}
+
+.fund-layout{display:grid;grid-template-columns:1.25fr .85fr;gap:14px;margin-bottom:14px}
+.fund-account-list{display:grid;gap:8px}
+.fund-account-item{display:grid;grid-template-columns:40px 1fr auto;gap:11px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+.fund-bank-icon{width:38px;height:38px;border-radius:10px;background:#eef2f6;display:grid;place-items:center}
+.fund-account-main strong,.fund-account-main small,.fund-account-balance strong,.fund-account-balance small{display:block}
+.fund-account-main strong{font-size:11px}.fund-account-main small{font-size:10px;color:var(--muted);margin-top:4px}
+.fund-account-balance{text-align:right}.fund-account-balance strong{font-size:13px;font-variant-numeric:tabular-nums}.fund-account-balance small{font-size:9px;color:#8995a2;margin-top:4px}.fund-account-balance small.ok{color:var(--green)}
+
+.fund-empty{border:1px dashed #ccd5dd;border-radius:12px;padding:24px;text-align:center;background:#fafbfc}
+.fund-empty strong,.fund-empty span{display:block}
+.fund-empty strong{font-size:12px}.fund-empty span{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5}
+
+.fund-flow-panel .fund-flow-row{display:grid;grid-template-columns:34px 1fr 105px;align-items:center;gap:10px;margin:14px 0}
+.fund-flow-row>span{font-size:10px;font-weight:900;color:#647180}
+.fund-flow-row>strong{text-align:right;font-size:10px;font-variant-numeric:tabular-nums}
+.fund-flow-track{height:10px;border-radius:999px;background:#edf1f4;overflow:hidden}
+.fund-flow-track i{display:block;height:100%;width:0;border-radius:999px;transition:.25s}
+.fund-flow-track i.in{background:var(--green)}
+.fund-flow-track i.out{background:var(--red)}
+.fund-note{margin-top:18px;background:#f7f9fb;border:1px solid var(--line);border-radius:10px;padding:11px;font-size:10px;color:#687684;line-height:1.55}
+
+.fund-transactions-panel{min-width:0}
+.fund-head-wrap{gap:12px}
+.fund-actions{display:flex;gap:7px}
+.fund-btn{height:34px;border-radius:8px;padding:0 12px;font-size:10px;font-weight:900}
+.fund-btn.primary{border:0;background:var(--navy);color:#fff}
+.fund-btn.secondary{border:1px solid var(--line);background:#fff;color:#596777}
+
+.fund-filter-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;margin-bottom:12px;padding:12px;background:#f7f9fb;border:1px solid var(--line);border-radius:12px}
+.fund-filter-grid label{font-size:9px;color:#718090;font-weight:900}
+.fund-filter-grid input,.fund-filter-grid select{width:100%;height:34px;margin-top:6px;border:1px solid #dce2e8;border-radius:8px;background:#fff;padding:0 9px;color:#36414d;font-size:10px}
+
+.fund-tabs{display:flex;gap:5px;margin-bottom:10px;overflow:auto}
+.fund-tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-size:10px;font-weight:900;color:#687684;white-space:nowrap}
+.fund-tab.active{background:var(--navy);border-color:var(--navy);color:#fff}
+
+.fund-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:520px}
+.fund-table{width:100%;border-collapse:collapse;min-width:1080px}
+.fund-table th{position:sticky;top:0;z-index:1;background:#f7f9fb;color:#74818f;font-size:9px;text-align:left;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.fund-table td{padding:9px 10px;border-bottom:1px solid #edf0f3;font-size:10px;vertical-align:middle}
+.fund-table tbody tr:hover{background:#fafbfc}
+.fund-table .money{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fund-table .money.in{color:#14764b;font-weight:800}
+.fund-table .money.out{color:#bd4747;font-weight:800}
+.fund-type,.fund-status{display:inline-block;padding:4px 7px;border-radius:999px;font-size:9px;font-weight:900;white-space:nowrap}
+.fund-type.in{background:#e7f5ee;color:#16734a}.fund-type.out{background:#fdeaea;color:#b84343}
+.fund-status.done{background:#e8f1ff;color:#2e61ad}.fund-status.pending{background:#fff1dd;color:#9a6518}
+.fund-empty-row td{text-align:center!important;padding:34px 12px!important;color:#84909c}
+.fund-empty-row strong,.fund-empty-row span{display:block}.fund-empty-row strong{font-size:12px}.fund-empty-row span{font-size:10px;margin-top:6px}
+
+@media(max-width:1300px){
+  .fund-kpi-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:1200px){
+  .fund-filter-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:900px){
+  .fund-layout{grid-template-columns:1fr}
+  .fund-hero{align-items:flex-start;flex-direction:column}
+  .fund-connection-box{width:100%}
+}
+@media(max-width:650px){
+  .fund-kpi-grid{grid-template-columns:1fr}
+  .fund-filter-grid{grid-template-columns:1fr}
+  .fund-head-wrap{align-items:flex-start;flex-direction:column}
+}
+
+
+
+/* =========================================
+   기존 본사 시스템 통합 연결 V6
+========================================= */
+.legacy-hero{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.legacy-count{min-width:145px;padding:13px 16px;border:1px solid var(--line);border-radius:13px;background:#f9fbfc;text-align:right}
+.legacy-count strong{display:block;font-size:24px;color:var(--navy);font-variant-numeric:tabular-nums}
+.legacy-count span{display:block;margin-top:3px;font-size:10px;color:var(--muted);font-weight:800}
+.legacy-module-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.module-card-top{display:flex;justify-content:flex-end;min-height:20px;margin-bottom:5px}
+.system-state{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-size:9px;font-weight:900}
+.system-state.live{background:#e7f5ee;color:#16734a}
+.system-state.live::before{content:"";width:6px;height:6px;border-radius:50%;background:#22a06b}
+.system-state.wait{background:#f0f2f4;color:#84909b}
+.module-card.linked{border-top:3px solid #2b6cb0}
+.module-card.planned{opacity:.7;border-top:3px solid #c8d0d8}
+.module-card button:disabled{cursor:not-allowed;background:#e8ecef!important;color:#8995a0!important;border-color:#dce2e7!important}
+@media(max-width:1200px){.legacy-module-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.legacy-module-grid{grid-template-columns:1fr}.legacy-hero{align-items:flex-start;flex-direction:column}.legacy-count{width:100%;text-align:left}}
+
+
+/* =========================================
+   본사 업무일정 관리 V7
+========================================= */
+.hq-task-hero{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.hq-task-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.hq-task-kpis article{background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px 18px;border-top:3px solid var(--accent);box-shadow:0 4px 16px rgba(31,45,61,.04)}
+.hq-task-kpis span,.hq-task-kpis small{display:block}.hq-task-kpis span{font-size:11px;color:var(--muted);font-weight:800}.hq-task-kpis strong{display:block;font-size:23px;margin:10px 0 6px}.hq-task-kpis small{font-size:10px;color:#99a4b1}
+.hq-task-layout{display:grid;grid-template-columns:1.45fr .75fr;gap:14px;margin-bottom:14px}
+.hq-today-list{display:grid;gap:8px}.hq-today-item{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:11px;border:1px solid var(--line);border-radius:12px;padding:11px 12px}.hq-today-item.done{background:#f7fbf9}
+.hq-check{width:30px;height:30px;border-radius:9px;border:1px solid #ccd5dd;background:#fff;font-weight:900;color:var(--green)}.hq-today-item.done .hq-check{background:var(--green);border-color:var(--green);color:#fff}
+.hq-today-item strong,.hq-today-item small{display:block}.hq-today-item strong{font-size:12px}.hq-today-item small{font-size:10px;color:var(--muted);margin-top:4px}
+.hq-state{padding:5px 8px;border-radius:999px;font-size:9px;font-weight:900}.hq-state.pending{background:#fff1dd;color:#9a6518}.hq-state.done{background:#e7f5ee;color:#16734a}
+.hq-task-form{display:grid;gap:11px}.hq-task-form label{font-size:10px;color:#657382;font-weight:900}.hq-task-form input,.hq-task-form select{width:100%;height:38px;margin-top:6px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:0 10px}.hq-form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.hq-add-btn{height:40px;border:0;border-radius:9px;background:var(--navy);color:#fff;font-weight:900}
+.hq-ledger-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}.hq-ledger{width:100%;min-width:900px;border-collapse:collapse}.hq-ledger th{background:#f7f9fb;color:#74818f;font-size:10px;text-align:left;padding:10px;border-bottom:1px solid var(--line)}.hq-ledger td{font-size:10px;padding:10px;border-bottom:1px solid #edf0f3}.hq-ledger td:first-child{font-size:11px}.hq-delete-btn{border:1px solid #ead0d0;background:#fff5f5;color:#b84343;border-radius:7px;padding:5px 8px;font-size:9px;font-weight:900}
+#homeHqTaskAlert{cursor:pointer;background:#fffaf2}
+@media(max-width:1100px){.hq-task-kpis{grid-template-columns:repeat(2,1fr)}.hq-task-layout{grid-template-columns:1fr}}
+@media(max-width:600px){.hq-task-kpis{grid-template-columns:1fr}.hq-form-row{grid-template-columns:1fr}.hq-task-hero{align-items:flex-start;flex-direction:column}}
+
+
+/* 홈 본사 업무현황 V8 */
+.kpi-card.clickable{cursor:pointer;transition:.18s}
+.kpi-card.clickable:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(31,45,61,.09)}
+.kpi-card.danger{border-top:3px solid var(--red)}
+.home-task-link{border:0;cursor:pointer}
+.company-status-row{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;box-shadow:0 3px 12px rgba(31,45,61,.03)}
+.company-status-row>div{font-size:10px;color:var(--muted)}
+.company-status-row>div:first-child{display:flex;align-items:center;gap:12px}
+.company-status-row span{font-weight:900;color:#657382}
+.company-status-row strong{font-size:10px;color:#657382}
+.company-status-row b{font-size:11px;color:var(--text);margin-left:3px}
+@media(max-width:700px){.company-status-row{gap:10px}.company-status-row>div{width:calc(50% - 8px)}}
+
+
+/* =========================================================
+   2026-09 Navigation detail visual differentiation
+   기능/링크/데이터 로직은 변경하지 않고 모듈별 색상만 차별화
+   ========================================================= */
+.module-view{--module-accent:#2f6fd6;--module-soft:#eef5ff;--module-soft2:#f8fbff;--module-border:#cfe0fb}
+.module-view[data-module="stores"]{--module-accent:#2575d8;--module-soft:#eaf4ff;--module-soft2:#f8fbff;--module-border:#bdd8fb}
+.module-view[data-module="schedule"]{--module-accent:#7858c7;--module-soft:#f1edff;--module-soft2:#fbf9ff;--module-border:#d9cef8}
+.module-view[data-module="sales"]{--module-accent:#16896b;--module-soft:#e8f8f2;--module-soft2:#f7fcfa;--module-border:#bfe8db}
+.module-view[data-module="opening"]{--module-accent:#d39124;--module-soft:#fff4df;--module-soft2:#fffaf1;--module-border:#f0d49e}
+.module-view[data-module="hq"]{--module-accent:#3568b8;--module-soft:#edf4ff;--module-soft2:#f9fbff;--module-border:#cadbf4}
+.module-view[data-module="support"]{--module-accent:#dc6c2d;--module-soft:#fff0e7;--module-soft2:#fffaf7;--module-border:#f3cfb8}
+.module-view[data-module="settlement"]{--module-accent:#15956f;--module-soft:#e8f8f1;--module-soft2:#f7fcfa;--module-border:#bfe9da}
+.module-view[data-module="vehicle"]{--module-accent:#287bc1;--module-soft:#eaf5fc;--module-soft2:#f7fbfe;--module-border:#c5e0f2}
+.module-view[data-module="tools"]{--module-accent:#8657c8;--module-soft:#f3edfb;--module-soft2:#fbf9fe;--module-border:#dfcff3}
+
+.module-view .module-hero{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--module-soft) 0%,#fff 58%,var(--module-soft2) 100%);
+  border-color:var(--module-border);
+  box-shadow:0 10px 28px rgba(31,45,61,.055);
+}
+.module-view .module-hero:before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--module-accent)
+}
+.module-view .module-hero:after{
+  content:"";position:absolute;right:-45px;top:-75px;width:190px;height:190px;border-radius:50%;
+  background:var(--module-soft);opacity:.72;pointer-events:none
+}
+.module-view .module-hero h2{position:relative;z-index:1;color:#16243a}
+.module-view .module-hero p{position:relative;z-index:1}
+.module-view .module-grid{align-items:stretch}
+.module-view .module-card{
+  position:relative;overflow:hidden;border-color:var(--module-border);
+  background:linear-gradient(145deg,#fff 0%,var(--module-soft2) 100%);
+  box-shadow:0 5px 16px rgba(31,45,61,.035);transition:.2s ease
+}
+.module-view .module-card:before{
+  content:"";position:absolute;left:0;top:0;width:100%;height:3px;background:var(--module-accent)
+}
+.module-view .module-card:hover{
+  transform:translateY(-2px);box-shadow:0 12px 26px rgba(31,45,61,.09)
+}
+.module-view .module-card button:not(.secondary){
+  background:var(--module-accent);box-shadow:0 5px 12px color-mix(in srgb,var(--module-accent) 20%,transparent)
+}
+.module-view .module-card button.secondary{
+  background:var(--module-soft);color:var(--module-accent);border:1px solid var(--module-border)
+}
+
+/* 지점관리: 4개 점포를 서로 다른 색으로 구분 */
+.store-management-view .store-link-card:nth-child(1),
+#view-stores .store-link-card:nth-child(1){--store-accent:#2476df;--store-soft:#edf5ff;--store-border:#bdd9fb}
+.store-management-view .store-link-card:nth-child(2),
+#view-stores .store-link-card:nth-child(2){--store-accent:#14966c;--store-soft:#eaf9f3;--store-border:#bfe8d9}
+.store-management-view .store-link-card:nth-child(3),
+#view-stores .store-link-card:nth-child(3){--store-accent:#8156c7;--store-soft:#f3eefc;--store-border:#ddcff4}
+.store-management-view .store-link-card:nth-child(4),
+#view-stores .store-link-card:nth-child(4){--store-accent:#dc711e;--store-soft:#fff1e5;--store-border:#f3cfb1}
+.store-link-card{
+  border-top:3px solid var(--store-accent,var(--module-accent,#2f6fd6))!important;
+  background:linear-gradient(145deg,#fff 0%,var(--store-soft,#f8fbff) 100%)!important
+}
+.store-link-card .store-status,
+.store-link-card .status-badge{background:var(--store-soft,#edf5ff)!important;color:var(--store-accent,#2f6fd6)!important}
+.store-link-card button,.store-link-card a.store-action{
+  background:var(--store-accent,#1b2638)!important;color:#fff!important
+}
+
+/* 신규점포 개설은 각 업무 성격별 카드 색상 차별화 */
+#view-opening .module-card:nth-child(1){--module-accent:#cf3e49;--module-soft:#fff0f2;--module-soft2:#fff8f8;--module-border:#f4cbd0}
+#view-opening .module-card:nth-child(2){--module-accent:#2478df;--module-soft:#edf5ff;--module-soft2:#f8fbff;--module-border:#c6dcfa}
+#view-opening .module-card:nth-child(3){--module-accent:#15966f;--module-soft:#eaf9f3;--module-soft2:#f7fcfa;--module-border:#c1e9db}
+#view-opening .module-card:nth-child(4){--module-accent:#d17b22;--module-soft:#fff3e7;--module-soft2:#fffaf5;--module-border:#f0d2b5}
+
+/* 좁은 화면에서도 색상/카드 구조 유지 */
+@media(max-width:900px){
+  .module-view .module-card{min-height:118px}
+}
+
+
+/* =========================================================
+   V23 실제 화면 ID 기준 모듈별 색상 차별화
+   ========================================================= */
+#view-stores{--module-accent:#2476df;--module-soft:#eaf4ff;--module-soft2:#f8fbff;--module-border:#bdd8fb}
+#view-schedule{--module-accent:#7858c7;--module-soft:#f1edff;--module-soft2:#fbf9ff;--module-border:#d9cef8}
+#view-sales{--module-accent:#16896b;--module-soft:#e8f8f2;--module-soft2:#f7fcfa;--module-border:#bfe8db}
+#view-opening{--module-accent:#d39124;--module-soft:#fff4df;--module-soft2:#fffaf1;--module-border:#f0d49e}
+#view-hq{--module-accent:#3568b8;--module-soft:#edf4ff;--module-soft2:#f9fbff;--module-border:#cadbf4}
+#view-support{--module-accent:#dc6c2d;--module-soft:#fff0e7;--module-soft2:#fffaf7;--module-border:#f3cfb8}
+#view-settlement{--module-accent:#15956f;--module-soft:#e8f8f1;--module-soft2:#f7fcfa;--module-border:#bfe9da}
+#view-vehicle{--module-accent:#287bc1;--module-soft:#eaf5fc;--module-soft2:#f7fbfe;--module-border:#c5e0f2}
+#view-tools{--module-accent:#8657c8;--module-soft:#f3edfb;--module-soft2:#fbf9fe;--module-border:#dfcff3}
+
+/* 실제 각 view 내부 hero/card에 적용 */
+[id^="view-"]:not(#view-home) .module-hero{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--module-soft,#eef5ff) 0%,#fff 58%,var(--module-soft2,#f8fbff) 100%)!important;
+  border-color:var(--module-border,#cfe0fb)!important;
+  box-shadow:0 10px 28px rgba(31,45,61,.055)
+}
+[id^="view-"]:not(#view-home) .module-hero:before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:5px;
+  background:var(--module-accent,#2f6fd6)
+}
+[id^="view-"]:not(#view-home) .module-card{
+  border-color:var(--module-border,#cfe0fb)!important;
+  background:linear-gradient(145deg,#fff 0%,var(--module-soft2,#f8fbff) 100%)!important;
+  box-shadow:0 5px 16px rgba(31,45,61,.04);
+  transition:transform .18s,box-shadow .18s
+}
+[id^="view-"]:not(#view-home) .module-card:hover{
+  transform:translateY(-2px);box-shadow:0 12px 26px rgba(31,45,61,.09)
+}
+[id^="view-"]:not(#view-home) .module-card.linked{
+  border-top:4px solid var(--module-accent,#2f6fd6)!important
+}
+[id^="view-"]:not(#view-home) .module-card button:not(:disabled){
+  background:var(--module-accent,#1b2638)!important;color:#fff!important
+}
+
+/* 점포관리 4개 카드 각각 다른 색 */
+#view-stores .module-card:nth-child(1){--module-accent:#2476df;--module-soft2:#f4f9ff;--module-border:#bfd9fb}
+#view-stores .module-card:nth-child(2){--module-accent:#14966c;--module-soft2:#f2fcf8;--module-border:#bfe8d9}
+#view-stores .module-card:nth-child(3){--module-accent:#8156c7;--module-soft2:#f8f4fd;--module-border:#ddcff4}
+#view-stores .module-card:nth-child(4){--module-accent:#dc711e;--module-soft2:#fff7ef;--module-border:#f3cfb1}
+#view-stores .module-card:nth-child(1) button{background:#2476df!important}
+#view-stores .module-card:nth-child(2) button{background:#14966c!important}
+#view-stores .module-card:nth-child(3) button{background:#8156c7!important}
+#view-stores .module-card:nth-child(4) button{background:#dc711e!important}
+
+/* 신규점포 개설 업무카드 각각 다른 색 */
+#view-opening .module-card:nth-child(1){--module-accent:#cf3e49;--module-soft2:#fff7f8;--module-border:#f4cbd0}
+#view-opening .module-card:nth-child(2){--module-accent:#2478df;--module-soft2:#f5f9ff;--module-border:#c6dcfa}
+#view-opening .module-card:nth-child(3){--module-accent:#15966f;--module-soft2:#f3fcf8;--module-border:#c1e9db}
+#view-opening .module-card:nth-child(4){--module-accent:#d17b22;--module-soft2:#fff8f1;--module-border:#f0d2b5}
+#view-opening .module-card:nth-child(1) button{background:#cf3e49!important}
+#view-opening .module-card:nth-child(2) button{background:#2478df!important}
+#view-opening .module-card:nth-child(3) button{background:#15966f!important}
+#view-opening .module-card:nth-child(4) button{background:#d17b22!important}
+
+
+/* =========================================================
+   V24 COLORFUL ERP HOME
+   현재 화면 순서/기능/API/ID는 그대로 유지하고 디자인만 변경
+   ========================================================= */
+.colorful-home{
+  --c-blue:#1473e6;
+  --c-sky:#4aa8ff;
+  --c-green:#13a873;
+  --c-mint:#16bfa0;
+  --c-purple:#8057d9;
+  --c-orange:#f28a1a;
+  --c-red:#e94d5d;
+  --c-pink:#e85c9b;
+  --c-navy:#112b52;
+}
+.colorful-home .hero-card{
+  min-height:210px;
+  border:0;
+  color:#fff;
+  background:
+    radial-gradient(circle at 82% 28%,rgba(255,183,77,.38),transparent 18%),
+    radial-gradient(circle at 66% 72%,rgba(65,142,255,.30),transparent 28%),
+    linear-gradient(115deg,#0d2b5c 0%,#1258b6 46%,#0d3c7c 72%,#10284e 100%);
+  box-shadow:0 18px 38px rgba(16,55,105,.20);
+  position:relative;
+  overflow:hidden;
+}
+.colorful-home .hero-card:before{
+  content:"";
+  position:absolute;right:4%;bottom:-58px;width:430px;height:190px;
+  border-radius:120px 120px 0 0;
+  border:2px solid rgba(255,255,255,.11);
+  box-shadow:
+    -75px -24px 0 -72px rgba(255,255,255,.28),
+    -145px -4px 0 -142px rgba(255,255,255,.20);
+  transform:skewX(-8deg);
+}
+.colorful-home .hero-card:after{
+  content:"THE BIG KOREA";
+  position:absolute;right:36px;top:26px;
+  color:rgba(255,255,255,.18);font-weight:900;letter-spacing:.22em;font-size:13px
+}
+.colorful-home .hero-card>div{position:relative;z-index:1}
+.colorful-home .hero-card .eyebrow{color:#ffd86f;letter-spacing:.18em;font-weight:900}
+.colorful-home .hero-card h2{font-size:32px;line-height:1.28;color:#fff;margin-top:10px}
+.colorful-home .hero-card p{color:#e7f1ff;font-size:14px}
+.colorful-home .hero-badge{
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);
+  backdrop-filter:blur(8px);box-shadow:none
+}
+.colorful-home .hero-badge strong,.colorful-home .hero-badge span{color:#fff}
+
+/* section title */
+.colorful-home .section-title-row{margin-top:22px}
+.colorful-home .section-title-row h3:before{
+  content:"★";display:inline-grid;place-items:center;width:30px;height:30px;margin-right:9px;
+  border-radius:10px;background:#eaf4ff;color:var(--c-blue);font-size:14px;vertical-align:middle
+}
+
+/* 오늘의 업무 KPI */
+.colorful-home .home-task-kpis{gap:12px}
+.colorful-home .home-task-kpis .kpi-card{
+  border:1px solid transparent;box-shadow:0 7px 20px rgba(37,71,117,.06);
+  min-height:108px;position:relative;overflow:hidden
+}
+.colorful-home .home-task-kpis .kpi-card:after{
+  content:"";position:absolute;right:-18px;top:-18px;width:68px;height:68px;border-radius:50%;opacity:.55
+}
+.colorful-home .home-task-kpis .kpi-card:nth-child(1){background:linear-gradient(135deg,#edf7ff,#f8fcff);border-color:#cfe8ff}
+.colorful-home .home-task-kpis .kpi-card:nth-child(1):after{background:#b9dcff}
+.colorful-home .home-task-kpis .kpi-card:nth-child(2){background:linear-gradient(135deg,#eafaf5,#f8fffc);border-color:#c9eddf}
+.colorful-home .home-task-kpis .kpi-card:nth-child(2):after{background:#b7ead9}
+.colorful-home .home-task-kpis .kpi-card:nth-child(3){background:linear-gradient(135deg,#fff7e8,#fffdf8);border-color:#f6dfb8}
+.colorful-home .home-task-kpis .kpi-card:nth-child(3):after{background:#f9d89e}
+.colorful-home .home-task-kpis .kpi-card:nth-child(4){background:linear-gradient(135deg,#f4efff,#fcfaff);border-color:#dfd2fa}
+.colorful-home .home-task-kpis .kpi-card:nth-child(4):after{background:#d7c2fa}
+.colorful-home .home-task-kpis .kpi-card:nth-child(5){background:linear-gradient(135deg,#fff0f3,#fff9fa);border-color:#f7ccd4}
+.colorful-home .home-task-kpis .kpi-card:nth-child(5):after{background:#f6bdc8}
+.colorful-home .home-task-kpis .kpi-card:nth-child(6){background:linear-gradient(135deg,#edf6ff,#fafcff);border-color:#d3e5f8}
+.colorful-home .home-task-kpis .kpi-card:nth-child(6):after{background:#c6dff8}
+.colorful-home .home-task-kpis .kpi-card strong{font-size:26px;color:#10284d}
+
+/* 회사 운영현황 */
+.colorful-home .company-status-row{
+  margin-top:12px;padding:10px 16px;border:1px solid #d9e6f5;
+  background:linear-gradient(90deg,#fff,#f7fbff,#fff);
+  box-shadow:0 5px 16px rgba(34,74,119,.045);border-radius:14px
+}
+.colorful-home .company-status-row>div:first-child>span{color:#1d5fae;font-weight:900}
+.colorful-home .company-status-row b{color:#0d376f}
+
+/* 패널 */
+.colorful-home .panel{
+  border:1px solid #dce6f2;box-shadow:0 8px 24px rgba(33,70,112,.055);
+  border-radius:18px;background:#fff
+}
+.colorful-home .panel-head h3{font-size:18px;color:#10294d}
+
+/* 자주 쓰는 업무 - 카드별 컬러 */
+.colorful-home .quick-panel{background:linear-gradient(180deg,#fff,#fbfdff)}
+.colorful-home .quick-grid{gap:10px}
+.colorful-home .quick-card{
+  min-height:92px;border:1px solid transparent!important;border-radius:14px!important;
+  box-shadow:none!important;transition:.18s ease!important;position:relative;overflow:hidden
+}
+.colorful-home .quick-card:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(30,72,120,.10)!important}
+.colorful-home .quick-card:nth-child(8n+1){background:#eaf9f4!important;border-color:#c9eee1!important;color:#087b5a}
+.colorful-home .quick-card:nth-child(8n+2){background:#eaf4ff!important;border-color:#cce3fb!important;color:#1466c2}
+.colorful-home .quick-card:nth-child(8n+3){background:#fff1e9!important;border-color:#f8d8c4!important;color:#d95f18}
+.colorful-home .quick-card:nth-child(8n+4){background:#f3edff!important;border-color:#dfd1fa!important;color:#7542ca}
+.colorful-home .quick-card:nth-child(8n+5){background:#fff0f3!important;border-color:#f6ccd5!important;color:#d83d55}
+.colorful-home .quick-card:nth-child(8n+6){background:#e9faf6!important;border-color:#c6ecdf!important;color:#07886a}
+.colorful-home .quick-card:nth-child(8n+7){background:#fff6e7!important;border-color:#f6dfb6!important;color:#d9820d}
+.colorful-home .quick-card:nth-child(8n+8){background:#edf6ff!important;border-color:#cfe5fb!important;color:#1473d6}
+.colorful-home .quick-card .quick-icon{
+  width:42px;height:42px;display:grid;place-items:center;border-radius:12px;
+  background:rgba(255,255,255,.72);font-size:22px;margin-bottom:8px
+}
+.colorful-home .quick-card strong{color:inherit!important;font-weight:900}
+.colorful-home .quick-card small{color:#6b7b90!important}
+
+/* 출퇴근자 명부 */
+.colorful-home .attendance-roster-panel{
+  background:linear-gradient(180deg,#ffffff,#f9fcff);border-top:4px solid #2478df
+}
+.colorful-home .attendance-store-tab.active{background:#173e75!important;color:#fff!important}
+.colorful-home .attendance-summary-row{
+  border-left:4px solid #3b82f6!important;background:#fff!important;
+  box-shadow:0 4px 12px rgba(40,85,130,.05)
+}
+.colorful-home .attendance-summary-row:nth-child(2){border-left-color:#14a673!important}
+.colorful-home .attendance-summary-row:nth-child(3){border-left-color:#7d55d5!important}
+.colorful-home .attendance-summary-row:nth-child(4){border-left-color:#ed8a18!important}
+
+/* 영업실적 */
+.colorful-home .sales-panel{
+  border-top:4px solid #16a277;background:linear-gradient(180deg,#fff,#fbfffd)
+}
+.colorful-home .sales-company-summary{gap:10px}
+.colorful-home .sales-company-card{
+  border:1px solid transparent!important;border-radius:14px!important;box-shadow:none!important
+}
+.colorful-home .sales-company-card:nth-child(1){background:#f1edff!important;border-color:#ded2fb!important}
+.colorful-home .sales-company-card:nth-child(2){background:#eafaf5!important;border-color:#c7ecdf!important}
+.colorful-home .sales-company-card:nth-child(3){background:#fff5e7!important;border-color:#f4ddb9!important}
+.colorful-home .sales-company-card:nth-child(4){background:#fff0f4!important;border-color:#f5ced8!important}
+.colorful-home .sales-company-card strong{color:#10294d}
+.colorful-home .sales-store-card{
+  overflow:hidden;border-radius:15px!important;border:1px solid #dbe6f2!important;
+  box-shadow:0 6px 16px rgba(35,73,116,.05)
+}
+.colorful-home .sales-store-card:nth-child(1){border-top:4px solid #2478df!important}
+.colorful-home .sales-store-card:nth-child(2){border-top:4px solid #7d55d5!important}
+.colorful-home .sales-store-card:nth-child(3){border-top:4px solid #16a277!important}
+.colorful-home .sales-store-card:nth-child(4){border-top:4px solid #e88118!important}
+
+/* 관리 알림 */
+.colorful-home .dashboard-grid.lower>.alert-panel{
+  border-top:4px solid #f0a11d;background:linear-gradient(180deg,#fff,#fffdf9)
+}
+.colorful-home .alert-item{border-radius:12px!important;margin-bottom:7px!important}
+.colorful-home .alert-item:hover{background:#f7fbff!important}
+
+/* 상단 버튼 */
+.colorful-home .text-btn,.colorful-home .home-task-link{
+  border-radius:999px!important;font-weight:800!important
+}
+
+/* 전체 모듈 상세화면도 메뉴별 색상 유지 */
+#view-stores{--module-accent:#2478df}
+#view-schedule{--module-accent:#8057d9}
+#view-sales{--module-accent:#16a277}
+#view-opening{--module-accent:#e29418}
+#view-hqtasks{--module-accent:#2478df}
+#view-support{--module-accent:#ef7c22}
+#view-settlement{--module-accent:#11a77d}
+#view-vehicle{--module-accent:#287bc1}
+#view-tools{--module-accent:#8756cf}
+[id^="view-"]:not(#view-home) .module-hero{
+  border-top:5px solid var(--module-accent,#2478df)!important
+}
+
+/* responsive */
+@media(max-width:1100px){
+  .colorful-home .hero-card h2{font-size:27px}
+  .colorful-home .quick-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:760px){
+  .colorful-home .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .colorful-home .hero-card{min-height:180px}
+  .colorful-home .hero-card h2{font-size:23px}
+}
+
+.colorful-home .quick-card:nth-child(1){--quick-photo:url("assets/quick-sales.jpg")}
+.colorful-home .quick-card:nth-child(2){--quick-photo:url("assets/quick-attendance.jpg")}
+.colorful-home .quick-card:nth-child(3){--quick-photo:url("assets/quick-notice.jpg")}
+.colorful-home .quick-card:nth-child(4){--quick-photo:url("assets/quick-salesinput.jpg")}
+.colorful-home .quick-card:nth-child(5){--quick-photo:url("assets/quick-leave.jpg")}
+.colorful-home .quick-card:nth-child(6){--quick-photo:url("assets/quick-trip.jpg")}
+.colorful-home .quick-card:nth-child(7){--quick-photo:url("assets/quick-opening.jpg")}
+.colorful-home .quick-card:nth-child(8){--quick-photo:url("assets/quick-daily.jpg")}
+.colorful-home .quick-card:nth-child(9){--quick-photo:url("assets/quick-parttime.jpg")}
+.colorful-home .quick-card:nth-child(10){--quick-photo:url("assets/quick-inspection.jpg")}
+.colorful-home .quick-card:nth-child(11){--quick-photo:url("assets/quick-mail.jpg")}
+.colorful-home .quick-card:nth-child(12){--quick-photo:url("assets/quick-drive.jpg")}
+
+/* =========================================================
+   V28 - 실제 업로드 파일 기준 최종 홈 보정
+   ========================================================= */
+.colorful-home .quick-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:11px!important;
+}
+.colorful-home .quick-card{
+  position:relative!important;
+  min-width:0!important;
+  min-height:154px!important;
+  padding:82px 13px 12px!important;
+  overflow:hidden!important;
+  border:1px solid #dbe4ee!important;
+  border-radius:15px!important;
+  background:#fff!important;
+  color:#10243f!important;
+  box-shadow:0 5px 15px rgba(24,55,91,.07)!important;
+  isolation:isolate;
+}
+.colorful-home .quick-card::before{
+  content:"";
+  position:absolute;
+  z-index:-2;
+  left:0;right:0;top:0;height:72px;
+  background-image:var(--quick-photo);
+  background-size:cover;
+  background-position:center;
+}
+.colorful-home .quick-card::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:0;right:0;top:42px;height:32px;
+  background:linear-gradient(180deg,rgba(255,255,255,0),#fff);
+}
+.colorful-home .quick-card:hover{
+  transform:translateY(-3px)!important;
+  box-shadow:0 10px 24px rgba(24,55,91,.13)!important;
+  border-color:#b9cadb!important;
+}
+.colorful-home .quick-card .quick-icon{
+  position:absolute!important;
+  top:48px!important;left:12px!important;
+  width:38px!important;height:38px!important;
+  display:grid!important;place-items:center!important;
+  margin:0!important;border-radius:11px!important;
+  background:#fff!important;
+  box-shadow:0 4px 12px rgba(14,42,74,.15)!important;
+  font-size:20px!important;
+}
+.colorful-home .quick-card strong{
+  display:block!important;
+  color:#10243f!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+  font-weight:900!important;
+  text-shadow:none!important;
+}
+.colorful-home .quick-card small{
+  display:block!important;
+  margin-top:5px!important;
+  color:#6b7b8e!important;
+  font-size:10px!important;
+  line-height:1.4!important;
+  text-shadow:none!important;
+}
+
+/* 모바일: 기존 900px 사이드바 접힘을 유지하면서 홈을 별도 정리 */
+@media(max-width:900px){
+  html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+  .app-shell{display:block!important;width:100%!important;max-width:100%!important}
+  .main-area{margin-left:0!important;width:100%!important;max-width:100%!important}
+  .topbar{height:auto!important;min-height:76px!important;padding:10px 12px!important}
+  .topbar-left{min-width:0!important}
+  .topbar h1{font-size:18px!important}
+  .topbar p{font-size:10px!important;white-space:normal!important}
+  .topbar-actions{gap:6px!important}
+  #refreshBtn.icon-btn{height:38px!important;min-height:38px!important;padding:0 9px!important;font-size:11px!important}
+  .content{padding:12px!important;width:100%!important;max-width:100%!important;overflow:hidden!important}
+  .colorful-home .hero-card{
+    min-height:170px!important;padding:18px!important;border-radius:16px!important
+  }
+  .colorful-home .hero-card h2{font-size:22px!important;line-height:1.3!important}
+  .colorful-home .hero-card p{font-size:11px!important;line-height:1.5!important}
+  .colorful-home .hero-badge{display:none!important}
+  .section-title-row{margin:16px 0 9px!important;gap:8px!important}
+  .colorful-home .home-task-kpis{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important
+  }
+  .colorful-home .home-task-kpis .kpi-card{
+    min-width:0!important;min-height:94px!important;padding:12px!important
+  }
+  .company-status-row{
+    width:100%!important;max-width:100%!important;
+    overflow-x:auto!important;flex-wrap:nowrap!important;
+    -webkit-overflow-scrolling:touch!important
+  }
+  .company-status-row>div{flex:0 0 auto!important;width:auto!important}
+  .dashboard-grid,.dashboard-grid.lower{
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+    gap:10px!important;width:100%!important
+  }
+  .panel{min-width:0!important;width:100%!important;max-width:100%!important;padding:13px!important}
+  .colorful-home .quick-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important
+  }
+  .colorful-home .quick-card{
+    min-height:145px!important;padding:76px 10px 10px!important
+  }
+  .colorful-home .quick-card::before{height:67px!important}
+  .colorful-home .quick-card::after{top:38px!important;height:30px!important}
+  .colorful-home .quick-card .quick-icon{top:43px!important;left:9px!important;width:34px!important;height:34px!important}
+  .attendance-roster-panel{
+    height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important
+  }
+  .attendance-store-tabs{
+    display:flex!important;max-width:100%!important;overflow-x:auto!important;
+    white-space:nowrap!important;-webkit-overflow-scrolling:touch!important
+  }
+  .attendance-store-tab{flex:0 0 auto!important}
+  .attendance-store-groups{overflow:visible!important;max-height:none!important;padding-right:0!important}
+  .attendance-summary-row{width:100%!important;min-width:0!important}
+  .attendance-summary-row small{word-break:break-word!important}
+  .sales-company-summary{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important
+  }
+  .sales-store-summary-grid,.module-grid{grid-template-columns:1fr!important}
+  .store-table-wrap,.hq-ledger-wrap{max-width:100%!important;overflow-x:auto!important}
+}
+@media(max-width:560px){
+  .month-box{display:none!important}
+  .colorful-home .home-task-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .colorful-home .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .colorful-home .quick-card strong{font-size:11px!important}
+  .colorful-home .quick-card small{font-size:9px!important}
+  .sales-company-summary{grid-template-columns:1fr!important}
+}
+
+
+/* =========================================================
+   V30 - 자주 쓰는 업무: 중복 아이콘 제거 / 실사 이미지 유지
+   ========================================================= */
+.colorful-home .quick-card{
+  padding:82px 13px 12px!important;
+}
+.colorful-home .quick-card .quick-icon{
+  display:none!important;
+}
+@media(max-width:900px){
+  .colorful-home .quick-card{
+    padding:76px 10px 10px!important;
+  }
+}
+
+
+/* =========================================================
+   V32 - 상단 ERP 배너 이미지만 교체
+   다른 화면/카드/기능은 변경하지 않음
+   ========================================================= */
+.colorful-home .hero-card{
+  position:relative!important;
+  overflow:hidden!important;
+  background:
+    linear-gradient(90deg,
+      rgba(7,45,101,.98) 0%,
+      rgba(10,72,157,.91) 30%,
+      rgba(7,51,112,.34) 58%,
+      rgba(4,31,73,.78) 100%),
+    url("assets/hero-thebigkorea.jpg") center right/cover no-repeat!important;
+}
+.colorful-home .hero-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.01),rgba(0,0,0,.10));
+}
+.colorful-home .hero-card > *{
+  position:relative;
+  z-index:1;
+}
+@media(max-width:900px){
+  .colorful-home .hero-card{
+    background:
+      linear-gradient(90deg,
+        rgba(7,45,101,.98) 0%,
+        rgba(9,64,137,.90) 52%,
+        rgba(4,31,73,.72) 100%),
+      url("assets/hero-thebigkorea.jpg") center/cover no-repeat!important;
+  }
+}
+
+/* =========================================================
+   회사 반복업무 예시 - 상단 분류 버튼 글자 잘림 수정
+   2026-09-15
+   ========================================================= */
+.recurring-reference-modal .reference-category-tabs,
+.reference-library-modal .reference-category-tabs,
+.reference-category-tabs,
+.recurring-reference-modal .reference-tabs,
+.reference-library-modal .reference-tabs,
+.reference-tabs {
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  min-height:48px !important;
+  height:auto !important;
+  padding:8px 0 9px !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+}
+
+.recurring-reference-modal .reference-category-tabs button,
+.reference-library-modal .reference-category-tabs button,
+.reference-category-tabs button,
+.recurring-reference-modal .reference-tabs button,
+.reference-library-modal .reference-tabs button,
+.reference-tabs button {
+  flex:0 0 auto !important;
+  min-width:72px !important;
+  height:36px !important;
+  min-height:36px !important;
+  padding:0 15px !important;
+  margin:0 !important;
+  border-radius:999px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+  box-sizing:border-box !important;
+  font-size:11px !important;
+  font-weight:900 !important;
+  vertical-align:middle !important;
+}
+
+/* 실제 팝업에서 category 관련 다른 클래스명을 쓰더라도 동일 적용 */
+[class*="reference"] [class*="category"][class*="tab"] button,
+[class*="recurring"] [class*="category"][class*="tab"] button {
+  height:36px !important;
+  min-height:36px !important;
+  padding:0 15px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+  box-sizing:border-box !important;
+}
+
+
+
+/* =========================================================
+   운영지원 > 더큰코리아 MasterData 통합조회
+========================================================= */
+.operations-hero{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  background:linear-gradient(135deg,#fff 0%,#f7f9fc 100%);
+  border-top:4px solid #3573d4;
+}
+.operations-hero-actions{display:flex;gap:8px;flex-wrap:wrap}
+.operations-hero-actions button{
+  border:0;background:var(--navy);color:#fff;border-radius:9px;
+  min-height:38px;padding:0 14px;font-size:11px;font-weight:900;
+}
+.master-panel{
+  background:#fff;border:1px solid var(--line);border-radius:18px;
+  padding:20px;box-shadow:var(--shadow);
+}
+.master-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}
+.master-head h3{margin:0;font-size:18px}
+.master-head p{margin:6px 0 0;color:var(--muted);font-size:11px}
+.master-source-badge{
+  flex:0 0 auto;background:#eef4ff;color:#2f66bd;border:1px solid #d7e5fb;
+  border-radius:999px;padding:7px 10px;font-size:10px;font-weight:900;
+}
+.master-search-row{margin-top:16px}
+.master-search-box{
+  min-height:48px;border:1px solid #cfd8e3;border-radius:13px;background:#f9fbfd;
+  display:flex;align-items:center;gap:9px;padding:0 10px 0 14px;
+}
+.master-search-box>span{font-size:17px}
+.master-search-box input{
+  flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--text);
+  font-size:12px;font-weight:700;
+}
+.master-search-box button{
+  border:0;background:#e9eef4;color:#536170;border-radius:8px;
+  height:32px;padding:0 10px;font-size:10px;font-weight:900;
+}
+.master-category-tabs{
+  display:flex;gap:7px;overflow-x:auto;padding:14px 0 8px;scrollbar-width:thin;
+}
+.master-tab{
+  flex:0 0 auto;border:1px solid var(--line);background:#fff;color:#5d6b79;
+  border-radius:999px;padding:8px 11px;font-size:10px;font-weight:900;
+}
+.master-tab:hover{border-color:#9fb7d8;background:#f8fbff}
+.master-tab.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.master-summary{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0 14px;
+}
+.master-summary>div{
+  border:1px solid var(--line);background:#f8fafc;border-radius:12px;padding:12px 14px;
+}
+.master-summary span,.master-summary strong{display:block}
+.master-summary span{font-size:9px;color:var(--muted);font-weight:900}
+.master-summary strong{font-size:14px;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.master-results{display:grid;gap:13px}
+.master-sheet-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.master-sheet-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:12px 14px;background:#f6f8fb;border-bottom:1px solid var(--line);
+}
+.master-sheet-head h4{margin:0;font-size:13px}
+.master-sheet-head span{font-size:9px;color:var(--muted);font-weight:900}
+.master-table-wrap{overflow:auto;max-height:470px}
+.master-table{border-collapse:collapse;width:max-content;min-width:100%;font-size:10px}
+.master-table th{
+  position:sticky;left:0;z-index:2;min-width:42px;background:#f7f9fb;color:#8995a2;
+  border-right:1px solid var(--line);border-bottom:1px solid #edf0f3;padding:9px;text-align:center;
+}
+.master-table td{
+  min-width:125px;max-width:260px;padding:9px 10px;border-bottom:1px solid #edf0f3;
+  border-right:1px solid #f0f2f5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.master-table tr:first-child td{background:#eef3f8;color:#3d4c5c;font-weight:900}
+.master-table tr:hover td{background:#fffaf2}
+.master-empty{color:#c1c8d0}
+.master-no-result{
+  border:1px dashed #cfd8e3;border-radius:14px;padding:38px 20px;text-align:center;color:var(--muted)
+}
+.master-no-result strong,.master-no-result span{display:block}
+.master-no-result strong{color:var(--text);font-size:14px;margin-bottom:7px}
+.master-security-note{
+  margin-top:14px;border:1px solid #ead7b6;background:#fff9ed;border-radius:12px;
+  padding:12px 14px;display:flex;align-items:flex-start;gap:9px;font-size:10px;line-height:1.55;color:#765d38;
+}
+.master-security-note strong{white-space:nowrap}
+@media(max-width:900px){
+  .operations-hero{align-items:flex-start;flex-direction:column}
+  .master-panel{padding:14px}
+  .master-summary{grid-template-columns:1fr}
+  .master-head{flex-direction:column}
+}
+
+
+/* 운영지원 상단 바로가기 - 카드형 확대 */
+.operations-card-actions{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(220px,1fr));
+  gap:12px !important;
+  min-width:500px;
+}
+.operations-card-actions .operations-link-card{
+  min-height:82px !important;
+  padding:14px 16px !important;
+  border:1px solid #dbe3ed !important;
+  border-radius:14px !important;
+  background:#fff !important;
+  color:var(--text) !important;
+  display:grid !important;
+  grid-template-columns:42px minmax(0,1fr) auto;
+  align-items:center;
+  gap:11px;
+  text-align:left;
+  box-shadow:0 5px 16px rgba(31,45,61,.06);
+  transition:.18s;
+}
+.operations-card-actions .operations-link-card:hover{
+  transform:translateY(-2px);
+  border-color:#9fb7d8 !important;
+  box-shadow:0 9px 22px rgba(31,45,61,.11);
+}
+.operations-link-icon{
+  width:42px;height:42px;border-radius:11px;
+  background:#eef4ff;display:grid;place-items:center;font-size:21px;
+}
+.operations-link-copy{display:block;min-width:0}
+.operations-link-copy strong{
+  display:block;font-size:12px;line-height:1.3;color:var(--text);
+}
+.operations-link-copy small{
+  display:block;margin-top:6px;font-size:9px;line-height:1.4;
+  color:var(--muted);white-space:normal;
+}
+.operations-link-card>b{
+  font-size:17px;color:var(--blue);font-weight:900;
+}
+@media(max-width:1200px){
+  .operations-card-actions{min-width:430px;grid-template-columns:1fr 1fr}
+}
+@media(max-width:900px){
+  .operations-card-actions{width:100%;min-width:0;grid-template-columns:1fr}
+}
+
+
+/* V13 자주 쓰는 업무 미처리 숫자 배지 */
+.quick-card{position:relative}
+.quick-pending-badge{position:absolute;top:8px;right:8px;z-index:5;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:#d9363e;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;line-height:1;box-shadow:0 3px 9px rgba(217,54,62,.28)}
+.quick-pending-badge[hidden]{display:none!important}
+.quick-pending-badge.loading{background:#8a96a3}
+@media(max-width:650px){.quick-pending-badge{top:7px;right:7px;min-width:20px;height:20px;font-size:10px;padding:0 5px}}
+
+
+/* ===== 2025 백화점·아울렛 매출 순위 ===== */
+.retail-ranking-panel{margin-top:16px;padding:20px}.retail-rank-head{gap:16px;align-items:center}.retail-rank-tools input{width:220px;height:38px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:#fff;outline:none}.retail-rank-tools input:focus{border-color:#9f7b45;box-shadow:0 0 0 3px rgba(181,138,82,.12)}
+.rank-tabs{display:flex;gap:8px;margin:4px 0 14px}.rank-tab{border:1px solid var(--line);background:#f7f9fb;color:#566474;border-radius:10px;padding:9px 13px;font-size:11px;font-weight:900}.rank-tab.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.retail-rank-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}.retail-rank-table{width:100%;border-collapse:collapse;min-width:760px}.retail-rank-table th{position:sticky;top:0;background:#f5f8fb;color:#647386;font-size:10px;text-align:left;padding:11px 12px;border-bottom:1px solid var(--line)}.retail-rank-table td{padding:11px 12px;border-bottom:1px solid #edf0f3;font-size:11px;line-height:1.45}.retail-rank-table tbody tr:hover{background:#fbfcfd}.retail-rank-table .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.rank-no{display:inline-grid;place-items:center;min-width:27px;height:27px;padding:0 6px;border-radius:8px;background:#eef2f6;color:#526172}.rank-no.top{background:#fff3d7;color:#8b651e}.rank-up{color:#16734a}.rank-down{color:#c34a4a}.retail-rank-note{margin:10px 2px 0;color:var(--muted);font-size:10px}.rank-empty{text-align:center!important;color:var(--muted);padding:28px!important}
+@media(max-width:680px){.retail-rank-head{align-items:stretch;flex-direction:column}.retail-rank-tools input{width:100%}.rank-tabs{display:grid;grid-template-columns:1fr 1fr}.rank-tab{padding:10px 7px}}
+
+/* V3 매출 순위 - 한눈에 보는 2열 카드형 */
+.retail-ranking-panel{margin-top:16px!important;padding:22px!important;background:linear-gradient(180deg,#fff,#fbfcfe)}
+.retail-rank-topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:14px}
+.retail-rank-topbar h3{margin:3px 0 5px;font-size:19px}.retail-rank-topbar p{margin:0;color:var(--muted);font-size:11px}
+.retail-rank-kicker{font-size:9px;font-weight:900;letter-spacing:.12em;color:var(--accent)}
+.retail-rank-tools input{width:200px!important;height:38px!important}
+.rank-tabs{margin:0 0 14px!important}.rank-tab{min-width:145px}
+.retail-rank-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.retail-rank-card{display:grid;grid-template-columns:58px minmax(0,1fr) 92px;align-items:center;gap:12px;min-height:88px;padding:12px 15px;border:1px solid #e4e9ef;border-radius:14px;background:#fff;box-shadow:0 2px 8px rgba(31,45,61,.035);transition:.15s}
+.retail-rank-card:hover{transform:translateY(-1px);border-color:#cbd5df;box-shadow:0 7px 18px rgba(31,45,61,.07)}
+.retail-rank-position{display:flex;align-items:center;justify-content:center;gap:4px;border-right:1px solid #edf0f3;min-height:54px}.retail-rank-position span{font-size:18px}.retail-rank-position b{font-size:20px;color:#26384c;font-variant-numeric:tabular-nums}
+.retail-rank-main{min-width:0}.retail-rank-main strong{display:block;font-size:13px;color:#1e2b38;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.retail-rank-main small{display:inline-block;margin-top:8px;color:#8995a2;font-size:9px;font-weight:800}.retail-rank-main em{display:inline-block;margin-left:7px;font-style:normal;font-size:16px;font-weight:900;color:#152b44;font-variant-numeric:tabular-nums}.retail-rank-main em i{margin-left:2px;font-size:10px;font-style:normal;color:#6f7c8a}.retail-rank-main p{margin:5px 0 0;color:#758292;font-size:9px;line-height:1.35;display:-webkit-box;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.retail-rank-rate{text-align:right;border-left:1px solid #edf0f3;padding-left:10px}.retail-rank-rate small{display:block;color:#929daa;font-size:9px;margin-bottom:6px}.retail-rank-rate b{font-size:12px;white-space:nowrap}
+.retail-rank-card.top-1{border-color:#e5cf92;background:linear-gradient(135deg,#fffdf7,#fff)}.retail-rank-card.top-2{border-color:#d8dde4;background:linear-gradient(135deg,#fafbfd,#fff)}.retail-rank-card.top-3{border-color:#e3c9b3;background:linear-gradient(135deg,#fffaf6,#fff)}
+.retail-rank-card.outlet{grid-template-columns:58px minmax(0,1fr)}.retail-rank-card.outlet .retail-rank-main em{margin-left:7px;font-size:13px}
+.rank-empty-card{grid-column:1/-1;padding:30px;text-align:center;border:1px dashed var(--line);border-radius:14px;color:var(--muted);font-size:11px}
+@media(max-width:1100px){.retail-rank-grid{grid-template-columns:1fr}}
+@media(max-width:680px){.retail-rank-topbar{align-items:stretch;flex-direction:column}.retail-rank-tools input{width:100%!important}.retail-rank-card{grid-template-columns:48px minmax(0,1fr) 76px;padding:10px}.retail-rank-position b{font-size:17px}.retail-rank-position span{font-size:15px}.retail-rank-main strong{font-size:12px}.retail-rank-main em{font-size:14px}}
+/* 백화점 매출 순위 - PC 한 줄 4개 */
+#retailRankGrid:not(.outlet){
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+
+/* 4열에 맞게 카드 내부를 세로형으로 정리 */
+#retailRankGrid:not(.outlet) .retail-rank-card{
+  grid-template-columns:44px minmax(0,1fr) !important;
+  min-height:112px !important;
+  padding:14px !important;
+}
+
+#retailRankGrid:not(.outlet) .retail-rank-rate{
+  grid-column:1 / -1;
+  text-align:right;
+  border-left:0 !important;
+  border-top:1px solid #edf0f3;
+  padding:8px 0 0 !important;
+  margin-top:4px;
+}
+
+/* 화면이 좁아지면 2개 */
+@media(max-width:1200px){
+  #retailRankGrid:not(.outlet){
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+
+/* 휴대폰은 1개 */
+@media(max-width:650px){
+  #retailRankGrid:not(.outlet){
+    grid-template-columns:1fr !important;
+  }
+}
+/* ===== 2025 백화점 브랜드 매출 · 점포수 대시보드 ===== */
+.department-brand-dashboard{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  margin:16px 0 24px;
+}
+.department-brand-card{
+  appearance:none;
+  width:100%;
+  text-align:left;
+  border:1px solid #e2e8ef;
+  border-radius:16px;
+  background:#fff;
+  padding:18px;
+  cursor:pointer;
+  transition:.18s ease;
+  box-shadow:0 4px 14px rgba(15,23,42,.04);
+}
+.department-brand-card:hover{
+  transform:translateY(-2px);
+  border-color:#8ebda6;
+  box-shadow:0 8px 20px rgba(15,23,42,.08);
+}
+.department-brand-card.active{
+  border:2px solid #4f9f78;
+  background:#f3fbf7;
+}
+.department-brand-name{
+  display:block;
+  font-size:14px;
+  font-weight:800;
+  color:#263445;
+  margin-bottom:8px;
+}
+.department-brand-card>strong{
+  display:block;
+  font-size:25px;
+  line-height:1.15;
+  color:#0f2742;
+  letter-spacing:-.5px;
+}
+.department-brand-card>strong i{
+  font-size:12px;
+  font-style:normal;
+  margin-left:3px;
+  color:#728096;
+}
+.department-brand-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px solid #edf1f4;
+  color:#7a8798;
+  font-size:11px;
+}
+.department-brand-meta b{color:#334155}
+.retail-rank-subhead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:4px;
+}
+.retail-rank-subhead h3{margin:0 0 10px;font-size:18px}
+@media(max-width:1100px){
+  .department-brand-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:650px){
+  .department-brand-dashboard{grid-template-columns:1fr}
+}
+/* 전체 백화점 순위 복귀 버튼 */
+.department-all-rank-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:38px;
+  padding:0 14px;
+  border:1px solid #d7dee7;
+  border-radius:10px;
+  background:#fff;
+  color:#263445;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.department-all-rank-btn:hover{
+  border-color:#4f9f78;
+  background:#f3fbf7;
+  color:#287452;
+}
+@media(max-width:650px){
+  .retail-rank-subhead{align-items:flex-start;gap:10px;flex-direction:column}
+  .department-all-rank-btn{width:100%}
+}
+/* ===== 경방 타임스퀘어 복합쇼핑몰 참고 카드 ===== */
+.timesquare-reference-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:22px;
+  margin:-10px 0 26px;
+  padding:16px 18px;
+  border:1px solid #d9e2ea;
+  border-radius:14px;
+  background:#f8fafc;
+}
+.timesquare-reference-card>div:first-child{
+  min-width:260px;
+}
+.timesquare-label{
+  display:block;
+  margin-bottom:5px;
+  font-size:10px;
+  font-weight:800;
+  color:#8b6b2f;
+  letter-spacing:.08em;
+}
+.timesquare-reference-card strong{
+  display:block;
+  font-size:16px;
+  color:#18283c;
+}
+.timesquare-reference-card p{
+  margin:5px 0 0;
+  font-size:12px;
+  color:#66758a;
+}
+.timesquare-reference-card p b{
+  font-size:17px;
+  color:#0f2742;
+}
+.timesquare-note{
+  max-width:520px;
+  padding-left:18px;
+  border-left:1px solid #dde4eb;
+  font-size:11px;
+  line-height:1.55;
+  color:#7a8798;
+}
+.timesquare-note b{
+  display:block;
+  margin-bottom:2px;
+  color:#4c5b6d;
+}
+@media(max-width:760px){
+  .timesquare-reference-card{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .timesquare-note{
+    max-width:none;
+    padding-left:0;
+    padding-top:10px;
+    border-left:0;
+    border-top:1px solid #dde4eb;
+  }
+}
+/* ===== 경방 타임스퀘어 별도 대시보드 ===== */
+.timesquare-dashboard{
+  margin:4px 0 26px;
+  padding:18px;
+  border:1px solid #d9e2ea;
+  border-radius:16px;
+  background:#f8fafc;
+}
+.timesquare-dashboard-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+.timesquare-dashboard-head h4{
+  margin:3px 0 0;
+  font-size:17px;
+  color:#18283c;
+}
+.timesquare-label{
+  display:block;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.08em;
+  color:#8b6b2f;
+}
+.timesquare-estimate-badge,.estimate-mini{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  background:#fff3d8;
+  color:#8a6218;
+  font-size:10px;
+  font-weight:900;
+  padding:5px 9px;
+}
+.estimate-mini{padding:2px 6px;vertical-align:2px}
+.timesquare-dashboard-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.timesquare-metric{
+  padding:14px 15px;
+  border:1px solid #e1e7ed;
+  border-radius:13px;
+  background:#fff;
+}
+.timesquare-metric.primary{
+  border-color:#b9d8c8;
+  background:#f3fbf7;
+}
+.timesquare-metric small{
+  display:block;
+  margin-bottom:6px;
+  color:#748195;
+  font-size:11px;
+  font-weight:800;
+}
+.timesquare-metric strong{
+  font-size:22px;
+  color:#10233e;
+}
+.timesquare-metric strong i{
+  margin-left:3px;
+  font-size:11px;
+  font-style:normal;
+  color:#748195;
+}
+.timesquare-formula{
+  margin:12px 2px 0;
+  font-size:11px;
+  line-height:1.55;
+  color:#758297;
+}
+.timesquare-rank-card{
+  border-color:#d7c69b !important;
+  background:#fffdf7 !important;
+}
+.rank-estimated b{color:#8a6218 !important}
+@media(max-width:760px){
+  .timesquare-dashboard-grid{grid-template-columns:1fr}
+  .timesquare-dashboard-head{align-items:flex-start}
+}
+/* 경방 타임스퀘어 대시보드 - 단일 매출 카드 */
+.timesquare-dashboard.single{
+  max-width:none;
+}
+.timesquare-dashboard-grid.single{
+  grid-template-columns:minmax(0,460px);
+}
+.timesquare-dashboard.single .timesquare-metric.primary{
+  min-height:96px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.timesquare-dashboard.single .timesquare-metric.primary strong{
+  font-size:28px;
+}
+@media(max-width:760px){
+  .timesquare-dashboard-grid.single{grid-template-columns:1fr}
+}
+/* ===== 백화점 대시보드 로고 + 경방 타임스퀘어 6번째 카드 ===== */
+.department-brand-dashboard{
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+}
+.department-brand-card-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:30px;
+  margin-bottom:7px;
+}
+.department-brand-logo{
+  width:auto;
+  max-width:92px;
+  height:24px;
+  object-fit:contain;
+  object-position:left center;
+  flex:0 0 auto;
+}
+.department-brand-card-head .department-brand-name{
+  margin:0;
+}
+.timesquare-brand-card{
+  border-color:#dfd5bd;
+}
+.timesquare-logo{max-width:105px}
+@media(max-width:1100px){
+  .department-brand-dashboard{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+}
+@media(max-width:650px){
+  .department-brand-dashboard{grid-template-columns:1fr !important}
+}
+
+/* =========================================================
+   회사 운영현황 - 6개 독립 카드
+   재직/정규직/아르바이트/사업소득자/직영점/위탁점
+   승인대기 및 계약직 별도카드는 사용하지 않음
+   ========================================================= */
+.company-status-wrap{
+  margin-top:10px;
+}
+.company-status-title{
+  margin:0 0 7px 3px;
+  font-size:11px;
+  font-weight:900;
+  color:#1769aa;
+}
+.company-status-row.company-status-cards{
+  margin-top:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  box-shadow:none;
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:10px;
+  align-items:stretch;
+}
+.company-status-row.company-status-cards>div.company-status-card{
+  width:auto;
+  min-width:0;
+  min-height:68px;
+  padding:12px 14px;
+  border:1px solid #dce6ef;
+  border-radius:13px;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:5px;
+  box-shadow:0 3px 10px rgba(31,45,61,.035);
+}
+.company-status-row.company-status-cards>div.company-status-card:first-child{
+  display:flex;
+  align-items:flex-start;
+  gap:5px;
+}
+.company-status-card span{
+  font-size:10px;
+  font-weight:900;
+  color:#68798a;
+}
+.company-status-card strong,
+.company-status-row.company-status-cards .company-status-card strong{
+  font-size:20px;
+  line-height:1;
+  font-weight:900;
+  color:#10243e;
+}
+.company-status-card.employee-total{background:#f3f9ff;border-color:#d6e8f8}
+.company-status-card.regular{background:#f4fbf8;border-color:#d5eee4}
+.company-status-card.parttime{background:#fff9ef;border-color:#f1e2bf}
+.company-status-card.business{background:#faf6ff;border-color:#e5d9f6}
+.company-status-card.store-direct{background:#f6f8ff;border-color:#dce3f5}
+.company-status-card.store-managed{background:#fff7f2;border-color:#f0ded1}
+
+@media(max-width:1100px){
+  .company-status-row.company-status-cards{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+@media(max-width:700px){
+  .company-status-row.company-status-cards{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+  .company-status-row.company-status-cards>div.company-status-card{
+    width:auto;
+    min-height:62px;
+    padding:10px 12px;
+  }
+  .company-status-card strong,
+  .company-status-row.company-status-cards .company-status-card strong{
+    font-size:18px;
+  }
+}
+/* 회사 운영현황 - PC 6개 동일 크기 한 줄 고정 */
+@media (min-width:1101px){
+  .company-status-row.company-status-cards{
+    display:grid !important;
+    grid-template-columns:repeat(6, minmax(0, 1fr)) !important;
+    gap:10px !important;
+  }
+
+  .company-status-row.company-status-cards > .company-status-card{
+    width:auto !important;
+    min-width:0 !important;
+    grid-column:auto !important;
+    grid-row:auto !important;
+    min-height:68px !important;
+    padding:12px 10px !important;
+    box-sizing:border-box !important;
+  }
+
+  .company-status-row.company-status-cards > .employee-total{
+    grid-column:auto !important;
+    width:auto !important;
+  }
+
+  .company-status-card span{
+    width:100%;
+    text-align:center;
+  }
+
+  .company-status-card strong{
+    width:100%;
+    text-align:center;
+  }
+}
+/* ===== 회사 운영현황 : 6개 동일 카드 한 줄 ===== */
+
+.company-status-wrap{
+  width:100% !important;
+  margin-top:10px !important;
+}
+
+.company-status-title{
+  margin:0 0 7px 3px !important;
+  font-size:11px !important;
+  font-weight:900 !important;
+  color:#1769aa !important;
+}
+
+.company-status-wrap .company-status-row.company-status-cards{
+  width:100% !important;
+  display:grid !important;
+  grid-template-columns:repeat(6, 1fr) !important;
+  grid-template-rows:1fr !important;
+  gap:10px !important;
+
+  padding:12px !important;
+  margin:0 !important;
+
+  border:1px solid #dce6ef !important;
+  border-radius:16px !important;
+  background:#fff !important;
+}
+
+/* 기존 첫번째 카드 확장 규칙까지 강제 해제 */
+.company-status-wrap .company-status-row.company-status-cards
+> div.company-status-card,
+.company-status-wrap .company-status-row.company-status-cards
+> div.company-status-card:first-child,
+.company-status-wrap .company-status-row.company-status-cards
+> div.employee-total{
+
+  grid-column:auto !important;
+  grid-row:auto !important;
+
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+
+  min-height:66px !important;
+  margin:0 !important;
+  padding:10px 8px !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+
+  border:1px solid #dce6ef !important;
+  border-radius:12px !important;
+  box-sizing:border-box !important;
+}
+
+.company-status-wrap .company-status-card span{
+  width:auto !important;
+  margin:0 !important;
+  font-size:11px !important;
+  font-weight:800 !important;
+  text-align:center !important;
+}
+
+.company-status-wrap .company-status-card strong{
+  width:auto !important;
+  margin:0 !important;
+  font-size:20px !important;
+  line-height:1.1 !important;
+  font-weight:900 !important;
+  text-align:center !important;
+}
+
+/* PC에서는 무조건 6개 한 줄 */
+@media (min-width:901px){
+  .company-status-wrap .company-status-row.company-status-cards{
+    grid-template-columns:repeat(6, minmax(0,1fr)) !important;
+  }
+}
+
+/* 모바일만 2열 */
+@media (max-width:900px){
+  .company-status-wrap .company-status-row.company-status-cards{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+/* 회사 운영현황 - 데스크톱은 무조건 6개 한 줄 */
+@media (min-width:701px){
+  .company-status-wrap .company-status-row.company-status-cards{
+    display:grid !important;
+    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+    grid-template-rows:auto !important;
+    gap:10px !important;
+  }
+
+  .company-status-wrap .company-status-row.company-status-cards > .company-status-card{
+    grid-column:auto !important;
+    grid-row:auto !important;
+    width:100% !important;
+    min-width:0 !important;
+  }
+}

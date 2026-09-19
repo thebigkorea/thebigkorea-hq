@@ -1,0 +1,3186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>더큰코리아 일용직 통합관리</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --navy: #172033;
+      --navy-deep: #101827;
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --bg: #eef2f7;
+      --card: #ffffff;
+      --line: #dbe2ea;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --green: #059669;
+      --orange: #d97706;
+      --red: #dc2626;
+      --sidebar-width: 240px;
+    }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      min-width: 1180px;
+      font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    .portal {
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+      color: #fff;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand {
+      padding: 28px 22px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      height: 26px;
+      padding: 0 9px;
+      margin-bottom: 12px;
+      border-radius: 999px;
+      background: rgba(59,130,246,0.18);
+      color: #bfdbfe;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.35;
+    }
+
+    .brand p {
+      margin: 8px 0 0;
+      color: #aab6c8;
+      font-size: 13px;
+    }
+
+    .nav {
+      padding: 18px 12px;
+      flex: 1;
+    }
+
+    .nav-button {
+      width: 100%;
+      height: 48px;
+      margin-bottom: 7px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-weight: 750;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.15s ease;
+    }
+
+    .nav-button:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.07);
+    }
+
+    .nav-button.active {
+      color: #fff;
+      background: var(--blue);
+      box-shadow: 0 8px 18px rgba(37,99,235,0.26);
+    }
+
+    .nav-icon {
+      width: 21px;
+      text-align: center;
+      font-size: 17px;
+    }
+
+    .sidebar-footer {
+      padding: 18px 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #94a3b8;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .main {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      height: 72px;
+      padding: 0 30px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar-title h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .topbar-title p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .content {
+      padding: 26px 30px 40px;
+    }
+
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    .page-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+
+    .page-heading h3 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .page-heading p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 5px 15px rgba(15,23,42,0.04);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      margin-top: 9px;
+      font-size: 25px;
+      font-weight: 850;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-sub {
+      margin-top: 6px;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .stat-card.blue { border-top: 4px solid var(--blue); }
+    .stat-card.green { border-top: 4px solid var(--green); }
+    .stat-card.orange { border-top: 4px solid var(--orange); }
+    .stat-card.red { border-top: 4px solid var(--red); }
+    .stat-card.navy { border-top: 4px solid var(--navy); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 5px 15px rgba(15,23,42,0.04);
+      margin-bottom: 18px;
+    }
+
+    .card-header {
+      min-height: 62px;
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .card-header h4 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .card-header p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .card-body { padding: 20px; }
+
+    .search-inline {
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) 120px;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px 18px;
+    }
+
+    .field.span-2 { grid-column: span 2; }
+    .field.span-3 { grid-column: span 3; }
+    .field.span-4 { grid-column: span 4; }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #374151;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #cfd8e3;
+      border-radius: 9px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: 0.15s ease;
+    }
+
+    input, select {
+      height: 42px;
+      padding: 0 12px;
+    }
+
+    textarea {
+      min-height: 92px;
+      padding: 11px 12px;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    .check-panel {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      border: 1px solid #fde68a;
+      border-radius: 9px;
+      background: #fffbeb;
+      color: #92400e;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .check-panel input {
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      flex: 0 0 auto;
+    }
+
+    .button-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 9px;
+      margin-top: 18px;
+    }
+
+    .btn {
+      height: 40px;
+      padding: 0 15px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn:hover { filter: brightness(0.97); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-dark { background: var(--navy); color: #fff; }
+    .btn-light { background: #fff; color: #334155; border-color: #cfd8e3; }
+    .btn-success { background: var(--green); color: #fff; }
+    .btn-danger { background: #fff; color: var(--red); border-color: #fecaca; }
+    .btn-small { height: 32px; padding: 0 10px; font-size: 12px; border-radius: 7px; }
+
+    .notice {
+      display: none;
+      margin-top: 12px;
+      padding: 11px 13px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .notice.ok { display: block; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    .notice.err { display: block; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .result-item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 13px;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .result-item:hover {
+      border-color: #93c5fd;
+      background: #eff6ff;
+    }
+
+    .result-item strong { font-size: 14px; }
+    .result-item p { margin: 7px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+
+    .filter-grid {
+  display: grid;
+  grid-template-columns:
+      140px
+      140px
+      170px
+      150px
+      150px
+      minmax(220px,1fr)
+      auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-top: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      min-width: 1100px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      padding: 12px 10px;
+      background: #f8fafc;
+      color: #475569;
+      border-bottom: 1px solid var(--line);
+      text-align: center;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 11px 10px;
+      border-bottom: 1px solid #edf1f5;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover { background: #f8fbff; }
+    td.left { text-align: left; }
+    td.money { text-align: right; font-weight: 750; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 62px;
+      height: 26px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .status-unpaid { background: #fff7ed; color: #c2410c; }
+    .status-paid { background: #ecfdf5; color: #047857; }
+
+    .table-empty {
+      padding: 42px 10px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .summary-bar {
+      padding: 13px 18px;
+      background: #f8fafc;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: flex-end;
+      gap: 24px;
+      font-size: 13px;
+    }
+
+    .summary-bar strong { font-size: 15px; }
+
+    .placeholder {
+      min-height: 460px;
+      padding: 70px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .placeholder-icon { font-size: 45px; }
+    .placeholder h4 { margin: 15px 0 8px; color: var(--text); font-size: 20px; }
+    .placeholder p { margin: 0; line-height: 1.7; }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      background: rgba(15,23,42,0.55);
+    }
+
+    .modal.open { display: flex; }
+
+    .modal-panel {
+      width: min(980px, calc(100vw - 80px));
+      max-height: calc(100vh - 70px);
+      overflow: auto;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 24px 70px rgba(15,23,42,0.25);
+    }
+
+    .modal-header {
+      height: 62px;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h4 { margin: 0; font-size: 18px; }
+    .modal-body { padding: 20px; }
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: flex-end;
+      gap: 9px;
+    }
+
+    .small-note { color: var(--muted); font-size: 12px; line-height: 1.6; }
+
+    @media (max-width: 1350px) {
+      .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .form-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .field.span-4 { grid-column: span 3; }
+      .filter-grid { grid-template-columns: 140px 140px 150px 140px minmax(180px, 1fr) auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="portal">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-badge">THE BIG KOREA</div>
+        <h1>더큰코리아<br>일용직 통합관리</h1>
+        <p>입력 · 지급 · 관리대장 · 세무자료</p>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-button active" data-page="dashboard" onclick="openPage('dashboard', this)">
+          <span class="nav-icon">▦</span><span>대시보드</span>
+        </button>
+        <button class="nav-button" data-page="input" onclick="openPage('input', this)">
+          <span class="nav-icon">✎</span><span>근무내역 입력</span>
+        </button>
+        <button class="nav-button" data-page="ledger" onclick="openPage('ledger', this)">
+          <span class="nav-icon">☷</span><span>근무내역 관리</span>
+        </button>
+        <button class="nav-button" data-page="unpaid" onclick="openPage('unpaid', this)">
+          <span class="nav-icon">₩</span><span>미지급 관리</span>
+        </button>
+        <button class="nav-button" data-page="tax" onclick="openPage('tax', this)">
+          <span class="nav-icon">▤</span><span>세무자료</span>
+        </button>
+        <button class="nav-button" data-page="workers" onclick="openPage('workers', this)">
+          <span class="nav-icon">♙</span><span>근무자 관리</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        데이터는 Google Sheets와 연동됩니다.<br>
+        지급상태 변경 시 집계자료도 갱신됩니다.
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-title">
+          <h2 id="topTitle">대시보드</h2>
+          <p id="topDescription">일용직 근무 및 지급 현황을 한눈에 확인합니다.</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-light" onclick="refreshCurrentPage()">새로고침</button>
+          <button class="btn btn-primary" onclick="openPage('input')">＋ 근무내역 등록</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- 대시보드 -->
+        <section id="page-dashboard" class="page-section active">
+          <div class="page-heading">
+            <div>
+              <h3>일용직 현황</h3>
+              <p>오늘과 이번 달의 근무 등록 및 지급 현황입니다.</p>
+            </div>
+            <div id="dashboardUpdatedAt" class="small-note"></div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card blue">
+              <div class="stat-label">오늘 등록</div>
+              <div id="statTodayCount" class="stat-value">-</div>
+              <div class="stat-sub">오늘 근무내역 등록 건수</div>
+            </div>
+            <div class="stat-card green">
+              <div class="stat-label">오늘 지급 예정액</div>
+              <div id="statTodayAmount" class="stat-value">-</div>
+              <div class="stat-sub">오늘 등록된 수당 합계</div>
+            </div>
+            <div class="stat-card orange">
+              <div class="stat-label">전체 미지급</div>
+              <div id="statUnpaidCount" class="stat-value">-</div>
+              <div class="stat-sub">현재 미지급 건수</div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-label">미지급 금액</div>
+              <div id="statUnpaidAmount" class="stat-value">-</div>
+              <div class="stat-sub">조회 자료 기준 미지급 합계</div>
+            </div>
+            <div class="stat-card navy">
+              <div class="stat-label">이번 달 지급액</div>
+              <div id="statMonthAmount" class="stat-value">-</div>
+              <div class="stat-sub">이번 달 등록 수당 합계</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h4>최근 근무내역</h4>
+                <p>최근 등록된 자료 10건을 표시합니다.</p>
+              </div>
+              <button class="btn btn-light" onclick="openPage('ledger')">전체 관리대장 보기</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>날짜</th><th>매장</th><th>성명</th><th>업무</th><th>수당</th><th>전화번호</th><th>지급상태</th>
+                  </tr>
+                </thead>
+                <tbody id="recentBody">
+                  <tr><td colspan="7" class="table-empty">자료를 불러오는 중입니다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+  <div class="card-header">
+    <div>
+      <h4>점포별 일용직 사용현황</h4>
+      <p>조회기간 동안 점포별 사용 인원, 근무 건수와 수당을 비교합니다.</p>
+    </div>
+
+    <div style="display:flex; align-items:end; gap:8px;">
+      <div>
+        <label for="storeSummaryStart">시작일</label>
+        <input id="storeSummaryStart" type="date" style="width:145px;">
+      </div>
+
+      <div>
+        <label for="storeSummaryEnd">종료일</label>
+        <input id="storeSummaryEnd" type="date" style="width:145px;">
+      </div>
+
+      <button
+        class="btn btn-primary"
+        onclick="loadStoreSummary()">
+        조회
+      </button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>점포</th>
+          <th>사용 인원</th>
+          <th>근무 건수</th>
+          <th>총수당</th>
+          <th>미지급 건수</th>
+          <th>미지급 금액</th>
+        </tr>
+      </thead>
+
+      <tbody id="storeSummaryBody">
+        <tr>
+          <td colspan="6" class="table-empty">
+            점포별 현황을 불러오는 중입니다.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="summary-bar">
+    <span>
+      점포 수
+      <strong id="storeSummaryStoreCount">0개</strong>
+    </span>
+
+    <span>
+      전체 사용 인원
+      <strong id="storeSummaryWorkerCount">0명</strong>
+    </span>
+
+    <span>
+      전체 근무
+      <strong id="storeSummaryWorkCount">0건</strong>
+    </span>
+
+    <span>
+      전체 수당
+      <strong id="storeSummaryTotalAmount">0원</strong>
+    </span>
+  </div>
+</div>
+
+          <div class="card">
+  <div class="card-header">
+    <div>
+      <h4>업무별 일용직 사용현황</h4>
+      <p>위 점포별 현황과 동일한 조회기간을 기준으로 표시합니다.</p>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>업무</th>
+          <th>사용 인원</th>
+          <th>근무 건수</th>
+          <th>총수당</th>
+          <th>평균 일당</th>
+          <th>미지급 건수</th>
+        </tr>
+      </thead>
+
+      <tbody id="jobSummaryBody">
+        <tr>
+          <td colspan="6" class="table-empty">
+            업무별 현황을 불러오는 중입니다.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="summary-bar">
+    <span>
+      업무 구분
+      <strong id="jobSummaryCount">0개</strong>
+    </span>
+
+    <span>
+      전체 근무
+      <strong id="jobSummaryWorkCount">0건</strong>
+    </span>
+
+    <span>
+      전체 수당
+      <strong id="jobSummaryTotalAmount">0원</strong>
+    </span>
+  </div>
+</div>
+
+        </section>
+
+        <!-- 입력 -->
+        <section id="page-input" class="page-section">
+          <div class="page-heading">
+            <div>
+              <h3>근무내역 입력</h3>
+              <p>기존 근무자를 검색한 뒤 오늘의 근무내역을 등록합니다.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h4>기존 근무자 검색</h4>
+                <p>성함 또는 전화번호로 주민번호·은행·계좌정보를 불러옵니다.</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="search-inline">
+                <div>
+                  <label for="keyword">성함 또는 전화번호</label>
+                  <input id="keyword" type="text" placeholder="예: 전현숙 또는 01091642554" onkeydown="if(event.key==='Enter') searchWorker()" />
+                </div>
+                <button class="btn btn-dark" onclick="searchWorker()">검색하기</button>
+              </div>
+              <div id="searchNotice" class="notice"></div>
+              <div id="resultBox" class="result-grid"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h4>근무정보 등록</h4>
+                <p>필수 내용을 확인한 뒤 저장하세요.</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="field">
+                  <label for="date">날짜</label>
+                  <input id="date" type="date" />
+                </div>
+                <div class="field">
+                  <label for="store">매장</label>
+                  <select id="store">
+                    <option value="한국의집">한국의집</option>
+                    <option value="더큰코리아 본사">더큰코리아 본사</option>
+                    <option value="소바공방 평촌점">소바공방 평촌점</option>
+                    <option value="길채정 압구정점">길채정 압구정점</option>
+                    <option value="효종갱 파주점">효종갱 파주점</option>
+                    <option value="기타">기타</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="name">성함</label>
+                  <input id="name" type="text" placeholder="성함" />
+                </div>
+                <div class="field">
+                  <label for="phone">전화번호</label>
+                  <input id="phone" type="tel" placeholder="예: 010-9164-2554" />
+                </div>
+
+                <div class="field">
+                  <label for="job">업무</label>
+                  <select id="job">
+                    <option value="">선택</option>
+                    <option value="홀">홀</option>
+                    <option value="설거지">설거지</option>
+                    <option value="주방">주방</option>
+                    <option value="전처리">전처리</option>
+                    <option value="퇴식">퇴식</option>
+                    <option value="기타">기타</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="allowance">수당</label>
+                  <input id="allowance" type="number" placeholder="예: 140000 또는 14" />
+                </div>
+                <div class="field">
+                  <label for="payStatus">지급여부</label>
+                  <select id="payStatus">
+                    <option value="미지급">미지급</option>
+                    <option value="지급완료">지급완료</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="rrn">주민번호·외국인등록번호</label>
+                  <input id="rrn" type="text" placeholder="예: 610807-2057344" />
+                </div>
+
+                <div class="field span-2">
+                  <label>&nbsp;</label>
+                  <label class="check-panel">
+                    <input id="foreignIdMissing" type="checkbox" onchange="toggleForeignIdFields()" />
+                    외국인등록증 미제출
+                  </label>
+                </div>
+                <div id="managementNoField" class="field" style="display:none;">
+                  <label for="managementNo">내부 관리번호</label>
+                  <input id="managementNo" type="text" readonly placeholder="저장 시 자동발급" />
+                </div>
+
+                <div class="field">
+                  <label for="bank">수취은행</label>
+                  <input id="bank" type="text" placeholder="예: 하나" />
+                </div>
+                <div class="field span-2">
+                  <label for="account">계좌번호</label>
+                  <input id="account" type="text" placeholder="계좌번호" />
+                </div>
+                <div class="field">
+                  <label>&nbsp;</label>
+                  <div class="small-note">수당은 140000원 또는 14처럼 입력할 수 있습니다.</div>
+                </div>
+
+                <div class="field span-4">
+                  <label for="memo">비고</label>
+                  <textarea id="memo" placeholder="특이사항을 입력하세요."></textarea>
+                </div>
+              </div>
+
+              <div id="saveNotice" class="notice"></div>
+
+              <div class="button-row">
+                <button class="btn btn-light" onclick="clearForm()">새 입력</button>
+                <button id="saveBtn" class="btn btn-primary" onclick="saveDailyWorker()">저장하기</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 관리대장 -->
+        <section id="page-ledger" class="page-section">
+          <div class="page-heading">
+            <div>
+              <h3>근무내역 관리대장</h3>
+              <p>기간·매장·지급상태·성명으로 근무내역을 검색하고 수정합니다.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div class="filter-grid">
+  <div>
+    <label>시작일</label>
+    <input id="ledgerStart" type="date">
+  </div>
+
+  <div>
+    <label>종료일</label>
+    <input id="ledgerEnd" type="date">
+  </div>
+
+  <div>
+    <label>매장</label>
+    <select id="ledgerStore" onchange="renderLedger()">
+      <option value="">전체 매장</option>
+      <option value="한국의집">한국의집</option>
+      <option value="더큰코리아 본사">더큰코리아 본사</option>
+      <option value="소바공방 평촌점">소바공방 평촌점</option>
+      <option value="길채정 압구정점">길채정 압구정점</option>
+      <option value="효종갱 파주점">효종갱 파주점</option>
+      <option value="기타">기타</option>
+    </select>
+  </div>
+
+  <div>
+    <label>업무</label>
+    <select id="ledgerJob" onchange="renderLedger()">
+      <option value="">전체 업무</option>
+      <option value="홀">홀</option>
+      <option value="설거지">설거지</option>
+      <option value="주방">주방</option>
+      <option value="전처리">전처리</option>
+      <option value="퇴식">퇴식</option>
+      <option value="기타">기타</option>
+    </select>
+  </div>
+
+  <div>
+    <label>지급상태</label>
+    <select id="ledgerPayStatus" onchange="renderLedger()">
+      <option value="">전체</option>
+      <option value="미지급">미지급</option>
+      <option value="지급완료">지급완료</option>
+    </select>
+  </div>
+
+  <div>
+    <label>성명 · 전화번호</label>
+    <input
+      id="ledgerKeyword"
+      type="text"
+      placeholder="검색어"
+      oninput="renderLedger()">
+  </div>
+
+  <button
+    class="btn btn-primary"
+    onclick="loadLedger()">
+    조회
+  </button>
+</div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>날짜</th><th>매장</th><th>성명</th><th>업무</th><th>수당</th><th>전화번호</th><th>은행</th><th>계좌번호</th><th>지급상태</th><th>관리</th>
+                  </tr>
+                </thead>
+                <tbody id="ledgerBody">
+                  <tr><td colspan="10" class="table-empty">조회 버튼을 눌러주세요.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="summary-bar">
+              <span>조회건수 <strong id="ledgerCount">0건</strong></span>
+              <span>총수당 <strong id="ledgerAmount">0원</strong></span>
+              <span>미지급 <strong id="ledgerUnpaidCount">0건</strong></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 미지급 -->
+        <section id="page-unpaid" class="page-section">
+          <div class="page-heading">
+            <div>
+              <h3>미지급 관리</h3>
+              <p>현재 미지급 상태인 근무내역을 확인하고 개별 지급완료 처리합니다.</p>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+            <div class="stat-card orange">
+              <div class="stat-label">미지급 건수</div>
+              <div id="unpaidPageCount" class="stat-value">-</div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-label">미지급 총액</div>
+              <div id="unpaidPageAmount" class="stat-value">-</div>
+            </div>
+            <div class="stat-card navy">
+              <div class="stat-label">최근 자료 기준</div>
+              <div id="unpaidPageDate" class="stat-value" style="font-size:19px;">-</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h4>미지급 내역</h4>
+                <p>지급완료 버튼을 누르면 원본 근무내역과 집계자료가 갱신됩니다.</p>
+              </div>
+              <button class="btn btn-light" onclick="loadUnpaid()">새로고침</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>날짜</th><th>매장</th><th>성명</th><th>업무</th><th>수당</th><th>전화번호</th><th>은행</th><th>계좌번호</th><th>처리</th>
+                  </tr>
+                </thead>
+                <tbody id="unpaidBody">
+                  <tr><td colspan="9" class="table-empty">자료를 불러오는 중입니다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 세무자료 -->
+        <!-- 세무자료 -->
+<!-- 세무자료 -->
+<section id="page-tax" class="page-section">
+  <div class="page-heading">
+    <div>
+      <h3>세무자료</h3>
+      <p>기간과 매장을 선택해 일용직 신고자료를 조회합니다.</p>
+    </div>
+  </div>
+
+  <div class="card">
+
+    <!-- 검색조건 -->
+    <div class="card-body">
+      <div
+        class="filter-grid"
+        style="grid-template-columns:150px 150px 190px 180px auto;"
+      >
+        <div>
+          <label>시작일</label>
+          <input id="taxStart" type="date">
+        </div>
+
+        <div>
+          <label>세무처리 상태</label>
+          <select id="taxStatusFilter" onchange="renderTaxData()">
+            <option value="신고 가능">신고 가능</option>
+            <option value="자료 보완 대기">자료 보완 대기</option>
+            <option value="">전체</option>
+          </select>
+        </div>
+
+        <div>
+          <label>종료일</label>
+          <input id="taxEnd" type="date">
+        </div>
+
+        <div>
+          <label>매장</label>
+          <select id="taxStore" onchange="renderTaxData()">
+            <option value="">전체 매장</option>
+            <option value="한국의집">한국의집</option>
+            <option value="더큰코리아 본사">더큰코리아 본사</option>
+            <option value="소바공방 평촌점">소바공방 평촌점</option>
+            <option value="길채정 압구정점">길채정 압구정점</option>
+            <option value="효종갱 파주점">효종갱 파주점</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button
+            class="btn btn-primary"
+            onclick="loadTaxData()"
+          >
+            조회
+          </button>
+
+          <button
+            class="btn btn-success"
+            onclick="createTaxReport()"
+          >
+            신고자료 생성
+          </button>
+
+          <a
+  href="https://docs.google.com/spreadsheets/d/1df-V4NKqg1rIYCk9hGH39iQZZdNkIfIpwA4DRjhsYcg/edit"
+  target="_blank"
+  class="btn"
+  style="
+    background:#16a34a;
+    color:#fff;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    padding:0 16px;
+    height:40px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+    border:none;
+    white-space:nowrap;
+  "
+>
+  📑 신고자료 원장
+</a>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 조회 결과 -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>날짜</th>
+            <th>매장</th>
+            <th>성명</th>
+            <th>주민등록번호</th>
+            <th>업무</th>
+            <th>지급액</th>
+            <th>지급상태</th>
+            <th>세무처리</th>
+          </tr>
+        </thead>
+
+        <tbody id="taxBody">
+          <tr>
+            <td colspan="8" class="table-empty">
+              조회 버튼을 눌러주세요.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 합계 -->
+    <div class="summary-bar">
+      <span>
+        조회건수
+        <strong id="taxCount">0건</strong>
+      </span>
+
+      <span>
+        총지급액
+        <strong id="taxAmount">0원</strong>
+      </span>
+
+      <span>
+        자료 보완 대기
+        <strong id="taxPendingCount">0건</strong>
+      </span>
+    </div>
+
+  </div>
+</section>
+
+        <!-- 근무자 관리 -->
+        <!-- 근무자 관리 -->
+<section id="page-workers" class="page-section">
+  <div class="page-heading">
+    <div>
+      <h3>근무자 관리</h3>
+      <p>성명 또는 전화번호로 일용직 인명정보를 조회합니다.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="search-inline">
+        <div>
+          <label for="workerManageKeyword">성명 · 전화번호</label>
+          <input
+            id="workerManageKeyword"
+            type="text"
+            placeholder="예: 홍길동 또는 01012345678"
+            onkeydown="if(event.key === 'Enter') loadWorkerManage()"
+          >
+        </div>
+
+        <button
+          class="btn btn-primary"
+          onclick="loadWorkerManage()"
+        >
+          조회
+        </button>
+      </div>
+
+      <div id="workerManageNotice" class="notice"></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>성명</th>
+            <th>전화번호</th>
+            <th>주민등록번호</th>
+            <th>은행</th>
+            <th>계좌번호</th>
+            <th>세무처리</th>
+            <th>내부 관리번호</th>
+            <th>최근 업무</th>
+            <th>최근 수당</th>
+            <th>최종 등록일</th>
+          </tr>
+        </thead>
+
+        <tbody id="workerManageBody">
+          <tr>
+            <td colspan="10" class="table-empty">
+              성명 또는 전화번호를 입력하고 조회하세요.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+      </div>
+    </main>
+  </div>
+
+  <!-- 점포별 상세조회 모달 -->
+<div
+  id="storeDetailModal"
+  class="modal"
+  onclick="
+    if(event.target === this){
+      closeStoreDetailModal();
+    }
+  "
+>
+  <div class="modal-panel">
+
+    <div class="modal-header">
+      <div>
+        <h4 id="storeDetailTitle">
+          점포별 일용직 사용내역
+        </h4>
+
+        <div
+          id="storeDetailPeriod"
+          class="small-note"
+          style="margin-top:5px;"
+        ></div>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-light btn-small"
+        onclick="closeStoreDetailModal()"
+      >
+        닫기
+      </button>
+    </div>
+
+    <div
+  style="
+    display:flex;
+    gap:8px;
+    padding:14px 20px;
+    border-bottom:1px solid #e5e7eb;
+    background:#f8fafc;
+  "
+>
+  <button
+    type="button"
+    id="storeDetailDateBtn"
+    class="btn btn-primary btn-small"
+    onclick="changeStoreDetailView('date')"
+  >
+    날짜별 상세
+  </button>
+
+  <button
+    type="button"
+    id="storeDetailJobBtn"
+    class="btn btn-light btn-small"
+    onclick="changeStoreDetailView('job')"
+  >
+    업무별 상세
+  </button>
+</div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>날짜</th>
+            <th>성명</th>
+            <th>업무</th>
+            <th>수당</th>
+            <th>전화번호</th>
+            <th>지급상태</th>
+            <th>비고</th>
+          </tr>
+        </thead>
+
+        <tbody id="storeDetailBody">
+          <tr>
+            <td
+              colspan="7"
+              class="table-empty"
+            >
+              상세내역을 불러오는 중입니다.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="summary-bar">
+      <span>
+        사용 인원
+        <strong id="storeDetailWorkerCount">
+          0명
+        </strong>
+      </span>
+
+      <span>
+        근무 건수
+        <strong id="storeDetailWorkCount">
+          0건
+        </strong>
+      </span>
+
+      <span>
+        총수당
+        <strong id="storeDetailTotalAmount">
+          0원
+        </strong>
+      </span>
+
+      <span>
+        미지급
+        <strong id="storeDetailUnpaidCount">
+          0건
+        </strong>
+      </span>
+
+      <span>
+        미지급 금액
+        <strong id="storeDetailUnpaidAmount">
+          0원
+        </strong>
+      </span>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-light"
+        onclick="closeStoreDetailModal()"
+      >
+        닫기
+      </button>
+    </div>
+
+  </div>
+</div>
+
+  <!-- 수정 모달 -->
+  <div id="editModal" class="modal" onclick="if(event.target===this) closeEditModal()">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h4>근무내역 수정</h4>
+        <button class="btn btn-light btn-small" onclick="closeEditModal()">닫기</button>
+      </div>
+      <div class="modal-body">
+        <input id="editRowNumber" type="hidden">
+        <div class="form-grid">
+          <div class="field"><label>날짜</label><input id="editDate" type="date"></div>
+          <div class="field"><label>매장</label><select id="editStore">
+            <option value="한국의집">한국의집</option><option value="더큰코리아 본사">더큰코리아 본사</option><option value="소바공방 평촌점">소바공방 평촌점</option><option value="길채정 압구정점">길채정 압구정점</option><option value="효종갱 파주점">효종갱 파주점</option><option value="기타">기타</option>
+          </select></div>
+          <div class="field"><label>성함</label><input id="editName" type="text"></div>
+          <div class="field"><label>전화번호</label><input id="editPhone" type="text"></div>
+          <div class="field"><label>업무</label><select id="editJob">
+            <option value="">선택</option><option value="홀">홀</option><option value="설거지">설거지</option><option value="주방">주방</option><option value="전처리">전처리</option><option value="퇴식">퇴식</option><option value="기타">기타</option>
+          </select></div>
+          <div class="field"><label>수당</label><input id="editAllowance" type="number"></div>
+          <div class="field"><label>지급여부</label><select id="editPayStatus"><option value="미지급">미지급</option><option value="지급완료">지급완료</option></select></div>
+          <div class="field"><label>주민번호·외국인등록번호</label><input id="editRrn" type="text"></div>
+          <div class="field span-2"><label>&nbsp;</label><label class="check-panel"><input id="editForeignIdMissing" type="checkbox" onchange="toggleEditForeignIdFields()">외국인등록증 미제출</label></div>
+          <div id="editManagementNoField" class="field" style="display:none;"><label>내부 관리번호</label><input id="editManagementNo" type="text" readonly placeholder="저장 시 자동발급"></div>
+          <div class="field"><label>수취은행</label><input id="editBank" type="text"></div>
+          <div class="field span-2"><label>계좌번호</label><input id="editAccount" type="text"></div>
+          <div class="field span-4"><label>비고</label><textarea id="editMemo"></textarea></div>
+        </div>
+        <div id="editNotice" class="notice"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light" onclick="closeEditModal()">취소</button>
+        <button id="editSaveBtn" class="btn btn-primary" onclick="saveEditWorker()">수정 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbz_NFlMRhx_mP_0maccpd62iWNHGMVo-pAZCHg7s8-tM26QvKlIVrPL6TmElRgM6XIS/exec";
+
+    let ledgerData = [];
+    let taxData = [];
+    let currentPage = "dashboard";
+
+    const PAGE_INFO = {
+      dashboard: ["대시보드", "일용직 근무 및 지급 현황을 한눈에 확인합니다."],
+      input: ["근무내역 입력", "기존 근무자를 검색하고 근무내역을 등록합니다."],
+      ledger: ["근무내역 관리", "기간검색과 수정으로 전체 근무대장을 관리합니다."],
+      unpaid: ["미지급 관리", "지급이 필요한 내역을 확인하고 처리합니다."],
+      tax: ["세무자료", "기간별 일용직 신고자료를 관리합니다."],
+      workers: ["근무자 관리", "일용직 인명정보와 누적 근무내역을 관리합니다."]
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+      setDefaultDates();
+      loadDashboard();
+    });
+
+    function openPage(page, button) {
+      currentPage = page;
+
+      document.querySelectorAll(".page-section").forEach(function(section) {
+        section.classList.remove("active");
+      });
+
+      const target = document.getElementById("page-" + page);
+      if (target) target.classList.add("active");
+
+      document.querySelectorAll(".nav-button").forEach(function(btn) {
+        btn.classList.toggle("active", btn.dataset.page === page);
+      });
+
+      document.getElementById("topTitle").textContent = PAGE_INFO[page][0];
+      document.getElementById("topDescription").textContent = PAGE_INFO[page][1];
+
+      if (page === "dashboard") loadDashboard();
+      if (page === "ledger" && ledgerData.length === 0) loadLedger();
+      if (page === "unpaid") loadUnpaid();
+      if (page === "tax" && taxData.length === 0) loadTaxData();
+    }
+
+    function refreshCurrentPage() {
+      if (currentPage === "dashboard") loadDashboard();
+      else if (currentPage === "ledger") loadLedger();
+      else if (currentPage === "unpaid") loadUnpaid();
+      else if (currentPage === "input") clearForm();
+    }
+
+    function setDefaultDates() {
+  const today = getLocalDateText(new Date());
+  const firstDay = today.substring(0, 8) + "01";
+
+  document.getElementById("date").value = today;
+
+  document.getElementById("ledgerStart").value = firstDay;
+  document.getElementById("ledgerEnd").value = today;
+
+  document.getElementById("storeSummaryStart").value = firstDay;
+  document.getElementById("storeSummaryEnd").value = today;
+
+  document.getElementById("taxStart").value = firstDay;
+  document.getElementById("taxEnd").value = today;
+}
+
+    async function loadDashboard() {
+      const today = getLocalDateText(new Date());
+      const monthStart = today.substring(0, 8) + "01";
+
+      setText("statTodayCount", "불러오는 중");
+      setText("statTodayAmount", "불러오는 중");
+      setText("statUnpaidCount", "불러오는 중");
+      setText("statUnpaidAmount", "불러오는 중");
+      setText("statMonthAmount", "불러오는 중");
+
+      try {
+        const [todayJson, monthJson, unpaidJson] = await Promise.all([
+          fetchJson(API_URL + "?action=getDailyWorkerList&startDate=" + today + "&endDate=" + today),
+          fetchJson(API_URL + "?action=getDailyWorkerList&startDate=" + monthStart + "&endDate=" + today),
+          fetchJson(API_URL + "?action=getDailyWorkerList")
+        ]);
+
+        const todayList = todayJson.success ? (todayJson.data || []) : [];
+        const monthList = monthJson.success ? (monthJson.data || []) : [];
+        const allList = unpaidJson.success ? (unpaidJson.data || []) : [];
+        console.table(allList.map(r => ({
+  name: r.name,
+  payStatus: r.payStatus,
+  row: r.rowNumber
+})));
+
+
+        const unpaidList = allList.filter(function(item) {
+  const payStatus = String(item.payStatus || "").trim();
+  const name = String(item.name || "").trim();
+
+  return (
+    name !== "NO" &&
+    name !== "" &&
+    payStatus === "미지급"
+  );
+});
+
+        setText("statTodayCount", todayList.length + "건");
+        setText("statTodayAmount", formatMoney(sumAllowance(todayList)));
+        setText("statUnpaidCount", unpaidList.length + "건");
+        setText("statUnpaidAmount", formatMoney(sumAllowance(unpaidList)));
+        setText("statMonthAmount", formatMoney(sumAllowance(monthList)));
+        setText("dashboardUpdatedAt", "최종 조회 " + new Date().toLocaleString("ko-KR"));
+
+        renderRecent(allList.slice(0, 10));
+        loadStoreSummary();
+      } catch (err) {
+        setText("statTodayCount", "오류");
+        setText("statTodayAmount", "오류");
+        setText("statUnpaidCount", "오류");
+        setText("statUnpaidAmount", "오류");
+        setText("statMonthAmount", "오류");
+        document.getElementById("recentBody").innerHTML = '<tr><td colspan="7" class="table-empty">자료 조회 중 오류가 발생했습니다.</td></tr>';
+      }
+    }
+
+    async function loadStoreSummary() {
+  const body = document.getElementById("storeSummaryBody");
+
+  const startDate =
+    document.getElementById("storeSummaryStart").value;
+
+  const endDate =
+    document.getElementById("storeSummaryEnd").value;
+
+  body.innerHTML = `
+    <tr>
+      <td colspan="6" class="table-empty">
+        점포별 현황을 불러오는 중입니다.
+      </td>
+    </tr>
+  `;
+
+  try {
+    const url =
+      API_URL +
+      "?action=getDailyWorkerStoreSummary" +
+      "&startDate=" + encodeURIComponent(startDate) +
+      "&endDate=" + encodeURIComponent(endDate);
+
+    const json = await fetchJson(url);
+
+    if (!json.success) {
+      throw new Error(json.message || "점포별 현황 조회 실패");
+    }
+
+    renderStoreSummary(json.data || [], json.totals || {});
+    renderJobSummary(json.jobData || [], json.totals || {});
+  } catch (err) {
+    console.error("점포별 현황 조회 오류:", err);
+
+    body.innerHTML = `
+      <tr>
+        <td colspan="6" class="table-empty">
+          점포별 현황을 불러오지 못했습니다.
+          Apps Script 배포 상태를 확인해주세요.
+        </td>
+      </tr>
+    `;
+
+    const jobBody = document.getElementById("jobSummaryBody");
+
+if (jobBody) {
+  jobBody.innerHTML = `
+    <tr>
+      <td colspan="6" class="table-empty">
+        업무별 현황을 불러오지 못했습니다.
+      </td>
+    </tr>
+  `;
+}
+
+setText("jobSummaryCount", "0개");
+setText("jobSummaryWorkCount", "0건");
+setText("jobSummaryTotalAmount", "0원");
+
+    setText("storeSummaryStoreCount", "0개");
+    setText("storeSummaryWorkerCount", "0명");
+    setText("storeSummaryWorkCount", "0건");
+    setText("storeSummaryTotalAmount", "0원");
+  }
+}
+
+
+function renderStoreSummary(list, totals) {
+  const body = document.getElementById("storeSummaryBody");
+
+  if (!list.length) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="6" class="table-empty">
+          조회기간에 등록된 근무내역이 없습니다.
+        </td>
+      </tr>
+    `;
+  } else {
+    body.innerHTML = list.map(function(item) {
+      return `
+        <tr>
+          <td class="left">
+  <a href="javascript:void(0)"
+     onclick="showStoreDetail('${escapeHtml(item.store || "")}')"
+     style="
+       color:#2563eb;
+       font-weight:700;
+       text-decoration:underline;
+       cursor:pointer;
+     ">
+     ${escapeHtml(item.store || "-")}
+  </a>
+</td>
+
+          <td>
+            ${Number(item.workerCount || 0).toLocaleString("ko-KR")}명
+          </td>
+
+          <td>
+            ${Number(item.workCount || 0).toLocaleString("ko-KR")}건
+          </td>
+
+          <td class="money">
+            ${formatMoney(item.totalAmount)}
+          </td>
+
+          <td>
+            ${
+              Number(item.unpaidCount || 0) > 0
+                ? '<span class="status-badge status-unpaid">' +
+                  Number(item.unpaidCount).toLocaleString("ko-KR") +
+                  '건</span>'
+                : '<span class="status-badge status-paid">0건</span>'
+            }
+          </td>
+
+          <td class="money">
+            ${formatMoney(item.unpaidAmount)}
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  setText(
+    "storeSummaryStoreCount",
+    Number(totals.storeCount || 0).toLocaleString("ko-KR") + "개"
+  );
+
+  setText(
+    "storeSummaryWorkerCount",
+    Number(totals.workerCount || 0).toLocaleString("ko-KR") + "명"
+  );
+
+  setText(
+    "storeSummaryWorkCount",
+    Number(totals.workCount || 0).toLocaleString("ko-KR") + "건"
+  );
+
+  setText(
+    "storeSummaryTotalAmount",
+    formatMoney(totals.totalAmount || 0)
+  );
+}
+
+let currentStoreDetailList = [];
+let currentStoreDetailTotals = {};
+let currentStoreDetailStore = "";
+let currentStoreDetailStartDate = "";
+let currentStoreDetailEndDate = "";
+let currentStoreDetailView = "date";
+
+async function showStoreDetail(store) {
+
+  const startDate =
+    document
+      .getElementById(
+        "storeSummaryStart"
+      )
+      .value;
+
+  const endDate =
+    document
+      .getElementById(
+        "storeSummaryEnd"
+      )
+      .value;
+
+  const modal =
+    document.getElementById(
+      "storeDetailModal"
+    );
+
+  const body =
+    document.getElementById(
+      "storeDetailBody"
+    );
+
+  document
+    .getElementById(
+      "storeDetailTitle"
+    )
+    .textContent =
+      store +
+      " 일용직 사용내역";
+
+  document
+    .getElementById(
+      "storeDetailPeriod"
+    )
+    .textContent =
+      "조회기간: " +
+      (startDate || "전체") +
+      " ~ " +
+      (endDate || "전체");
+
+  body.innerHTML = `
+    <tr>
+      <td
+        colspan="7"
+        class="table-empty"
+      >
+        상세내역을 불러오는 중입니다.
+      </td>
+    </tr>
+  `;
+
+  setText(
+    "storeDetailWorkerCount",
+    "0명"
+  );
+
+  setText(
+    "storeDetailWorkCount",
+    "0건"
+  );
+
+  setText(
+    "storeDetailTotalAmount",
+    "0원"
+  );
+
+  setText(
+    "storeDetailUnpaidCount",
+    "0건"
+  );
+
+  setText(
+    "storeDetailUnpaidAmount",
+    "0원"
+  );
+
+  modal.classList.add("open");
+
+  const url =
+    API_URL +
+    "?action=getDailyWorkerStoreDetail" +
+    "&store=" +
+    encodeURIComponent(store) +
+    "&startDate=" +
+    encodeURIComponent(startDate) +
+    "&endDate=" +
+    encodeURIComponent(endDate);
+
+  try {
+
+    const json =
+      await fetchJson(url);
+
+    if (!json.success) {
+      throw new Error(
+        json.message ||
+        "상세조회에 실패했습니다."
+      );
+    }
+
+    renderStoreDetailModal(
+      store,
+      json.data || [],
+      json.totals || {},
+      startDate,
+      endDate
+    );
+
+  } catch (err) {
+
+    console.error(
+      "점포 상세조회 오류:",
+      err
+    );
+
+    body.innerHTML = `
+      <tr>
+        <td
+          colspan="7"
+          class="table-empty"
+        >
+          상세내역을 불러오지 못했습니다.<br>
+          Apps Script 배포 상태를 확인해주세요.
+        </td>
+      </tr>
+    `;
+  }
+}
+
+function renderStoreDetailModal(
+  store,
+  list,
+  totals,
+  startDate,
+  endDate
+) {
+
+  currentStoreDetailStore =
+    store || "";
+
+  currentStoreDetailList =
+    Array.isArray(list)
+      ? list
+      : [];
+
+  currentStoreDetailTotals =
+    totals || {};
+
+  currentStoreDetailStartDate =
+    startDate || "";
+
+  currentStoreDetailEndDate =
+    endDate || "";
+
+  currentStoreDetailView =
+    "date";
+
+  updateStoreDetailViewButtons();
+
+  renderStoreDetailRows();
+}
+
+
+function changeStoreDetailView(mode) {
+
+  currentStoreDetailView =
+    mode === "job"
+      ? "job"
+      : "date";
+
+  updateStoreDetailViewButtons();
+
+  renderStoreDetailRows();
+}
+
+
+function updateStoreDetailViewButtons() {
+
+  const dateBtn =
+    document.getElementById(
+      "storeDetailDateBtn"
+    );
+
+  const jobBtn =
+    document.getElementById(
+      "storeDetailJobBtn"
+    );
+
+  if (dateBtn) {
+    dateBtn.className =
+      currentStoreDetailView === "date"
+        ? "btn btn-primary btn-small"
+        : "btn btn-light btn-small";
+  }
+
+  if (jobBtn) {
+    jobBtn.className =
+      currentStoreDetailView === "job"
+        ? "btn btn-primary btn-small"
+        : "btn btn-light btn-small";
+  }
+}
+
+
+function renderStoreDetailRows() {
+
+  const body =
+    document.getElementById(
+      "storeDetailBody"
+    );
+
+  const list =
+    currentStoreDetailList || [];
+
+  const totals =
+    currentStoreDetailTotals || {};
+
+  document
+    .getElementById(
+      "storeDetailTitle"
+    )
+    .textContent =
+      currentStoreDetailStore +
+      " 일용직 사용내역";
+
+  document
+    .getElementById(
+      "storeDetailPeriod"
+    )
+    .textContent =
+      "조회기간: " +
+      (
+        currentStoreDetailStartDate ||
+        "전체"
+      ) +
+      " ~ " +
+      (
+        currentStoreDetailEndDate ||
+        "전체"
+      );
+
+  if (!list.length) {
+
+    body.innerHTML = `
+      <tr>
+        <td
+          colspan="7"
+          class="table-empty"
+        >
+          조회기간에 등록된 근무내역이 없습니다.
+        </td>
+      </tr>
+    `;
+
+  } else if (
+    currentStoreDetailView === "job"
+  ) {
+
+    renderStoreDetailByJob(
+      body,
+      list
+    );
+
+  } else {
+
+    renderStoreDetailByDate(
+      body,
+      list
+    );
+  }
+
+  setText(
+    "storeDetailWorkerCount",
+    Number(
+      totals.workerCount || 0
+    ).toLocaleString("ko-KR") +
+    "명"
+  );
+
+  setText(
+    "storeDetailWorkCount",
+    Number(
+      totals.workCount ||
+      list.length ||
+      0
+    ).toLocaleString("ko-KR") +
+    "건"
+  );
+
+  setText(
+    "storeDetailTotalAmount",
+    formatMoney(
+      totals.totalAmount || 0
+    )
+  );
+
+  setText(
+    "storeDetailUnpaidCount",
+    Number(
+      totals.unpaidCount || 0
+    ).toLocaleString("ko-KR") +
+    "건"
+  );
+
+  setText(
+    "storeDetailUnpaidAmount",
+    formatMoney(
+      totals.unpaidAmount || 0
+    )
+  );
+}
+
+
+function renderStoreDetailByDate(
+  body,
+  list
+) {
+
+  const sortedList =
+    list
+      .slice()
+      .sort(function(a, b) {
+
+        return String(
+          b.date || ""
+        ).localeCompare(
+          String(a.date || "")
+        );
+      });
+
+  body.innerHTML =
+    sortedList
+      .map(function(item) {
+
+        return createStoreDetailRow(
+          item
+        );
+      })
+      .join("");
+}
+
+
+function renderStoreDetailByJob(
+  body,
+  list
+) {
+
+  const grouped = {};
+
+  list.forEach(function(item) {
+
+    const job =
+      String(
+        item.job || "미분류"
+      ).trim() || "미분류";
+
+    if (!grouped[job]) {
+
+      grouped[job] = {
+        list: [],
+        totalAmount: 0,
+        unpaidCount: 0,
+        unpaidAmount: 0,
+        workers: new Set()
+      };
+    }
+
+    const allowance =
+      Number(
+        item.allowance || 0
+      );
+
+    const payStatus =
+      String(
+        item.payStatus || "미지급"
+      ).trim();
+
+    grouped[job]
+      .list
+      .push(item);
+
+    grouped[job]
+      .totalAmount +=
+        allowance;
+
+    grouped[job]
+      .workers
+      .add(
+        String(
+          item.phone ||
+          item.name ||
+          ""
+        )
+      );
+
+    if (
+      payStatus !== "지급완료"
+    ) {
+
+      grouped[job]
+        .unpaidCount += 1;
+
+      grouped[job]
+        .unpaidAmount +=
+          allowance;
+    }
+  });
+
+  const jobs =
+    Object
+      .keys(grouped)
+      .sort(function(a, b) {
+
+        return (
+          grouped[b].totalAmount -
+          grouped[a].totalAmount
+        );
+      });
+
+  let html = "";
+
+  jobs.forEach(function(job) {
+
+    const group =
+      grouped[job];
+
+    html += `
+      <tr>
+        <td
+          colspan="7"
+          style="
+            background:#eef4ff;
+            color:#183b77;
+            font-weight:800;
+            text-align:left;
+            padding:14px 16px;
+            border-top:2px solid #cbdaf5;
+          "
+        >
+          ${escapeHtml(job)}
+
+          <span
+            style="
+              margin-left:14px;
+              color:#475569;
+              font-weight:700;
+            "
+          >
+            ${group.workers.size.toLocaleString("ko-KR")}명
+            ·
+            ${group.list.length.toLocaleString("ko-KR")}건
+            ·
+            합계 ${formatMoney(group.totalAmount)}
+            ·
+            미지급 ${group.unpaidCount.toLocaleString("ko-KR")}건
+            (${formatMoney(group.unpaidAmount)})
+          </span>
+        </td>
+      </tr>
+    `;
+
+    group
+      .list
+      .slice()
+      .sort(function(a, b) {
+
+        return String(
+          b.date || ""
+        ).localeCompare(
+          String(a.date || "")
+        );
+      })
+      .forEach(function(item) {
+
+        html +=
+          createStoreDetailRow(
+            item
+          );
+      });
+  });
+
+  body.innerHTML = html;
+}
+
+
+function createStoreDetailRow(item) {
+
+  const payStatus =
+    String(
+      item.payStatus ||
+      "미지급"
+    ).trim();
+
+  const statusClass =
+    payStatus === "지급완료"
+      ? "status-paid"
+      : "status-unpaid";
+
+  return `
+    <tr>
+      <td>
+        ${escapeHtml(
+          item.date || "-"
+        )}
+      </td>
+
+      <td class="left">
+        <strong>
+          ${escapeHtml(
+            item.name || "-"
+          )}
+        </strong>
+      </td>
+
+      <td>
+        ${escapeHtml(
+          item.job || "-"
+        )}
+      </td>
+
+      <td class="money">
+        ${formatMoney(
+          item.allowance || 0
+        )}
+      </td>
+
+      <td>
+        ${escapeHtml(
+          item.phone || "-"
+        )}
+      </td>
+
+      <td>
+        <span
+          class="status-badge ${statusClass}"
+        >
+          ${escapeHtml(
+            payStatus
+          )}
+        </span>
+      </td>
+
+      <td class="left">
+        ${escapeHtml(
+          item.memo || "-"
+        )}
+      </td>
+    </tr>
+  `;
+}
+
+function closeStoreDetailModal() {
+
+  const modal =
+    document.getElementById(
+      "storeDetailModal"
+    );
+
+  if (modal) {
+    modal.classList.remove("open");
+  }
+}
+
+function renderJobSummary(list, totals) {
+  const body = document.getElementById("jobSummaryBody");
+
+  if (!body) return;
+
+  if (!list.length) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="6" class="table-empty">
+          조회기간에 등록된 업무별 근무내역이 없습니다.
+        </td>
+      </tr>
+    `;
+
+    setText("jobSummaryCount", "0개");
+    setText("jobSummaryWorkCount", "0건");
+    setText("jobSummaryTotalAmount", "0원");
+    return;
+  }
+
+  body.innerHTML = list.map(function(item) {
+    const unpaidCount = Number(item.unpaidCount || 0);
+
+    return `
+      <tr>
+        <td class="left">
+          <strong>${escapeHtml(item.job || "기타")}</strong>
+        </td>
+
+        <td>
+          ${Number(item.workerCount || 0).toLocaleString("ko-KR")}명
+        </td>
+
+        <td>
+          ${Number(item.workCount || 0).toLocaleString("ko-KR")}건
+        </td>
+
+        <td class="money">
+          ${formatMoney(item.totalAmount || 0)}
+        </td>
+
+        <td class="money">
+          ${formatMoney(item.averageAmount || 0)}
+        </td>
+
+        <td>
+          ${
+            unpaidCount > 0
+              ? `<span class="status-badge status-unpaid">${unpaidCount}건</span>`
+              : `<span class="status-badge status-paid">0건</span>`
+          }
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  const totalWorkCount = list.reduce(function(sum, item) {
+    return sum + Number(item.workCount || 0);
+  }, 0);
+
+  const totalAmount = list.reduce(function(sum, item) {
+    return sum + Number(item.totalAmount || 0);
+  }, 0);
+
+  setText(
+    "jobSummaryCount",
+    list.length.toLocaleString("ko-KR") + "개"
+  );
+
+  setText(
+    "jobSummaryWorkCount",
+    totalWorkCount.toLocaleString("ko-KR") + "건"
+  );
+
+  setText(
+    "jobSummaryTotalAmount",
+    formatMoney(totalAmount)
+  );
+}
+
+    function renderRecent(list) {
+      const body = document.getElementById("recentBody");
+
+      if (!list.length) {
+        body.innerHTML = '<tr><td colspan="7" class="table-empty">등록된 근무내역이 없습니다.</td></tr>';
+        return;
+      }
+
+      body.innerHTML = list.map(function(item) {
+        return `
+          <tr>
+            <td>${escapeHtml(item.date)}</td>
+            <td>${escapeHtml(item.store)}</td>
+            <td><strong>${escapeHtml(item.name)}</strong></td>
+            <td>${escapeHtml(item.job || "-")}</td>
+            <td class="money">${formatMoney(normalizeAllowance(item.allowance))}</td>
+            <td>${escapeHtml(formatPhone(item.phone))}</td>
+            <td>${payBadge(item.payStatus)}</td>
+          </tr>`;
+      }).join("");
+    }
+
+    async function searchWorker() {
+      const keyword = document.getElementById("keyword").value.trim();
+      const resultBox = document.getElementById("resultBox");
+      resultBox.innerHTML = "";
+      clearNotice("searchNotice");
+
+      if (!keyword) {
+        showNotice("searchNotice", "err", "성함 또는 전화번호를 입력해주세요.");
+        return;
+      }
+
+      showNotice("searchNotice", "ok", "검색 중입니다...");
+
+      try {
+        const json = await fetchJson(API_URL + "?action=searchWorker&keyword=" + encodeURIComponent(keyword));
+
+        if (!json.success || !json.data || json.data.length === 0) {
+          showNotice("searchNotice", "err", "기존 정보가 없습니다. 아래에 직접 입력해주세요.");
+          document.getElementById("name").value = keyword;
+          return;
+        }
+
+        showNotice("searchNotice", "ok", json.data.length + "건의 기존 정보를 찾았습니다.");
+
+        resultBox.innerHTML = json.data.map(function(worker, index) {
+          return `
+            <div class="result-item" onclick="selectWorker(${index})">
+              <strong>${escapeHtml(worker.name || "")} / ${escapeHtml(formatPhone(worker.phone || ""))}</strong>
+              <p>은행: ${escapeHtml(worker.bank || "-")}<br>계좌: ${escapeHtml(worker.account || "-")}<br>세무처리: ${escapeHtml(worker.taxStatus || "신고 가능")}${worker.managementNo ? " / " + escapeHtml(worker.managementNo) : ""}<br>최근업무: ${escapeHtml(worker.lastJob || "-")} / 최근수당: ${escapeHtml(String(worker.lastAllowance || "-"))}</p>
+            </div>`;
+        }).join("");
+
+        window.__workerSearchResults = json.data;
+      } catch (err) {
+        showNotice("searchNotice", "err", "검색 중 오류가 발생했습니다. 배포 URL 또는 권한을 확인해주세요.");
+      }
+    }
+
+    async function loadWorkerManage() {
+  const keyword =
+    document.getElementById("workerManageKeyword").value.trim();
+
+  const body =
+    document.getElementById("workerManageBody");
+
+  clearNotice("workerManageNotice");
+
+  if (!keyword) {
+    showNotice(
+      "workerManageNotice",
+      "err",
+      "성명 또는 전화번호를 입력해주세요."
+    );
+    return;
+  }
+
+  body.innerHTML = `
+    <tr>
+      <td colspan="10" class="table-empty">
+        근무자 정보를 불러오는 중입니다.
+      </td>
+    </tr>
+  `;
+
+  try {
+    const json = await fetchJson(
+      API_URL +
+      "?action=searchWorker&keyword=" +
+      encodeURIComponent(keyword)
+    );
+
+    const list =
+      json.success && Array.isArray(json.data)
+        ? json.data
+        : [];
+
+    if (!list.length) {
+      body.innerHTML = `
+        <tr>
+          <td colspan="10" class="table-empty">
+            검색된 근무자가 없습니다.
+          </td>
+        </tr>
+      `;
+
+      showNotice(
+        "workerManageNotice",
+        "err",
+        "등록된 근무자 정보를 찾지 못했습니다."
+      );
+      return;
+    }
+
+    showNotice(
+      "workerManageNotice",
+      "ok",
+      list.length + "명의 근무자를 찾았습니다."
+    );
+
+    body.innerHTML = list.map(function(worker) {
+      return `
+        <tr>
+          <td><strong>${escapeHtml(worker.name || "")}</strong></td>
+          <td>${escapeHtml(formatPhone(worker.phone || ""))}</td>
+          <td>${escapeHtml(worker.rrn || "-")}</td>
+          <td>${escapeHtml(worker.bank || "-")}</td>
+          <td>${escapeHtml(worker.account || "-")}</td>
+          <td>${escapeHtml(worker.taxStatus || "신고 가능")}</td>
+          <td>${escapeHtml(worker.managementNo || "-")}</td>
+          <td>${escapeHtml(worker.lastJob || "-")}</td>
+          <td class="money">
+            ${
+              worker.lastAllowance
+                ? formatMoney(
+                    normalizeAllowance(worker.lastAllowance)
+                  )
+                : "-"
+            }
+          </td>
+          <td>${escapeHtml(worker.lastDate || "-")}</td>
+        </tr>
+      `;
+    }).join("");
+
+  } catch (err) {
+    console.error("근무자 조회 오류:", err);
+
+    body.innerHTML = `
+      <tr>
+        <td colspan="10" class="table-empty">
+          근무자 정보를 불러오지 못했습니다.
+        </td>
+      </tr>
+    `;
+
+    showNotice(
+      "workerManageNotice",
+      "err",
+      "근무자 조회 중 오류가 발생했습니다."
+    );
+  }
+}
+
+    function selectWorker(index) {
+      const worker = (window.__workerSearchResults || [])[index];
+      if (!worker) return;
+      fillWorker(worker);
+      showNotice("searchNotice", "ok", worker.name + " 님의 기존 정보를 불러왔습니다.");
+    }
+
+    function fillWorker(worker) {
+      document.getElementById("name").value = worker.name || "";
+      document.getElementById("phone").value = formatPhone(worker.phone || "");
+      document.getElementById("rrn").value = worker.rrn || "";
+      document.getElementById("bank").value = worker.bank || "";
+      document.getElementById("account").value = worker.account || "";
+      document.getElementById("foreignIdMissing").checked = Boolean(worker.foreignIdMissing) || worker.identityStatus === "외국인등록증 미제출";
+      document.getElementById("managementNo").value = worker.managementNo || "";
+      toggleForeignIdFields();
+      if (worker.lastJob) document.getElementById("job").value = worker.lastJob;
+      if (worker.lastAllowance) document.getElementById("allowance").value = worker.lastAllowance;
+    }
+
+    async function saveDailyWorker() {
+      clearNotice("saveNotice");
+
+      const btn = document.getElementById("saveBtn");
+      btn.disabled = true;
+      btn.textContent = "저장 중...";
+
+      const data = {
+        action: "saveDailyWorker",
+        date: document.getElementById("date").value,
+        store: document.getElementById("store").value,
+        name: document.getElementById("name").value.trim(),
+        allowance: document.getElementById("allowance").value,
+        job: document.getElementById("job").value,
+        rrn: document.getElementById("rrn").value.trim(),
+        bank: document.getElementById("bank").value.trim(),
+        account: document.getElementById("account").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        memo: document.getElementById("memo").value.trim(),
+        payStatus: document.getElementById("payStatus").value,
+        foreignIdMissing: document.getElementById("foreignIdMissing").checked,
+        managementNo: document.getElementById("managementNo").value.trim()
+      };
+
+      if (!data.name) {
+        showNotice("saveNotice", "err", "성함을 입력해주세요.");
+        resetSaveButton();
+        return;
+      }
+
+      if (!data.phone) {
+        showNotice("saveNotice", "err", "전화번호를 입력해주세요.");
+        resetSaveButton();
+        return;
+      }
+
+      try {
+        const json = await postJson(data);
+
+        if (json.success) {
+          if (json.managementNo) document.getElementById("managementNo").value = json.managementNo;
+          showNotice("saveNotice", "ok", json.message || "저장되었습니다.");
+          document.getElementById("keyword").value = "";
+          document.getElementById("resultBox").innerHTML = "";
+          ledgerData = [];
+        } else {
+          showNotice("saveNotice", "err", json.message || "저장에 실패했습니다.");
+        }
+      } catch (err) {
+        showNotice("saveNotice", "err", "저장 중 오류가 발생했습니다. 웹앱 배포 권한을 확인해주세요.");
+      }
+
+      resetSaveButton();
+    }
+
+    function resetSaveButton() {
+      const btn = document.getElementById("saveBtn");
+      btn.disabled = false;
+      btn.textContent = "저장하기";
+    }
+
+    function clearForm() {
+      document.getElementById("keyword").value = "";
+      document.getElementById("resultBox").innerHTML = "";
+      clearNotice("searchNotice");
+      clearNotice("saveNotice");
+
+      document.getElementById("date").value = getLocalDateText(new Date());
+      document.getElementById("store").value = "한국의집";
+      document.getElementById("name").value = "";
+      document.getElementById("allowance").value = "";
+      document.getElementById("job").value = "";
+      document.getElementById("rrn").value = "";
+      document.getElementById("bank").value = "";
+      document.getElementById("phone").value = "";
+      document.getElementById("account").value = "";
+      document.getElementById("memo").value = "";
+      document.getElementById("payStatus").value = "미지급";
+      document.getElementById("foreignIdMissing").checked = false;
+      document.getElementById("managementNo").value = "";
+      toggleForeignIdFields();
+    }
+
+    function toggleForeignIdFields() {
+      const checked = document.getElementById("foreignIdMissing").checked;
+      const rrn = document.getElementById("rrn");
+      rrn.disabled = checked;
+      if (checked) rrn.value = "";
+      document.getElementById("managementNoField").style.display = checked ? "block" : "none";
+    }
+
+    async function loadLedger() {
+      const startDate = document.getElementById("ledgerStart").value;
+      const endDate = document.getElementById("ledgerEnd").value;
+      const body = document.getElementById("ledgerBody");
+
+      body.innerHTML = '<tr><td colspan="10" class="table-empty">자료를 불러오는 중입니다.</td></tr>';
+
+      try {
+        const url = API_URL + "?action=getDailyWorkerList&startDate=" + encodeURIComponent(startDate) + "&endDate=" + encodeURIComponent(endDate);
+        const json = await fetchJson(url);
+
+        if (!json.success) throw new Error(json.message || "조회 실패");
+
+        ledgerData = json.data || [];
+        renderLedger();
+      } catch (err) {
+        body.innerHTML = '<tr><td colspan="10" class="table-empty">근무내역 조회 중 오류가 발생했습니다.</td></tr>';
+      }
+    }
+
+    function getFilteredLedger() {
+      const store = document.getElementById("ledgerStore").value;
+      const job = document.getElementById("ledgerJob").value;
+      const payStatus = document.getElementById("ledgerPayStatus").value;
+      const keyword = normalizeSearch(document.getElementById("ledgerKeyword").value);
+
+      return ledgerData.filter(function(item) {
+        if (store && item.store !== store) return false;
+        if (job && item.job !== job) return false;
+        if (payStatus && item.payStatus !== payStatus) return false;
+
+        if (keyword) {
+          const haystack = normalizeSearch([item.name, item.phone, item.job, item.store].join(" "));
+          if (!haystack.includes(keyword)) return false;
+        }
+
+        return true;
+      });
+    }
+
+    function renderLedger() {
+      const body = document.getElementById("ledgerBody");
+      const list = getFilteredLedger();
+
+      if (!list.length) {
+        body.innerHTML = '<tr><td colspan="10" class="table-empty">검색 조건에 맞는 근무내역이 없습니다.</td></tr>';
+      } else {
+        body.innerHTML = list.map(function(item) {
+          return `
+            <tr>
+              <td>${escapeHtml(item.date)}</td>
+              <td>${escapeHtml(item.store)}</td>
+              <td><strong>${escapeHtml(item.name)}</strong></td>
+              <td>${escapeHtml(item.job || "-")}</td>
+              <td class="money">${formatMoney(normalizeAllowance(item.allowance))}</td>
+              <td>${escapeHtml(formatPhone(item.phone))}</td>
+              <td>${escapeHtml(item.bank || "-")}</td>
+              <td>${escapeHtml(item.account || "-")}</td>
+              <td>${payBadge(item.payStatus)}</td>
+              <td>
+
+  <button
+    class="btn btn-light btn-small"
+    onclick="openEditModal(${item.rowNumber})">
+    수정
+  </button>
+
+  ${
+    item.payStatus === "미지급"
+      ? `
+      <button
+        class="btn btn-success btn-small"
+        onclick="markPaid(${item.rowNumber})">
+        지급완료
+      </button>
+      `
+      : ""
+  }
+
+</td>
+            </tr>`;
+        }).join("");
+      }
+
+      const unpaidCount = list.filter(function(item) {
+  return String(item.payStatus || "").trim() === "미지급";
+}).length;
+
+setText("ledgerCount", list.length + "건");
+setText("ledgerAmount", formatMoney(sumAllowance(list)));
+setText("ledgerUnpaidCount", unpaidCount + "건");
+    }
+
+    async function loadUnpaid() {
+      const body = document.getElementById("unpaidBody");
+      body.innerHTML = '<tr><td colspan="9" class="table-empty">자료를 불러오는 중입니다.</td></tr>';
+
+      try {
+        const json = await fetchJson(API_URL + "?action=getDailyWorkerList");
+        if (!json.success) throw new Error(json.message || "조회 실패");
+
+        const list = (json.data || []).filter(function(item) {
+  const payStatus = String(item.payStatus || "").trim();
+  const name = String(item.name || "").trim();
+
+  return (
+    name !== "NO" &&
+    name !== "" &&
+    payStatus === "미지급"
+  );
+});
+
+        setText("unpaidPageCount", list.length + "건");
+        setText("unpaidPageAmount", formatMoney(sumAllowance(list)));
+        setText("unpaidPageDate", list.length ? list[0].date : "내역 없음");
+
+        if (!list.length) {
+          body.innerHTML = '<tr><td colspan="9" class="table-empty">현재 미지급 내역이 없습니다.</td></tr>';
+          return;
+        }
+
+        body.innerHTML = list.map(function(item) {
+          return `
+            <tr>
+              <td>${escapeHtml(item.date)}</td>
+              <td>${escapeHtml(item.store)}</td>
+              <td><strong>${escapeHtml(item.name)}</strong></td>
+              <td>${escapeHtml(item.job || "-")}</td>
+              <td class="money">${formatMoney(normalizeAllowance(item.allowance))}</td>
+              <td>${escapeHtml(formatPhone(item.phone))}</td>
+              <td>${escapeHtml(item.bank || "-")}</td>
+              <td>${escapeHtml(item.account || "-")}</td>
+              <td><button class="btn btn-success btn-small" onclick="markPaid(${item.rowNumber})">지급완료</button></td>
+            </tr>`;
+        }).join("");
+      } catch (err) {
+        body.innerHTML = '<tr><td colspan="9" class="table-empty">미지급 내역 조회 중 오류가 발생했습니다.</td></tr>';
+      }
+    }
+
+   async function loadTaxData() {
+  const startDate = document.getElementById("taxStart").value;
+  const endDate = document.getElementById("taxEnd").value;
+  const body = document.getElementById("taxBody");
+
+  body.innerHTML = `
+    <tr>
+      <td colspan="8" class="table-empty">
+        세무자료를 불러오는 중입니다.
+      </td>
+    </tr>
+  `;
+
+  try {
+    const url =
+      API_URL +
+      "?action=getDailyWorkerList" +
+      "&startDate=" + encodeURIComponent(startDate) +
+      "&endDate=" + encodeURIComponent(endDate);
+
+    const json = await fetchJson(url);
+
+    if (!json.success) {
+      throw new Error(json.message || "조회 실패");
+    }
+
+    taxData = json.data || [];
+    renderTaxData();
+
+  } catch (err) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="8" class="table-empty">
+          세무자료 조회 중 오류가 발생했습니다.
+        </td>
+      </tr>
+    `;
+
+    setText("taxCount", "0건");
+    setText("taxAmount", "0원");
+  }
+}
+
+async function createTaxReport() {
+  const startDate =
+    document.getElementById("taxStart").value;
+
+  const endDate =
+    document.getElementById("taxEnd").value;
+
+  const store =
+    document.getElementById("taxStore").value;
+
+  if (!startDate || !endDate) {
+    alert("시작일과 종료일을 선택해주세요.");
+    return;
+  }
+
+  if (startDate > endDate) {
+    alert("시작일이 종료일보다 늦습니다.");
+    return;
+  }
+
+  if (!confirm("선택한 기간의 신고자료를 생성하시겠습니까?")) {
+    return;
+  }
+
+  try {
+    const json = await postJson({
+      action: "makeDailyTaxReport",
+      startDate: startDate,
+      endDate: endDate,
+      store: store
+    });
+
+    if (!json.success) {
+      throw new Error(json.message || "신고자료 생성 실패");
+    }
+
+    alert(json.message || "신고자료가 생성되었습니다.");
+
+  } catch (err) {
+    console.error("신고자료 생성 오류:", err);
+
+    alert(
+      "신고자료 생성 중 오류가 발생했습니다.\n" +
+      "Apps Script 새 버전 배포 여부를 확인해주세요."
+    );
+  }
+}
+
+function getTaxStatus_(item) {
+  if (item.taxStatus) return String(item.taxStatus).trim();
+  return item.rrn ? "신고 가능" : "자료 보완 대기";
+}
+
+function getFilteredTaxData_(forceReportableOnly) {
+  const store = document.getElementById("taxStore").value;
+  const statusFilter = forceReportableOnly
+    ? "신고 가능"
+    : document.getElementById("taxStatusFilter").value;
+
+  return taxData.filter(function(item) {
+    if (store && item.store !== store) return false;
+    if (statusFilter && getTaxStatus_(item) !== statusFilter) return false;
+
+    const name = String(item.name || "").trim();
+    return name && name !== "NO";
+  });
+}
+
+function renderTaxData() {
+  const body = document.getElementById("taxBody");
+  const list = getFilteredTaxData_(false);
+
+  if (!list.length) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="8" class="table-empty">
+          조회 조건에 맞는 세무자료가 없습니다.
+        </td>
+      </tr>
+    `;
+  } else {
+    body.innerHTML = list.map(function(item) {
+      return `
+        <tr>
+          <td>${escapeHtml(item.date || "")}</td>
+          <td>${escapeHtml(item.store || "")}</td>
+          <td><strong>${escapeHtml(item.name || "")}</strong></td>
+          <td>${escapeHtml(item.rrn || "-")}</td>
+          <td>${escapeHtml(item.job || "-")}</td>
+          <td class="money">
+            ${formatMoney(normalizeAllowance(item.allowance))}
+          </td>
+          <td>${payBadge(item.payStatus)}</td>
+          <td>${escapeHtml(getTaxStatus_(item))}${item.managementNo ? "<br><span class=\"small-note\">" + escapeHtml(item.managementNo) + "</span>" : ""}</td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  setText("taxCount", list.length + "건");
+  setText("taxAmount", formatMoney(sumAllowance(list)));
+  setText("taxPendingCount", taxData.filter(function(item) {
+    return getTaxStatus_(item) === "자료 보완 대기";
+  }).length + "건");
+} 
+
+function downloadTaxCsv() {
+  const store = document.getElementById("taxStore").value;
+  const list = getFilteredTaxData_(true);
+
+  if (!list.length) {
+    alert("다운로드할 세무자료가 없습니다.");
+    return;
+  }
+
+  const rows = [
+    [
+      "날짜",
+      "매장",
+      "성명",
+      "주민등록번호",
+      "업무",
+      "지급액",
+      "지급상태"
+    ]
+  ];
+
+  list.forEach(function(item) {
+    rows.push([
+      item.date || "",
+      item.store || "",
+      item.name || "",
+      item.rrn || "",
+      item.job || "",
+      normalizeAllowance(item.allowance),
+      String(item.payStatus || "").trim()
+    ]);
+  });
+
+  const csv = rows
+    .map(function(row) {
+      return row.map(function(value) {
+        const text = String(value == null ? "" : value)
+          .replace(/"/g, '""');
+
+        return '"' + text + '"';
+      }).join(",");
+    })
+    .join("\n");
+
+  const bom = "\uFEFF";
+  const blob = new Blob([bom + csv], {
+    type: "text/csv;charset=utf-8;"
+  });
+
+  const startDate =
+    document.getElementById("taxStart").value || "";
+
+  const endDate =
+    document.getElementById("taxEnd").value || "";
+
+  const storeName =
+    store || "전체매장";
+
+  const fileName =
+    "일용직_세무자료_" +
+    storeName +
+    "_" +
+    startDate +
+    "_" +
+    endDate +
+    ".csv";
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = fileName;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+}
+
+    async function markPaid(rowNumber) {
+      const allJson = await fetchJson(API_URL + "?action=getDailyWorkerList");
+      const item = (allJson.data || []).find(function(row) { return Number(row.rowNumber) === Number(rowNumber); });
+      if (!item) {
+        alert("해당 근무내역을 찾을 수 없습니다.");
+        return;
+      }
+
+      if (!confirm(item.name + " 님의 " + formatMoney(normalizeAllowance(item.allowance)) + "을 지급완료 처리하시겠습니까?")) return;
+
+      const data = Object.assign({}, item, {
+        action: "updateDailyWorker",
+        payStatus: "지급완료"
+      });
+
+      try {
+        const json = await postJson(data);
+        if (!json.success) throw new Error(json.message || "처리 실패");
+        alert("지급완료 처리되었습니다.");
+        ledgerData = [];
+        loadUnpaid();
+      } catch (err) {
+        alert("지급완료 처리 중 오류가 발생했습니다.");
+      }
+    }
+
+    function openEditModal(rowNumber) {
+      const item = ledgerData.find(function(row) { return Number(row.rowNumber) === Number(rowNumber); });
+      if (!item) return;
+
+      document.getElementById("editRowNumber").value = item.rowNumber;
+      document.getElementById("editDate").value = item.date || "";
+      document.getElementById("editStore").value = item.store || "한국의집";
+      document.getElementById("editName").value = item.name || "";
+      document.getElementById("editPhone").value = formatPhone(item.phone || "");
+      document.getElementById("editJob").value = item.job || "";
+      document.getElementById("editAllowance").value = item.allowance || "";
+      document.getElementById("editPayStatus").value = item.payStatus || "미지급";
+      document.getElementById("editRrn").value = item.rrn || "";
+      document.getElementById("editBank").value = item.bank || "";
+      document.getElementById("editAccount").value = item.account || "";
+      document.getElementById("editMemo").value = item.memo || "";
+      document.getElementById("editForeignIdMissing").checked = Boolean(item.foreignIdMissing) || item.identityStatus === "외국인등록증 미제출";
+      document.getElementById("editManagementNo").value = item.managementNo || "";
+      toggleEditForeignIdFields();
+      clearNotice("editNotice");
+      document.getElementById("editModal").classList.add("open");
+    }
+
+    function closeEditModal() {
+      document.getElementById("editModal").classList.remove("open");
+    }
+
+    async function saveEditWorker() {
+      const btn = document.getElementById("editSaveBtn");
+      btn.disabled = true;
+      btn.textContent = "저장 중...";
+      clearNotice("editNotice");
+
+      const data = {
+        action: "updateDailyWorker",
+        rowNumber: document.getElementById("editRowNumber").value,
+        date: document.getElementById("editDate").value,
+        store: document.getElementById("editStore").value,
+        name: document.getElementById("editName").value.trim(),
+        phone: document.getElementById("editPhone").value.trim(),
+        job: document.getElementById("editJob").value,
+        allowance: document.getElementById("editAllowance").value,
+        payStatus: document.getElementById("editPayStatus").value,
+        rrn: document.getElementById("editRrn").value.trim(),
+        bank: document.getElementById("editBank").value.trim(),
+        account: document.getElementById("editAccount").value.trim(),
+        memo: document.getElementById("editMemo").value.trim(),
+        foreignIdMissing: document.getElementById("editForeignIdMissing").checked,
+        managementNo: document.getElementById("editManagementNo").value.trim()
+      };
+
+      try {
+        const json = await postJson(data);
+        if (!json.success) {
+          showNotice("editNotice", "err", json.message || "수정에 실패했습니다.");
+          return;
+        }
+
+        showNotice("editNotice", "ok", json.message || "수정되었습니다.");
+        setTimeout(function() {
+          closeEditModal();
+          loadLedger();
+        }, 500);
+      } catch (err) {
+        showNotice("editNotice", "err", "수정 중 오류가 발생했습니다.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "수정 저장";
+      }
+    }
+
+    function toggleEditForeignIdFields() {
+      const checked = document.getElementById("editForeignIdMissing").checked;
+      const rrn = document.getElementById("editRrn");
+      rrn.disabled = checked;
+      if (checked) rrn.value = "";
+      document.getElementById("editManagementNoField").style.display = checked ? "block" : "none";
+    }
+
+    async function fetchJson(url) {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      return response.json();
+    }
+
+    async function postJson(data) {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      return response.json();
+    }
+
+    function sumAllowance(list) {
+      return list.reduce(function(sum, item) {
+        return sum + normalizeAllowance(item.allowance);
+      }, 0);
+    }
+
+    function normalizeAllowance(value) {
+      const number = Number(value || 0);
+      return number > 0 && number < 1000 ? number * 10000 : number;
+    }
+
+    function formatMoney(value) {
+      return Number(value || 0).toLocaleString("ko-KR") + "원";
+    }
+
+    function formatPhone(phone) {
+      const num = String(phone || "").replace(/[^0-9]/g, "");
+      if (num.length === 11) return num.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+      if (num.length === 10) return num.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+      return phone || "";
+    }
+
+    function payBadge(status) {
+      const paid = status === "지급완료";
+      return '<span class="status-badge ' + (paid ? 'status-paid' : 'status-unpaid') + '">' + (paid ? '지급완료' : '미지급') + '</span>';
+    }
+
+    function normalizeSearch(value) {
+      return String(value || "").toLowerCase().replace(/[\s-]/g, "");
+    }
+
+    function getLocalDateText(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return y + "-" + m + "-" + d;
+    }
+
+    function showNotice(id, type, message) {
+      const el = document.getElementById(id);
+      el.className = "notice " + type;
+      el.textContent = message;
+    }
+
+    function clearNotice(id) {
+      const el = document.getElementById(id);
+      el.className = "notice";
+      el.textContent = "";
+    }
+
+    function setText(id, value) {
+      document.getElementById(id).textContent = value;
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>

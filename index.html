@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>더큰코리아 통합 ERP</title>
+  <meta name="description" content="더큰코리아 통합 ERP - 인사·급여·점포·경영관리 통합 시스템" />
+  <link rel="stylesheet" href="style.css?v=36" />
+
+  <style>
+    /* ===== ERP 홈 상단/브랜드 정렬 개선 ===== */
+    .brand.brand-premium{
+      min-height:92px;
+      display:flex;
+      align-items:center;
+      gap:13px;
+      padding:17px 20px;
+      box-sizing:border-box;
+    }
+    .brand-mark.brand-mark-premium{
+      position:relative;
+      flex:0 0 56px;
+      width:56px;
+      height:56px;
+      border-radius:15px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      background:linear-gradient(145deg,#172235 0%,#0d1625 100%);
+      border:2px solid #caa45e;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,232,176,.18),
+        0 7px 18px rgba(0,0,0,.24);
+    }
+    .brand-mark-premium::before{
+      content:"";
+      position:absolute;
+      inset:4px;
+      border:1px solid rgba(237,203,131,.28);
+      border-radius:11px;
+      pointer-events:none;
+    }
+    .brand-tk{
+      position:relative;
+      z-index:2;
+      transform:translateY(-2px);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:25px;
+      line-height:1;
+      font-weight:800;
+      letter-spacing:-2px;
+      color:#e5bf73;
+      text-shadow:0 1px 0 #fff0c4,0 2px 5px rgba(0,0,0,.35);
+    }
+    .brand-swoosh{
+      position:absolute;
+      z-index:1;
+      left:11px;
+      right:9px;
+      bottom:12px;
+      height:10px;
+      border-bottom:2px solid #e2b763;
+      border-radius:0 0 50% 50%;
+      transform:rotate(-5deg);
+    }
+    .brand-copy{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:2px;
+    }
+    .brand-copy strong{
+      color:#fff;
+      font-size:19px;
+      line-height:1.2;
+      letter-spacing:-.4px;
+      white-space:nowrap;
+    }
+    .brand-copy span{
+      color:#aeb8c8;
+      font-size:12px;
+      line-height:1.2;
+    }
+    .brand-copy small{
+      margin-top:2px;
+      color:#caa45e;
+      font-size:8px;
+      line-height:1;
+      letter-spacing:1.05px;
+      white-space:nowrap;
+    }
+
+    /* 상단 제목과 기준월/새로고침을 정확히 같은 높이로 */
+    .topbar{
+      min-height:104px;
+      display:flex;
+      align-items:center;
+      box-sizing:border-box;
+    }
+    .topbar-left,
+    .topbar-actions{
+      display:flex;
+      align-items:center;
+    }
+    .topbar-actions{
+      gap:12px;
+      margin-left:auto;
+    }
+    .month-box{
+      margin:0 !important;
+      display:flex !important;
+      flex-direction:column;
+      justify-content:center;
+      min-height:62px;
+      box-sizing:border-box;
+    }
+    .month-box input{
+      height:44px;
+      box-sizing:border-box;
+    }
+    #refreshBtn.icon-btn{
+      align-self:flex-end;
+      height:44px;
+      min-height:44px;
+      margin:0 0 0 0 !important;
+      box-sizing:border-box;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      white-space:nowrap;
+    }
+    .user-chip{display:none !important;}
+
+    @media (max-width:900px){
+      .brand.brand-premium{padding:14px 16px;}
+      .brand-copy small{display:none;}
+      .topbar{align-items:flex-start;}
+      .topbar-actions{align-items:flex-end;}
+    }
+  
+    /* ===== 자주 쓰는 업무 12개 카드 이미지 ===== */
+    .quick-grid .quick-card{
+      position:relative;
+      overflow:hidden;
+      padding:0 !important;
+      text-align:left;
+      display:flex;
+      flex-direction:column;
+      min-height:184px;
+    }
+    .quick-grid .quick-card .quick-thumb{
+      display:block;
+      width:100%;
+      height:88px;
+      object-fit:cover;
+      flex:0 0 88px;
+      border:0;
+    }
+    .quick-grid .quick-card .quick-copy{
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+      padding:12px 14px 14px;
+      width:100%;
+    }
+    .quick-grid .quick-card .quick-copy strong{
+      display:block;
+      line-height:1.35;
+    }
+    .quick-grid .quick-card .quick-copy small{
+      display:block;
+      line-height:1.45;
+    }
+    .quick-grid .quick-card .quick-pending-badge{
+      position:absolute;
+      top:8px;
+      right:8px;
+      z-index:3;
+    }
+
+  
+    /* ===== 회사 운영현황 : 6개 동일 카드 한 줄 ===== */
+    #view-home .company-status-wrap{
+      width:100%;
+      margin:10px 0 18px;
+    }
+
+    #view-home .company-status-title{
+      margin:0 0 7px 3px;
+      font-size:11px;
+      font-weight:900;
+      color:#1769aa;
+    }
+
+    #view-home .company-status-row.company-status-cards{
+      display:grid !important;
+      grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+      gap:10px !important;
+      width:100% !important;
+      min-height:0 !important;
+      margin:0 !important;
+      padding:12px !important;
+      background:#fff !important;
+      border:1px solid #dbe7f3 !important;
+      border-radius:16px !important;
+      box-shadow:0 5px 16px rgba(26,62,100,.06) !important;
+      align-items:stretch !important;
+    }
+
+    #view-home .company-status-row.company-status-cards > .company-status-card,
+    #view-home .company-status-row.company-status-cards > .company-status-card:first-child{
+      grid-column:auto !important;
+      grid-row:auto !important;
+      width:auto !important;
+      min-width:0 !important;
+      min-height:62px !important;
+      margin:0 !important;
+      padding:10px 8px !important;
+      display:flex !important;
+      flex-direction:column !important;
+      flex-wrap:nowrap !important;
+      align-items:center !important;
+      justify-content:center !important;
+      gap:6px !important;
+      background:#f8fbff !important;
+      border:1px solid #e3edf7 !important;
+      border-radius:12px !important;
+      box-sizing:border-box !important;
+    }
+
+    #view-home .company-status-row.company-status-cards > .employee-total{
+      background:linear-gradient(135deg,#f4f9ff,#f8fffb) !important;
+    }
+
+    #view-home .company-status-card span{
+      width:auto !important;
+      margin:0 !important;
+      font-size:11px !important;
+      font-weight:900 !important;
+      line-height:1.2 !important;
+      color:#1769aa !important;
+      text-align:center !important;
+    }
+
+    #view-home .company-status-card strong{
+      width:auto !important;
+      margin:0 !important;
+      font-size:20px !important;
+      line-height:1.1 !important;
+      font-weight:900 !important;
+      color:#071f3e !important;
+      text-align:center !important;
+    }
+
+    @media(max-width:680px){
+      #view-home .company-status-row.company-status-cards{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      }
+    }
+
+
+    /* ===== 관리 알림: 실제 상세내역 중심 ===== */
+    #view-home .alert-panel .alert-list{
+      display:flex !important;
+      flex-direction:column !important;
+      gap:8px !important;
+    }
+    #view-home .alert-panel .alert-item{
+      width:100% !important;
+      min-height:62px !important;
+      padding:10px 12px !important;
+      text-align:left !important;
+    }
+    #view-home .alert-panel .alert-item>div{
+      min-width:0 !important;
+      flex:1 !important;
+    }
+    #view-home .alert-panel .alert-item small{
+      display:block !important;
+      margin-top:3px !important;
+      white-space:normal !important;
+      line-height:1.45 !important;
+      color:#65768a !important;
+    }
+    #view-home .alert-panel .alert-empty{
+      padding:22px 14px;
+      text-align:center;
+      color:#718096;
+      border:1px dashed #d8e2ec;
+      border-radius:12px;
+      background:#fafcff;
+      font-size:13px;
+    }
+    @media(max-width:1100px){
+      #view-home .company-status-row{grid-template-columns:1fr 1fr !important}
+      #view-home .company-status-row>div:first-child{grid-column:1/-1}
+    }
+    @media(max-width:680px){
+      #view-home .company-status-row{grid-template-columns:1fr !important}
+      #view-home .company-status-row>div:first-child{grid-column:auto}
+    }
+
+    /* ===== ERP 홈 상단 배너 : 밝은 이미지 + 안내문구 ===== */
+    #view-home .hero-card.hero-image-only{
+      position:relative !important;
+      min-height:210px !important;
+      padding:0 !important;
+      background-image:url("assets/erp-hero-future-company.png") !important;
+      background-size:cover !important;
+      background-position:center center !important;
+      background-repeat:no-repeat !important;
+      border-radius:18px !important;
+      overflow:hidden !important;
+    }
+    #view-home .hero-card.hero-image-only::before{
+      content:"" !important;
+      display:block !important;
+      position:absolute !important;
+      inset:0 !important;
+      background:linear-gradient(90deg,rgba(255,255,255,.94) 0%,rgba(255,255,255,.78) 30%,rgba(255,255,255,.16) 55%,rgba(255,255,255,0) 72%) !important;
+      pointer-events:none !important;
+    }
+    #view-home .hero-card.hero-image-only::after{display:none !important;}
+
+    #view-home .hero-copy{
+      position:relative;
+      z-index:2;
+      max-width:620px;
+      padding:34px 30px;
+    }
+    #view-home .hero-eyebrow{
+      display:block;
+      margin-bottom:9px;
+      font-size:11px;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:1.2px;
+      color:#c58a00;
+    }
+    #view-home .hero-copy h2{
+      margin:0;
+      font-size:31px;
+      line-height:1.22;
+      letter-spacing:-1.3px;
+      color:#08284d;
+      font-weight:950;
+    }
+    #view-home .hero-copy h2 em{
+      color:#1677e8;
+      font-style:normal;
+    }
+    #view-home .hero-copy p{
+      margin:13px 0 0;
+      max-width:590px;
+      font-size:12px;
+      line-height:1.65;
+      color:#3e5d78;
+      font-weight:700;
+    }
+
+    /* 회사 운영현황 매출 카드 */
+    #view-home .company-status-card small{
+      margin:0 !important;
+      font-size:9px !important;
+      line-height:1.2 !important;
+      color:#8a9bad !important;
+      font-weight:700 !important;
+      text-align:center !important;
+    }
+    #view-home .company-status-card.sales-ytd,
+    #view-home .company-status-card.sales-month{
+      background:linear-gradient(135deg,#f5fbff,#f7fff9) !important;
+    }
+    #view-home .company-status-card.sales-ytd strong,
+    #view-home .company-status-card.sales-month strong{
+      font-size:18px !important;
+      color:#071f3e !important;
+    }
+
+    @media(max-width:680px){
+      #view-home .hero-card.hero-image-only{
+        min-height:180px !important;
+        background-position:58% center !important;
+      }
+      #view-home .hero-copy{padding:24px 20px;max-width:82%;}
+      #view-home .hero-copy h2{font-size:22px;}
+      #view-home .hero-copy p{font-size:10px;}
+    }
+
+
+    /* 회사 운영현황 클릭 카드 */
+    #view-home .company-status-action{
+      appearance:none !important;
+      font-family:inherit !important;
+      cursor:pointer !important;
+    }
+    #view-home .company-status-action:hover{
+      transform:translateY(-2px) !important;
+      box-shadow:0 7px 18px rgba(20,55,90,.10) !important;
+      border-color:#9fc8ee !important;
+    }
+
+    /* 재직 직원 구성현황 팝업 */
+    .employee-status-modal[hidden]{display:none !important;}
+    .employee-status-modal{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;}
+    .employee-status-backdrop{position:absolute;inset:0;background:rgba(7,25,48,.48);backdrop-filter:blur(2px);}
+    .employee-status-dialog{position:relative;width:min(620px,94vw);background:#fff;border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.24);padding:24px;}
+    .employee-status-head{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #e5edf5;padding-bottom:15px;}
+    .employee-status-head span{font-size:11px;font-weight:900;color:#1976d2;}
+    .employee-status-head h3{margin:4px 0 0;font-size:22px;color:#102d4d;}
+    .employee-status-close{border:0;background:#eef4f9;width:36px;height:36px;border-radius:50%;font-size:25px;line-height:1;cursor:pointer;color:#49647d;}
+    .employee-status-total{margin:18px 0 12px;padding:18px;border-radius:15px;background:linear-gradient(135deg,#eef7ff,#f1fbf6);display:flex;align-items:center;justify-content:space-between;}
+    .employee-status-total span{font-size:13px;font-weight:800;color:#526b82;}
+    .employee-status-total strong{font-size:28px;color:#08294f;}
+    .employee-status-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+    .employee-status-grid>div{padding:15px 10px;border:1px solid #e0e9f1;border-radius:13px;text-align:center;background:#fbfdff;}
+    .employee-status-grid span{display:block;font-size:11px;font-weight:800;color:#71869a;margin-bottom:6px;}
+    .employee-status-grid strong{font-size:20px;color:#102d4d;}
+    .employee-status-foot{margin-top:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .employee-status-foot small{font-size:10px;color:#8091a2;}
+    .employee-status-foot button{border:0;border-radius:10px;background:#126fd1;color:#fff;padding:10px 14px;font-weight:900;cursor:pointer;}
+    @media(max-width:620px){.employee-status-grid{grid-template-columns:repeat(2,1fr)}.employee-status-foot{align-items:stretch;flex-direction:column;}}
+
+  </style>
+
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand brand-premium">
+        <div class="brand-mark brand-mark-premium">
+          <span class="brand-tk">TK</span>
+          <span class="brand-swoosh"></span>
+        </div>
+        <div class="brand-copy">
+          <strong>더큰코리아</strong>
+          <span>통합 ERP</span>
+          <small>THE BIG KOREA</small>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-view="home"><span>⌂</span> ERP 홈</button>
+
+        <div class="nav-group-title">점포 · 운영</div>
+        <button class="nav-item" data-view="stores"><span>🏬</span> 점포관리</button>
+        <button class="nav-item" data-view="schedule"><span>📅</span> 근무스케줄</button>
+        <button class="nav-item" data-view="sales"><span>📈</span> 매출관리</button>
+        <button class="nav-item" data-view="opening"><span>🏗️</span> 신규점포 개설</button>
+
+        <div class="nav-group-title">본사 업무</div>
+        <button class="nav-item" data-view="hqtasks"><span>📅</span> 본사 업무관리</button>
+        <button class="nav-item" data-view="operations"><span>📣</span> 운영지원</button>
+        <button class="nav-item" type="button"
+          onclick="event.stopPropagation(); window.location.href='https://thebigkorea.github.io/thebigkorea-settlement/settlement-integrated.html';">
+          <span>🧮</span> 월정산 통합관리
+        </button>
+        <button class="nav-item" data-view="travel"><span>🚙</span> 차량 · 출장</button>
+        <button class="nav-item" data-view="tools"><span>🧰</span> 업무도구</button>
+        <button class="nav-item" data-view="admin"><span>⚙️</span> 원장 · 관리자</button>
+
+        <div class="nav-group-title">인사 · 급여</div>
+        <button class="nav-item" data-view="hr"><span>👥</span> 통합인사</button>
+        <button class="nav-item" data-view="attendance"><span>🕘</span> 근태 · 휴가</button>
+        <button class="nav-item" data-view="contract"><span>📝</span> 전자계약</button>
+        <button class="nav-item" data-view="payroll"><span>💳</span> 급여관리</button>
+        <button class="nav-item" data-view="tax"><span>🧾</span> 4대보험 · 세무</button>
+
+        <div class="nav-group-title">재무 · 경영</div>
+        <button class="nav-item" data-view="purchase"><span>📦</span> 매입 · 원가</button>
+        <button class="nav-item" data-view="fund"><span>🏦</span> 경비 · 자금</button>
+        <button class="nav-item" data-view="profit"><span>📊</span> 손익관리</button>
+        <button class="nav-item" data-view="analysis"><span>🔎</span> 경영분석</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <small>THE BIG KOREA ERP V1</small>
+        <span>기존 시스템을 연결하는 통합 허브</span>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menuToggle">☰</button>
+          <div>
+            <h1 id="pageTitle">ERP 홈</h1>
+            <p id="pageSubtitle">더큰코리아 전체 경영현황을 한눈에 확인합니다.</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <label class="month-box">기준월
+            <input type="month" id="erpMonth" />
+          </label>
+          <button class="icon-btn" id="refreshBtn">⟳ 새로고침</button>
+
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- HOME -->
+        <section class="view active colorful-home" id="view-home">
+          <div class="hero-card hero-image-only hero-with-copy" aria-label="더큰코리아 통합 ERP">
+            <div class="hero-copy">
+              <span class="hero-eyebrow">THE BIG KOREA MANAGEMENT HUB</span>
+              <h2>더큰코리아의 모든 경영업무를<br><em>하나의 ERP</em>에서 관리합니다.</h2>
+              <p>오늘의 업무부터 인사·급여·점포·매출·손익까지, 주요 경영정보를 한곳에서 확인하고 관리합니다.</p>
+            </div>
+          </div>
+
+          <div class="section-title-row">
+            <div>
+              <h3>오늘의 본사 업무 현황</h3>
+              <p>오늘 해야 할 업무와 마감 임박·지연 업무를 바로 확인합니다.</p>
+            </div>
+            <button class="status-pill draft home-task-link" type="button" onclick="openView('hqtasks')">본사 업무관리 열기</button>
+          </div>
+
+          <div class="kpi-grid home-task-kpis">
+            <article class="kpi-card clickable" onclick="openView('hqtasks')">
+              <span>오늘 업무</span>
+              <strong id="homeTaskToday">0건</strong>
+              <small>오늘 처리 예정</small>
+            </article>
+            <article class="kpi-card clickable">
+              <span>완료</span>
+              <strong id="homeTaskDone">0건</strong>
+              <small>오늘 완료 처리</small>
+            </article>
+            <article class="kpi-card warning clickable" onclick="openView('hqtasks')">
+              <span>미처리</span>
+              <strong id="homeTaskPending">0건</strong>
+              <small>오늘 남은 업무</small>
+            </article>
+            <article class="kpi-card accent clickable" onclick="openView('hqtasks')">
+              <span>기한 임박</span>
+              <strong id="homeTaskSoon">0건</strong>
+              <small>7일 이내 예정</small>
+            </article>
+            <article class="kpi-card danger clickable" onclick="openView('hqtasks')">
+              <span>기한 경과</span>
+              <strong id="homeTaskOverdue">0건</strong>
+              <small>처리 확인 필요</small>
+            </article>
+            <article class="kpi-card clickable" onclick="openView('hqtasks')">
+              <span>이번 달 주요업무</span>
+              <strong id="homeTaskMonth">0건</strong>
+              <small>반복업무 포함</small>
+            </article>
+          </div>
+
+          <div class="company-status-wrap">
+            <div class="company-status-title">회사 운영현황</div>
+            <div class="company-status-row company-status-cards">
+              <button class="company-status-card sales-ytd company-status-action" type="button" onclick="handleQuickSystem('managementDashboard')" title="경영대시보드 열기">
+                <span id="kpiSalesYearLabel">2026 누적 매출</span>
+                <strong id="kpiAllStoreYearSales">불러오는 중</strong>
+                <small>더큰코리아 전 점포 · 클릭하여 상세보기</small>
+              </button>
+              <button class="company-status-card employee-total company-status-action" type="button" onclick="openEmployeeStatusModal()" title="직원 구성현황 보기">
+                <span>재직 직원</span>
+                <strong id="kpiEmployees">-명</strong>
+                <small>현재 재직 기준</small>
+              </button>
+              <button class="company-status-card company-status-action" type="button" onclick="openEmployeeStatusModal()" title="직원 구성현황 보기">
+                <span>정직원</span>
+                <strong id="kpiRegularEmployees">-명</strong>
+                <small>현재 재직 기준</small>
+              </button>
+              <button class="company-status-card company-status-action" type="button" onclick="openEmployeeStatusModal()" title="직원 구성현황 보기">
+                <span>아르바이트</span>
+                <strong id="kpiPartTimeEmployees">-명</strong>
+                <small>현재 재직 기준</small>
+              </button>
+              <button class="company-status-card company-status-action" type="button" onclick="openEmployeeStatusModal()" title="직원 구성현황 보기">
+                <span>사업소득자</span>
+                <strong id="kpiBusinessEmployees">-명</strong>
+                <small>현재 재직 기준</small>
+              </button>
+              <div class="company-status-card store-total">
+                <span>총 매장</span>
+                <strong id="kpiTotalStores">13개</strong>
+                <small>현재 운영</small>
+              </div>
+
+              <!-- 기존 JS 호환용 숨김 집계값 -->
+              <span id="kpiManagedStores" hidden>-개</span>
+              <span id="kpiSalesMonthLabel" hidden>선택월 매출</span>
+              <span id="kpiSelectedMonthSales" hidden>불러오는 중</span>
+              <span id="kpiContractEmployees" hidden>0명</span>
+              <span id="kpiOtherEmployees" hidden>0명</span>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel quick-panel">
+              <div class="panel-head">
+                <div><h3>인트라넷 자주 쓰는 업무</h3><p>본사에서 자주 사용하는 핵심 업무입니다.</p></div>
+              </div>
+              <div class="quick-grid">
+                <button class="quick-card" data-system="managementDashboard">
+                  <img class="quick-thumb" src="assets/quick/01_sales_dashboard.jpg" alt="">
+                  <span class="quick-copy"><strong>더큰코리아 영업실적 대시보드</strong><small>매출 · 전년비 · 월별 실적 조회</small></span>
+                </button>
+
+                <button class="quick-card" data-system="opening">
+                  <img class="quick-thumb" src="assets/quick/02_new_store.jpg" alt="">
+                  <span class="quick-copy"><strong>신규점포 개설</strong><small>행정 · 회계 · 진행현황과 투자비용 관리</small></span>
+                </button>
+
+                <button class="quick-card" data-system="notice">
+                  <img class="quick-thumb" src="assets/quick/03_notice.jpg" alt="">
+                  <span class="quick-copy"><strong>공지사항</strong><small>점포 운영지침 · 행사 · 교육 · 긴급사항 전달</small></span>
+                </button>
+
+                <button class="quick-card" data-system="trip">
+                  <span class="quick-pending-badge" data-badge="trip" hidden>0</span>
+                  <img class="quick-thumb" src="assets/quick/04_trip.jpg" alt="">
+                  <span class="quick-copy"><strong>출장 통합관리</strong><small>출장 신청 · 승인 · 정산 · 전체 현황 관리</small></span>
+                </button>
+
+                <button class="quick-card" data-system="leave">
+                  <span class="quick-pending-badge" data-badge="leave" hidden>0</span>
+                  <img class="quick-thumb" src="assets/quick/05_leave.jpg" alt="">
+                  <span class="quick-copy"><strong>연월차 신청</strong><small>연월차 신청 및 내역 확인</small></span>
+                </button>
+
+                <button class="quick-card" data-system="storeDashboard">
+                  <span class="quick-pending-badge" data-badge="storeDashboard" hidden>0</span>
+                  <img class="quick-thumb" src="assets/quick/06_store_inspection.jpg" alt="">
+                  <span class="quick-copy"><strong>매장점검 대시보드</strong><small>본사 담당자 피드백 및 조치 진행</small></span>
+                </button>
+
+                <button class="quick-card" data-system="daily">
+                  <span class="quick-pending-badge" data-badge="daily" hidden>0</span>
+                  <img class="quick-thumb" src="assets/quick/07_daily_worker.jpg" alt="">
+                  <span class="quick-copy"><strong>일용직 관리</strong><small>통합 근무내역</small></span>
+                </button>
+
+                <button class="quick-card" data-system="storePartTime">
+                  <img class="quick-thumb" src="assets/quick/08_parttime_store.jpg" alt="">
+                  <span class="quick-copy"><strong>아르바이트 매장별 관리</strong><small>직원 · 근로내역 · 급여명세서 · 급여대장</small></span>
+                </button>
+
+                <button class="quick-card" type="button" onclick="window.location.href='https://thebigkorea.github.io/thebigkorea-settlement/settlement-integrated.html'">
+                  <img class="quick-thumb" src="assets/quick/10_monthly_settlement.jpg" alt="">
+                  <span class="quick-copy"><strong>월정산 통합관리</strong><small>점포별 정산관리 · 월별 합산 · 정산현황</small></span>
+                </button>
+
+                <button class="quick-card" data-system="attendanceAdmin">
+                  <img class="quick-thumb" src="assets/quick/11_attendance_admin.jpg" alt="">
+                  <span class="quick-copy"><strong>관리자 출퇴근 조회화면</strong><small>출퇴근 · 출장 · 연차 · 미휴무 등 직원 근무현황 조회</small></span>
+                </button>
+
+                <button class="quick-card" data-system="salesInput">
+                  <img class="quick-thumb" src="assets/quick/12_consignment_sales.jpg" alt="">
+                  <span class="quick-copy"><strong>위탁영업점 매출내역 입력</strong><small>위탁영업점 매출 데이터 입력</small></span>
+                </button>
+              </div>
+            </section>
+
+            <section class="panel alert-panel attendance-roster-panel">
+              <div class="panel-head">
+                <div><h3>오늘의 출퇴근자 명부</h3><p id="attendanceRosterSummary">지정된 5개 사업장 출퇴근 현황을 불러오는 중입니다.</p></div>
+                <button class="text-btn" type="button" onclick="loadAllStoreAttendance()">새로고침</button>
+              </div>
+              <div class="attendance-store-tabs" id="attendanceStoreTabs" role="tablist" aria-label="출퇴근 매장 선택">
+                <button class="attendance-store-tab active" type="button" data-store="all">전체</button>
+              </div>
+              <div class="attendance-store-groups" id="attendanceStoreGroups" aria-live="polite">
+                <div class="attendance-roster-empty">출퇴근 명단을 불러오는 중입니다.</div>
+              </div>
+            </section>
+          </div>
+
+          <div class="dashboard-grid lower">
+            <section class="panel sales-panel">
+              <div class="panel-head">
+                <div>
+                  <h3>더큰코리아 영업실적 대시보드</h3>
+                  <p id="salesComparisonGuide">이 화면은 4개 점포의 영업실적을 표시합니다. 자세한 실적은 ‘영업실적 대시보드 열기’를 눌러 조회하세요.</p>
+                </div>
+                <div class="panel-actions">
+                  <span class="sales-linked-badge" id="salesDataStatus">매출 데이터 불러오는 중</span>
+                  <button class="text-btn" onclick="handleQuickSystem('managementDashboard')">영업실적 대시보드 열기</button>
+                </div>
+              </div>
+
+              <div class="sales-company-summary" aria-label="더큰코리아 핵심 매출 지표">
+                <div class="sales-company-card"><span>선택 월 4개 점포 합계</span><strong id="salesSelectedMonth">-</strong><small id="salesCurrentPeriod">조회 중</small></div>
+                <div class="sales-company-card"><span>전년도 동기간 매출</span><strong id="salesPreviousYearAmount">-</strong><small><b id="salesYearComparison">-</b> · <em id="salesYearPeriod">비교 중</em></small></div>
+                <div class="sales-company-card"><span id="salesYearTotalLabel">4개 점포 연 매출 합계</span><strong id="salesYearToDate">-</strong><small>1월부터 선택 월까지 누계</small></div>
+                <div class="sales-company-card"><span id="salesAllStoreYearTotalLabel">더큰코리아 전 점포 연 매출 합계</span><strong id="salesAllStoreYearToDate">-</strong><small id="salesAllStoreYearNote">대시보드 캐시 기준</small></div>
+              </div>
+
+              <div class="sales-store-summary-grid" id="salesStoreSummary" aria-live="polite">
+                <div class="sales-store-loading">4개 점포 실적을 불러오는 중입니다.</div>
+              </div>
+            </section>
+
+            <section class="panel alert-panel">
+              <div class="panel-head">
+                <div><h3>관리 알림</h3><p>건수 반복 대신 실제 확인·처리가 필요한 상세 업무를 표시합니다.</p></div>
+                <button class="text-btn" type="button" onclick="openView('hqtasks')">본사업무 전체보기</button>
+              </div>
+              <div class="alert-list" id="managementAlertList">
+                <div class="alert-empty">관리 알림 상세내역을 불러오는 중입니다.</div>
+              </div>
+            </section>
+          </div>
+
+        </section>
+
+        <!-- Generic views -->
+        <section class="view" id="view-hr"></section>
+        <section class="view" id="view-attendance"></section>
+        <section class="view" id="view-contract"></section>
+        <section class="view" id="view-payroll"></section>
+        <section class="view" id="view-tax"></section>
+        <section class="view" id="view-stores"></section>
+        <section class="view" id="view-schedule"></section>
+        <section class="view" id="view-sales"></section>
+        <section class="view" id="view-opening"></section>
+        <section class="view" id="view-hqtasks"></section>
+        <section class="view" id="view-operations"></section>
+        <section class="view" id="view-settlement"></section>
+        <section class="view" id="view-travel"></section>
+        <section class="view" id="view-tools"></section>
+        <section class="view" id="view-admin"></section>
+        <section class="view" id="view-purchase"></section>
+        <section class="view" id="view-fund"></section>
+        <section class="view" id="view-profit"></section>
+        <section class="view" id="view-analysis"></section>
+      
+    <div id="employeeStatusModal" class="employee-status-modal" hidden>
+      <div class="employee-status-backdrop" onclick="closeEmployeeStatusModal()"></div>
+      <section class="employee-status-dialog" role="dialog" aria-modal="true" aria-labelledby="employeeStatusTitle">
+        <div class="employee-status-head">
+          <div>
+            <span>통합인사</span>
+            <h3 id="employeeStatusTitle">재직 직원 구성현황</h3>
+          </div>
+          <button type="button" class="employee-status-close" onclick="closeEmployeeStatusModal()" aria-label="닫기">×</button>
+        </div>
+        <div class="employee-status-total">
+          <span>현재 재직 직원</span>
+          <strong id="employeeModalTotal">-명</strong>
+        </div>
+        <div class="employee-status-grid">
+          <div><span>정규직</span><strong id="employeeModalRegular">-명</strong></div>
+          <div><span>아르바이트</span><strong id="employeeModalPartTime">-명</strong></div>
+          <div><span>사업소득자</span><strong id="employeeModalBusiness">-명</strong></div>
+          <div><span>기타</span><strong id="employeeModalOther">-명</strong></div>
+        </div>
+        <div class="employee-status-foot">
+          <small>현재 인사DB의 재직 상태를 기준으로 집계합니다.</small>
+          <button type="button" onclick="window.open('https://thebigkorea.github.io/thebigkorea-hq/employee-admin.html','_blank','noopener,noreferrer')">직원현황 상세보기 →</button>
+        </div>
+      </section>
+    </div>
+
+  </main>
+    </div>
+  </div>
+
+  <script src="script.js?v=36"></script>
+</body>
+</html>
