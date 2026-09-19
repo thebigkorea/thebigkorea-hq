@@ -2594,14 +2594,23 @@
     }
 
     function openModule(section,title){
-      const item=findModule(section,title);
-      const url=item?.[3];
-      if(url){
-        window.open(url,"_blank","noopener,noreferrer");
-        return;
-      }
-      alert(`${title}\n\n현재 기존 본사 포털에서 확인되는 실제 연결 주소가 없는 기능입니다.\n기존 시스템 연결을 모두 끝낸 뒤 새 기능으로 구축합니다.`);
+  const item=findModule(section,title);
+  const url=item?.[3];
+
+  if(url){
+    // 같은 ERP 내부 페이지는 현재 창에서 이동
+    if(url.startsWith(HQ_BASE)){
+      window.location.href=url;
+      return;
     }
+
+    // 외부 시스템만 새 탭으로 열기
+    window.open(url,"_blank","noopener,noreferrer");
+    return;
+  }
+
+  alert(`${title}\n\n현재 기존 본사 포털에서 확인되는 실제 연결 주소가 없는 기능입니다.\n기존 시스템 연결을 모두 끝낸 뒤 새 기능으로 구축합니다.`);
+}
 
 
     function openEmployeeStatusModal(){
