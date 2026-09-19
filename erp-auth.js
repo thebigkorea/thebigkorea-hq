@@ -87,3 +87,58 @@ document.addEventListener("DOMContentLoaded",()=>{
   if(logout) logout.addEventListener("click",erpLogout);
   erpVerifySession();
 });
+/* =========================================================
+   ERP 내부 페이지 직접접속 보호
+   - index.html은 기존 로그인 화면 사용
+   - 그 외 HTML은 세션이 없으면 index.html로 이동
+========================================================= */
+
+(function protectErpInternalPage(){
+
+  const path = window.location.pathname;
+  const fileName = path.split("/").pop().toLowerCase();
+
+  // 메인 로그인 페이지는 제외
+  if(fileName === "" || fileName === "index.html"){
+    return;
+  }
+
+  // 인증 확인이 끝나기 전 화면을 숨김
+  document.documentElement.style.visibility = "hidden";
+
+  async function verifyInternalPage(){
+
+    const token = sessionStorage.getItem(ERP_AUTH_TOKEN_KEY);
+
+    // 토큰 자체가 없으면 즉시 로그인 페이지로
+    if(!token){
+      window.location.replace("./index.html");
+      return;
+    }
+
+    try{
+      const data = await erpAuthRequest({
+        action: "verify",
+        token: token
+      });
+
+      if(data && data.ok && data.authenticated){
+        // 인증된 사용자만 화면 공개
+        document.documentElement.style.visibility = "";
+        return;
+      }
+
+    }catch(error){
+      console.error("ERP 내부 페이지 인증 실패", error);
+    }
+
+    // 잘못됐거나 만료된 토큰 제거
+    sessionStorage.removeItem(ERP_AUTH_TOKEN_KEY);
+
+    // 로그인 페이지로 이동
+    window.location.replace("./index.html");
+  }
+
+  verifyInternalPage();
+
+})();
