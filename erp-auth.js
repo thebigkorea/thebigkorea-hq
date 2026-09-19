@@ -321,7 +321,8 @@ document.addEventListener(
 
 const ERP_PUBLIC_PAGES = [
   "contract-view.html",       // 체결된 근로·용역계약서 조회
-  "contract-complete.html"    // 계약 완료 안내
+  "contract-complete.html",    // 계약 완료 안내
+   "daily-worker.html"
 ];
 
 // 메인 로그인 페이지 + 공개 페이지는 ERP 인증 제외
