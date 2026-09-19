@@ -33,7 +33,7 @@ async function erpAuthRequest(payload){
 /* =========================================================
    로그인 정보 관리
    - localStorage 사용
-   - 새로고침 / 브라우저 재실행 / 새 탭에서도 6시간 유지
+   - 새로고침 / 브라우저 재실행 / 새 탭에서도 12시간 유지
 ========================================================= */
 
 function erpSaveSession(token){
@@ -50,7 +50,7 @@ function erpGetToken(){
     return null;
   }
 
-  // 브라우저 보관시간 6시간이 실제로 지난 경우에만 삭제
+  // 브라우저 보관시간 12시간이 실제로 지난 경우에만 삭제
   if(!expiresAt || Date.now() >= expiresAt){
     erpClearSession();
     return null;
@@ -70,6 +70,7 @@ function erpClearSession(){
 ========================================================= */
 
 function erpShowLogin(message=""){
+  document.documentElement.classList.remove("erp-auth-checking");
   document.documentElement.classList.add("erp-auth-pending");
 
   const gate = document.getElementById("erpLoginGate");
@@ -87,6 +88,7 @@ function erpShowLogin(message=""){
 ========================================================= */
 
 function erpUnlock(){
+  document.documentElement.classList.remove("erp-auth-checking");
   const gate = document.getElementById("erpLoginGate");
   const logout = document.getElementById("erpLogoutButton");
 
@@ -281,7 +283,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   async function verifyInternalPage(){
     const token = erpGetToken();
 
-    // 토큰 자체가 없거나 로컬 6시간이 만료된 경우
+    // 토큰 자체가 없거나 로컬 12시간이 만료된 경우
     if(!token){
       window.location.replace("./index.html");
       return;
