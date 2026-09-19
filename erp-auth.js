@@ -314,13 +314,24 @@ document.addEventListener(
     path.split("/").pop().toLowerCase();
 
 
-  // 메인 로그인 페이지는 제외
-  if(
-    fileName === "" ||
-    fileName === "index.html"
-  ){
-    return;
-  }
+  // =========================================================
+// ERP 로그인 예외 페이지
+// 직원·외부인에게 직접 전달되어야 하는 화면만 등록
+// =========================================================
+
+const ERP_PUBLIC_PAGES = [
+  "contract-view.html",       // 체결된 근로·용역계약서 조회
+  "contract-complete.html"    // 계약 완료 안내
+];
+
+// 메인 로그인 페이지 + 공개 페이지는 ERP 인증 제외
+if(
+  fileName === "" ||
+  fileName === "index.html" ||
+  ERP_PUBLIC_PAGES.includes(fileName)
+){
+  return;
+}
 
 
   // 인증 확인 전 내부 화면 숨김
