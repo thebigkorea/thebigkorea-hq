@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -46,7 +46,6 @@ th{background:#eef3f8}
   .wrap{width:calc(100% - 14px)}
 }
 </style>
-  <script src="erp-auth.js"></script>
 </head>
 <body>
 <div id="passwordGate" class="password-gate">
@@ -220,34 +219,72 @@ let currentEmployees = [];
 let editingNew = false;
 let STORE_MAP = {};
 
-const STORE_ACCESS_PASSWORD = "0401";
-const STORE_ACCESS_SESSION_KEY = "employeeStoreReviewAccess";
 
-function checkAccessPassword(){
+const STORE_ACCESS_SESSION_KEY = "employeeStoreReviewToken";
+const STORE_ACCESS_STORE_KEY = "employeeStoreReviewStoreId";
+let STORE_TOKEN = sessionStorage.getItem(STORE_ACCESS_SESSION_KEY) || "";
+let AUTH_STORE_ID = sessionStorage.getItem(STORE_ACCESS_STORE_KEY) || "";
+
+async function checkAccessPassword(){
   const input = document.getElementById("accessPassword");
   const error = document.getElementById("passwordError");
+  const password = input.value;
+  error.textContent = "";
 
-  if(input.value === STORE_ACCESS_PASSWORD){
-    sessionStorage.setItem(STORE_ACCESS_SESSION_KEY, "ok");
+  try{
+    await loadStores(false);
+
+    const store = val("storeSelect");
+    const storeId = String(STORE_MAP[store] || "").trim();
+
+    if(!storeId){
+      throw new Error("점포를 확인할 수 없습니다.");
+    }
+
+    const result = await postApi({
+      action:"storeReviewLogin",
+      storeId:storeId,
+      password:password
+    });
+
+    if(!result.success && !result.ok){
+      throw new Error(result.message || "비밀번호가 올바르지 않습니다.");
+    }
+
+    STORE_TOKEN = String(result.storeToken || "");
+    AUTH_STORE_ID = String(result.storeId || storeId);
+
+    sessionStorage.setItem(STORE_ACCESS_SESSION_KEY, STORE_TOKEN);
+    sessionStorage.setItem(STORE_ACCESS_STORE_KEY, AUTH_STORE_ID);
+
     document.getElementById("passwordGate").classList.add("hidden");
-    error.textContent = "";
-    loadStores();
-  }else{
-    error.textContent = "비밀번호가 올바르지 않습니다.";
+    input.value = "";
+    if(loadAfter !== false && STORE_TOKEN){
+      await loadEmployees();
+    }
+  }catch(e){
+    error.textContent = e.message || "인증에 실패했습니다.";
     input.value = "";
     input.focus();
   }
 }
 
-function initAccessGate(){
-  if(sessionStorage.getItem(STORE_ACCESS_SESSION_KEY) === "ok"){
-    document.getElementById("passwordGate").classList.add("hidden");
-    loadStores();
-  }else{
-    document.getElementById("passwordGate").classList.remove("hidden");
-    setTimeout(function(){
-      document.getElementById("accessPassword").focus();
-    },100);
+async function initAccessGate(){
+  try{
+    await loadStores(false);
+
+    if(STORE_TOKEN && AUTH_STORE_ID){
+      document.getElementById("passwordGate").classList.add("hidden");
+      await loadEmployees();
+    }else{
+      document.getElementById("passwordGate").classList.remove("hidden");
+      setTimeout(function(){
+        document.getElementById("accessPassword").focus();
+      },100);
+    }
+  }catch(e){
+    document.getElementById("passwordError").textContent =
+      e.message || "점포 정보를 불러오지 못했습니다.";
   }
 }
 
@@ -302,7 +339,7 @@ function normalizeEmployee(item){
   };
 }
 
-async function loadStores(){
+async function loadStores(loadAfter){
   const select = document.getElementById("storeSelect");
   const urlStore = String(q("store") || "").trim();
 
@@ -325,9 +362,14 @@ async function loadStores(){
     });
 
     if(urlStore){
-      select.innerHTML = '<option value="' + escapeHtml(urlStore) + '">' +
-        escapeHtml(urlStore) + '</option>';
-      select.value = urlStore;
+      const matched = stores.find(function(store){
+        return String(store.storeId || "").trim() === urlStore ||
+               String(store.storeName || "").trim() === urlStore;
+      });
+      const fixedName = matched ? String(matched.storeName || "").trim() : urlStore;
+      select.innerHTML = '<option value="' + escapeHtml(fixedName) + '">' +
+        escapeHtml(fixedName) + '</option>';
+      select.value = fixedName;
       select.disabled = true;
     }else{
       select.innerHTML = stores.map(function(store){
@@ -351,9 +393,20 @@ async function loadEmployees(){
   document.getElementById("status").textContent = "조회 중입니다...";
 
   const storeId = String(STORE_MAP[store] || "");
+  if(!STORE_TOKEN){
+    document.getElementById("status").textContent = "점포 인증이 필요합니다.";
+    return;
+  }
+
+  if(AUTH_STORE_ID && storeId !== AUTH_STORE_ID){
+    document.getElementById("status").textContent = "인증된 점포와 일치하지 않습니다.";
+    return;
+  }
+
   const result = await getApi({
-    action:"getEmployeesAdmin",
-    storeId:storeId
+    action:"getStoreEmployees",
+    storeId:storeId,
+    storeToken:STORE_TOKEN
   });
 
   if(!result.success && !result.ok){
@@ -468,7 +521,8 @@ async function saveEmployee(){
   }
 
   const payload = {
-    action:"saveEmployee",
+    action:"saveStoreEmployee",
+    storeToken:STORE_TOKEN,
     employeeId: val("m_employeeId"),
     storeId:storeId,
     storeName:store,
@@ -481,6 +535,8 @@ async function saveEmployee(){
     status: val("m_status"),
     department: val("m_department"),
     address: val("m_address"),
+    bankName: val("m_bank"),
+    accountNo: val("m_account"),
     note: val("m_memo"),
     source: editingNew ? "점포 신규직원 입력" : "점포 직원정보 확인"
   };
@@ -508,6 +564,8 @@ async function completeStoreReview(){
   const result = await postApi({
     action:"saveStoreEmployeeReview",
     workplace:store,
+    storeId:String(STORE_MAP[store] || "").trim(),
+    storeToken:STORE_TOKEN,
     reviewer:editor
   });
 
