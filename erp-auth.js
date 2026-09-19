@@ -3,8 +3,8 @@ const ERP_AUTH_API = "https://script.google.com/macros/s/AKfycbyczBpNvw5SH3o9jFZ
 const ERP_AUTH_TOKEN_KEY = "thebigkorea_erp_session";
 const ERP_AUTH_EXPIRES_KEY = "thebigkorea_erp_session_expires";
 
-// 로그인 유지시간: 6시간
-const ERP_AUTH_DURATION = 6 * 60 * 60 * 1000;
+// 로그인 유지시간: 12시간
+const ERP_AUTH_DURATION = 12 * 60 * 60 * 1000;
 
 
 /* =========================================================
