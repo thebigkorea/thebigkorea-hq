@@ -540,12 +540,79 @@
       .field.span-4 { grid-column: span 3; }
       .filter-grid { grid-template-columns: 140px 140px 150px 140px minmax(180px, 1fr) auto; }
     }
+
+    /* 일용직 전용 인증 */
+    #dwAuthGate {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: linear-gradient(135deg, #0f1b2d 0%, #17365d 100%);
+    }
+    #dwAuthGate.hidden { display: none; }
+    .dw-login-card {
+      width: min(430px, calc(100vw - 36px));
+      padding: 32px;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 28px 80px rgba(0,0,0,.28);
+    }
+    .dw-login-badge {
+      display: inline-flex;
+      padding: 6px 10px;
+      margin-bottom: 16px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .dw-login-card h2 { margin: 0 0 8px; font-size: 25px; }
+    .dw-login-card p { margin: 0 0 22px; color: #64748b; font-size: 13px; line-height: 1.6; }
+    .dw-login-field { margin-bottom: 14px; }
+    .dw-login-field label { margin-bottom: 7px; }
+    .dw-login-field input { height: 46px; }
+    #dwLoginMessage { min-height: 20px; margin-top: 12px; color: #b91c1c; font-size: 13px; }
+    #dwPortalRoot.auth-pending { visibility: hidden; }
+    .dw-access-chip {
+      display: inline-flex;
+      align-items: center;
+      height: 34px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
   </style>
-  <script src="erp-auth.js"></script>
 </head>
 
 <body>
-  <div class="portal">
+
+  <div id="dwAuthGate">
+    <form class="dw-login-card" onsubmit="dwStoreLogin(event)">
+      <div class="dw-login-badge">THE BIG KOREA</div>
+      <h2>일용직 관리 로그인</h2>
+      <p>각 점포에 발급된 아이디와 비밀번호로 로그인하세요. 로그인 후에는 해당 점포 자료만 조회·등록할 수 있습니다.</p>
+      <div class="dw-login-field">
+        <label for="dwLoginId">점포 아이디</label>
+        <input id="dwLoginId" type="text" autocomplete="username" required>
+      </div>
+      <div class="dw-login-field">
+        <label for="dwLoginPassword">비밀번호</label>
+        <input id="dwLoginPassword" type="password" autocomplete="current-password" required>
+      </div>
+      <button id="dwLoginButton" class="btn btn-primary" type="submit" style="width:100%;height:46px;">로그인</button>
+      <div id="dwLoginMessage"></div>
+    </form>
+  </div>
+
+  <div id="dwPortalRoot" class="portal auth-pending">
     <aside class="sidebar">
       <div class="brand">
         <div class="brand-badge">THE BIG KOREA</div>
@@ -587,6 +654,8 @@
           <p id="topDescription">일용직 근무 및 지급 현황을 한눈에 확인합니다.</p>
         </div>
         <div class="topbar-actions">
+          <span id="dwAccessChip" class="dw-access-chip" style="display:none;"></span>
+          <button id="dwLogoutButton" class="btn btn-light" onclick="dwLogout()" style="display:none;">로그아웃</button>
           <button class="btn btn-light" onclick="refreshCurrentPage()">새로고침</button>
           <button class="btn btn-primary" onclick="openPage('input')">＋ 근무내역 등록</button>
         </div>
@@ -1433,6 +1502,189 @@
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbz_NFlMRhx_mP_0maccpd62iWNHGMVo-pAZCHg7s8-tM26QvKlIVrPL6TmElRgM6XIS/exec";
 
+    const DW_TOKEN_KEY = "thebigkorea_daily_worker_session";
+    const ERP_TOKEN_KEY = "thebigkorea_erp_session";
+    let DW_ACCESS = null;
+
+    function dwGetStoreToken() {
+      return localStorage.getItem(DW_TOKEN_KEY) || "";
+    }
+
+    function dwGetErpToken() {
+      return localStorage.getItem(ERP_TOKEN_KEY) || "";
+    }
+
+    function dwAuthParams() {
+      if (DW_ACCESS && DW_ACCESS.role === "admin") {
+        const erpToken = dwGetErpToken();
+        return erpToken ? { erpToken: erpToken } : {};
+      }
+      const accessToken = dwGetStoreToken();
+      return accessToken ? { accessToken: accessToken } : {};
+    }
+
+    function dwAppendAuth(url) {
+      const auth = dwAuthParams();
+      const u = new URL(url, window.location.href);
+      Object.keys(auth).forEach(function(key) {
+        if (auth[key]) u.searchParams.set(key, auth[key]);
+      });
+      return u.toString();
+    }
+
+    async function dwProbeAccess(params) {
+      const u = new URL(API_URL);
+      u.searchParams.set("action", "getDailyWorkerAccess");
+      Object.keys(params || {}).forEach(function(key) {
+        if (params[key]) u.searchParams.set(key, params[key]);
+      });
+      const response = await fetch(u.toString());
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      return response.json();
+    }
+
+    async function initDailyWorkerAuth() {
+      document.getElementById("dwPortalRoot").classList.add("auth-pending");
+
+      const erpToken = dwGetErpToken();
+      if (erpToken) {
+        try {
+          const j = await dwProbeAccess({ erpToken: erpToken });
+          if (j && j.success && j.access) {
+            DW_ACCESS = j.access;
+            dwEnterPortal();
+            return;
+          }
+        } catch (e) {}
+      }
+
+      const storeToken = dwGetStoreToken();
+      if (storeToken) {
+        try {
+          const j = await dwProbeAccess({ accessToken: storeToken });
+          if (j && j.success && j.access) {
+            DW_ACCESS = j.access;
+            dwEnterPortal();
+            return;
+          }
+        } catch (e) {}
+        localStorage.removeItem(DW_TOKEN_KEY);
+      }
+
+      dwShowLogin();
+    }
+
+    async function dwStoreLogin(event) {
+      event.preventDefault();
+      const id = document.getElementById("dwLoginId").value.trim();
+      const password = document.getElementById("dwLoginPassword").value;
+      const btn = document.getElementById("dwLoginButton");
+      const msg = document.getElementById("dwLoginMessage");
+
+      msg.textContent = "";
+      btn.disabled = true;
+      btn.textContent = "확인 중...";
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "loginDailyWorker",
+            id: id,
+            password: password
+          })
+        });
+        const json = await response.json();
+
+        if (!json.success || !json.token || !json.access) {
+          throw new Error(json.message || "로그인에 실패했습니다.");
+        }
+
+        localStorage.setItem(DW_TOKEN_KEY, json.token);
+        document.getElementById("dwLoginPassword").value = "";
+        DW_ACCESS = json.access;
+        dwEnterPortal();
+      } catch (err) {
+        msg.textContent = err.message || "로그인에 실패했습니다.";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "로그인";
+      }
+    }
+
+    function dwShowLogin() {
+      DW_ACCESS = null;
+      document.getElementById("dwPortalRoot").classList.add("auth-pending");
+      document.getElementById("dwAuthGate").classList.remove("hidden");
+      setTimeout(function() {
+        const el = document.getElementById("dwLoginId");
+        if (el) el.focus();
+      }, 0);
+    }
+
+    function dwEnterPortal() {
+      document.getElementById("dwAuthGate").classList.add("hidden");
+      document.getElementById("dwPortalRoot").classList.remove("auth-pending");
+      applyDailyWorkerAccessUI();
+      setDefaultDates();
+      loadDashboard();
+    }
+
+    async function dwLogout() {
+      const accessToken = dwGetStoreToken();
+      if (accessToken) {
+        try {
+          await fetch(API_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "logoutDailyWorker", accessToken: accessToken })
+          });
+        } catch (e) {}
+      }
+      localStorage.removeItem(DW_TOKEN_KEY);
+      DW_ACCESS = null;
+      location.reload();
+    }
+
+    function applyDailyWorkerAccessUI() {
+      if (!DW_ACCESS) return;
+
+      const isAdmin = DW_ACCESS.role === "admin";
+      const store = String(DW_ACCESS.store || "");
+      const chip = document.getElementById("dwAccessChip");
+      const logout = document.getElementById("dwLogoutButton");
+
+      chip.style.display = "inline-flex";
+      chip.textContent = isAdmin ? "본사 관리자" : (store || DW_ACCESS.label || "점포");
+      logout.style.display = isAdmin ? "none" : "inline-flex";
+
+      document.querySelectorAll('[data-page="unpaid"], [data-page="tax"]').forEach(function(el) {
+        el.style.display = isAdmin ? "" : "none";
+      });
+
+      const storeSummary = document.getElementById("storeSummaryBody");
+      const jobSummary = document.getElementById("jobSummaryBody");
+      if (storeSummary && storeSummary.closest(".card")) storeSummary.closest(".card").style.display = isAdmin ? "" : "none";
+      if (jobSummary && jobSummary.closest(".card")) jobSummary.closest(".card").style.display = isAdmin ? "" : "none";
+
+      if (!isAdmin) {
+        ["store", "ledgerStore", "editStore"].forEach(function(id) {
+          const el = document.getElementById(id);
+          if (!el) return;
+          let option = Array.from(el.options || []).find(function(o) { return o.value === store; });
+          if (!option && store) {
+            option = new Option(store, store);
+            el.add(option);
+          }
+          el.value = store;
+          el.disabled = true;
+        });
+
+        const taxStore = document.getElementById("taxStore");
+        if (taxStore) taxStore.disabled = true;
+      }
+    }
+
+
     let ledgerData = [];
     let taxData = [];
     let currentPage = "dashboard";
@@ -1447,11 +1699,14 @@
     };
 
     document.addEventListener("DOMContentLoaded", function() {
-      setDefaultDates();
-      loadDashboard();
+      initDailyWorkerAuth();
     });
 
     function openPage(page, button) {
+      if (DW_ACCESS && DW_ACCESS.role !== "admin" && (page === "unpaid" || page === "tax")) {
+        alert("본사 관리자 전용 기능입니다.");
+        return;
+      }
       currentPage = page;
 
       document.querySelectorAll(".page-section").forEach(function(section) {
@@ -1543,7 +1798,7 @@
         setText("dashboardUpdatedAt", "최종 조회 " + new Date().toLocaleString("ko-KR"));
 
         renderRecent(allList.slice(0, 10));
-        loadStoreSummary();
+        if (DW_ACCESS && DW_ACCESS.role === "admin") loadStoreSummary();
       } catch (err) {
         setText("statTodayCount", "오류");
         setText("statTodayAmount", "오류");
@@ -2608,7 +2863,7 @@ function renderJobSummary(list, totals) {
       clearNotice("saveNotice");
 
       document.getElementById("date").value = getLocalDateText(new Date());
-      document.getElementById("store").value = "한국의집";
+      document.getElementById("store").value = (DW_ACCESS && DW_ACCESS.role !== "admin" && DW_ACCESS.store) ? DW_ACCESS.store : "한국의집";
       document.getElementById("name").value = "";
       document.getElementById("allowance").value = "";
       document.getElementById("job").value = "";
@@ -3106,18 +3361,31 @@ function downloadTaxCsv() {
     }
 
     async function fetchJson(url) {
-      const response = await fetch(url);
+      const response = await fetch(dwAppendAuth(url));
       if (!response.ok) throw new Error("HTTP " + response.status);
-      return response.json();
+      const json = await response.json();
+      if (json && json.authRequired) {
+        localStorage.removeItem(DW_TOKEN_KEY);
+        dwShowLogin();
+        throw new Error("로그인이 필요합니다.");
+      }
+      return json;
     }
 
     async function postJson(data) {
+      const payload = Object.assign({}, data, dwAuthParams());
       const response = await fetch(API_URL, {
         method: "POST",
-        body: JSON.stringify(data)
+        body: JSON.stringify(payload)
       });
       if (!response.ok) throw new Error("HTTP " + response.status);
-      return response.json();
+      const json = await response.json();
+      if (json && json.authRequired) {
+        localStorage.removeItem(DW_TOKEN_KEY);
+        dwShowLogin();
+        throw new Error("로그인이 필요합니다.");
+      }
+      return json;
     }
 
     function sumAllowance(list) {
