@@ -546,13 +546,14 @@
       position: fixed;
       inset: 0;
       z-index: 10000;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       padding: 24px;
       background: linear-gradient(135deg, #0f1b2d 0%, #17365d 100%);
     }
     #dwAuthGate.hidden { display: none; }
+    #dwAuthGate.show { display: flex; }
     .dw-login-card {
       width: min(430px, calc(100vw - 36px));
       padding: 32px;
@@ -1615,7 +1616,7 @@
     function dwShowLogin() {
       DW_ACCESS = null;
       document.getElementById("dwPortalRoot").classList.add("auth-pending");
-      document.getElementById("dwAuthGate").classList.remove("hidden");
+      document.getElementById("dwAuthGate").classList.add("show");
       setTimeout(function() {
         const el = document.getElementById("dwLoginId");
         if (el) el.focus();
@@ -1623,7 +1624,7 @@
     }
 
     function dwEnterPortal() {
-      document.getElementById("dwAuthGate").classList.add("hidden");
+      document.getElementById("dwAuthGate").classList.remove("show");
       document.getElementById("dwPortalRoot").classList.remove("auth-pending");
       applyDailyWorkerAccessUI();
       setDefaultDates();
