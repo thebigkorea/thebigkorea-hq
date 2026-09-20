@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
@@ -10,17 +10,14 @@
 
 <body>
   <div class="page">
-
     <header class="header">
       <h1>사업소득자 용역계약서</h1>
       <p>Service Provider Contract</p>
     </header>
 
     <main class="card">
-
       <section class="section">
         <h2>사업장 정보</h2>
-
         <div class="grid">
           <label>사업장 선택
             <select id="workplaceCode">
@@ -36,36 +33,24 @@
             <input id="contractType" value="사업소득자 용역계약서" readonly />
           </label>
         </div>
-
         <div id="workplaceInfo" class="info-box"></div>
       </section>
 
-            </section>
-
-      
-      <section class="section">
-        <h2>용역 정보</h2>
-
       <section class="section">
         <h2>용역제공자 정보</h2>
-
         <div class="grid">
           <label>성명
             <input id="empName" placeholder="성명을 입력하세요" />
           </label>
-
           <label>주민등록번호
             <input id="residentNo" placeholder="예: 900101-1234567" maxlength="14" />
           </label>
-
           <label>생년월일
             <input id="birth" placeholder="주민번호 입력 시 자동 입력" readonly />
           </label>
-
           <label>연락처
             <input id="phone" placeholder="예: 010-0000-0000" />
           </label>
-
           <label class="full">주소
             <input id="address" placeholder="주소 입력" />
           </label>
@@ -74,7 +59,6 @@
 
       <section class="section">
         <h2>용역 정보</h2>
-
         <div class="grid">
           <label>계약 시작일
             <input id="startDate" type="date" />
@@ -85,7 +69,7 @@
           </label>
 
           <label>용역장소
-            <input id="workPlace" />
+            <input id="workPlace" readonly />
           </label>
 
           <label>용역내용
@@ -152,11 +136,33 @@
       </section>
 
       <div id="resultBox" class="result-box" style="display:none;"></div>
-
     </main>
   </div>
 
   <script src="service-contract.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const workplaceCode = document.getElementById("workplaceCode");
+      const workPlace = document.getElementById("workPlace");
+
+      const workplaceNames = {
+        hq: "더큰코리아 본사",
+        koreahouse_jamsil: "한국의집 롯데월드몰점",
+        gilchaejeong_apgujeong: "길채정 압구정",
+        sobagongbang_pyeongchon: "평촌 소바공방",
+        koreahouse_hyojonggang_paju: "한국의집 효종갱 파주"
+      };
+
+      function syncWorkPlace() {
+        workPlace.value = workplaceNames[workplaceCode.value] || "";
+      }
+
+      setTimeout(syncWorkPlace, 0);
+
+      workplaceCode.addEventListener("change", function () {
+        setTimeout(syncWorkPlace, 0);
+      });
+    });
+  </script>
 </body>
 </html>
-
