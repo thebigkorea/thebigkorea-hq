@@ -1,199 +1,426 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>계약직·아르바이트 근로계약서</title>
-  <link rel="stylesheet" href="part-contract.css" />
-  <script src="erp-auth.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>아르바이트 근로계약서</title>
+
+  <meta property="og:title" content="아르바이트 근로계약서 전자서명 요청">
+  <meta property="og:description" content="더큰코리아 전자근로계약 시스템">
+  <meta property="og:image" content="https://thebigkorea.github.io/thebigkorea-hq/part-contract-sign-thumb.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://thebigkorea.github.io/thebigkorea-hq/part-contract.html">
+
+  <link rel="stylesheet" href="part-contract.css">
+
+  <style>
+    body.loading main { display: none !important; }
+
+    #loadingScreen {
+      display: none;
+      text-align: center;
+      padding: 120px 20px;
+      font-size: 26px;
+      font-weight: 800;
+      color: #1f3f6d;
+    }
+
+    body.loading #loadingScreen { display: block; }
+
+    .readonly-field {
+      background: #f3f6fa !important;
+      color: #334155;
+    }
+  </style>
 </head>
 
-<body>
-  <div class="page">
+<body class="loading">
+  <div id="loadingScreen">계약서를 불러오는 중입니다...</div>
 
-    <header class="header">
-      <h1>계약직·아르바이트 근로계약서</h1>
-      <p>Part-time / Fixed-term Employment Contract</p>
-    </header>
-
-    <main class="card">
-
-      <section class="section">
-        <h2>사업장 정보</h2>
-
-        <div class="grid">
-          <label>사업장 선택
-            <select id="workplaceCode">
-              <option value="hq">더큰코리아 본사</option>
-              <option value="koreahouse_jamsil">한국의집 롯데월드몰점</option>
-              <option value="gilchaejeong_apgujeong">길채정 압구정</option>
-              <option value="sobagongbang_pyeongchon">평촌 소바공방</option>
-              <option value="koreahouse_hyojonggang_paju">한국의집 효종갱 파주</option>
-            </select>
-          </label>
-
-          <label>계약종류
-            <select id="contractType">
-              <option value="계약직 근로계약서">계약직 근로계약서</option>
-              <option value="아르바이트 근로계약서">아르바이트 근로계약서</option>
-            </select>
-          </label>
-        </div>
-
-        <div id="workplaceInfo" class="info-box"></div>
-      </section>
-
-      <section class="section">
-        <h2>직원 기본정보</h2>
-
-        <div class="grid">
-          <label>직원 성명
-            <input id="empName" placeholder="직원의 이름을 입력하세요" />
-          </label>
-
-          <label>주민등록번호
-            <input id="residentNo" placeholder="예: 900101-1234567" maxlength="14" />
-          </label>
-
-          <label>생년월일
-            <input id="birth" placeholder="주민번호 입력 시 자동 입력" readonly />
-          </label>
-
-          <label>연락처
-            <input id="phone" placeholder="예: 010-0000-0000" />
-          </label>
-
-          <label class="full">주소
-            <input id="address" placeholder="직원 주소 입력" />
-          </label>
-        </div>
-      </section>
-
-            </section>
-
-      
-      <section class="section">
-        <h2>계약 및 근무 정보</h2>
-
-      <section class="section">
-        <h2>계약 및 근무 정보</h2>
-
-        <div class="grid">
-          <label>계약 시작일
-            <input id="startDate" type="date" />
-          </label>
-
-          <label>계약 종료일
-            <input id="endDate" type="date" />
-          </label>
-
-          <label>주 근무일수
-            <select id="workDays">
-              <option value="">선택</option>
-              <option value="주 2일">주 2일</option>
-              <option value="주 3일">주 3일</option>
-              <option value="주 4일">주 4일</option>
-              <option value="주 5일">주 5일</option>
-              <option value="주 6일">주 6일</option>
-              <option value="스케줄 근무">스케줄 근무</option>
-            </select>
-          </label>
-
-          <label>출근시간
-            <select id="startTime"></select>
-          </label>
-
-          <label>퇴근시간
-            <select id="endTime"></select>
-          </label>
-
-          <label>휴게시간
-            <select id="breakTime">
-              <option value="">선택</option>
-              <option value="30분">30분</option>
-              <option value="1시간">1시간</option>
-              <option value="1시간 30분">1시간 30분</option>
-              <option value="2시간">2시간</option>
-            </select>
-          </label>
-
-          <label>근무장소
-            <input id="workPlace" />
-          </label>
-
-          <label>업무내용
-            <select id="jobDuty">
-              <option value="">선택</option>
-              <option value="홀">홀</option>
-              <option value="주방">주방</option>
-              <option value="조리">조리</option>
-              <option value="찬모">찬모</option>
-              <option value="세척">세척</option>
-              <option value="관리자">관리자</option>
-              <option value="매니저">매니저</option>
-              <option value="기타">기타</option>
-            </select>
-          </label>
-
-          <label id="jobDutyEtcWrap" style="display:none;">
-            기타 업무내용
-            <input id="jobDutyEtc" placeholder="업무내용 직접 입력" />
-          </label>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2>임금 정보</h2>
-
-        <div class="grid">
-          <label>시급
-            <input id="hourPay" class="money" placeholder="예: 12,000" />
-          </label>
-
-          
-          <label>주휴수당
-            <select id="weeklyHolidayPay">
-              <option value="">선택</option>
-              <option value="포함">포함</option>
-              <option value="미포함">미포함</option>
-            </select>
-          </label>
-
-          <label>4대보험
-            <select id="insurance">
-              <option value="">선택</option>
-              <option value="가입">가입</option>
-              <option value="미가입">미가입</option>
-              <option value="근로조건에 따라 적용">근로조건에 따라 적용</option>
-            </select>
-          </label>
-
-          <label>급여은행
-            <input id="bankName" placeholder="예: 국민은행" />
-          </label>
-
-          <label>계좌번호
-            <input id="bankAccount" placeholder="예: 816901-04-112155" />
-          </label>
-        </div>
-      </section>
-
-      <div class="buttons">
-        <button class="blue" onclick="makePreview()">계약직·아르바이트 계약서 생성</button>
-        <button class="green" id="saveBtn" onclick="saveContract()">계약 저장 및 직원 링크 생성</button>
-      </div>
-
-      <section class="section preview-section">
-        <h2>계약서 미리보기</h2>
-        <div id="preview" class="preview"></div>
-      </section>
-
-      <div id="resultBox" class="result-box" style="display:none;"></div>
-
-    </main>
+  <div class="top-area no-print">
+    <h1>아르바이트 근로계약서</h1>
+    <p>Part-time Employment Contract</p>
   </div>
 
-  <script src="part-contract.js"></script>
+  <div class="form-box no-print">
+    <h2>사업장 정보</h2>
+
+    <div class="grid">
+      <div class="input-group">
+        <label>사업장 선택</label>
+        <select id="storeSelect">
+          <option value="">사업장을 선택하세요</option>
+          <option value="더큰코리아 본사">더큰코리아 본사</option>
+          <option value="한국의집 롯데월드몰점">한국의집 롯데월드몰점</option>
+          <option value="길채정 압구정점">길채정 압구정점</option>
+          <option value="소바공방 롯데평촌점">소바공방 롯데평촌점</option>
+          <option value="고궁 롯데부여아울렛점">고궁 롯데부여아울렛점</option>
+          <option value="효종갱 파주점">효종갱 파주점</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>계약종류</label>
+        <input type="text" value="아르바이트 근로계약서" readonly class="readonly-field">
+      </div>
+    </div>
+  </div>
+
+  <div class="form-box no-print">
+    <h2>직원 기본정보</h2>
+
+    <div class="grid">
+      <div class="input-group">
+        <label>직원 성명</label>
+        <input type="text" id="empName" placeholder="직원의 이름을 입력하세요">
+      </div>
+
+      <div class="input-group">
+        <label>주민등록번호</label>
+        <input type="text" id="residentNo" placeholder="예: 900101-1234567">
+      </div>
+
+      <div class="input-group">
+        <label>생년월일</label>
+        <input type="text" id="birth" placeholder="주민번호 입력 시 자동 입력">
+      </div>
+
+      <div class="input-group">
+        <label>연락처</label>
+        <input type="text" id="phone" placeholder="예: 010-0000-0000">
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>주소</label>
+      <input type="text" id="address" placeholder="직원 주소 입력">
+    </div>
+  </div>
+
+  <div class="form-box no-print">
+    <h2>계약 및 근무 정보</h2>
+
+    <div class="grid">
+      <div class="input-group">
+        <label>계약 시작일</label>
+        <input type="date" id="startDate">
+      </div>
+
+      <div class="input-group">
+        <label>계약 종료일</label>
+        <input type="date" id="endDate">
+      </div>
+
+      <div class="input-group">
+        <label>주 근무일수</label>
+        <select id="workDays">
+          <option value="">선택</option>
+          <option>주2일</option>
+          <option>주3일</option>
+          <option>주4일</option>
+          <option>주5일</option>
+          <option>주6일</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>주휴일</label>
+        <select id="holiday">
+          <option value="">선택 안함</option>
+          <option>월요일</option>
+          <option>화요일</option>
+          <option>수요일</option>
+          <option>목요일</option>
+          <option>금요일</option>
+          <option>토요일</option>
+          <option>일요일</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>출근시간</label>
+        <select id="startTime">
+          <option value="">출근시간 선택</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>퇴근시간</label>
+        <select id="endTime">
+          <option value="">퇴근시간 선택</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>휴게시간</label>
+        <select id="breakTime">
+          <option value="">선택</option>
+          <option>30분</option>
+          <option>1시간</option>
+          <option>1시간 30분</option>
+          <option>2시간</option>
+          <option>14:00 ~ 15:00</option>
+          <option>14:00 ~ 16:00</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>근무장소</label>
+        <input type="text" id="workPlace" readonly class="readonly-field" placeholder="사업장 선택 시 자동 입력">
+      </div>
+
+      <div class="input-group">
+        <label>업무내용</label>
+        <select id="jobDuty">
+          <option value="">선택</option>
+          <option>홀서빙</option>
+          <option>주방보조</option>
+          <option>조리보조</option>
+          <option>설거지</option>
+          <option>매장업무</option>
+        </select>
+      </div>
+    </div>
+
+    <h2>임금 및 보험</h2>
+
+    <div class="grid">
+      <div class="input-group">
+        <label>시급</label>
+        <input type="text" id="hourPay" placeholder="예: 13,500">
+      </div>
+
+      <div class="input-group">
+        <label>4대보험</label>
+        <select id="insurance">
+          <option value="">선택</option>
+          <option>희망</option>
+          <option>미희망</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>급여은행</label>
+        <input type="text" id="bank" placeholder="예: 국민은행">
+      </div>
+
+      <div class="input-group">
+        <label>계좌번호</label>
+        <input type="text" id="account" placeholder="예: 816901-04-112155">
+      </div>
+    </div>
+
+    <button onclick="createContract()">아르바이트 근로계약서 생성</button>
+
+    <button onclick="saveContractAndCreateLink(event)" class="green-btn">
+      계약 저장 및 직원 링크 생성
+    </button>
+
+    <div id="contractLinkBox" class="contract-link-box" style="display:none;">
+      <label>직원 전용 링크</label>
+      <input type="text" id="contractLink" readonly>
+      <button onclick="copyContractLink()">링크 복사</button>
+    </div>
+
+    <div id="message"></div>
+  </div>
+
+  <div class="paper" id="contractPaper">
+    <h1 class="contract-title">아르바이트 근로계약서</h1>
+
+    <p>
+      <strong id="cStoreName"></strong>(이하 “사업주”라 함)과 근로자
+      <strong id="cEmpName"></strong>
+      (이하 “근로자”라 함)은 다음과 같이 근로계약을 체결한다.
+    </p>
+
+    <h3>1. 근로계약기간</h3>
+    <p><span id="cStartDate"></span>부터 <span id="cEndDate"></span>까지</p>
+
+    <h3>2. 근무장소</h3>
+    <p id="cWorkPlace"></p>
+
+    <h3>3. 업무내용</h3>
+    <p id="cJobDuty"></p>
+
+    <h3>4. 근로시간</h3>
+    <table>
+      <tr>
+        <th>출근시간</th>
+        <th>퇴근시간</th>
+        <th>휴게시간</th>
+      </tr>
+      <tr>
+        <td id="cStartTime"></td>
+        <td id="cEndTime"></td>
+        <td id="cBreakTime"></td>
+      </tr>
+    </table>
+
+    <h3>5. 근무일 / 휴일</h3>
+    <p>
+      <span id="cWorkDays"></span> 근무 /
+      주휴일 : <span id="cHoliday"></span>
+    </p>
+
+    <h3>6. 임금</h3>
+    <table>
+      <tr>
+        <th>시급</th>
+        <th>4대보험</th>
+      </tr>
+      <tr>
+        <td id="cHourPay"></td>
+        <td id="cInsurance"></td>
+      </tr>
+    </table>
+
+    <p>
+      회사는 매월 1일부터 말일까지의 기간 동안 산정한 급여를
+      익월 10일에 근로자 명의의 은행계좌로 송금한다.
+    </p>
+    <p>급여 지급 시 갑근세, 사회보험료 등 법정공제액은 공제 후 지급한다.</p>
+    <p>급여계좌 : <span id="cBank"></span> <span id="cAccount"></span></p>
+
+    <h3>7. 4대보험 가입유무</h3>
+    <p>근로자는 4대보험 가입 여부에 대하여 <strong id="cInsuranceText"></strong> 의사를 표시한다.</p>
+
+    <h3>8. 근로계약서 교부</h3>
+    <p>근로자는 본 근로계약서를 전자문서 방식으로 교부받았음을 확인한다.</p>
+
+    <h3>9. CCTV 설치 동의</h3>
+    <p>근로자는 방범, 화재예방, 시설안전관리 목적의 CCTV 설치 및 운영에 대해 충분히 설명을 듣고 동의한다.</p>
+
+    <h3>10. 전자계약 및 전자서명</h3>
+    <p>사업주와 근로자는 본 계약이 전자문서 및 전자서명 방식으로 체결될 수 있음을 확인하며, 전자서명은 자필서명 또는 날인과 동일한 효력을 가진다.</p>
+
+    <p class="date" id="cToday"></p>
+
+    <div class="sign-area">
+      <div class="sign-box">
+        <h4>[사업주]</h4>
+        <p>사업체명 : <span id="cStoreName2"></span></p>
+        <p>대표자 : 박병호</p>
+        <p>주소 : <span id="cStoreAddress"></span></p>
+        <img src="https://thebigkorea.github.io/thebigkorea-hq/stamp.png" class="stamp-img">
+      </div>
+
+      <div class="sign-box">
+        <h4>[근로자]</h4>
+        <p>성명 : <span id="cWorkerName"></span></p>
+        <p>주민번호 : <span id="cResidentNo"></span></p>
+        <p>생년월일 : <span id="cBirth"></span></p>
+        <p>주소 : <span id="cAddress"></span></p>
+        <p>연락처 : <span id="cPhone"></span></p>
+        <p>급여계좌 : <span id="cBank2"></span> <span id="cAccount2"></span></p>
+
+        <p class="sign-label">근로자 전자서명</p>
+        <img id="workerSignatureImage" class="worker-sign">
+        <p id="signedTime"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="electronic-sign-box no-print">
+    <h3>전자계약 확인 및 서명</h3>
+
+    <div class="worker-guide">
+      반드시 서명 후 <b>전자계약 완료</b> 버튼을 눌러야 계약이 저장됩니다.
+    </div>
+
+    <label class="agree-line">
+      <input type="checkbox" id="agreeCheck">
+      본인은 근로계약 내용을 확인하였으며 전자계약에 동의합니다.
+    </label>
+
+    <canvas id="signaturePad" width="600" height="220"></canvas>
+
+    <div class="sign-buttons">
+      <button onclick="clearSignature()">다시서명</button>
+      <button onclick="completeElectronicContract(event)" class="green-btn">
+        전자계약 완료
+      </button>
+    </div>
+
+    <div id="completeBox" class="complete-box">
+      전자계약이 정상 완료되었습니다.
+    </div>
+  </div>
+
+  <script src="part-contract.js?v=20260920-2"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const startTime = document.getElementById("startTime");
+      const endTime = document.getElementById("endTime");
+      const storeSelect = document.getElementById("storeSelect");
+      const workPlace = document.getElementById("workPlace");
+
+      function toTime(minutes) {
+        const h = String(Math.floor(minutes / 60)).padStart(2, "0");
+        const m = String(minutes % 60).padStart(2, "0");
+        return h + ":" + m;
+      }
+
+      function makeStartTimes() {
+        const previous = startTime.value;
+        startTime.innerHTML = '<option value="">출근시간 선택</option>';
+
+        // 09:00 ~ 20:30, 30분 단위
+        for (let min = 9 * 60; min <= 20 * 60 + 30; min += 30) {
+          const time = toTime(min);
+          startTime.add(new Option(time, time));
+        }
+
+        if ([...startTime.options].some(o => o.value === previous)) {
+          startTime.value = previous;
+        }
+      }
+
+      function makeEndTimes() {
+        const previous = endTime.value;
+        endTime.innerHTML = '<option value="">퇴근시간 선택</option>';
+
+        let firstEnd = 9 * 60 + 30;
+
+        if (startTime.value) {
+          const parts = startTime.value.split(":").map(Number);
+          firstEnd = parts[0] * 60 + parts[1] + 30;
+        }
+
+        // 선택한 출근시간 이후부터 21:00까지, 30분 단위
+        for (let min = firstEnd; min <= 21 * 60; min += 30) {
+          const time = toTime(min);
+          endTime.add(new Option(time, time));
+        }
+
+        if ([...endTime.options].some(o => o.value === previous)) {
+          endTime.value = previous;
+        }
+      }
+
+      function syncWorkPlace() {
+        workPlace.value = storeSelect.value || "";
+
+        // 기존 JS가 미리보기에서 참조할 수 있도록 함께 반영
+        const cWorkPlace = document.getElementById("cWorkPlace");
+        const cStoreName = document.getElementById("cStoreName");
+        const cStoreName2 = document.getElementById("cStoreName2");
+
+        if (cWorkPlace) cWorkPlace.textContent = storeSelect.value || "";
+        if (cStoreName) cStoreName.textContent = storeSelect.value || "";
+        if (cStoreName2) cStoreName2.textContent = storeSelect.value || "";
+      }
+
+      makeStartTimes();
+      makeEndTimes();
+
+      startTime.addEventListener("change", makeEndTimes);
+      storeSelect.addEventListener("change", syncWorkPlace);
+
+      syncWorkPlace();
+    });
+  </script>
 </body>
 </html>
-
