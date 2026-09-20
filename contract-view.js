@@ -2,32 +2,45 @@ const API_URL =
 "https://script.google.com/macros/s/AKfycbwRGQcXgYhfkTUiklPrHs4uFe7oHpgn8D_jM2jJPpU74tXr3D_h6vGMq72CHXU0EnAb/exec";
 
 let CURRENT_CONTRACT_ID = "";
+let CURRENT_PUBLIC_TOKEN = "";
 let HAS_DRAWN = false;
 
 window.onload = loadContractView;
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function getVal(c, keys, fallback = "") {
   for (const key of keys) {
     if (c && c[key] !== undefined && c[key] !== null && String(c[key]).trim() !== "") {
-      return c[key];
+      return escapeHtml(c[key]);
     }
   }
-  return fallback;
+  return escapeHtml(fallback);
 }
 
 async function loadContractView() {
   const contractId = getParam("id");
+  const publicToken = getParam("token");
   CURRENT_CONTRACT_ID = contractId;
+  CURRENT_PUBLIC_TOKEN = publicToken || "";
 
-  if (!contractId) {
-    showError("계약번호가 없습니다.");
+  if (!contractId || !publicToken) {
+    showError("유효한 계약서 링크가 아닙니다.");
     return;
   }
 
   try {
     const result = await postData({
       action: "getContractById",
-      contractId
+      contractId,
+      publicToken: CURRENT_PUBLIC_TOKEN
     });
 
     if (!result.success) {
@@ -507,6 +520,7 @@ async function submitSignature() {
     const result = await postData({
       action: "signContract",
       contractId: CURRENT_CONTRACT_ID,
+      publicToken: CURRENT_PUBLIC_TOKEN,
       signature
     });
 
@@ -519,7 +533,7 @@ async function submitSignature() {
 
     alert("전자서명이 완료되었습니다.");
     location.href =
-      `contract-view.html?id=${encodeURIComponent(CURRENT_CONTRACT_ID)}&v=${Date.now()}`;
+      `contract-view.html?id=${encodeURIComponent(CURRENT_CONTRACT_ID)}&token=${encodeURIComponent(CURRENT_PUBLIC_TOKEN)}&v=${Date.now()}`;
 
   } catch (err) {
     alert("오류 발생: " + err.message);
