@@ -930,3 +930,45 @@ button:disabled {
 .contract-topbar {
   justify-content: flex-end;
 }
+
+
+/* ===== 인재를 소중히 하는 기업 - 상단 비주얼 ===== */
+.header{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+}
+.header > *:not(.hero-people){
+  position:relative;
+  z-index:2;
+}
+.hero-people{
+  position:absolute;
+  z-index:1;
+  right:0;
+  top:0;
+  width:52%;
+  height:100%;
+  background-image:
+    linear-gradient(90deg, rgba(239,248,255,1) 0%, rgba(239,248,255,.62) 18%, rgba(239,248,255,.05) 42%),
+    url("images/contract-people-hero.png");
+  background-size:cover;
+  background-position:67% 17%;
+  background-repeat:no-repeat;
+  pointer-events:none;
+}
+.header:after{
+  z-index:3;
+  background:rgba(255,255,255,.68);
+  backdrop-filter:blur(1px);
+}
+@media(max-width:980px){
+  .hero-people{width:58%;opacity:.82}
+}
+@media(max-width:640px){
+  .hero-people{
+    width:46%;
+    opacity:.28;
+    background-position:66% 14%;
+  }
+}
