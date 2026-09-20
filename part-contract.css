@@ -932,43 +932,44 @@ button:disabled {
 }
 
 
-/* ===== 인재를 소중히 하는 기업 - 상단 비주얼 ===== */
+/* ===== 상단 인재 배너: 사용자 제공 첫 번째 이미지만 사용 ===== */
 .header{
   position:relative;
   overflow:hidden;
   isolation:isolate;
 }
-.header > *:not(.hero-people){
+.header > *:not(.hero-people-banner){
   position:relative;
   z-index:2;
 }
-.hero-people{
+.hero-people-banner{
   position:absolute;
   z-index:1;
   right:0;
   top:0;
   width:52%;
   height:100%;
-  background-image:
-    linear-gradient(90deg, rgba(239,248,255,1) 0%, rgba(239,248,255,.62) 18%, rgba(239,248,255,.05) 42%),
-    url("images/contract-people-hero.png");
-  background-size:cover;
-  background-position:67% 17%;
+  background-image:url("images/contract-people-banner.png");
   background-repeat:no-repeat;
+  background-position:center center;
+  background-size:cover;
   pointer-events:none;
 }
+/* 기존 CSS의 가상 문구가 이미지 위에 중복되지 않도록 제거 */
 .header:after{
-  z-index:3;
-  background:rgba(255,255,255,.68);
-  backdrop-filter:blur(1px);
+  display:none !important;
+  content:none !important;
 }
 @media(max-width:980px){
-  .hero-people{width:58%;opacity:.82}
+  .hero-people-banner{
+    width:55%;
+    background-size:cover;
+  }
 }
 @media(max-width:640px){
-  .hero-people{
-    width:46%;
-    opacity:.28;
-    background-position:66% 14%;
+  .hero-people-banner{
+    width:48%;
+    opacity:.32;
+    background-position:center;
   }
 }
