@@ -6,13 +6,17 @@
 
   <title>전자근로계약 서명요청서</title>
 
+  <!-- 직원용 공개 계약 링크 보안 -->
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+
   <meta property="og:title" content="전자근로계약 서명요청서">
-<meta property="og:description" content="전자근로계약 내용을 확인하고 전자서명을 진행해 주세요.">
-<meta property="og:image" content="https://thebigkorea.github.io/thebigkorea-hq/contract-sign-thumb.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://thebigkorea.github.io/thebigkorea-hq/contract-view.html">
+  <meta property="og:description" content="전자근로계약 내용을 확인하고 전자서명을 진행해 주세요.">
+  <meta property="og:image" content="https://thebigkorea.github.io/thebigkorea-hq/contract-sign-thumb.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://thebigkorea.github.io/hr-system/contract-view.html">
 
   <style>
     body {
@@ -33,6 +37,7 @@
       color: #1f3d68;
       text-align: center;
       padding: 20px;
+      box-sizing: border-box;
     }
 
     .contract-wrap {
@@ -173,26 +178,16 @@
       cursor: pointer;
     }
 
-    button.gray {
-      background: #64748b;
-    }
-
-    button.green {
-      background: #079669;
-    }
-
-    button.blue {
-      background: #1f3d68;
-    }
+    button.gray { background: #64748b; }
+    button.green { background: #079669; }
+    button.blue { background: #1f3d68; }
 
     button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
 
-    .bottom-buttons {
-      margin-top: 40px;
-    }
+    .bottom-buttons { margin-top: 40px; }
 
     @media (max-width: 768px) {
       .contract-wrap {
@@ -200,13 +195,8 @@
         border-radius: 0;
       }
 
-      .top-area {
-        padding: 32px 18px;
-      }
-
-      .top-area h1 {
-        font-size: 30px;
-      }
+      .top-area { padding: 32px 18px; }
+      .top-area h1 { font-size: 30px; }
 
       .content {
         padding: 26px;
@@ -218,9 +208,7 @@
         letter-spacing: 4px;
       }
 
-      .content h3 {
-        font-size: 24px;
-      }
+      .content h3 { font-size: 24px; }
 
       table {
         display: block;
@@ -234,19 +222,12 @@
         padding: 10px;
       }
 
-      .sign-area {
-        grid-template-columns: 1fr;
-      }
-
-      .sign-buttons {
-        grid-template-columns: 1fr;
-      }
+      .sign-area { grid-template-columns: 1fr; }
+      .sign-buttons { grid-template-columns: 1fr; }
     }
 
     @media print {
-      body {
-        background: #fff;
-      }
+      body { background: #fff; }
 
       .contract-wrap {
         box-shadow: none;
@@ -261,7 +242,6 @@
       }
     }
   </style>
-  <script src="erp-auth.js"></script>
 </head>
 
 <body>
@@ -279,7 +259,8 @@
   <div class="content" id="contractContent"></div>
 </div>
 
-<script src="contract-view.js"></script>
+<!-- 직원 계약서는 ERP 로그인과 독립적으로 publicToken으로 검증 -->
+<!-- 버전값을 붙여 GitHub Pages/브라우저의 이전 JS 캐시 사용 방지 -->
+<script src="contract-view.js?v=20260920-1"></script>
 </body>
 </html>
-
