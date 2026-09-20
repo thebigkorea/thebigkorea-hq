@@ -925,3 +925,8 @@ button:disabled {
     box-shadow: none;
   }
 }
+
+/* 상단 메뉴 제거 후 슬로건만 오른쪽 정렬 */
+.contract-topbar {
+  justify-content: flex-end;
+}
