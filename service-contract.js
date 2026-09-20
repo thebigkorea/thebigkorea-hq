@@ -45,16 +45,20 @@ let canvas;
 let ctx;
 let drawing = false;
 let currentContractId = null;
+let currentPublicToken = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
   initResidentNoAutoBirth();
   initMoneyInput();
   initSignaturePad();
 
-  const id = new URLSearchParams(window.location.search).get("id");
-  if (id) {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+  const token = params.get("token");
+  if (id && token) {
     currentContractId = id;
-    await loadContract(id);
+    currentPublicToken = token;
+    await loadContract(id, token);
   }
 
   document.body.classList.remove("loading");
@@ -230,11 +234,12 @@ async function saveContractAndCreateLink(event) {
   }
 }
 
-async function loadContract(id) {
+async function loadContract(id, publicToken) {
   try {
     const result = await postData({
       action: "getContractById",
-      contractId: id
+      contractId: id,
+      publicToken: publicToken || currentPublicToken
     });
 
     if (!result.success) {
@@ -397,6 +402,7 @@ async function completeElectronicContract(event) {
     const result = await postData({
       action: "signContract",
       contractId: currentContractId,
+      publicToken: currentPublicToken,
       signature
     });
 
