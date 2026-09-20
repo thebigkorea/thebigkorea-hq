@@ -932,44 +932,37 @@ button:disabled {
 }
 
 
-/* ===== 상단 인재 배너: 사용자 제공 첫 번째 이미지만 사용 ===== */
+/* ===== 고화질 인재 배너 ===== */
 .header{
   position:relative;
   overflow:hidden;
   isolation:isolate;
 }
-.header > *:not(.hero-people-banner){
+.header > *:not(.hero-hd-banner){
   position:relative;
   z-index:2;
 }
-.hero-people-banner{
+.hero-hd-banner{
   position:absolute;
   z-index:1;
   right:0;
   top:0;
-  width:52%;
+  width:53%;
   height:100%;
-  background-image:url("images/contract-people-banner.png");
+  background-image:url("images/contract-people-hero-hd.png");
   background-repeat:no-repeat;
-  background-position:center center;
   background-size:cover;
+  background-position:67% center;
   pointer-events:none;
 }
-/* 기존 CSS의 가상 문구가 이미지 위에 중복되지 않도록 제거 */
+/* 이미지 안에 문구가 있으므로 기존 CSS 가상문구 중복 제거 */
 .header:after{
   display:none !important;
   content:none !important;
 }
 @media(max-width:980px){
-  .hero-people-banner{
-    width:55%;
-    background-size:cover;
-  }
+  .hero-hd-banner{width:55%;background-position:66% center;}
 }
 @media(max-width:640px){
-  .hero-people-banner{
-    width:48%;
-    opacity:.32;
-    background-position:center;
-  }
+  .hero-hd-banner{width:47%;opacity:.34;background-position:67% center;}
 }
