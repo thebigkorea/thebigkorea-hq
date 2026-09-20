@@ -516,13 +516,77 @@ function copyText(text) {
   document.body.removeChild(temp);
 }
 
+function getErpTokenForContractAdmin() {
+  // 현재 ERP가 사용하는 공통 로그인 세션을 그대로 사용
+  const raw = localStorage.getItem("thebigkorea_erp_session");
+  if (!raw) return "";
+
+  // 세션 만료시간이 있으면 만료 여부 확인
+  const expiresRaw = localStorage.getItem("thebigkorea_erp_session_expires");
+  if (expiresRaw) {
+    const expires = Number(expiresRaw);
+    if (Number.isFinite(expires) && expires > 0 && Date.now() >= expires) {
+      return "";
+    }
+  }
+
+  // 저장값이 토큰 문자열인 경우
+  if (!raw.trim().startsWith("{")) return raw.trim();
+
+  // 저장값이 JSON 세션 객체인 경우
+  try {
+    const session = JSON.parse(raw);
+    return String(
+      session.erpToken ||
+      session.token ||
+      session.sessionToken ||
+      session.accessToken ||
+      ""
+    ).trim();
+  } catch (e) {
+    return raw.trim();
+  }
+}
+
 async function postData(data) {
+  const erpToken = getErpTokenForContractAdmin();
+
+  if (!erpToken) {
+    return {
+      success: false,
+      message: "ERP 로그인 세션이 없습니다. ERP 홈에서 다시 로그인해 주세요."
+    };
+  }
+
   const response = await fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify(data)
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify({
+      ...data,
+      erpToken: erpToken
+    })
   });
 
-  return await response.json();
+  const result = await response.json();
+
+  // 서버가 명확하게 인증 실패를 반환한 경우에만 안내
+  if (
+    result &&
+    (
+      result.authenticated === false ||
+      /ERP 인증|로그인 세션|인증이 필요/i.test(String(result.message || ""))
+    )
+  ) {
+    return {
+      ...result,
+      success: false,
+      message: result.message || "ERP 로그인 인증이 만료되었습니다. ERP 홈에서 다시 로그인해 주세요."
+    };
+  }
+
+  return result;
 }
 
 function won(v) {
