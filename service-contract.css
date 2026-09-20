@@ -932,37 +932,14 @@ button:disabled {
 }
 
 
-/* ===== 고화질 인재 배너 ===== */
-.header{
-  position:relative;
-  overflow:hidden;
-  isolation:isolate;
-}
-.header > *:not(.hero-hd-banner){
-  position:relative;
-  z-index:2;
-}
-.hero-hd-banner{
-  position:absolute;
-  z-index:1;
-  right:0;
-  top:0;
-  width:53%;
-  height:100%;
-  background-image:url("images/contract-people-hero-hd.png");
-  background-repeat:no-repeat;
-  background-size:cover;
-  background-position:67% center;
+/* ===== 3종 계약서 공통 고화질 인재 배너 ===== */
+.header{position:relative;overflow:hidden;isolation:isolate}
+.header > *:not(.hero-common-banner){position:relative;z-index:2}
+.hero-common-banner{
+  position:absolute;z-index:1;right:0;top:0;width:53%;height:100%;
+  background:url("images/contract-people-common-hd.png") center center/cover no-repeat;
   pointer-events:none;
 }
-/* 이미지 안에 문구가 있으므로 기존 CSS 가상문구 중복 제거 */
-.header:after{
-  display:none !important;
-  content:none !important;
-}
-@media(max-width:980px){
-  .hero-hd-banner{width:55%;background-position:66% center;}
-}
-@media(max-width:640px){
-  .hero-hd-banner{width:47%;opacity:.34;background-position:67% center;}
-}
+.header:after{display:none!important;content:none!important}
+@media(max-width:980px){.hero-common-banner{width:55%;background-position:center}}
+@media(max-width:640px){.hero-common-banner{width:47%;opacity:.34;background-position:center}}
