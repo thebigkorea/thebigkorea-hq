@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>계약직·아르바이트 근로계약서</title>
+  <title>아르바이트 근로계약서</title>
   <link rel="stylesheet" href="part-contract.css" />
   <script src="erp-auth.js"></script>
 </head>
@@ -12,8 +12,8 @@
   <div class="page">
 
     <header class="header">
-      <h1>계약직·아르바이트 근로계약서</h1>
-      <p>Part-time / Fixed-term Employment Contract</p>
+      <h1>아르바이트 근로계약서</h1>
+      <p>Part-time Employment Contract</p>
     </header>
 
     <main class="card">
@@ -33,10 +33,7 @@
           </label>
 
           <label>계약종류
-            <select id="contractType">
-              <option value="계약직 근로계약서">계약직 근로계약서</option>
-              <option value="아르바이트 근로계약서">아르바이트 근로계약서</option>
-            </select>
+            <input id="contractType" value="아르바이트 근로계약서" readonly />
           </label>
         </div>
 
@@ -68,12 +65,6 @@
           </label>
         </div>
       </section>
-
-            </section>
-
-      
-      <section class="section">
-        <h2>계약 및 근무 정보</h2>
 
       <section class="section">
         <h2>계약 및 근무 정보</h2>
@@ -118,7 +109,7 @@
           </label>
 
           <label>근무장소
-            <input id="workPlace" />
+            <input id="workPlace" readonly />
           </label>
 
           <label>업무내용
@@ -150,7 +141,6 @@
             <input id="hourPay" class="money" placeholder="예: 12,000" />
           </label>
 
-          
           <label>주휴수당
             <select id="weeklyHolidayPay">
               <option value="">선택</option>
@@ -179,7 +169,7 @@
       </section>
 
       <div class="buttons">
-        <button class="blue" onclick="makePreview()">계약직·아르바이트 계약서 생성</button>
+        <button class="blue" onclick="makePreview()">아르바이트 계약서 생성</button>
         <button class="green" id="saveBtn" onclick="saveContract()">계약 저장 및 직원 링크 생성</button>
       </div>
 
@@ -194,6 +184,90 @@
   </div>
 
   <script src="part-contract.js"></script>
+
+  <script>
+    /*
+      요청사항만 보정:
+      1. 아르바이트 계약서로 통일
+      2. 출퇴근 시간은 09:00~21:00 범위 내 30분 단위
+      3. 퇴근시간은 선택한 출근시간보다 뒤의 시간만 표시
+      4. 사업장 선택 시 근무장소 자동 입력
+      기존 part-contract.js 기능은 그대로 사용
+    */
+    document.addEventListener("DOMContentLoaded", function () {
+      const workplaceCode = document.getElementById("workplaceCode");
+      const workPlace = document.getElementById("workPlace");
+      const startTime = document.getElementById("startTime");
+      const endTime = document.getElementById("endTime");
+
+      const workplaceNames = {
+        hq: "더큰코리아 본사",
+        koreahouse_jamsil: "한국의집 롯데월드몰점",
+        gilchaejeong_apgujeong: "길채정 압구정",
+        sobagongbang_pyeongchon: "평촌 소바공방",
+        koreahouse_hyojonggang_paju: "한국의집 효종갱 파주"
+      };
+
+      function syncWorkPlace() {
+        workPlace.value = workplaceNames[workplaceCode.value] || "";
+      }
+
+      function timeText(totalMinutes) {
+        const hour = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
+        const minute = String(totalMinutes % 60).padStart(2, "0");
+        return hour + ":" + minute;
+      }
+
+      function fillStartTimes() {
+        const oldValue = startTime.value;
+        startTime.innerHTML = '<option value="">선택</option>';
+
+        // 출근: 09:00 ~ 20:30
+        for (let m = 9 * 60; m <= 20 * 60 + 30; m += 30) {
+          const t = timeText(m);
+          startTime.add(new Option(t, t));
+        }
+
+        if ([...startTime.options].some(o => o.value === oldValue)) {
+          startTime.value = oldValue;
+        }
+      }
+
+      function fillEndTimes() {
+        const oldValue = endTime.value;
+        endTime.innerHTML = '<option value="">선택</option>';
+
+        let first = 9 * 60 + 30;
+
+        if (startTime.value) {
+          const parts = startTime.value.split(":").map(Number);
+          first = parts[0] * 60 + parts[1] + 30;
+        }
+
+        // 퇴근: 출근 이후 ~ 21:00
+        for (let m = first; m <= 21 * 60; m += 30) {
+          const t = timeText(m);
+          endTime.add(new Option(t, t));
+        }
+
+        if ([...endTime.options].some(o => o.value === oldValue)) {
+          endTime.value = oldValue;
+        }
+      }
+
+      // part-contract.js가 먼저 시간 목록을 만들더라도 마지막에 요청 범위로 다시 제한
+      setTimeout(function () {
+        fillStartTimes();
+        fillEndTimes();
+        syncWorkPlace();
+      }, 0);
+
+      startTime.addEventListener("change", fillEndTimes);
+      workplaceCode.addEventListener("change", function () {
+        // 기존 JS의 사업장 정보 갱신이 먼저 실행된 뒤 근무장소만 맞춰줌
+        setTimeout(syncWorkPlace, 0);
+      });
+    });
+  </script>
 </body>
 </html>
-
