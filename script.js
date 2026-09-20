@@ -760,12 +760,21 @@
 
       async function getHrApi(params){
         const query=new URLSearchParams();
+
+        // HR API는 ERP 공통 인증 토큰이 있어야 직원정보를 반환한다.
+        // 직원관리 화면(getApi)과 동일하게 홈 대시보드 조회에도 토큰을 전달한다.
+        const erpToken = (typeof erpGetToken === "function") ? erpGetToken() : null;
+        if(!erpToken){
+          throw new Error("ERP 로그인이 필요합니다.");
+        }
+
         Object.keys(params||{}).forEach(key=>{
           const value=params[key];
           if(value!==undefined && value!==null && String(value)!==""){
             query.set(key,String(value));
           }
         });
+        query.set("erpToken",erpToken);
         query.set("t",String(Date.now()));
 
         const controller=new AbortController();
