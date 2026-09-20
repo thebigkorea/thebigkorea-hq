@@ -227,6 +227,10 @@ function createContract() {
   setMessage("정규직 근로계약서가 생성되었습니다.");
 }
 
+function getErpToken_() {
+  return String(localStorage.getItem("thebigkorea_erp_session") || "").trim();
+}
+
 async function saveContractAndCreateLink(event) {
   const btn = event?.target || document.getElementById("saveBtn");
   const d = collectData();
@@ -243,8 +247,16 @@ async function saveContractAndCreateLink(event) {
   setMessage("계약 저장 및 직원 링크 생성 중입니다...");
 
   try {
+    const erpToken = getErpToken_();
+    if (!erpToken) {
+      alert("ERP 로그인 세션이 없습니다. ERP에서 다시 로그인해 주세요.");
+      setMessage("ERP 로그인이 필요합니다.");
+      return;
+    }
+
     const result = await postData({
       action: "saveContractDraft",
+      erpToken: erpToken,
       ...d,
       data: d,
       contract: d
@@ -258,7 +270,7 @@ async function saveContractAndCreateLink(event) {
     }
 
     currentContractId = result.contractId;
-    showLinkResult(result.contractId);
+    showLinkResult(result.contractId, result.contractUrl || "");
 
     setMessage("계약 저장 완료. 직원 링크가 생성되었습니다.");
     alert("계약 저장 및 직원 링크 생성이 완료되었습니다.");
@@ -663,25 +675,31 @@ function showPreviewHtml(title, rows, d) {
   `;
 }
 
-function showLinkResult(contractId) {
-  const link =
-    "https://thebigkorea.github.io/thebigkorea-hq/contract-view.html?id=" +
-    encodeURIComponent(contractId) +
-    "&v=" + Date.now();
+function showLinkResult(contractId, contractUrl) {
+  const link = String(contractUrl || "").trim();
 
   const box = document.getElementById("resultBox");
   if (box) {
-    // 링크 박스를 '계약 저장 및 직원 링크 생성' 버튼 바로 아래로 이동
     const buttons = document.querySelector(".buttons");
     if (buttons && box.parentNode) {
       buttons.insertAdjacentElement("afterend", box);
     }
 
     box.style.display = "block";
+
+    if (!link || !link.includes("&token=")) {
+      box.innerHTML = `
+        <strong>계약서는 저장되었지만 보안 링크를 확인할 수 없습니다.</strong><br>
+        계약번호 : ${escHtml(contractId)}<br>
+        관리자에게 문의해 주세요.
+      `;
+      return "";
+    }
+
     box.innerHTML = `
       <strong>계약서가 저장되었습니다.</strong><br>
       계약번호 : ${escHtml(contractId)}<br>
-      직원에게 아래 링크를 보내 전자서명을 진행하세요.
+      직원에게 아래 보안 링크를 보내 전자서명을 진행하세요.
       <input id="contractLink" value="${escHtml(link)}" readonly
              style="width:100%;box-sizing:border-box;margin:12px 0;padding:12px;">
       <button type="button" onclick="copyContractLink()"
