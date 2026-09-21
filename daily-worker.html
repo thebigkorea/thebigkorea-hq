@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
@@ -1506,6 +1506,11 @@
     const DW_TOKEN_KEY = "thebigkorea_daily_worker_session";
     const ERP_TOKEN_KEY = "thebigkorea_erp_session";
     let DW_ACCESS = null;
+    let DW_SELECTED_EXISTING_WORKER = false;
+
+    function dwIsAdmin() {
+      return !!(DW_ACCESS && DW_ACCESS.role === "admin");
+    }
 
     function dwGetStoreToken() {
       return localStorage.getItem(DW_TOKEN_KEY) || "";
@@ -1657,6 +1662,17 @@
       chip.style.display = "inline-flex";
       chip.textContent = isAdmin ? "본사 관리자" : (store || DW_ACCESS.label || "점포");
       logout.style.display = isAdmin ? "none" : "inline-flex";
+
+      if (!isAdmin) {
+        const rrn = document.getElementById("rrn");
+        const account = document.getElementById("account");
+        const editRrn = document.getElementById("editRrn");
+        const editAccount = document.getElementById("editAccount");
+        if (rrn) rrn.placeholder = "기존 근무자는 원본정보를 서버에서 안전하게 재사용";
+        if (account) account.placeholder = "기존 근무자는 원본 계좌정보를 서버에서 재사용";
+        if (editRrn) editRrn.placeholder = "보안상 점포 화면에는 표시하지 않음";
+        if (editAccount) editAccount.placeholder = "보안상 점포 화면에는 표시하지 않음";
+      }
 
       document.querySelectorAll('[data-page="unpaid"], [data-page="tax"]').forEach(function(el) {
         el.style.display = isAdmin ? "" : "none";
@@ -2779,6 +2795,7 @@ function renderJobSummary(list, totals) {
     function selectWorker(index) {
       const worker = (window.__workerSearchResults || [])[index];
       if (!worker) return;
+      DW_SELECTED_EXISTING_WORKER = true;
       fillWorker(worker);
       showNotice("searchNotice", "ok", worker.name + " 님의 기존 정보를 불러왔습니다.");
     }
@@ -2786,9 +2803,9 @@ function renderJobSummary(list, totals) {
     function fillWorker(worker) {
       document.getElementById("name").value = worker.name || "";
       document.getElementById("phone").value = formatPhone(worker.phone || "");
-      document.getElementById("rrn").value = worker.rrn || "";
+      document.getElementById("rrn").value = dwIsAdmin() ? (worker.rrn || "") : "";
       document.getElementById("bank").value = worker.bank || "";
-      document.getElementById("account").value = worker.account || "";
+      document.getElementById("account").value = dwIsAdmin() ? (worker.account || "") : "";
       document.getElementById("foreignIdMissing").checked = Boolean(worker.foreignIdMissing) || worker.identityStatus === "외국인등록증 미제출";
       document.getElementById("managementNo").value = worker.managementNo || "";
       toggleForeignIdFields();
@@ -2817,7 +2834,8 @@ function renderJobSummary(list, totals) {
         memo: document.getElementById("memo").value.trim(),
         payStatus: document.getElementById("payStatus").value,
         foreignIdMissing: document.getElementById("foreignIdMissing").checked,
-        managementNo: document.getElementById("managementNo").value.trim()
+        managementNo: document.getElementById("managementNo").value.trim(),
+        useStoredSensitiveInfo: !dwIsAdmin() && DW_SELECTED_EXISTING_WORKER
       };
 
       if (!data.name) {
@@ -2841,6 +2859,7 @@ function renderJobSummary(list, totals) {
           document.getElementById("keyword").value = "";
           document.getElementById("resultBox").innerHTML = "";
           ledgerData = [];
+          DW_SELECTED_EXISTING_WORKER = false;
         } else {
           showNotice("saveNotice", "err", json.message || "저장에 실패했습니다.");
         }
@@ -2858,6 +2877,7 @@ function renderJobSummary(list, totals) {
     }
 
     function clearForm() {
+      DW_SELECTED_EXISTING_WORKER = false;
       document.getElementById("keyword").value = "";
       document.getElementById("resultBox").innerHTML = "";
       clearNotice("searchNotice");
@@ -3294,9 +3314,9 @@ function downloadTaxCsv() {
       document.getElementById("editJob").value = item.job || "";
       document.getElementById("editAllowance").value = item.allowance || "";
       document.getElementById("editPayStatus").value = item.payStatus || "미지급";
-      document.getElementById("editRrn").value = item.rrn || "";
+      document.getElementById("editRrn").value = dwIsAdmin() ? (item.rrn || "") : "";
       document.getElementById("editBank").value = item.bank || "";
-      document.getElementById("editAccount").value = item.account || "";
+      document.getElementById("editAccount").value = dwIsAdmin() ? (item.account || "") : "";
       document.getElementById("editMemo").value = item.memo || "";
       document.getElementById("editForeignIdMissing").checked = Boolean(item.foreignIdMissing) || item.identityStatus === "외국인등록증 미제출";
       document.getElementById("editManagementNo").value = item.managementNo || "";
