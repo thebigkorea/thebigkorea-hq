@@ -210,6 +210,20 @@ function renderContractHtml(c, result, signature, isSigned) {
     contractType.includes("용역") ||
     contractType.includes("사업소득");
 
+  // 계약유형을 명확하게 구분한다.
+  // "근로계약서"라는 공통 문구의 "계약" 때문에 정규직이 아르바이트로
+  // 잘못 분류되지 않도록, 실제 유형명만 검사한다.
+  const isPartTime =
+    contractType.includes("아르바이트") ||
+    contractType.includes("파트타임") ||
+    contractType.includes("시간제");
+
+  const isFixedTerm =
+    contractType.includes("계약직") && !isPartTime;
+
+  const isRegular =
+    contractType.includes("정규직") || (!isService && !isPartTime && !isFixedTerm);
+
   if (isService) {
     return renderServiceView(c, result, signature, isSigned);
   }
@@ -242,10 +256,6 @@ function renderContractHtml(c, result, signature, isSigned) {
   const companyAddress = getVal(c, ["companyAddress"], "");
   const companyPhone = getVal(c, ["companyPhone"], "");
 
-  if (isService) {
-  return renderServiceView(c, result, signature, isSigned);
-}
-
   return `
     <h1>근 로 계 약 서</h1>
 
@@ -258,8 +268,7 @@ function renderContractHtml(c, result, signature, isSigned) {
     <h3>제1조 계약기간</h3>
 
 ${
-  contractType &&
-  contractType.includes("계약")
+  isFixedTerm
   ? `
     <p>계약 시작일 : ${c.startDate || c.contractStartDate || ""}</p>
     <p>계약 종료일 : ${c.endDate || c.contractEndDate || ""}</p>
@@ -299,7 +308,7 @@ ${
 
     
    ${
-  contractType && contractType.includes("계약")
+  isPartTime
   ? `
 
 <h3>제5조 임금</h3>
