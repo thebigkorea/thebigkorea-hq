@@ -32,16 +32,14 @@
     </select>
 
     <label>공지 이미지</label>
-     <select id="noticeType">
-
-     <option value="main">일반공지</option>
-     <option value="emergency">긴급공지</option>
-     <option value="hygiene">위생점검안내</option>
-     <option value="hr">인사공지</option>
-     <option value="sales">매출공지</option>
-     <option value="discipline">인사복무</option>
-
-     </select>
+    <select id="noticeType">
+      <option value="main">일반공지</option>
+      <option value="emergency">긴급공지</option>
+      <option value="hygiene">위생점검안내</option>
+      <option value="hr">인사공지</option>
+      <option value="sales">매출공지</option>
+      <option value="discipline">인사복무</option>
+    </select>
 
     <label>대상</label>
     <select id="target">
@@ -57,15 +55,56 @@
     <label>내용</label>
     <textarea id="content" placeholder="공지 내용을 입력하세요"></textarea>
 
-    <label>첨부파일 링크</label>
-     <input id="fileUrl" type="url"
-      placeholder="구글드라이브 공유 링크를 붙여넣으세요">
+    <!-- 첨부파일 -->
+    <div class="form-group">
+      <label for="fileUrl">📎 첨부파일 링크</label>
 
-    
-    <label>공지 종료일</label>
-     <input id="expireDate" type="date">
+      <div style="display:flex;gap:10px;align-items:center;">
+        <input
+          id="fileUrl"
+          type="url"
+          placeholder="Google Drive 공유 링크를 붙여넣으세요"
+          style="flex:1;"
+        >
 
-    
+        <button
+          type="button"
+          onclick="window.open('https://drive.google.com/drive/my-drive','_blank')"
+          style="width:auto;height:44px;padding:0 18px;background:#1f3d68;white-space:nowrap;font-size:14px;border-radius:10px;"
+        >
+          Google Drive 열기
+        </button>
+      </div>
+
+      <div style="margin-top:10px;padding:14px 16px;background:#f6f8fb;border:1px solid #dbe3ee;border-radius:10px;font-size:13px;line-height:1.8;color:#475569;">
+        <strong style="color:#1f3d68;">📎 첨부파일 등록 방법</strong><br>
+        ① 위의 <b>Google Drive 열기</b>를 누릅니다.<br>
+        ② Google Drive에 PDF·엑셀·한글·워드·이미지 등의 파일을 올립니다.<br>
+        ③ 업로드한 파일을 마우스 오른쪽 버튼으로 누르고 <b>공유</b>를 선택합니다.<br>
+        ④ 일반 액세스를 <b>링크가 있는 모든 사용자</b>로 변경합니다.<br>
+        ⑤ <b>링크 복사</b>를 누른 뒤 위 첨부파일 링크 칸에 붙여넣습니다.
+      </div>
+    </div>
+
+    <!-- 공지 종료일 -->
+    <div class="form-group" style="margin-top:22px;">
+      <label for="expireDate">📅 공지 종료일</label>
+
+      <div style="position:relative;">
+        <input
+          id="expireDate"
+          type="date"
+          style="width:100%;padding-right:50px;cursor:pointer;"
+          title="공지사항을 표시할 마지막 날짜를 선택하세요"
+        >
+      </div>
+
+      <div style="margin-top:7px;font-size:12px;color:#64748b;">
+        📅 날짜를 선택하면 해당 날짜까지 공지가 표시됩니다.
+        종료일이 필요하지 않으면 비워두세요.
+      </div>
+    </div>
+
     <label>중요 공지</label>
     <select id="important">
       <option value="N">아니오</option>
@@ -87,8 +126,7 @@
 
 </main>
 
-<script src="notice.js"></script>
+<script src="notice.js?v=20260922-1"></script>
 
 </body>
 </html>
-

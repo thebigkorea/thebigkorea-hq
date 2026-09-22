@@ -1,7 +1,7 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycby8SCh-WsBXjBp1V-WsVKomUSWxlsWsnCUIMtNA8xTCNcnOqVGaQ-GCvyNY7XnzoLGgug/exec";
 
-  let ALL_NOTICES = [];
+let ALL_NOTICES = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   loadNotices();
@@ -22,7 +22,6 @@ async function loadNotices(){
     }
 
     ALL_NOTICES = data.notices || [];
-
     renderNotices(ALL_NOTICES);
 
   }catch(err){
@@ -41,14 +40,13 @@ function renderNotices(list){
 
   box.innerHTML = list.map(n => {
 
-    const important =
-      n.important === "Y";
+    const important = n.important === "Y";
 
     return `
       <div class="notice-item">
         <div class="notice-top">
           <span class="badge ${important ? "red" : ""}">
-            ${important ? "중요" : n.category}
+            ${important ? "중요" : escapeHtml(n.category)}
           </span>
           <span>${formatDate(n.createdAt)}</span>
         </div>
@@ -62,22 +60,22 @@ function renderNotices(list){
         </div>
 
         <div class="notice-info">
-          구분: ${n.category} /
-          대상: ${n.target} /
-          작성자: ${n.writer}
+          구분: ${escapeHtml(n.category)} /
+          대상: ${escapeHtml(n.target)} /
+          작성자: ${escapeHtml(n.writer)}
         </div>
 
         <div class="notice-buttons">
 
-         <button class="delete-btn"
-          onclick="deleteNotice('${n.noticeId}')">
-          삭제
-         </button>
+          <button class="delete-btn"
+            onclick="deleteNotice('${n.noticeId}')">
+            삭제
+          </button>
 
-         <button class="kakao-btn"
-         onclick="copyNoticeLink('${n.noticeId}')">
-         링크 복사
-         </button>
+          <button class="kakao-btn"
+            onclick="copyNoticeLink('${n.noticeId}')">
+            링크 복사
+          </button>
 
         </div>
       </div>
@@ -100,22 +98,19 @@ async function saveNotice(){
     document.getElementById("content").value.trim();
 
   const expireDate =
-    document.getElementById("expireDate").value;  
+    document.getElementById("expireDate").value;
 
   const important =
     document.getElementById("important").value;
 
   const writer =
-  document.getElementById("writer").value.trim()
-  || "관리자";
+    document.getElementById("writer").value.trim() || "관리자";
 
   const noticeType =
-  document.getElementById("noticeType").value;
+    document.getElementById("noticeType").value;
 
   const fileUrl =
-  document.getElementById("fileUrl").value.trim();
-
-      
+    document.getElementById("fileUrl").value.trim();
 
   if(!title){
     alert("제목을 입력하세요.");
@@ -147,17 +142,18 @@ async function saveNotice(){
     const data = await res.json();
 
     if(data.success){
-  alert("공지사항이 등록되었습니다.");
+      alert("공지사항이 등록되었습니다.");
 
-  document.getElementById("title").value = "";
-  document.getElementById("content").value = "";
-  document.getElementById("important").value = "N";
-  document.getElementById("fileUrl").value = "";
+      document.getElementById("title").value = "";
+      document.getElementById("content").value = "";
+      document.getElementById("important").value = "N";
+      document.getElementById("fileUrl").value = "";
+      document.getElementById("expireDate").value = "";
 
-  await loadNotices();
-}else{
-  alert(data.message || "등록 실패");
-}
+      await loadNotices();
+    }else{
+      alert(data.message || "등록 실패");
+    }
 
   }catch(err){
     alert("서버 연결 오류가 발생했습니다.");
@@ -247,6 +243,7 @@ function getNoticeImage(type){
 
   return base + "notice-main.png";
 }
+
 function copyNoticeLink(noticeId){
 
   const notice =
@@ -273,23 +270,4 @@ ${url}`;
     .catch(() => {
       prompt("아래 내용을 복사하세요.", text);
     });
-}
-function fileToBase64(file){
-
-  return new Promise((resolve,reject) => {
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      resolve({
-        name: file.name,
-        type: file.type,
-        data: reader.result.split(",")[1]
-      });
-    };
-
-    reader.onerror = reject;
-
-    reader.readAsDataURL(file);
-  });
 }
