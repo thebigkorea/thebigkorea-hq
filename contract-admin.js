@@ -182,36 +182,136 @@ function displayContractType(type) {
 }
 
 async function openContract(contractId) {
-  const result = await postData({
-    action: "getContractById",
-    contractId
-  });
-
-  if (!result.success) {
-    alert(result.message || "계약서를 불러오지 못했습니다.");
+  if (!contractId) {
+    alert("계약번호가 없습니다.");
     return;
   }
 
-  selectedContract = result;
+  // 즉시 로딩창 표시
+  const modal = document.getElementById("modal");
+  const detail = document.getElementById("contractDetail");
 
-  const contractType =
-    result.contractType ||
-    (result.contract && result.contract.contractType) ||
-    "";
+  if (detail) {
+    detail.innerHTML = `
+      <div style="
+        text-align:center;
+        padding:70px 20px;
+        font-size:16px;
+        color:#23456f;
+      ">
+        <div style="
+          font-size:30px;
+          margin-bottom:15px;
+        ">⏳</div>
 
-  const isPart =
-    String(contractType).includes("계약직") ||
-    String(contractType).includes("아르바이트");
+        <strong>계약서 원본을 불러오는 중입니다.</strong>
 
-  const isService =
-    String(contractType).includes("용역") ||
-    String(contractType).includes("사업소득");
+        <div style="
+          margin-top:8px;
+          font-size:13px;
+          color:#777;
+        ">
+          계약번호 : ${contractId}
+        </div>
+      </div>
+    `;
+  }
 
-  renderContractDetail(result, isPart, isService);
+  if (modal) {
+    modal.style.display = "block";
+  }
 
-  document.getElementById("modal").style.display = "block";
+  try {
+
+    const result = await postData({
+      action: "getContractById",
+      contractId: contractId
+    });
+
+    console.log(
+      "getContractById 응답:",
+      result
+    );
+
+    if (!result) {
+      throw new Error(
+        "계약서 서버에서 응답이 없습니다."
+      );
+    }
+
+    if (
+      result.success === false ||
+      result.ok === false
+    ) {
+      throw new Error(
+        result.message ||
+        "계약서를 불러오지 못했습니다."
+      );
+    }
+
+    selectedContract = result;
+
+    const contractType =
+      result.contractType ||
+      (result.contract &&
+        result.contract.contractType) ||
+      "";
+
+    const isPart =
+      String(contractType).includes("계약직") ||
+      String(contractType).includes("아르바이트");
+
+    const isService =
+      String(contractType).includes("용역") ||
+      String(contractType).includes("사업소득");
+
+    renderContractDetail(
+      result,
+      isPart,
+      isService
+    );
+
+  } catch (error) {
+
+    console.error(
+      "계약서 원본 조회 오류:",
+      error
+    );
+
+    if (detail) {
+      detail.innerHTML = `
+        <div style="
+          padding:50px 20px;
+          text-align:center;
+        ">
+          <div style="
+            font-size:30px;
+            margin-bottom:15px;
+          ">⚠️</div>
+
+          <strong>
+            계약서를 불러오지 못했습니다.
+          </strong>
+
+          <p style="
+            margin-top:12px;
+            color:#b42318;
+          ">
+            ${error.message || "알 수 없는 오류"}
+          </p>
+
+          <p style="
+            margin-top:15px;
+            font-size:13px;
+            color:#777;
+          ">
+            계약번호 : ${contractId}
+          </p>
+        </div>
+      `;
+    }
+  }
 }
-
 function renderContractDetail(result, isPart, isService) {
   const c = result.contract || {};
   const signature = result.signature || "";
