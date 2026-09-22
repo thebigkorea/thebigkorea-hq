@@ -49,6 +49,7 @@ async function loadNotices(){
 
     ALL_NOTICES = data.notices || [];
     renderNotices(ALL_NOTICES);
+
   }catch(err){
     console.error(err);
     box.innerHTML = '<div class="empty">서버 연결 오류가 발생했습니다.</div>';
@@ -131,7 +132,6 @@ async function saveNotice(){
 
   try{
     saveBtn.disabled = true;
-    saveBtn.classList.add("saving");
     saveBtn.querySelector("span").textContent = "등록 중...";
 
     const res = await fetch(API_URL, {
@@ -165,12 +165,12 @@ async function saveNotice(){
     }else{
       alert(data.message || "등록 실패");
     }
+
   }catch(err){
     console.error(err);
     alert("서버 연결 오류가 발생했습니다.");
   }finally{
     saveBtn.disabled = false;
-    saveBtn.classList.remove("saving");
     saveBtn.querySelector("span").textContent = "공지 등록";
   }
 }
@@ -212,11 +212,13 @@ function normalizeNoticeType(type, category){
     "매출공지":"sales",
     "인사복무":"discipline"
   };
+
   return map[category] || "main";
 }
 
 function getNoticeImage(type){
   const base = "https://thebigkorea.github.io/thebigkorea-hq/images/";
+
   const files = {
     main:"notice-main.png",
     emergency:"notice-emergency.png",
@@ -225,6 +227,7 @@ function getNoticeImage(type){
     sales:"notice-sales.png",
     discipline:"notice-discipline.png"
   };
+
   return base + (files[type] || files.main);
 }
 
@@ -233,29 +236,48 @@ function openAttachment(url){
   window.open(url, "_blank", "noopener");
 }
 
+/*
+  중요:
+  이제 GitHub notice-view.html 주소를 바로 복사하지 않습니다.
+  Apps Script의 shareNotice 주소를 복사해야 카카오톡이
+  공지별 og:image를 읽을 수 있습니다.
+*/
 function copyNoticeLink(noticeId){
-  const notice = ALL_NOTICES.find(n => n.noticeId === noticeId);
+  const notice =
+    ALL_NOTICES.find(n => String(n.noticeId) === String(noticeId));
 
   if(!notice){
     alert("공지 정보를 찾을 수 없습니다.");
     return;
   }
 
-  const url =
-    "https://thebigkorea.github.io/thebigkorea-hq/notice-view.html?id=" +
+  const shareUrl =
+    API_URL +
+    "?action=shareNotice&id=" +
     encodeURIComponent(noticeId);
 
-  const text = `${notice.title}\n\n${url}`;
+  const text =
+`${notice.title}
+
+${shareUrl}`;
 
   navigator.clipboard.writeText(text)
-    .then(() => alert("공지 링크가 복사되었습니다."))
-    .catch(() => prompt("아래 내용을 복사하세요.", text));
+    .then(() => {
+      alert("공지 링크가 복사되었습니다.\n카카오톡에 붙여넣으면 공지 유형별 미리보기 이미지가 적용됩니다.");
+    })
+    .catch(() => {
+      prompt("아래 내용을 복사하세요.", text);
+    });
 }
 
 function formatDate(value){
   if(!value) return "";
+
   const d = new Date(value);
-  if(isNaN(d.getTime())) return value;
+
+  if(isNaN(d.getTime())){
+    return value;
+  }
 
   return d.toLocaleDateString("ko-KR", {
     year:"numeric",
