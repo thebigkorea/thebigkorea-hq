@@ -595,16 +595,51 @@ function copyViewLink(link, contractId) {
 }
 
 function makeViewLink(link, contractId) {
-  let id = contractId || "";
+  const rawLink = String(link || "").trim();
 
-  if (!id && link) {
-    const match = link.match(/[?&]id=([^&]+)/);
-    if (match) id = decodeURIComponent(match[1]);
+  // 서버에 저장된 정상 계약서 URL이 있으면
+  // token을 포함한 원본 URL을 그대로 사용한다.
+  if (rawLink) {
+    try {
+      const url = new URL(rawLink);
+
+      const id =
+        url.searchParams.get("id") ||
+        contractId ||
+        "";
+
+      const token =
+        url.searchParams.get("token") ||
+        "";
+
+      if (id && token) {
+        return (
+          "https://thebigkorea.github.io/thebigkorea-hq/contract-view.html" +
+          "?id=" +
+          encodeURIComponent(id) +
+          "&token=" +
+          encodeURIComponent(token) +
+          "&v=" +
+          Date.now()
+        );
+      }
+    } catch (e) {
+      console.warn("계약서 링크 분석 실패", e);
+    }
   }
 
-  if (!id) return "";
+  // 보안토큰이 없는 링크는 새로 만들어 주지 않는다.
+  // 계약번호만 있는 링크를 만들면 보안검증에서 차단되므로
+  // 빈 값으로 반환한다.
+  console.error(
+    "계약서 공개토큰이 없습니다.",
+    {
+      contractId: contractId,
+      link: rawLink
+    }
+  );
 
-  return `https://thebigkorea.github.io/thebigkorea-hq/contract-view.html?id=${encodeURIComponent(id)}&v=${Date.now()}`;
+  return "";
 }
 
 function copyText(text) {
