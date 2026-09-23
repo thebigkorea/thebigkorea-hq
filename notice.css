@@ -8,3 +8,58 @@
   height:190px !important;
   resize:vertical;
 }
+/* ==================================================
+   공지 작성 입력영역 최종 보정
+   ================================================== */
+
+.content-panel .field > span{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:7px;
+  font-size:13px;
+  font-weight:800;
+  color:#26364d;
+}
+
+/* 공지 제목 */
+.title-field{
+  margin-top:15px;
+}
+
+#title{
+  width:100%;
+}
+
+/* 공지 내용 */
+.content-field{
+  margin-top:15px;
+}
+
+#content{
+  width:100%;
+  min-height:190px !important;
+  height:190px !important;
+  padding:15px 16px;
+  line-height:1.7;
+  resize:vertical;
+  background:#fff;
+  border:1px solid #dce3ec;
+  border-radius:12px;
+  font-family:inherit;
+  font-size:14px;
+  transition:border-color .18s ease, box-shadow .18s ease;
+}
+
+#content:focus{
+  outline:none;
+  border-color:#607b9f;
+  box-shadow:0 0 0 3px rgba(63,91,129,.08);
+}
+
+@media(max-width:700px){
+  #content{
+    min-height:170px !important;
+    height:170px !important;
+  }
+}
