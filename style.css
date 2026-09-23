@@ -1724,3 +1724,32 @@ button{cursor:pointer}
     min-width:0 !important;
   }
 }
+/* =========================================
+   상단 기준월 · 새로고침 · 로그아웃 높이 통일
+========================================= */
+
+.month-picker,
+.refresh-btn,
+.logout-btn{
+  height:52px !important;
+  min-height:52px !important;
+  box-sizing:border-box !important;
+}
+
+/* 기준월 */
+.month-picker{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+/* 새로고침 / 로그아웃 */
+.refresh-btn,
+.logout-btn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding-top:0 !important;
+  padding-bottom:0 !important;
+  line-height:1 !important;
+}
