@@ -13,6 +13,7 @@ let noticesCache = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   bindTypeCards();
+  bindSearch();
   loadNotices();
 });
 
@@ -33,9 +34,37 @@ function bindTypeCards() {
 
       if (categoryEl) categoryEl.value = selectedCategory;
       if (typeEl) typeEl.value = selectedNoticeType;
-      if (textEl) textEl.textContent =
-        card.querySelector("b")?.textContent || selectedCategory;
+      if (textEl) {
+        textEl.textContent =
+          card.querySelector("b")?.textContent || selectedCategory;
+      }
     });
+  });
+}
+
+function bindSearch() {
+  const input = document.getElementById("noticeSearch");
+  if (!input) return;
+
+  input.addEventListener("input", () => {
+    const q = input.value.trim().toLowerCase();
+
+    if (!q) {
+      renderNotices(noticesCache);
+      return;
+    }
+
+    const filtered = noticesCache.filter(n => {
+      return [
+        n.title,
+        n.content,
+        n.category,
+        n.target,
+        n.writer
+      ].some(v => String(v || "").toLowerCase().includes(q));
+    });
+
+    renderNotices(filtered);
   });
 }
 
@@ -55,7 +84,6 @@ async function apiPost(payload) {
 
 async function saveNotice() {
   const btn = document.getElementById("saveBtn");
-
   const title = document.getElementById("title")?.value.trim() || "";
   const content = document.getElementById("content")?.value.trim() || "";
 
@@ -107,10 +135,12 @@ async function saveNotice() {
   } catch (err) {
     console.error(err);
     alert("공지 등록 중 오류가 발생했습니다.\n" + err.message);
+
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = "<b>공지 등록</b><span>선택한 유형으로 직원에게 전달</span>";
+      btn.innerHTML =
+        "<b>공지 등록</b><span>선택한 유형으로 직원에게 전달</span>";
     }
   }
 }
@@ -119,7 +149,8 @@ async function loadNotices() {
   const listEl = document.getElementById("noticeList");
   if (!listEl) return;
 
-  listEl.innerHTML = '<div class="loading">공지사항을 불러오는 중입니다...</div>';
+  listEl.innerHTML =
+    '<div class="loading">공지사항을 불러오는 중입니다...</div>';
 
   try {
     const response = await fetch(
@@ -138,6 +169,10 @@ async function loadNotices() {
     }
 
     noticesCache = Array.isArray(data.notices) ? data.notices : [];
+
+    const search = document.getElementById("noticeSearch");
+    if (search) search.value = "";
+
     renderNotices(noticesCache);
 
   } catch (err) {
@@ -153,13 +188,18 @@ function renderNotices(list) {
 
   if (!list.length) {
     listEl.innerHTML =
-      '<div class="loading">등록된 공지사항이 없습니다.</div>';
+      '<div class="empty">조건에 맞는 공지사항이 없습니다.</div>';
     return;
   }
 
   listEl.innerHTML = list.map(n => {
     const viewUrl =
       NOTICE_VIEW_BASE + "?id=" + encodeURIComponent(n.noticeId || "");
+
+    const important =
+      String(n.important || "").toUpperCase() === "Y"
+        ? '<span class="notice-badge" style="background:#fff0f0;color:#c92a2a">중요</span>'
+        : "";
 
     return `
       <article class="notice-item">
@@ -170,6 +210,7 @@ function renderNotices(list) {
         <div class="notice-info">
           <div class="notice-topline">
             <span class="notice-badge">${escapeHtml(n.category || "공지사항")}</span>
+            ${important}
             <span class="notice-date">${escapeHtml(formatDisplayDate(n.createdAt))}</span>
           </div>
 
@@ -177,34 +218,43 @@ function renderNotices(list) {
           <p>${escapeHtml(n.content || "")}</p>
 
           <div class="notice-meta">
-            대상 ${escapeHtml(n.target || "전체 직원")}
-            &nbsp; 작성자 ${escapeHtml(n.writer || "관리자")}
-            ${n.expireDate ? "&nbsp; 종료 " + escapeHtml(n.expireDate) : ""}
+            <span class="meta-item">♙ 대상 ${escapeHtml(n.target || "전체 직원")}</span>
+            <span class="meta-item">♙ 작성자 ${escapeHtml(n.writer || "관리자")}</span>
+            ${n.expireDate
+              ? `<span class="meta-item">▣ 종료 ${escapeHtml(n.expireDate)}</span>`
+              : ""}
           </div>
+        </div>
 
-          <div class="notice-actions">
-            <a class="action-btn primary-action"
-               href="${viewUrl}"
-               target="_blank"
-               rel="noopener">공지 확인하기</a>
+        <div class="notice-actions">
+          <a class="action-btn primary-action"
+             href="${viewUrl}"
+             target="_blank"
+             rel="noopener">
+             ◉ 공지 확인하기 <span aria-hidden="true">›</span>
+          </a>
 
+          <div class="secondary-actions">
             ${n.fileUrl ? `
               <a class="action-btn"
                  href="${escapeHtml(n.fileUrl)}"
                  target="_blank"
                  rel="noopener">📎 첨부파일</a>
-            ` : ""}
+            ` : `
+              <button class="action-btn" type="button" disabled
+                      style="opacity:.45;cursor:default">📎 첨부없음</button>
+            `}
 
             <button type="button"
                     class="action-btn"
                     onclick="copyNoticeLink('${escapeJs(n.noticeId)}','${escapeJs(n.noticeType)}')">
-              링크 복사
+              🔗 링크 복사
             </button>
 
             <button type="button"
                     class="action-btn delete-action"
                     onclick="deleteNotice('${escapeJs(n.noticeId)}')">
-              삭제
+              🗑 삭제
             </button>
           </div>
         </div>
@@ -237,6 +287,7 @@ async function copyNoticeLink(noticeId, noticeType) {
   try {
     await navigator.clipboard.writeText(shareUrl);
     alert("카카오톡 공유용 링크를 복사했습니다.");
+
   } catch (err) {
     const ta = document.createElement("textarea");
     ta.value = shareUrl;
@@ -246,6 +297,7 @@ async function copyNoticeLink(noticeId, noticeType) {
     ta.select();
     document.execCommand("copy");
     ta.remove();
+
     alert("카카오톡 공유용 링크를 복사했습니다.");
   }
 }
@@ -264,6 +316,7 @@ async function deleteNotice(noticeId) {
     }
 
     await loadNotices();
+
   } catch (err) {
     console.error(err);
     alert("삭제 중 오류가 발생했습니다.\n" + err.message);
@@ -274,6 +327,7 @@ function formatDisplayDate(value) {
   if (!value) return "";
 
   const d = new Date(String(value).replace(" ", "T"));
+
   if (isNaN(d.getTime())) {
     return String(value).substring(0, 10).replaceAll("-", ". ") + ".";
   }
