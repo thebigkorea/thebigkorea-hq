@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>공지사항 | 더큰코리아 인트라넷</title>
-  <link rel="stylesheet" href="notice.css?v=20260923-10">
+  <link rel="stylesheet" href="notice.css?v=20260923-11">
   <script src="erp-auth.js"></script>
 </head>
 <body>
@@ -12,186 +12,103 @@
 <header class="top">
   <div class="top-inner">
     <button class="back" onclick="history.back()" aria-label="뒤로가기">←</button>
-
     <div class="top-copy">
       <div class="eyebrow">THE BIG KOREA · INTRANET</div>
       <h1>공지사항</h1>
       <p>전사 공지를 등록하고 직원에게 전달합니다.</p>
     </div>
-
     <div class="top-brand" aria-hidden="true">
       <div class="brand-mark">BK</div>
-      <div class="brand-text">
-        <b>더큰코리아</b>
-        <span>THE BIG KOREA</span>
-      </div>
+      <div class="brand-text"><b>더큰코리아</b><span>THE BIG KOREA</span></div>
     </div>
   </div>
 </header>
 
 <main class="wrap">
-
   <div class="notice-compose-grid">
-<section class="panel type-panel">
-    <div class="section-title">
-      <span class="step">01</span>
-      <div>
-        <h2>공지 유형 선택</h2>
-        <p>전달할 공지의 성격을 선택하세요. 직원용 공지 화면에는 선택한 유형의 이미지가 표시됩니다.</p>
-      </div>
-    </div>
-
-    <div class="type-grid">
-      <button type="button" class="type-card active" data-category="공지사항" data-type="main">
-        <span class="type-icon">📢</span><b>일반공지</b><small>일반 안내 및 전달사항</small>
-      </button>
-      <button type="button" class="type-card" data-category="긴급공지" data-type="emergency">
-        <span class="type-icon">🚨</span><b>긴급공지</b><small>즉시 확인이 필요한 내용</small>
-      </button>
-      <button type="button" class="type-card" data-category="위생점검안내" data-type="hygiene">
-        <span class="type-icon">🧼</span><b>위생점검</b><small>위생·점검·교육 안내</small>
-      </button>
-      <button type="button" class="type-card" data-category="인사공지" data-type="hr">
-        <span class="type-icon">👥</span><b>인사공지</b><small>승진·발령·인사 안내</small>
-      </button>
-      <button type="button" class="type-card" data-category="매출공지" data-type="sales">
-        <span class="type-icon">📈</span><b>매출공지</b><small>매출 및 영업 관련 안내</small>
-      </button>
-      <button type="button" class="type-card" data-category="인사복무" data-type="discipline">
-        <span class="type-icon">📋</span><b>인사복무</b><small>근무기강·출퇴근 안내</small>
-      </button>
-    </div>
-
-    <input type="hidden" id="category" value="공지사항">
-    <input type="hidden" id="noticeType" value="main">
-
-    <div class="selected-line">
-      현재 선택: <b id="selectedTypeText">일반공지</b>
-    </div>
-  </section>
-
-  <section class="panel content-panel">
-    <div class="section-title">
-      <span class="step">02</span>
-      <div>
-        <h2>공지 내용 작성</h2>
-        <p>공지 대상과 제목, 전달 내용을 입력하세요.</p>
-      </div>
-    </div>
-
-    <div class="form-grid two">
-      <div class="field">
-        <label for="target">대상</label>
-        <select id="target">
-          <option value="전체 직원">전체 직원</option>
-          <option value="홀 직원">홀 직원</option>
-          <option value="주방 직원">주방 직원</option>
-          <option value="관리자">관리자</option>
-        </select>
+    <section class="panel type-panel">
+      <div class="section-title">
+        <span class="step">01</span>
+        <div><h2>공지 유형 선택</h2><p>전달할 공지 유형을 선택하세요.</p></div>
       </div>
 
-      <div class="field">
-        <label for="important">중요 공지</label>
-        <select id="important">
-          <option value="N">아니오</option>
-          <option value="Y">예</option>
-        </select>
+      <div class="type-grid">
+        <button type="button" class="type-card active" data-category="공지사항" data-type="main"><span class="type-icon">📢</span><b>일반공지</b><small>일반 안내 및 전달사항</small></button>
+        <button type="button" class="type-card" data-category="긴급공지" data-type="emergency"><span class="type-icon">🚨</span><b>긴급공지</b><small>즉시 확인이 필요한 내용</small></button>
+        <button type="button" class="type-card" data-category="위생점검안내" data-type="hygiene"><span class="type-icon">🧼</span><b>위생점검</b><small>위생·점검·교육 안내</small></button>
+        <button type="button" class="type-card" data-category="인사공지" data-type="hr"><span class="type-icon">👥</span><b>인사공지</b><small>승진·발령·인사 안내</small></button>
+        <button type="button" class="type-card" data-category="매출공지" data-type="sales"><span class="type-icon">📈</span><b>매출공지</b><small>매출 및 영업 관련 안내</small></button>
+        <button type="button" class="type-card" data-category="인사복무" data-type="discipline"><span class="type-icon">📋</span><b>인사복무</b><small>근무기강·출퇴근 안내</small></button>
       </div>
-    </div>
+      <input type="hidden" id="category" value="공지사항">
+      <input type="hidden" id="noticeType" value="main">
+      <div class="selected-line">현재 선택: <b id="selectedTypeText">일반공지</b></div>
+    </section>
 
-    <div class="field">
-      <label for="title">제목</label>
-      <input id="title" type="text" placeholder="예: 10월 승진 인사 안내">
-    </div>
+    <section class="panel content-panel">
+      <div class="section-title">
+        <span class="step">02</span>
+        <div><h2>공지 내용 작성</h2><p>공지 대상과 제목, 전달 내용을 입력하세요.</p></div>
+      </div>
+      <div class="form-grid two">
+        <div class="field"><label for="target">대상</label><select id="target"><option value="전체 직원">전체 직원</option><option value="홀 직원">홀 직원</option><option value="주방 직원">주방 직원</option><option value="관리자">관리자</option></select></div>
+        <div class="field"><label for="important">중요 공지</label><select id="important"><option value="N">아니오</option><option value="Y">예</option></select></div>
+      </div>
+      <div class="field"><label for="title">제목</label><input id="title" type="text" placeholder="예: 10월 승진 인사 안내"></div>
+      <div class="field"><label for="content">내용</label><textarea id="content" placeholder="직원에게 전달할 공지 내용을 입력하세요"></textarea></div>
+    </section>
+  </div>
 
-    <div class="field">
-      <label for="content">내용</label>
-      <textarea id="content" placeholder="직원에게 전달할 공지 내용을 입력하세요"></textarea>
-    </div>
-  </section>
-</div>
-
-  <section class="panel">
+  <section class="panel setting-panel">
     <div class="section-title">
       <span class="step">03</span>
-      <div>
-        <h2>첨부파일 · 게시 설정</h2>
-        <p>필요한 경우 Google Drive 파일을 연결하고 공지 종료일을 지정하세요.</p>
-      </div>
+      <div><h2>첨부파일 · 게시 설정</h2><p>필요한 경우 Google Drive 파일을 연결하고 공지 종료일을 지정하세요.</p></div>
     </div>
-
     <div class="field">
       <label for="fileUrl">📎 첨부파일 링크</label>
       <div class="drive-row">
         <input id="fileUrl" type="url" placeholder="Google Drive 공유 링크를 붙여넣으세요">
-        <button class="drive-btn" type="button"
-          onclick="window.open('https://drive.google.com/drive/my-drive','_blank','noopener')">
-          Google Drive 열기
-        </button>
+        <button class="drive-btn" type="button" onclick="window.open('https://drive.google.com/drive/my-drive','_blank','noopener')">Google Drive 열기</button>
       </div>
     </div>
-
     <details class="help-box">
       <summary>📎 Google Drive 파일 올리기 · 첨부방법</summary>
       <div class="help-content">
-        <p><b>① 「Google Drive 열기」</b> 버튼을 누릅니다.</p>
-        <p><b>② 왼쪽 위 「+ 신규」</b> 버튼을 누릅니다.</p>
-        <p><b>③ 「파일 업로드」</b>를 누르고 공지에 첨부할 파일을 선택합니다.</p>
-        <p><b>④ 업로드 완료 후 파일명을 클릭</b>합니다.</p>
-        <p><b>⑤ 오른쪽 위 「공유」</b> 버튼을 누릅니다.</p>
-        <p><b>⑥ 직원들이 열람할 수 있도록 공유 범위를 확인</b>합니다.</p>
-        <p><b>⑦ 「링크 복사」 후 이 화면의 첨부파일 링크 칸에 붙여넣기</b>합니다.</p>
-        <div class="warning">
-          ⚠ 제한된 링크는 다른 직원이 파일을 열지 못할 수 있습니다. 등록 전 링크가 정상적으로 열리는지 확인해 주세요.
-        </div>
+        <p><b>① Google Drive 열기</b> → 파일 업로드</p>
+        <p><b>② 업로드한 파일의 공유 설정</b>을 확인합니다.</p>
+        <p><b>③ 링크 복사</b> 후 위 첨부파일 링크 칸에 붙여넣습니다.</p>
+        <div class="warning">⚠ 제한된 링크는 다른 직원이 열지 못할 수 있으므로 등록 전 확인해 주세요.</div>
       </div>
     </details>
-
     <div class="form-grid two settings-row">
-      <div class="field">
-        <label for="expireDate">📅 공지 종료일</label>
-        <input id="expireDate" type="date">
-        <small>비워두면 종료일 없이 계속 게시됩니다.</small>
-      </div>
-
-      <div class="field">
-        <label for="writer">작성자</label>
-        <input id="writer" type="text" value="관리자">
-      </div>
+      <div class="field"><label for="expireDate">📅 공지 종료일</label><input id="expireDate" type="date"><small>비워두면 종료일 없이 계속 게시됩니다.</small></div>
+      <div class="field"><label for="writer">작성자</label><input id="writer" type="text" value="관리자"></div>
     </div>
-
-    <button id="saveBtn" class="primary" type="button" onclick="saveNotice()">
-      <b>공지 등록</b>
-      <span>선택한 유형으로 직원에게 전달</span>
-    </button>
+    <button id="saveBtn" class="primary" type="button" onclick="saveNotice()"><b>공지 등록</b><span>선택한 유형으로 직원에게 전달</span></button>
   </section>
 
   <section class="panel list-panel">
     <div class="list-head">
       <div class="section-title no-margin">
         <span class="step">04</span>
-        <div>
-          <h2>공지 목록</h2>
-          <p>등록된 공지사항을 확인하고 관리할 수 있습니다.</p>
-        </div>
+        <div><h2>공지 목록</h2><p>진행중 공지를 기본 표시합니다. 유형 또는 제목 하나만으로도 검색할 수 있습니다.</p></div>
       </div>
-
       <div class="list-tools">
-        <label class="search-box">
-          <span>⌕</span>
-          <input id="noticeSearch" type="search" placeholder="제목·내용 검색">
-        </label>
-        <button class="refresh-btn" type="button" onclick="loadNotices()">↻ 새로고침</button>
+        <select id="noticeTypeFilter" class="filter-control" aria-label="공지 유형">
+          <option value="all">전체 유형</option><option value="main">일반공지</option><option value="emergency">긴급공지</option><option value="hygiene">위생점검</option><option value="hr">인사공지</option><option value="sales">매출공지</option><option value="discipline">인사복무</option>
+        </select>
+        <input id="noticeTitleSearch" class="filter-control title-search" type="search" placeholder="공지 제목 검색" autocomplete="off">
+        <select id="noticeStatusFilter" class="filter-control" aria-label="게시 상태">
+          <option value="active" selected>진행중 공지</option><option value="expired">종료된 공지</option><option value="all">전체 공지</option>
+        </select>
+        <span id="noticeResultCount" class="result-count">0건</span>
+        <button class="refresh-btn" type="button" onclick="loadNotices({force:true})">↻ 새로고침</button>
       </div>
     </div>
-
-    <div id="noticeList" class="notice-list">
-      <div class="loading">공지사항을 불러오는 중입니다...</div>
-    </div>
+    <div id="noticeList" class="notice-list"><div class="loading">공지사항을 불러오는 중입니다...</div></div>
   </section>
-
 </main>
 
-<script src="notice.js?v=20260923-10"></script>
+<script src="notice.js?v=20260923-11"></script>
 </body>
 </html>
