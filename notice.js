@@ -348,7 +348,7 @@ function renderNotices(list) {
               🔗 링크 복사
             </button>
 
-            <button type="button" class="action-btn reregister-action" onclick="reRegisterNotice('${escapeJs(n.noticeId)}')">↻ 재등록</button>
+            <button type="button" class="action-btn reregister-action" onclick="reRegisterNotice('${escapeJs(n.noticeId)}')">↻ 수정·재등록</button>
 
             <button type="button"
                     class="action-btn delete-action"
