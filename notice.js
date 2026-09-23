@@ -14,32 +14,41 @@ function initNoticeTypeCards() {
   const typeInput = document.getElementById("noticeType");
   const selectedText = document.getElementById("selectedTypeText");
 
-  if (!cards.length) {
-    console.warn("공지 유형 카드를 찾을 수 없습니다.");
-    return;
-  }
+  if (!cards.length) return;
 
   cards.forEach(card => {
     card.addEventListener("click", function () {
       cards.forEach(item => item.classList.remove("active"));
       this.classList.add("active");
 
-      const category = this.dataset.category || "공지사항";
-      const type = this.dataset.type || "main";
-      const title = this.querySelector("b");
+      const category =
+        this.dataset.category || "공지사항";
 
-      if (categoryInput) categoryInput.value = category;
-      if (typeInput) typeInput.value = type;
+      const type =
+        this.dataset.type || "main";
+
+      const title =
+        this.querySelector("b");
+
+      if (categoryInput) {
+        categoryInput.value = category;
+      }
+
+      if (typeInput) {
+        typeInput.value = type;
+      }
 
       if (selectedText) {
-        selectedText.textContent = title ? title.textContent : category;
+        selectedText.textContent =
+          title ? title.textContent : category;
       }
     });
   });
 }
 
 async function loadNotices() {
-  const box = document.getElementById("noticeList");
+  const box =
+    document.getElementById("noticeList");
 
   if (!box) return;
 
@@ -48,7 +57,9 @@ async function loadNotices() {
 
   try {
     const res = await fetch(
-      API_URL + "?action=getNotices&_=" + Date.now(),
+      API_URL +
+      "?action=getNotices&_=" +
+      Date.now(),
       { cache: "no-store" }
     );
 
@@ -60,7 +71,11 @@ async function loadNotices() {
       return;
     }
 
-    ALL_NOTICES = Array.isArray(data.notices) ? data.notices : [];
+    ALL_NOTICES =
+      Array.isArray(data.notices)
+        ? data.notices
+        : [];
+
     renderNotices(ALL_NOTICES);
 
   } catch (err) {
@@ -72,7 +87,8 @@ async function loadNotices() {
 }
 
 function renderNotices(list) {
-  const box = document.getElementById("noticeList");
+  const box =
+    document.getElementById("noticeList");
 
   if (!box) return;
 
@@ -82,71 +98,98 @@ function renderNotices(list) {
     return;
   }
 
-  box.innerHTML = list.map(n => {
-    const important = String(n.important || "") === "Y";
-    const imageUrl = n.imageUrl || getNoticeImage(n.noticeType);
+  box.innerHTML =
+    list.map(n => {
 
-    return `
-      <article class="notice-item">
-        <div class="notice-thumb">
-          <img src="${escapeAttr(imageUrl)}"
-               alt="${escapeAttr(n.category || "공지사항")}">
-        </div>
+      const important =
+        String(n.important || "") === "Y";
 
-        <div class="notice-main">
-          <div class="notice-top">
-            <span class="badge ${important ? "red" : ""}">
-              ${important ? "중요" : escapeHtml(n.category)}
-            </span>
+      const imageUrl =
+        n.imageUrl ||
+        getNoticeImage(n.noticeType);
 
-            <span>${formatDate(n.createdAt)}</span>
+      return `
+        <article class="notice-item">
+
+          <div class="notice-thumb">
+            <img
+              src="${escapeAttr(imageUrl)}"
+              alt="${escapeAttr(n.category || "공지사항")}"
+            >
           </div>
 
-          <div class="notice-title">
-            ${escapeHtml(n.title)}
-          </div>
+          <div class="notice-main">
 
-          <div class="notice-content">
-            ${escapeHtml(n.content)}
-          </div>
+            <div class="notice-top">
+              <span class="badge ${important ? "red" : ""}">
+                ${important ? "중요" : escapeHtml(n.category)}
+              </span>
 
-          <div class="notice-info">
-            대상 ${escapeHtml(n.target)}
-            &nbsp; 작성자 ${escapeHtml(n.writer)}
-            ${n.expireDate ? "&nbsp; 종료 " + escapeHtml(n.expireDate) : ""}
-          </div>
+              <span>${formatDate(n.createdAt)}</span>
+            </div>
 
-          <div class="notice-buttons">
-            <button type="button"
-                    class="view-btn"
-                    onclick="openNotice('${escapeJs(n.noticeId)}')">
-              공지 확인하기
-            </button>
+            <div class="notice-title">
+              ${escapeHtml(n.title)}
+            </div>
 
-            ${n.fileUrl ? `
-              <button type="button"
+            <div class="notice-content">
+              ${escapeHtml(n.content)}
+            </div>
+
+            <div class="notice-info">
+              대상 ${escapeHtml(n.target)}
+              &nbsp; 작성자 ${escapeHtml(n.writer)}
+              ${
+                n.expireDate
+                  ? "&nbsp; 종료 " +
+                    escapeHtml(n.expireDate)
+                  : ""
+              }
+            </div>
+
+            <div class="notice-buttons">
+
+              <button
+                type="button"
+                class="view-btn"
+                onclick="openNotice('${escapeJs(n.noticeId)}')">
+                공지 확인하기
+              </button>
+
+              ${
+                n.fileUrl
+                  ? `
+                    <button
+                      type="button"
                       class="file-link-btn"
                       onclick="window.open('${escapeJs(n.fileUrl)}','_blank','noopener')">
-                📎 첨부파일
+                      📎 첨부파일
+                    </button>
+                  `
+                  : ""
+              }
+
+              <button
+                type="button"
+                class="kakao-btn"
+                onclick="copyNoticeLink('${escapeJs(n.noticeId)}')">
+                링크 복사
               </button>
-            ` : ""}
 
-            <button type="button"
-                    class="kakao-btn"
-                    onclick="copyNoticeLink('${escapeJs(n.noticeId)}')">
-              링크 복사
-            </button>
+              <button
+                type="button"
+                class="delete-btn"
+                onclick="deleteNotice('${escapeJs(n.noticeId)}')">
+                삭제
+              </button>
 
-            <button type="button"
-                    class="delete-btn"
-                    onclick="deleteNotice('${escapeJs(n.noticeId)}')">
-              삭제
-            </button>
+            </div>
+
           </div>
-        </div>
-      </article>
-    `;
-  }).join("");
+
+        </article>
+      `;
+    }).join("");
 }
 
 async function saveNotice() {
@@ -172,7 +215,8 @@ async function saveNotice() {
     document.getElementById("important").value;
 
   const writer =
-    document.getElementById("writer").value.trim() || "관리자";
+    document.getElementById("writer").value.trim() ||
+    "관리자";
 
   const fileUrl =
     document.getElementById("fileUrl").value.trim();
@@ -192,7 +236,10 @@ async function saveNotice() {
     return;
   }
 
-  if (fileUrl && !/^https?:\/\//i.test(fileUrl)) {
+  if (
+    fileUrl &&
+    !/^https?:\/\//i.test(fileUrl)
+  ) {
     alert("첨부파일 링크를 확인해 주세요.");
     document.getElementById("fileUrl").focus();
     return;
@@ -208,7 +255,8 @@ async function saveNotice() {
     const res = await fetch(API_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "text/plain;charset=utf-8"
+        "Content-Type":
+          "text/plain;charset=utf-8"
       },
       body: JSON.stringify({
         action: "saveNotice",
@@ -260,13 +308,16 @@ async function saveNotice() {
 }
 
 async function deleteNotice(noticeId) {
-  if (!confirm("이 공지사항을 삭제할까요?")) return;
+  if (!confirm("이 공지사항을 삭제할까요?")) {
+    return;
+  }
 
   try {
     const res = await fetch(API_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "text/plain;charset=utf-8"
+        "Content-Type":
+          "text/plain;charset=utf-8"
       },
       body: JSON.stringify({
         action: "deleteNotice",
@@ -294,37 +345,65 @@ function openNotice(noticeId) {
     "https://thebigkorea.github.io/thebigkorea-hq/notice-view.html?id=" +
     encodeURIComponent(noticeId);
 
-  window.open(url, "_blank", "noopener");
+  window.open(
+    url,
+    "_blank",
+    "noopener"
+  );
 }
 
+/*
+ * 중요:
+ * 카카오톡에 notice-view.html 주소를 직접 복사하지 않습니다.
+ * Apps Script의 shareNotice 주소를 복사해야
+ * 공지 종류별 OG 이미지가 적용됩니다.
+ */
 function copyNoticeLink(noticeId) {
   const notice =
-    ALL_NOTICES.find(n => String(n.noticeId) === String(noticeId));
+    ALL_NOTICES.find(
+      n =>
+        String(n.noticeId) ===
+        String(noticeId)
+    );
 
   if (!notice) {
     alert("공지 정보를 찾을 수 없습니다.");
     return;
   }
 
-  const url =
-    "https://thebigkorea.github.io/thebigkorea-hq/notice-view.html?id=" +
+  const shareUrl =
+    API_URL +
+    "?action=shareNotice&id=" +
     encodeURIComponent(noticeId);
 
   const text =
 `${notice.title}
 
-${url}`;
+${shareUrl}`;
 
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text)
+  if (
+    navigator.clipboard &&
+    window.isSecureContext
+  ) {
+    navigator.clipboard
+      .writeText(text)
       .then(() => {
-        alert("공지 링크가 복사되었습니다.");
+        alert(
+          "공지 공유 링크가 복사되었습니다.\n카카오톡에 붙여넣으면 공지 유형별 이미지가 표시됩니다."
+        );
       })
       .catch(() => {
-        prompt("아래 내용을 복사하세요.", text);
+        prompt(
+          "아래 내용을 복사하세요.",
+          text
+        );
       });
+
   } else {
-    prompt("아래 내용을 복사하세요.", text);
+    prompt(
+      "아래 내용을 복사하세요.",
+      text
+    );
   }
 }
 
@@ -341,7 +420,8 @@ function getNoticeImage(type) {
     discipline: "notice-discipline.png"
   };
 
-  return base + (files[type] || files.main);
+  return base +
+    (files[type] || files.main);
 }
 
 function formatDate(value) {
@@ -353,11 +433,14 @@ function formatDate(value) {
     return String(value);
   }
 
-  return d.toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  });
+  return d.toLocaleDateString(
+    "ko-KR",
+    {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }
+  );
 }
 
 function escapeHtml(str) {
