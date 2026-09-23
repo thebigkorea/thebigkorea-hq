@@ -533,6 +533,54 @@
     })();
   </script>
 
+  <style>
+    /* ===== 2026-09-23 모바일 상단바 안정화 ===== */
+    @media (max-width:680px){
+      .main-area{min-width:0 !important;width:100% !important;}
+      .topbar{
+        min-height:auto !important;
+        height:auto !important;
+        padding:10px 12px 12px !important;
+        display:grid !important;
+        grid-template-columns:minmax(0,1fr) auto !important;
+        grid-template-areas:"left logout" "actions actions" !important;
+        gap:9px 10px !important;
+        align-items:center !important;
+      }
+      .topbar-left{grid-area:left;min-width:0 !important;display:flex !important;align-items:center !important;gap:9px !important;}
+      .menu-toggle{position:static !important;flex:0 0 40px !important;width:40px !important;height:40px !important;margin:0 !important;}
+      .topbar-left>div{min-width:0 !important;}
+      #pageTitle{margin:0 !important;font-size:19px !important;line-height:1.2 !important;white-space:nowrap !important;}
+      #pageSubtitle{display:none !important;}
+      .topbar-actions{
+        grid-area:actions;
+        width:100% !important;
+        margin:0 !important;
+        display:grid !important;
+        grid-template-columns:minmax(0,1fr) auto !important;
+        gap:8px !important;
+        align-items:end !important;
+      }
+      .month-box{min-width:0 !important;width:100% !important;font-size:10px !important;line-height:1.15 !important;}
+      .month-box input{width:100% !important;min-width:0 !important;height:42px !important;font-size:13px !important;padding:0 10px !important;}
+      #refreshBtn.icon-btn{height:42px !important;min-height:42px !important;padding:0 12px !important;font-size:12px !important;white-space:nowrap !important;}
+      #erpLogoutButton{
+        grid-area:logout;
+        width:auto !important;
+        min-width:74px !important;
+        height:40px !important;
+        min-height:40px !important;
+        padding:0 11px !important;
+        white-space:nowrap !important;
+        writing-mode:horizontal-tb !important;
+        word-break:keep-all !important;
+        line-height:1 !important;
+        font-size:12px !important;
+      }
+      .content{padding-top:12px !important;}
+    }
+  </style>
+
 </head>
 <body>
   <div id="erpAuthLoading" aria-live="polite">
