@@ -730,6 +730,8 @@
       const otherEl=document.getElementById("kpiOtherEmployees");
       const managedStoreEl=document.getElementById("kpiManagedStores");
 
+      
+
       function normalizeUnifiedEmployee(item){
         item=item||{};
         return {
@@ -885,6 +887,41 @@
         });
       }
 
+    }
+
+
+    /* =========================================
+       로그인 완료 후 직원현황 자동 조회
+       - 최초 로그인 직후 조회 실패 방지
+       - ERP 인증 토큰 생성 후 직원현황 조회
+       - 로그인 입력 시간이 길어져도 최대 10분 대기
+    ========================================= */
+    function loadCompanyOperationStatusAfterAuth(){
+      const CHECK_INTERVAL = 500;
+      const MAX_WAIT = 10 * 60 * 1000;
+      const startedAt = Date.now();
+
+      const tryLoad = ()=>{
+        const token =
+          (typeof erpGetToken === "function")
+            ? erpGetToken()
+            : localStorage.getItem("thebigkorea_erp_session");
+
+        if(!token) return false;
+
+        loadCompanyOperationStatus();
+        return true;
+      };
+
+      // 이미 로그인되어 있으면 즉시 조회
+      if(tryLoad()) return;
+
+      // 최초 로그인 화면이면 토큰이 만들어질 때까지 기다린 뒤 자동 조회
+      const authWaitTimer = setInterval(()=>{
+        if(tryLoad() || Date.now() - startedAt >= MAX_WAIT){
+          clearInterval(authWaitTimer);
+        }
+      }, CHECK_INTERVAL);
     }
 
 
@@ -1389,7 +1426,7 @@
       loadQuickPendingBadges();
       loadContractRenewalTargets();
       loadMasterExpiryAlerts();
-      loadCompanyOperationStatus();
+      loadCompanyOperationStatusAfterAuth();
       loadFundData();
       loadAllStoreAttendance();
       loadErpStoreSales();
