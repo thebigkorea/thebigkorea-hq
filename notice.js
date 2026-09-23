@@ -7,6 +7,10 @@ const NOTICE_VIEW_BASE =
 const NOTICE_SHARE_BASE =
 "https://thebigkorea.github.io/thebigkorea-hq/";
 
+const NOTICE_CACHE_KEY = "thebigkorea_notice_cache_v2";
+const NOTICE_CACHE_TIME_KEY = "thebigkorea_notice_cache_time_v2";
+const NOTICE_CACHE_MAX_AGE = 24 * 60 * 60 * 1000;
+
 let selectedCategory = "공지사항";
 let selectedNoticeType = "main";
 let noticesCache = [];
@@ -14,7 +18,16 @@ let noticesCache = [];
 document.addEventListener("DOMContentLoaded", () => {
   bindTypeCards();
   bindSearch();
-  loadNotices();
+
+  // 1. 저장된 목록이 있으면 즉시 표시
+  const cached = readNoticeCache();
+  if (cached.length) {
+    noticesCache = cached;
+    renderNotices(noticesCache);
+  }
+
+  // 2. 서버 최신 데이터는 뒤에서 갱신
+  loadNotices({ silent: cached.length > 0 });
 });
 
 function bindTypeCards() {
@@ -43,11 +56,14 @@ function bindTypeCards() {
 }
 
 function bindSearch() {
-  const input = document.getElementById("noticeSearch");
+  const input =
+    document.getElementById("noticeSearch") ||
+    document.querySelector(".search-box input");
+
   if (!input) return;
 
   input.addEventListener("input", () => {
-    const q = input.value.trim().toLowerCase();
+    const q = String(input.value || "").trim().toLowerCase();
 
     if (!q) {
       renderNotices(noticesCache);
@@ -56,9 +72,9 @@ function bindSearch() {
 
     const filtered = noticesCache.filter(n => {
       return [
+        n.category,
         n.title,
         n.content,
-        n.category,
         n.target,
         n.writer
       ].some(v => String(v || "").toLowerCase().includes(q));
@@ -84,6 +100,7 @@ async function apiPost(payload) {
 
 async function saveNotice() {
   const btn = document.getElementById("saveBtn");
+
   const title = document.getElementById("title")?.value.trim() || "";
   const content = document.getElementById("content")?.value.trim() || "";
 
@@ -124,18 +141,18 @@ async function saveNotice() {
       throw new Error(result.message || "공지 등록에 실패했습니다.");
     }
 
-    alert("공지사항이 등록되었습니다.");
-
     document.getElementById("title").value = "";
     document.getElementById("content").value = "";
     document.getElementById("fileUrl").value = "";
 
-    await loadNotices();
+    // 서버 최신 목록을 받아 캐시까지 즉시 교체
+    await loadNotices({ silent: true, force: true });
+
+    alert("공지사항이 등록되었습니다.");
 
   } catch (err) {
     console.error(err);
     alert("공지 등록 중 오류가 발생했습니다.\n" + err.message);
-
   } finally {
     if (btn) {
       btn.disabled = false;
@@ -145,18 +162,37 @@ async function saveNotice() {
   }
 }
 
-async function loadNotices() {
+async function loadNotices(options = {}) {
+  const { silent = false, force = false } = options;
+
   const listEl = document.getElementById("noticeList");
   if (!listEl) return;
 
-  listEl.innerHTML =
-    '<div class="loading">공지사항을 불러오는 중입니다...</div>';
+  // 수동 새로고침일 경우 기존 목록은 그대로 두고 버튼만 표시
+  const refreshBtn = document.querySelector(".refresh-btn");
+
+  if (!silent && !noticesCache.length) {
+    listEl.innerHTML =
+      '<div class="loading">공지사항을 불러오는 중입니다...</div>';
+  }
+
+  if (refreshBtn) {
+    refreshBtn.disabled = true;
+    refreshBtn.dataset.oldText = refreshBtn.textContent;
+    refreshBtn.textContent = "↻ 갱신 중";
+  }
 
   try {
-    const response = await fetch(
-      API_URL + "?action=getNotices&t=" + Date.now(),
-      { cache: "no-store" }
-    );
+    // Date.now()를 URL에 매번 붙이지 않는다.
+    // force일 때만 브라우저 캐시를 피한다.
+    const url =
+      API_URL +
+      "?action=getNotices" +
+      (force ? "&refresh=1" : "");
+
+    const response = await fetch(url, {
+      cache: force ? "no-store" : "default"
+    });
 
     if (!response.ok) {
       throw new Error("서버 응답 오류: " + response.status);
@@ -170,15 +206,30 @@ async function loadNotices() {
 
     noticesCache = Array.isArray(data.notices) ? data.notices : [];
 
-    const search = document.getElementById("noticeSearch");
-    if (search) search.value = "";
-
+    saveNoticeCache(noticesCache);
     renderNotices(noticesCache);
 
   } catch (err) {
     console.error(err);
-    listEl.innerHTML =
-      '<div class="loading">서버 연결 오류가 발생했습니다.</div>';
+
+    // 캐시가 있으면 서버 오류가 나도 기존 공지는 그대로 유지
+    if (!noticesCache.length) {
+      const cached = readNoticeCache();
+
+      if (cached.length) {
+        noticesCache = cached;
+        renderNotices(noticesCache);
+      } else {
+        listEl.innerHTML =
+          '<div class="loading">서버 연결 오류가 발생했습니다.</div>';
+      }
+    }
+  } finally {
+    if (refreshBtn) {
+      refreshBtn.disabled = false;
+      refreshBtn.textContent =
+        refreshBtn.dataset.oldText || "↻ 새로고침";
+    }
   }
 }
 
@@ -188,7 +239,7 @@ function renderNotices(list) {
 
   if (!list.length) {
     listEl.innerHTML =
-      '<div class="empty">조건에 맞는 공지사항이 없습니다.</div>';
+      '<div class="loading">등록된 공지사항이 없습니다.</div>';
     return;
   }
 
@@ -196,54 +247,74 @@ function renderNotices(list) {
     const viewUrl =
       NOTICE_VIEW_BASE + "?id=" + encodeURIComponent(n.noticeId || "");
 
-    const important =
-      String(n.important || "").toUpperCase() === "Y"
-        ? '<span class="notice-badge" style="background:#fff0f0;color:#c92a2a">중요</span>'
-        : "";
-
     return `
       <article class="notice-item">
+
         <img class="notice-thumb"
              src="${escapeHtml(n.imageUrl || "")}"
-             alt="${escapeHtml(n.category || "공지")}">
+             alt="${escapeHtml(n.category || "공지")}"
+             loading="lazy"
+             decoding="async">
 
         <div class="notice-info">
+
           <div class="notice-topline">
-            <span class="notice-badge">${escapeHtml(n.category || "공지사항")}</span>
-            ${important}
-            <span class="notice-date">${escapeHtml(formatDisplayDate(n.createdAt))}</span>
+            <span class="notice-badge">
+              ${escapeHtml(n.category || "공지사항")}
+            </span>
+
+            ${
+              String(n.important || "").toUpperCase() === "Y"
+                ? '<span class="notice-badge" style="background:#fff1f0;color:#d92d20;">중요</span>'
+                : ""
+            }
+
+            <span class="notice-date">
+              ${escapeHtml(formatDisplayDate(n.createdAt))}
+            </span>
           </div>
 
           <h3>${escapeHtml(n.title || "")}</h3>
+
           <p>${escapeHtml(n.content || "")}</p>
 
           <div class="notice-meta">
             <span class="meta-item">♙ 대상 ${escapeHtml(n.target || "전체 직원")}</span>
             <span class="meta-item">♙ 작성자 ${escapeHtml(n.writer || "관리자")}</span>
-            ${n.expireDate
-              ? `<span class="meta-item">▣ 종료 ${escapeHtml(n.expireDate)}</span>`
-              : ""}
+            ${
+              n.expireDate
+                ? '<span class="meta-item">▣ 종료 ' +
+                  escapeHtml(n.expireDate) +
+                  "</span>"
+                : ""
+            }
           </div>
+
         </div>
 
         <div class="notice-actions">
+
           <a class="action-btn primary-action"
              href="${viewUrl}"
              target="_blank"
              rel="noopener">
-             ◉ 공지 확인하기 <span aria-hidden="true">›</span>
+            ◉ 공지 확인하기 ›
           </a>
 
           <div class="secondary-actions">
-            ${n.fileUrl ? `
-              <a class="action-btn"
-                 href="${escapeHtml(n.fileUrl)}"
-                 target="_blank"
-                 rel="noopener">📎 첨부파일</a>
-            ` : `
-              <button class="action-btn" type="button" disabled
-                      style="opacity:.45;cursor:default">📎 첨부없음</button>
-            `}
+
+            ${
+              n.fileUrl
+                ? `
+                  <a class="action-btn"
+                     href="${escapeHtml(n.fileUrl)}"
+                     target="_blank"
+                     rel="noopener">
+                    📎 첨부파일
+                  </a>
+                `
+                : ""
+            }
 
             <button type="button"
                     class="action-btn"
@@ -256,11 +327,45 @@ function renderNotices(list) {
                     onclick="deleteNotice('${escapeJs(n.noticeId)}')">
               🗑 삭제
             </button>
+
           </div>
+
         </div>
+
       </article>
     `;
   }).join("");
+}
+
+function saveNoticeCache(list) {
+  try {
+    localStorage.setItem(NOTICE_CACHE_KEY, JSON.stringify(list || []));
+    localStorage.setItem(NOTICE_CACHE_TIME_KEY, String(Date.now()));
+  } catch (e) {
+    console.warn("공지 캐시 저장 실패", e);
+  }
+}
+
+function readNoticeCache() {
+  try {
+    const raw = localStorage.getItem(NOTICE_CACHE_KEY);
+    if (!raw) return [];
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed;
+  } catch (e) {
+    console.warn("공지 캐시 읽기 실패", e);
+    return [];
+  }
+}
+
+function clearNoticeCache() {
+  try {
+    localStorage.removeItem(NOTICE_CACHE_KEY);
+    localStorage.removeItem(NOTICE_CACHE_TIME_KEY);
+  } catch (e) {}
 }
 
 function getSharePage(type) {
@@ -274,6 +379,7 @@ function getSharePage(type) {
   ];
 
   type = String(type || "main").trim();
+
   if (!valid.includes(type)) type = "main";
 
   return NOTICE_SHARE_BASE + "notice-share-" + type + ".html";
@@ -287,12 +393,13 @@ async function copyNoticeLink(noticeId, noticeType) {
   try {
     await navigator.clipboard.writeText(shareUrl);
     alert("카카오톡 공유용 링크를 복사했습니다.");
-
   } catch (err) {
     const ta = document.createElement("textarea");
+
     ta.value = shareUrl;
     ta.style.position = "fixed";
     ta.style.opacity = "0";
+
     document.body.appendChild(ta);
     ta.select();
     document.execCommand("copy");
@@ -315,7 +422,16 @@ async function deleteNotice(noticeId) {
       throw new Error(result.message || "삭제 실패");
     }
 
-    await loadNotices();
+    // 화면에서 먼저 제거해 즉각 반응하게 함
+    noticesCache = noticesCache.filter(
+      n => String(n.noticeId) !== String(noticeId)
+    );
+
+    saveNoticeCache(noticesCache);
+    renderNotices(noticesCache);
+
+    // 서버 데이터도 뒤에서 한 번 동기화
+    loadNotices({ silent: true, force: true });
 
   } catch (err) {
     console.error(err);
