@@ -721,23 +721,23 @@
     }
 
 
-    async function loadCompanyOperationStatus(){
+    async function loadCompanyOperationStatus(retry = 0){
       const employeeEl=document.getElementById("kpiEmployees");
       const regularEl=document.getElementById("kpiRegularEmployees");
       const partTimeEl=document.getElementById("kpiPartTimeEmployees");
       const businessEl=document.getElementById("kpiBusinessEmployees");
       const contractEl=document.getElementById("kpiContractEmployees");
       const otherEl=document.getElementById("kpiOtherEmployees");
-      const managedStoreEl=document.getElementById("kpiManagedStores");
 
-      
+      const MAX_RETRY = 8;
+      const RETRY_DELAY = 700;
 
       function normalizeUnifiedEmployee(item){
         item=item||{};
         return {
-          employmentType:item.employmentType||item.employeeType||item.workType||item["고용형태"]||item["근로형태"]||"",
-          contractType:item.employmentType||item.contractType||item.contract_type||item["계약형태"]||"",
-          status:item.status||item.employmentStatus||item.workStatus||item["재직상태"]||item["상태"]||""
+          employmentType:item.employmentType||"",
+          contractType:item.employmentType||item.contractType||"",
+          status:item.status||""
         };
       }
 
@@ -754,86 +754,59 @@
         if(raw.includes("사업소득")) return "사업소득자";
         if(raw.includes("용역")) return "용역";
         if(raw.includes("일용")) return "일용직";
-        // 현재 인사DB의 '계약직'은 회사 운영현황에서는 아르바이트로 통합 집계
         if(raw.includes("계약")) return "아르바이트";
         if(raw.includes("파견")) return "파견";
         return raw;
       }
 
-      async function getHrApi(params){
-        const query=new URLSearchParams();
-
-        // HR API는 ERP 공통 인증 토큰이 있어야 직원정보를 반환한다.
-        // 직원관리 화면(getApi)과 동일하게 홈 대시보드 조회에도 토큰을 전달한다.
+      async function getEmployeesAdmin(){
         const erpToken = (typeof erpGetToken === "function") ? erpGetToken() : null;
         if(!erpToken){
-          throw new Error("ERP 로그인이 필요합니다.");
+          throw new Error("ERP 로그인 토큰 대기 중");
         }
 
-        Object.keys(params||{}).forEach(key=>{
-          const value=params[key];
-          if(value!==undefined && value!==null && String(value)!==""){
-            query.set(key,String(value));
-          }
+        const query=new URLSearchParams({
+          action:"getEmployeesAdmin",
+          erpToken:String(erpToken),
+          t:String(Date.now())
         });
-        query.set("erpToken",erpToken);
-        query.set("t",String(Date.now()));
 
         const controller=new AbortController();
         const timer=setTimeout(()=>controller.abort(),15000);
+
         try{
           const res=await fetch(HR_API_URL+"?"+query.toString(),{
             cache:"no-store",
             signal:controller.signal
           });
-          if(!res.ok) throw new Error("API 응답 오류: HTTP "+res.status);
-          return await res.json();
+
+          if(!res.ok){
+            throw new Error("API 응답 오류: HTTP "+res.status);
+          }
+
+          const result=await res.json();
+
+          // employee-admin.html과 동일한 성공 판정 방식
+          if(!result.ok && !result.success){
+            throw new Error(result.message || "직원 조회 실패");
+          }
+
+          return result;
         }finally{
           clearTimeout(timer);
         }
       }
 
-      // 직원 현황과 점포 현황은 서로 독립적으로 처리한다.
-      // 점포 API가 실패해도 직원 집계가 사라지지 않도록 분리.
       try{
-        let employeeData=null;
-        let rawRows=[];
-        const employeeActions=["getEmployeesAdmin","getEmployees","listEmployees"];
-
-        for(const action of employeeActions){
-          try{
-            const candidate=await getHrApi({action});
-            const candidateRows=
-              (Array.isArray(candidate?.employees) && candidate.employees) ||
-              (Array.isArray(candidate?.rows) && candidate.rows) ||
-              (Array.isArray(candidate?.data) && candidate.data) ||
-              (Array.isArray(candidate?.result) && candidate.result) ||
-              (Array.isArray(candidate?.staff) && candidate.staff) ||
-              (Array.isArray(candidate?.items) && candidate.items) ||
-              (Array.isArray(candidate?.data?.employees) && candidate.data.employees) ||
-              (Array.isArray(candidate?.data?.rows) && candidate.data.rows) ||
-              (Array.isArray(candidate?.data?.staff) && candidate.data.staff) ||
-              (Array.isArray(candidate?.data?.items) && candidate.data.items) ||
-              [];
-
-            employeeData=candidate;
-            if(candidateRows.length){
-              rawRows=candidateRows;
-              break;
-            }
-          }catch(actionError){
-            console.warn(`직원 조회 ${action} 실패:`,actionError);
-          }
-        }
-
-        if(!employeeData || !rawRows.length){
-          throw new Error("직원 조회 API 연결 실패");
-        }
-
+        // 인사관리대장과 동일하게 getEmployeesAdmin 하나만 사용
+        const result=await getEmployeesAdmin();
+        const rawRows=Array.isArray(result.employees) ? result.employees : [];
         const rows=rawRows.map(normalizeUnifiedEmployee);
 
         const activeEmployees=rows.filter(item=>
-          ["재직","재직중","근무중","active","사용"].includes(String(item.status||"").replace(/\s+/g,"").toLowerCase())
+          ["재직","재직중","근무중","active","사용"].includes(
+            String(item.status||"").replace(/\s+/g,"").toLowerCase()
+          )
         );
 
         const grand={};
@@ -842,16 +815,11 @@
           grand[group]=Number(grand[group]||0)+1;
         });
 
-        if(!rows.length){
-          throw new Error(employeeData.message||"직원 목록이 비어 있습니다.");
-        }
-
         if(employeeEl) employeeEl.textContent=`${activeEmployees.length}명`;
         if(regularEl) regularEl.textContent=`${Number(grand["정규직"]||0)}명`;
         if(partTimeEl) partTimeEl.textContent=`${Number(grand["아르바이트"]||0)}명`;
         if(businessEl) businessEl.textContent=`${Number(grand["사업소득자"]||0)}명`;
 
-        // 재직 직원 카드 팝업 구성현황 동기화
         const modalTotal=document.getElementById("employeeModalTotal");
         const modalRegular=document.getElementById("employeeModalRegular");
         const modalPartTime=document.getElementById("employeeModalPartTime");
@@ -861,7 +829,6 @@
         if(modalPartTime) modalPartTime.textContent=`${Number(grand["아르바이트"]||0)}명`;
         if(modalBusiness) modalBusiness.textContent=`${Number(grand["사업소득자"]||0)}명`;
 
-        // 계약직은 아르바이트에 포함하므로 별도 항목은 화면에서 숨김
         if(contractEl){
           contractEl.textContent="0명";
           const wrap=contractEl.closest(".employee-breakdown-item");
@@ -878,15 +845,39 @@
           const wrap=otherEl.closest(".employee-breakdown-item");
           if(wrap) wrap.hidden=otherCount===0;
         }
+
         const modalOther=document.getElementById("employeeModalOther");
         if(modalOther) modalOther.textContent=`${otherCount}명`;
-      }catch(error){
-        console.error("직원 운영현황 조회 실패:",error);
-        [employeeEl,regularEl,partTimeEl,businessEl,contractEl,otherEl].forEach(el=>{
-          if(el && !/^\d+명$/.test(String(el.textContent||"").trim())) el.textContent="조회 실패";
-        });
-      }
 
+        return true;
+
+      }catch(error){
+        console.warn(`직원 운영현황 조회 재시도 ${retry+1}/${MAX_RETRY+1}:`,error);
+
+        // 최초 로그인 직후에는 인증/API 준비가 늦을 수 있으므로 자동 재시도
+        if(retry < MAX_RETRY){
+          [employeeEl,regularEl,partTimeEl,businessEl].forEach(el=>{
+            if(el && !/^\d+명$/.test(String(el.textContent||"").trim())){
+              el.textContent="조회중";
+            }
+          });
+
+          setTimeout(()=>{
+            loadCompanyOperationStatus(retry + 1);
+          }, RETRY_DELAY);
+
+          return false;
+        }
+
+        console.error("직원 운영현황 최종 조회 실패:",error);
+        [employeeEl,regularEl,partTimeEl,businessEl,contractEl,otherEl].forEach(el=>{
+          if(el && !/^\d+명$/.test(String(el.textContent||"").trim())){
+            el.textContent="조회 실패";
+          }
+        });
+
+        return false;
+      }
     }
 
 
