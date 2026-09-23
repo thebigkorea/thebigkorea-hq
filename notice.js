@@ -62,26 +62,94 @@ function bindSearch() {
 
   if (!input) return;
 
-  input.addEventListener("input", () => {
-    const q = String(input.value || "").trim().toLowerCase();
+  // 기존 검색창 앞에 공지유형 필터를 자동 생성
+  let typeFilter = document.getElementById("noticeTypeFilter");
 
-    if (!q) {
-      renderNotices(noticesCache);
-      return;
-    }
+  if (!typeFilter) {
+    typeFilter = document.createElement("select");
+    typeFilter.id = "noticeTypeFilter";
+    typeFilter.className = "notice-type-filter";
+    typeFilter.setAttribute("aria-label", "공지유형 검색");
+    typeFilter.innerHTML = `
+      <option value="">전체 유형</option>
+      <option value="main">일반공지</option>
+      <option value="emergency">긴급공지</option>
+      <option value="hygiene">위생점검</option>
+      <option value="hr">인사공지</option>
+      <option value="sales">매출공지</option>
+      <option value="discipline">인사복무</option>
+    `;
+
+    input.placeholder = "공지 제목 검색";
+
+    const parent = input.parentElement;
+    if (parent) parent.insertBefore(typeFilter, input);
+  }
+
+  const applyFilters = () => {
+    const selectedType = String(typeFilter.value || "").trim();
+    const titleQuery = String(input.value || "").trim().toLowerCase();
 
     const filtered = noticesCache.filter(n => {
-      return [
-        n.category,
-        n.title,
-        n.content,
-        n.target,
-        n.writer
-      ].some(v => String(v || "").toLowerCase().includes(q));
+      const noticeType = normalizeNoticeType(n.noticeType, n.category);
+      const typeOk = !selectedType || noticeType === selectedType;
+      const titleOk =
+        !titleQuery ||
+        String(n.title || "").toLowerCase().includes(titleQuery);
+
+      return typeOk && titleOk;
     });
 
     renderNotices(filtered);
+  };
+
+  // 유형은 선택 즉시 검색
+  typeFilter.addEventListener("change", applyFilters);
+
+  // 제목은 서버 호출 없이 메모리에서 즉시 검색
+  input.addEventListener("input", applyFilters);
+}
+
+function normalizeNoticeType(type, category) {
+  const valid = ["main", "emergency", "hygiene", "hr", "sales", "discipline"];
+  const t = String(type || "").trim();
+
+  if (valid.includes(t)) return t;
+
+  const map = {
+    "공지사항": "main",
+    "일반공지": "main",
+    "긴급공지": "emergency",
+    "위생점검": "hygiene",
+    "위생점검안내": "hygiene",
+    "인사공지": "hr",
+    "매출공지": "sales",
+    "인사복무": "discipline"
+  };
+
+  return map[String(category || "").trim()] || "main";
+}
+
+function applyCurrentNoticeFilters() {
+  const input =
+    document.getElementById("noticeSearch") ||
+    document.querySelector(".search-box input");
+  const typeFilter = document.getElementById("noticeTypeFilter");
+
+  const selectedType = String(typeFilter?.value || "").trim();
+  const titleQuery = String(input?.value || "").trim().toLowerCase();
+
+  const filtered = noticesCache.filter(n => {
+    const noticeType = normalizeNoticeType(n.noticeType, n.category);
+    const typeOk = !selectedType || noticeType === selectedType;
+    const titleOk =
+      !titleQuery ||
+      String(n.title || "").toLowerCase().includes(titleQuery);
+
+    return typeOk && titleOk;
   });
+
+  renderNotices(filtered);
 }
 
 async function apiPost(payload) {
@@ -207,7 +275,7 @@ async function loadNotices(options = {}) {
     noticesCache = Array.isArray(data.notices) ? data.notices : [];
 
     saveNoticeCache(noticesCache);
-    renderNotices(noticesCache);
+    applyCurrentNoticeFilters();
 
   } catch (err) {
     console.error(err);
@@ -323,6 +391,12 @@ function renderNotices(list) {
             </button>
 
             <button type="button"
+                    class="action-btn re-register-action"
+                    onclick="reregisterNotice('${escapeJs(n.noticeId)}')">
+              ↻ 재등록
+            </button>
+
+            <button type="button"
                     class="action-btn delete-action"
                     onclick="deleteNotice('${escapeJs(n.noticeId)}')">
               🗑 삭제
@@ -335,6 +409,66 @@ function renderNotices(list) {
       </article>
     `;
   }).join("");
+}
+
+function reregisterNotice(noticeId) {
+  const n = noticesCache.find(
+    item => String(item.noticeId) === String(noticeId)
+  );
+
+  if (!n) {
+    alert("재등록할 공지사항을 찾을 수 없습니다.");
+    return;
+  }
+
+  const type = normalizeNoticeType(n.noticeType, n.category);
+
+  const typeCard = document.querySelector(
+    `.type-card[data-type="${type}"]`
+  );
+
+  if (typeCard) {
+    typeCard.click();
+  } else {
+    selectedCategory = n.category || "공지사항";
+    selectedNoticeType = type;
+
+    const categoryEl = document.getElementById("category");
+    const typeEl = document.getElementById("noticeType");
+
+    if (categoryEl) categoryEl.value = selectedCategory;
+    if (typeEl) typeEl.value = selectedNoticeType;
+  }
+
+  setFieldValue("target", n.target || "전체 직원");
+  setFieldValue("important", n.important || "N");
+  setFieldValue("title", n.title || "");
+  setFieldValue("content", n.content || "");
+  setFieldValue("fileUrl", n.fileUrl || "");
+  setFieldValue("writer", n.writer || "관리자");
+
+  // 과거 종료일은 그대로 복사하지 않음: 재등록 시 새 종료일을 선택
+  setFieldValue("expireDate", "");
+
+  const titleEl = document.getElementById("title");
+  const formTarget =
+    titleEl?.closest(".panel") ||
+    document.querySelector(".type-card")?.closest(".panel") ||
+    document.querySelector("main");
+
+  if (formTarget) {
+    formTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  setTimeout(() => {
+    titleEl?.focus();
+    titleEl?.select();
+  }, 450);
+}
+
+function setFieldValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value ?? "";
 }
 
 function saveNoticeCache(list) {
@@ -428,7 +562,7 @@ async function deleteNotice(noticeId) {
     );
 
     saveNoticeCache(noticesCache);
-    renderNotices(noticesCache);
+    applyCurrentNoticeFilters();
 
     // 서버 데이터도 뒤에서 한 번 동기화
     loadNotices({ silent: true, force: true });
