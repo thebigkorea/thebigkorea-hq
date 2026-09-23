@@ -4,14 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>공지사항 | 더큰코리아 인트라넷</title>
-  <link rel="stylesheet" href="notice.css?v=20260922-4">
+
+  <link rel="stylesheet" href="notice.css?v=20260923-1">
   <script src="erp-auth.js"></script>
 </head>
+
 <body>
 
 <header class="top">
   <div class="top-inner">
     <button class="back" onclick="history.back()" aria-label="뒤로가기">←</button>
+
     <div>
       <div class="eyebrow">THE BIG KOREA · INTRANET</div>
       <h1>공지사항</h1>
@@ -32,23 +35,46 @@
     </div>
 
     <div class="type-grid">
-      <button type="button" class="type-card active" data-category="공지사항" data-type="main">
-        <span class="type-icon">📢</span><b>일반공지</b><small>일반 안내 및 전달사항</small>
+      <button type="button" class="type-card active"
+              data-category="공지사항" data-type="main">
+        <span class="type-icon">📢</span>
+        <b>일반공지</b>
+        <small>일반 안내 및 전달사항</small>
       </button>
-      <button type="button" class="type-card" data-category="긴급공지" data-type="emergency">
-        <span class="type-icon">🚨</span><b>긴급공지</b><small>즉시 확인이 필요한 내용</small>
+
+      <button type="button" class="type-card"
+              data-category="긴급공지" data-type="emergency">
+        <span class="type-icon">🚨</span>
+        <b>긴급공지</b>
+        <small>즉시 확인이 필요한 내용</small>
       </button>
-      <button type="button" class="type-card" data-category="위생점검안내" data-type="hygiene">
-        <span class="type-icon">🧼</span><b>위생점검</b><small>위생·점검·교육 안내</small>
+
+      <button type="button" class="type-card"
+              data-category="위생점검안내" data-type="hygiene">
+        <span class="type-icon">🧼</span>
+        <b>위생점검</b>
+        <small>위생·점검·교육 안내</small>
       </button>
-      <button type="button" class="type-card" data-category="인사공지" data-type="hr">
-        <span class="type-icon">👥</span><b>인사공지</b><small>승진·발령·인사 안내</small>
+
+      <button type="button" class="type-card"
+              data-category="인사공지" data-type="hr">
+        <span class="type-icon">👥</span>
+        <b>인사공지</b>
+        <small>승진·발령·인사 안내</small>
       </button>
-      <button type="button" class="type-card" data-category="매출공지" data-type="sales">
-        <span class="type-icon">📈</span><b>매출공지</b><small>매출 및 영업 관련 안내</small>
+
+      <button type="button" class="type-card"
+              data-category="매출공지" data-type="sales">
+        <span class="type-icon">📈</span>
+        <b>매출공지</b>
+        <small>매출 및 영업 관련 안내</small>
       </button>
-      <button type="button" class="type-card" data-category="인사복무" data-type="discipline">
-        <span class="type-icon">📋</span><b>인사복무</b><small>근무기강·출퇴근 안내</small>
+
+      <button type="button" class="type-card"
+              data-category="인사복무" data-type="discipline">
+        <span class="type-icon">📋</span>
+        <b>인사복무</b>
+        <small>근무기강·출퇴근 안내</small>
       </button>
     </div>
 
@@ -111,10 +137,14 @@
 
     <div class="field">
       <label for="fileUrl">📎 첨부파일 링크</label>
+
       <div class="drive-row">
-        <input id="fileUrl" type="url" placeholder="Google Drive 공유 링크를 붙여넣으세요">
-        <button class="drive-btn" type="button"
-          onclick="window.open('https://drive.google.com/drive/my-drive','_blank','noopener')">
+        <input id="fileUrl" type="url"
+               placeholder="Google Drive 공유 링크를 붙여넣으세요">
+
+        <button class="drive-btn"
+                type="button"
+                onclick="window.open('https://drive.google.com/drive/my-drive','_blank','noopener')">
           Google Drive 열기
         </button>
       </div>
@@ -122,6 +152,7 @@
 
     <details class="help-box" open>
       <summary>📎 Google Drive 파일 올리기 · 첨부방법</summary>
+
       <div class="help-content">
         <p><b>① 「Google Drive 열기」</b> 버튼을 누릅니다.</p>
         <p><b>② 왼쪽 위 「+ 신규」</b> 버튼을 누릅니다.</p>
@@ -165,7 +196,10 @@
         <span class="step">04</span>
         <div><h2>공지 목록</h2></div>
       </div>
-      <button class="refresh-btn" type="button" onclick="loadNotices()">↻ 새로고침</button>
+
+      <button class="refresh-btn" type="button" onclick="loadNotices()">
+        ↻ 새로고침
+      </button>
     </div>
 
     <div id="noticeList" class="notice-list">
@@ -175,6 +209,6 @@
 
 </main>
 
-<script src="notice.js?v=20260922-4"></script>
+<script src="notice.js?v=20260923-1"></script>
 </body>
 </html>
