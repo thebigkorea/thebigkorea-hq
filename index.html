@@ -701,6 +701,96 @@
       }
     }
 
+
+/* ===== THE BIG KOREA 밝은 프리미엄 테마 ===== */
+
+/* 로그인: 밝은 아이보리 + 골드 빛 */
+#erpLoginGate{
+  background:
+    radial-gradient(circle at 20% 18%,rgba(255,194,55,.30),transparent 30%),
+    radial-gradient(circle at 82% 78%,rgba(217,196,161,.35),transparent 32%),
+    linear-gradient(135deg,#fffaf0 0%,#f6efe2 48%,#fffdf8 100%) !important;
+}
+.erp-login-card{
+  background:rgba(255,255,255,.96) !important;
+  border:1px solid #ead7ae !important;
+  box-shadow:0 24px 65px rgba(102,76,37,.18) !important;
+}
+.erp-login-card h2{color:#30281f !important;}
+#erpLoginButton{
+  background:linear-gradient(135deg,#f3b300,#ffc93f) !important;
+  color:#272018 !important;
+  box-shadow:0 8px 22px rgba(211,155,16,.23) !important;
+}
+#erpAuthLoading{
+  background:
+    radial-gradient(circle at 22% 18%,rgba(255,190,35,.26),transparent 30%),
+    linear-gradient(135deg,#fff9ed,#f3eadb 58%,#fffdf8) !important;
+}
+
+/* 사이드바: 로고가 가장 돋보이는 따뜻한 웜그레이/아이보리 */
+.sidebar{
+  background:
+    linear-gradient(180deg,#f7f2e9 0%,#eee6d9 48%,#e7ddce 100%) !important;
+  border-right:1px solid #d9c7aa !important;
+  box-shadow:8px 0 28px rgba(78,61,38,.10) !important;
+}
+.brand.brand-premium.brand-official{
+  background:linear-gradient(135deg,#fffdf8,#f1e5d1) !important;
+  border-bottom:1px solid #d7bd8d !important;
+}
+.sidebar-official-logo{
+  filter:drop-shadow(0 3px 5px rgba(83,63,35,.10));
+}
+.nav-group-title{
+  color:#8b7250 !important;
+  font-weight:900 !important;
+}
+.nav-item{
+  color:#413a32 !important;
+  border:1px solid transparent !important;
+}
+.nav-item:hover{
+  background:rgba(255,255,255,.72) !important;
+  color:#211c17 !important;
+}
+.nav-item.active{
+  background:linear-gradient(90deg,#fff,#fff8e9) !important;
+  color:#28221c !important;
+  border:1px solid #e3bf65 !important;
+  box-shadow:
+    inset 5px 0 0 #f2b400,
+    0 6px 18px rgba(112,84,38,.11) !important;
+}
+.nav-item.active span{
+  color:#d69a00 !important;
+}
+.sidebar-footer{
+  background:rgba(255,250,240,.72) !important;
+  border-top:1px solid #d7bd8d !important;
+}
+.sidebar-footer small{
+  color:#a36e00 !important;
+  font-weight:900 !important;
+}
+.sidebar-footer span{
+  color:#776d61 !important;
+}
+
+/* 스크롤바도 밝게 */
+.sidebar::-webkit-scrollbar-track{background:#eee6d9 !important;}
+.sidebar::-webkit-scrollbar-thumb{
+  background:#c8b99f !important;
+  border-radius:10px;
+}
+
+/* 좁은 화면 동일 적용 */
+@media(max-width:900px){
+  .sidebar{
+    background:linear-gradient(180deg,#f7f2e9,#e7ddce) !important;
+  }
+}
+
 </style>
 
 </head>
