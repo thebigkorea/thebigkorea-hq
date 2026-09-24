@@ -622,7 +622,86 @@
       }
       .content{padding-top:12px !important;}
     }
-  </style>
+  
+    /* ===== 2026-09 정식 로고 컬러 테마 : Charcoal + Gold ===== */
+    :root{
+      --tbk-charcoal:#15191e;
+      --tbk-charcoal-2:#1b2026;
+      --tbk-gold:#f2b400;
+      --tbk-gold-soft:#d9aa3e;
+      --tbk-warm-gray:#8d8579;
+    }
+
+    /* 로그인 배경: 푸른 네이비를 줄이고 정식 로고와 어울리는 차콜/골드로 */
+    #erpLoginGate{
+      background:
+        radial-gradient(circle at 72% 18%, rgba(242,180,0,.12), transparent 29%),
+        radial-gradient(circle at 18% 82%, rgba(141,133,121,.10), transparent 32%),
+        linear-gradient(135deg,#101419 0%,#171c22 52%,#20252b 100%) !important;
+    }
+    .erp-login-card{
+      border:1px solid rgba(242,180,0,.14);
+      box-shadow:0 30px 85px rgba(0,0,0,.38) !important;
+    }
+    #erpLoginButton{
+      background:linear-gradient(135deg,#e9aa00,#f4bc16) !important;
+      color:#171717 !important;
+      box-shadow:0 8px 20px rgba(210,154,0,.20);
+    }
+    #erpLoginButton:hover{filter:brightness(.98);}
+    .erp-login-card h2{color:#171c22 !important;}
+
+    /* 인증 확인 로딩 화면도 같은 색감 */
+    #erpAuthLoading{
+      background:
+        radial-gradient(circle at 70% 20%,rgba(242,180,0,.12),transparent 30%),
+        linear-gradient(135deg,#101419,#1b2026 58%,#242a30) !important;
+    }
+
+    /* 좌측 네비게이션 */
+    .sidebar{
+      background:linear-gradient(180deg,#15191e 0%,#191e24 52%,#11151a 100%) !important;
+      border-right:1px solid rgba(242,180,0,.10);
+      box-shadow:8px 0 26px rgba(0,0,0,.08);
+    }
+    .brand.brand-premium.brand-official{
+      background:rgba(255,255,255,.015) !important;
+      border-bottom:1px solid rgba(242,180,0,.14);
+    }
+    .nav-group-title{
+      color:#a9a39a !important;
+      letter-spacing:.04em;
+    }
+    .nav-item{
+      color:#e5e2dd !important;
+      border:1px solid transparent !important;
+    }
+    .nav-item:hover{
+      background:rgba(255,255,255,.065) !important;
+      color:#fff !important;
+    }
+    .nav-item.active{
+      background:#fff !important;
+      color:#1a1d20 !important;
+      border-color:rgba(242,180,0,.38) !important;
+      box-shadow:inset 4px 0 0 var(--tbk-gold),0 7px 18px rgba(0,0,0,.12);
+    }
+    .nav-item.active span{color:#c28e00 !important;}
+    .sidebar-footer{
+      background:#11151a !important;
+      border-top:1px solid rgba(242,180,0,.14) !important;
+    }
+    .sidebar-footer small{color:#e5bc67 !important;}
+    .sidebar-footer span{color:#8e949b !important;}
+
+    /* 모바일에서도 같은 테마 유지 */
+    @media(max-width:900px){
+      .sidebar{
+        background:linear-gradient(180deg,#15191e,#11151a) !important;
+      }
+    }
+
+</style>
 
 </head>
 <body>
