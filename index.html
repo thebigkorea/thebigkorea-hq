@@ -463,7 +463,50 @@
       line-height:1 !important;
     }
 
-  </style>
+  
+    /* ===== 더큰코리아 정식 로고 ===== */
+    .tbk-official-logo{
+      display:block;
+      width:100%;
+      height:auto;
+      object-fit:contain;
+    }
+    .sidebar-official-logo{
+      width:205px;
+      max-width:100%;
+      max-height:58px;
+      object-position:left center;
+    }
+    .brand.brand-premium.brand-official{
+      min-height:92px;
+      padding:15px 20px;
+      display:flex;
+      align-items:center;
+    }
+    .erp-login-brand.erp-login-brand-official{
+      display:block;
+      margin-bottom:24px;
+    }
+    .erp-login-official-logo{
+      width:245px;
+      max-width:88%;
+      max-height:78px;
+      margin:0;
+      object-position:left center;
+    }
+    .erp-auth-official-logo{
+      width:230px;
+      max-width:80vw;
+      max-height:74px;
+      margin:0 auto 18px;
+      object-position:center;
+    }
+    @media(max-width:680px){
+      .sidebar-official-logo{width:175px;max-height:50px;}
+      .erp-login-official-logo{width:220px;}
+    }
+
+</style>
 
 
   <!-- ERP LOGIN GUARD -->
@@ -585,7 +628,7 @@
 <body>
   <div id="erpAuthLoading" aria-live="polite">
     <div class="erp-auth-loading-card">
-      <div class="erp-auth-loading-logo">TK</div>
+      <img class="tbk-official-logo erp-auth-official-logo" src="assets/thebigkorea-logo.png" alt="더큰코리아">
       <div class="erp-auth-spinner"></div>
       <strong>더큰코리아 ERP</strong>
       <span>로그인 상태를 확인하고 있습니다.</span>
@@ -594,7 +637,7 @@
 
   <div id="erpLoginGate" role="dialog" aria-modal="true" aria-labelledby="erpLoginTitle">
     <form class="erp-login-card" id="erpLoginForm" autocomplete="off">
-      <div class="erp-login-brand"><div class="erp-login-logo">TK</div><div><strong>더큰코리아</strong><span>통합 ERP 보안 로그인</span></div></div>
+      <div class="erp-login-brand erp-login-brand-official"><img class="tbk-official-logo erp-login-official-logo" src="assets/thebigkorea-logo.png" alt="더큰코리아"></div>
       <h2 id="erpLoginTitle">ERP 로그인</h2>
       <p>승인된 사용자만 접속할 수 있습니다. 로그인 후 12시간 동안 유지되며, 로그아웃 시 인증이 해제됩니다.</p>
       <label class="erp-login-field"><span>아이디</span><input id="erpLoginId" name="erp_login_id" type="text" inputmode="text" autocomplete="off" autocapitalize="none" spellcheck="false" required></label>
@@ -607,16 +650,8 @@
 
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
-      <div class="brand brand-premium">
-        <div class="brand-mark brand-mark-premium">
-          <span class="brand-tk">TK</span>
-          <span class="brand-swoosh"></span>
-        </div>
-        <div class="brand-copy">
-          <strong>더큰코리아</strong>
-          <span>통합 ERP</span>
-          <small>THE BIG KOREA</small>
-        </div>
+      <div class="brand brand-premium brand-official">
+        <img class="tbk-official-logo sidebar-official-logo" src="assets/thebigkorea-logo.png" alt="더큰코리아">
       </div>
 
       <nav class="nav">
